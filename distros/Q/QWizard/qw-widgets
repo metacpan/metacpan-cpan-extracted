@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use Data::Dumper;
+use QWizard;
+my @table;
+
+my %primaries =
+(
+ main =>
+ {
+  title => 'Supported Widgets',
+  introduction => 
+  'These are the supported widget types for this QWizard::Genertor',
+  questions =>
+  [{ type => 'dynamic',
+     values => sub { 
+#	 print Dumper(\@table);
+	 return [\@table];
+     }
+   }]
+ }
+);
+
+my $wiz = new QWizard(title => 'QWizard Widgets',
+		      primaries => \%primaries);
+
+my $g = $wiz->{'generator'};
+
+#print Dumper($g->{'typemap'});
+foreach my $widget (keys(%{$g->{'typemap'}})) {
+    my $defs;
+    foreach my $def (@{$g->{'typemap'}{$widget}{'argdef'}}) {
+	if ($def->[0] eq 'default') {
+	    push @$defs, ['default','single'];
+	} elsif ($def->[0] eq 'values,labels') {
+	    push @$defs, ['labels','multi'];
+	    push @$defs, ['values','multi'];
+	} elsif ($def->[0] ne 'forced') {
+	    push @$defs, [$def->[1] || '',$def->[0] || ''];
+	}
+    }
+    push @table,{ type => 'table',
+		  text => $widget . ":",
+		  headers => [['option name','option type']],
+		  values => [$defs] }, "";
+}
+
+$wiz->magic('main');
+

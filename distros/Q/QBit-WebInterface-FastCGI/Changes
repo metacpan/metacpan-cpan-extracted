@@ -1,0 +1,45 @@
+==================================================
+Changes from 2015-09-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2016-09-04 20:49:55 +0000
+------------------------------------------
+
+  Change: a07fc58ef00f3bb4202ca6aec0017a33a93fca1b
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-05 00:48:26 +0000
+
+    Merge pull request #6 from Madskill/upload_to_cpan
+
+    Upload to cpan 
+
+  Change: 4547671cd0cb082a749eda5611cb6e8b676f8e09
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:47:45 +0000
+
+    Merge remote-tracking branch 'upstream/master' into upload_to_cpan 
+
+  Change: 65a5389aa072bc5d55ae88886e917e0f806c60bd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:46:54 +0000
+
+    upload to cpan 
+
+  Change: a40698277b884581da9b7f41f72c2019694b9505
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2015-05-14 14:50:11 +0000
+
+    Merge pull request #5 from Madskill/fix_filename
+
+    use utf8::encode for filename 
+
+  Change: f826e7bc14b44ad57a2c03fc415e63be0a8af21a
+  Author: Igor Sverdlov <blizzard@yandex-team.ru>
+  Date : 2015-05-14 14:43:19 +0000
+
+    use utf8::encode for filename 
+
+================================================
+Plus 4 releases after 2015-09-05 00:00:00 +0000.
+================================================

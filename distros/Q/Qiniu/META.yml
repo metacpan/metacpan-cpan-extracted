@@ -1,0 +1,30 @@
+---
+abstract: "Perl ç\x89\x88ä¸\x83ç\x89\x9Bäº\x91å­\x98å\x82¨ API"
+author:
+  - "fukai (æ\x89¶å\x87¯) <iakuf@163.com>"
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Qiniu
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  Mojolicious: '0'
+  Moo: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/iakuf/Qiniu/issues
+  repository: https://github.com/iakuf/Qiniu.git
+version: '0.07'

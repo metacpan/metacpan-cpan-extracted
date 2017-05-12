@@ -1,0 +1,48 @@
+[% SET renotify = recipient.renotify_days %][% DEFAULT renotify = config.renotify_recipient_days %]From: [% GET config.send_from %]
+To: [% GET recipient %]
+Date: [% GET now %]
+[% IF domain %]Subject: We are holding mail for you
+
+We are holding mail for you.  The mail we are holding is most likely 
+spam.  We don't know for sure.
+
+If you would like to get your mail, please click the following link:
+
+ [% GET recipient_url %]
+
+The reason we are holding the mail for you is because the service that
+handles email for @[% GET domain %] addresses has a policy of blacklisting
+mail from servers that send too much spam.  We filter the email that is
+going from our servers to your server so that we don't get in trouble
+with your service's policy.
+
+As long as we keep receiving mail for you that we think is spam, we will
+continue to send you a reminder of the mail no more often than every
+[% GET renotify %] days.  If you would prefer that we discard your mail
+silently please click here:
+
+ [% GET recipient_url %]?action=DISCARD_MY_MAIL
+
+To get your mail, you will have to establish an email account with a
+service that does not have a blacklisting policy and provide that address
+to us.  We will then redirect all the mail receive for [% GET recipient %]
+that we think might be spam to that address.
+
+We are not an intentional source of spam, but we do allow our customers to
+forward their email to other services.  When they do this, we end up sending 
+the spam our customers receive on to other servers.
+
+The specific email that triggered this notice:
+
+ Sender: [% GET sender %]
+ From: [% GET headers.get('From') %] Subject: [% GET headers.get('Subject') %]
+
+[% ELSE %]Subject: Spam quarantine site access
+
+We may be holding mail for you.  If so, you can redirect it after you
+authenticate yourself by clicking the following URL:
+
+ [% GET recipient_url %]
+
+This email was sent to you because of a request we received from [% GET request_ip %].
+[% END %]

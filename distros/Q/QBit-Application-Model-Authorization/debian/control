@@ -1,0 +1,12 @@
+Source: libqbit-application-model-authorization-perl
+Section: perl
+Priority: extra
+Maintainer: Igor Sverdlov <igor-sverdlov@mail.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-perl, libqbit-application-model-db-perl, libdigest-sha-perl, libcrypt-cbc-perl, liblib-abs-perl, libtest-deep-perl, libcrypt-blowfish-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-authorization-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-perl, libqbit-application-model-db-perl, libdigest-sha-perl, libcrypt-cbc-perl, liblib-abs-perl, libtest-deep-perl, libcrypt-blowfish-perl
+Description: Simple model for authorization in QBit application.
+ Simple model for authorization in QBit application.

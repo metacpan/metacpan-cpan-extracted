@@ -1,0 +1,8 @@
+Revision history for Perl extension QPixmap.
+
+0.03  Fri Apr 11 10:46:38 1997
+	- added the loadFromData function
+
+0.01  Fri Mar 14 22:35:17 1997
+	- original version; created by h2xs 1.18
+

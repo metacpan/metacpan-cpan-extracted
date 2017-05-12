@@ -1,0 +1,12 @@
+Source: libqbit-querydata-perl
+Section: perl
+Priority: extra
+Maintainer: Igor Sverdlov <igor-sverdlov@mail.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libtest-deep-perl, libqbit-perl, libqbit-class-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-webinterface-psgi-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-class-perl
+Description: Query constructor for the data.
+ Query constructor for the data.

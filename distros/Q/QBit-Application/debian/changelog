@@ -1,0 +1,97 @@
+libqbit-application-perl (0.014) raring; urgency=low
+
+  * clear current user rights
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 12 Jan 2017 08:39:58 +0300
+
+libqbit-application-perl (0.013) raring; urgency=low
+
+  * unique rights and added _fix_cur_user
+
+  * speed up check_rights
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 01 Dec 2016 21:32:44 +0300
+
+libqbit-application-perl (0.012) raring; urgency=low
+
+  * added TestTimeLog
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 11:56:57 +0300
+
+libqbit-application-perl (0.011) raring; urgency=low
+
+  * fix regexp
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 03 Jul 2016 18:28:01 +0300
+
+libqbit-application-perl (0.010) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Mar 2016 23:21:40 +0300
+
+libqbit-application-perl (0.009) raring; urgency=low
+
+  * perltidy
+
+  * fix ApplicationPath: '/t_lib/Application.pm' -> './'
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 24 Jan 2016 19:08:00 +0300
+
+libqbit-application-perl (0.008) raring; urgency=low
+
+  * Fixed descedant check
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 01 Feb 2015 19:15:54 +0400
+
+libqbit-application-perl (0.007) raring; urgency=low
+
+  * Add pre_run and post_run calls for models from the same application
+    methods.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 06 Oct 2014 14:23:13 +0400
+
+libqbit-application-perl (0.006) raring; urgency=low
+
+  * Fix registred misprint.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 25 Mar 2014 14:02:36 +0400
+
+libqbit-application-perl (0.005) raring; urgency=low
+
+  * Added config to change QBit::TimeLog class
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 20 Dec 2013 20:41:10 +0400
+
+libqbit-application-perl (0.004) raring; urgency=low
+
+  * Fixed temp rights for application without cur_user
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 11 Nov 2013 16:02:49 +0400
+
+libqbit-application-perl (0.003) raring; urgency=low
+
+  * Optimized check_rights for undefined cur_user
+
+  * Fixed changelog
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 28 Oct 2013 16:52:49 +0400
+
+libqbit-application-perl (0.002) raring; urgency=low
+
+  * Added base class for RBAC
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 14:49:47 +0400
+
+libqbit-application-perl (0.001) raring; urgency=low
+
+  * Fixed tests
+
+  * Fixed debian package
+
+  * Added base class for models
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 11:26:38 +0400
+

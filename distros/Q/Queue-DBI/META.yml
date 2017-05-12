@@ -1,0 +1,47 @@
+---
+abstract: 'A queueing module with an emphasis on safety, using DBI as a storage system for queued data.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+  Test::Type: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Queue-DBI
+no_index:
+  file:
+    - t/LocalTest.pm
+provides:
+  Queue::DBI:
+    file: lib/Queue/DBI.pm
+    version: v2.7.0
+  Queue::DBI::Admin:
+    file: lib/Queue/DBI/Admin.pm
+    version: v2.7.0
+  Queue::DBI::Element:
+    file: lib/Queue/DBI/Element.pm
+    version: v2.7.0
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Data::Validate::Type: '0'
+  MIME::Base64: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Queue-DBI/issues
+  homepage: https://metacpan.org/release/Queue-DBI
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/Queue-DBI
+version: v2.7.0

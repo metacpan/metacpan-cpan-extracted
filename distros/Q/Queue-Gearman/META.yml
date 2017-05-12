@@ -1,0 +1,66 @@
+---
+abstract: 'Queue like low-level interface for Gearman.'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  File::Which: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0.98'
+  Test::SharedFork: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.3, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Queue-Gearman
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Queue::Gearman:
+    file: lib/Queue/Gearman.pm
+    version: '0.01'
+  Queue::Gearman::Job:
+    file: lib/Queue/Gearman/Job.pm
+  Queue::Gearman::Message:
+    file: lib/Queue/Gearman/Message.pm
+    version: '0.01'
+  Queue::Gearman::Pool:
+    file: lib/Queue/Gearman/Pool.pm
+  Queue::Gearman::Select:
+    file: lib/Queue/Gearman/Select.pm
+  Queue::Gearman::Socket:
+    file: lib/Queue/Gearman/Socket.pm
+  Queue::Gearman::Task:
+    file: lib/Queue/Gearman/Task.pm
+  Queue::Gearman::Taskset:
+    file: lib/Queue/Gearman/Taskset.pm
+  Queue::Gearman::Util:
+    file: lib/Queue/Gearman/Util.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Digest::MD5: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/Queue-Gearman/issues
+  homepage: https://github.com/karupanerura/Queue-Gearman
+  repository: git://github.com/karupanerura/Queue-Gearman.git
+version: '0.01'
+x_authority: cpan:KARUPA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

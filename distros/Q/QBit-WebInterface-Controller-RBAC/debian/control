@@ -1,0 +1,12 @@
+Source: libqbit-webinterface-controller-rbac-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-perl, libqbit-webinterface-perl (>=0.010)
+Standards-Version: 3.9.4
+
+Package: libqbit-webinterface-controller-rbac-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-perl, libqbit-webinterface-perl (>=0.010)
+Description: RBAC manager for QBit application.
+ RBAC manager for QBit application.

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Example init file that works with Debian systems and perhaps others too.
+# Should probably use start-stop-daemon. I don't know.
+
+### BEGIN INIT INFO
+# Provides:          qmail-deliverabled
+# Required-Start:
+# Should-Start:
+# Required-Stop:
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 6
+# Short-Description: Qmail deliverability checker
+# Description:       Qmail deliverability checker daemon
+### END INIT INFO
+
+LISTEN=127.0.0.1:8998
+PIDFILE=/var/run/qmail-deliverabled.pid
+case "$1" in
+  start)
+    echo -n "Starting qmail-deliverabled"
+    qmail-deliverabled --listen $LISTEN --pidfile $PIDFILE
+    echo ".";
+  ;;
+  stop)
+    echo -n "Stopping qmail-deliverabled"
+    qmail-deliverabled --stop --pidfile $PIDFILE
+    echo ".";
+  ;;
+  restart)
+    $0 stop
+    $0 start
+  ;;
+  reload)
+    echo -n "Reloading qmail configuration for qmail-deliverabled";
+    kill -HUP `cat $PIDFILE`
+  ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|reload}" >&2
+    exit 1
+  ;;
+esac
+
+exit 0
+

@@ -1,0 +1,12 @@
+Source: libqbit-application-model-db-mysql-kvstore-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-model-db-mysql-perl, libqbit-application-model-kvstore-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-db-mysql-kvstore-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-model-db-mysql-perl, libqbit-application-model-kvstore-perl
+Description: MySQL table for QBit::Application::Model::KvStore.
+ MySQL table for QBit::Application::Model::KvStore.

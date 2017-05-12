@@ -1,0 +1,21 @@
+libqbit-application-model-db-mysql-users-perl (0.002) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 16:08:02 +0300
+
+libqbit-application-model-db-mysql-users-perl (0.001) raring; urgency=low
+
+  * added file for build
+
+  * README.md
+
+  * added QBit::Application::Model::DB::mysql::Users
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Dec 2015 01:24:49 +0300
+
+libqbit-application-model-db-mysql-users-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 12 Dec 2015 14:06:53 +0400

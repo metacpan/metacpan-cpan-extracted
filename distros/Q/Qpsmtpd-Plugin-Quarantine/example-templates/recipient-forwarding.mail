@@ -1,0 +1,14 @@
+From: [% GET config.send_from %]
+To: [% GET new_address %]
+Date: [% GET now %]
+Subject: [% GET recipient %] is forwarding their spammy mail to you
+
+We expect that you and [% GET recipient %] are the same person.  If not,
+please be advised that [% GET recipient %] has chosen to send some of
+their spammy mail to [% GET new_address %].
+
+If you don't like this, you can modify [% GET recipient %]'s settings
+at the following location:
+
+ [% GET recipient_url %]
+

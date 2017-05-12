@@ -1,0 +1,16 @@
+TODO - Quantum-ClebschGordan
+
+(in no particular order)
+
+* efficiency -- cache __check_state in a __state attribute
+* efficiency -- cache calc calls
+* memoize __seq calls
+* add methods like  all_js, all_j2s, all_ms, etc ..
+* more thorough tests
+ - full coverage on __check_state
+ - test explode()
+* a /bin script for explode (takes j1, j2)
+* review POD
+* review comments; move appropriate info to POD
+* efficiency -- try to reduce use of Number::Fraction objects? or look at speeding up Number::Fraction internals??
+

@@ -1,0 +1,9 @@
+[% INCLUDE header.inc title = "SPAM Quarantine Error" %]
+
+<h1>[% GET error %]</h1>
+
+<ul>
+	[% GET verbose %]
+</ul>
+
+[% INCLUDE footer.inc %]

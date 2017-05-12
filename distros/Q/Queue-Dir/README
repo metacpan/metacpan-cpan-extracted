@@ -1,0 +1,69 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Hash: SHA1
+
+Queue::Dir
+==========
+
+This module makes the task of dealing with queues of jobs in files
+within a directory, easier.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+IO::File
+IO::Dir
+Time::HiRes (optional)
+Test::More
+
+Some of them, are part of the core installation. Please insure that
+all of them are properly installed and working before issuing bug
+reports.
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution. This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc". This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution. If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+COPYRIGHT AND LICENSE
+
+This code is released under the same terms as Perl itself
+
+Copyright (C) 2002 Luis E. Muñoz <luismunoz@cpan.org>
+All rights reserved
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (Darwin)
+Comment: For info see http://www.gnupg.org
+
+iD8DBQE97WwbQyDWGRI/hhARAh8TAKCAmyclLqhdfNan73qcu6aztnbdOQCePWp7
+Z7HyrcZp62yx0pFhWUONgVo=
+=pkvK
+-----END PGP SIGNATURE-----
+
+$Id: README,v 1.3 2002/12/04 02:45:07 lem Exp $
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension Queue::Q4Pg::Lite
+
+0.03    Thu Apr 27 16:40:00 2009
+        - ignore "order by" for next()
+
+0.02    Thu Apr 27 16:11:02 2009
+        - strict evaluation order for pg_try_advisory_lock()
+
+0.01    Thu Apr 23 21:19:02 2009
+        - original version

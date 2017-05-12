@@ -1,0 +1,66 @@
+libqbit-application-model-db-mysql-perl (0.010) raring; urgency=low
+
+  * added collate, engine and length for text column in index
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 22 Jan 2017 14:50:16 +0300
+
+libqbit-application-model-db-mysql-perl (0.009) raring; urgency=low
+
+  * deleted require
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 30 Oct 2016 13:40:33 +0300
+
+libqbit-application-model-db-mysql-perl (0.008) raring; urgency=low
+
+  * use __END__
+
+  * added pod documentation and upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Sep 2016 22:15:35 +0300
+
+libqbit-application-model-db-mysql-perl (0.007) raring; urgency=low
+
+  * Reconnect at mysql err 2013 - Lost connection to mysql server during
+    query.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 17 Mar 2015 12:25:44 +0400
+
+libqbit-application-model-db-mysql-perl (0.006) raring; urgency=low
+
+  * Put mysql_enable_utf8 to initial params to enable utf8 on
+    reconnection.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 13 Mar 2015 19:45:37 +0400
+
+libqbit-application-model-db-mysql-perl (0.005) raring; urgency=low
+
+  * Reconnect to server by default but not in transactions.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 06 Mar 2015 19:14:28 +0400
+
+libqbit-application-model-db-mysql-perl (0.004) raring; urgency=low
+
+  * Generate i18n TEXT fields with locale suffixes.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 15 Sep 2014 16:02:22 +0400
+
+libqbit-application-model-db-mysql-perl (0.003) raring; urgency=low
+
+  * Removed PPA info
+
+  * Throw Exception::DB::DuplicateEntry while editing.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 02 Jun 2014 16:27:24 +0400
+
+libqbit-application-model-db-mysql-perl (0.002) raring; urgency=low
+
+  * Fixed fork error
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 13 Oct 2013 18:25:03 +0400
+
+libqbit-application-model-db-mysql-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 14:20:45 +0400
+

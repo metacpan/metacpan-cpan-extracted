@@ -1,0 +1,18 @@
+[% WRAPPER page %]
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>[% gettext('ID') %]</th>
+      <th>[% gettext('Role name') %]</th>
+      <th>[% gettext('Description') %]</th>
+    </tr>
+  </thead>
+  [% FOREACH role = roles %]
+  <tr>
+    <td>[% role.id | html %]</td>
+    <td>[% role.name | html %]</td>
+    <td>[% role.description | html %]</td>
+  </tr>
+  [% END %]
+</table>
+[% END %]

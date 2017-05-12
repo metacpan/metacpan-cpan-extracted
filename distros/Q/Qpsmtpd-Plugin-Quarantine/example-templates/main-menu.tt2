@@ -1,0 +1,30 @@
+[% INCLUDE header.inc title = 'SPAM Quarantine Controls' %]
+[% USE CGI %]
+
+<p>
+This web site implements mail handling controls for outbound 
+mail coming from multiple ISPs.
+</p><p>
+You might use this site as a sender or as a recipient.  
+	<ul>
+	<li>Senders can be asked to verify that the mail they sent isn't actually
+	spam.  
+	<li>Recipients can be asked what we should do when we receive mail
+	for them that we think might be spam.
+	</ul>
+</p><p>
+Senders may authorized onto the site by clicking on a URL
+in a bounce message they've received because one of their emails was
+quarantined or by asking for an authorization email.
+</p><p>
+Recipients may be authorized only be clicking on a URL in a message
+they received either because we are holding mail for them or by
+asking for an authorization email.
+</p><p>
+
+<a href="[% CGI.url() %]/recipient/">Click here</a> for recipient access and options.
+<a href="[% CGI.url() %]/sender/abcd1234abcd1234abcd1234abcd1234/">Click here</a> for sender access and options.
+
+</p>
+
+[% INCLUDE footer.inc %]

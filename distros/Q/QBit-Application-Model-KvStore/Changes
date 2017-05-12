@@ -1,0 +1,31 @@
+==================================================
+Changes from 2016-03-14 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2017-03-14 05:38:06 +0000
+------------------------------------------
+
+  Change: 8346abdcb5a93436bf5002a8f32e93bf199f8609
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-03-14 09:37:13 +0000
+
+    Merge pull request #1 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: a8ae8162f1e16c6410765e37502fe87066553d4c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-03-14 08:35:59 +0000
+
+    fix description 
+
+  Change: 83c5c8ccaf7a633b06342e54ad96578d65b9f1cf
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-03-14 08:31:46 +0000
+
+    upload to cpan 
+
+================================================
+Plus 3 releases after 2016-03-14 00:00:00 +0000.
+================================================

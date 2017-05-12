@@ -1,0 +1,119 @@
+libqbit-validator-perl (0.010) raring; urgency=low
+
+  * next => return and use ref
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 23 Apr 2017 14:45:45 +0300
+
+libqbit-validator-perl (0.009) raring; urgency=low
+
+  * added documentation
+
+  * added new option 'any_of' for hash
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Dec 2016 03:01:00 +0300
+
+libqbit-validator-perl (0.008) raring; urgency=low
+
+  * move check error
+
+  * last if error
+
+  * last
+
+  * move logic into type
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 19 Nov 2016 18:12:19 +0300
+
+libqbit-validator-perl (0.007) raring; urgency=low
+
+  * added pod
+
+  * upload to cpan and fix error for scalar
+
+  * adde super_check
+
+  * added tests
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 14:16:05 +0300
+
+libqbit-validator-perl (0.006) raring; urgency=low
+
+  * rebuild
+
+  * added method template in README.md
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Dec 2015 00:46:45 +0300
+
+libqbit-validator-perl (0.005) raring; urgency=low
+
+  * Version 0.004
+
+  * added method data into README.md
+
+  * added README.md
+
+  * added pre_run and template - mk_accessors
+
+  * check error - main
+
+  * fix check
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Dec 2015 00:15:29 +0300
+
+libqbit-validator-perl (0.004) raring; urgency=low
+
+  * added method data into README.md
+
+  * added README.md
+
+  * added pre_run and template - mk_accessors
+
+  * check error - main
+
+  * fix check
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Dec 2015 00:15:05 +0300
+
+libqbit-validator-perl (0.003) raring; urgency=low
+
+  * little fix and added new option "one_of"
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 04 Nov 2015 20:03:49 +0300
+
+libqbit-validator-perl (0.002) raring; urgency=low
+
+  * $template -> %$template
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 12 Sep 2015 22:45:58 +0300
+
+libqbit-validator-perl (0.001) raring; urgency=low
+
+  * Fixed .gitignore
+
+  * deleted old functions
+
+  * QBit::Validator and new types: array, hash, scalar
+
+  * fix errors
+
+  * check deps if data defined
+
+  * added accessor app
+
+  * catch error
+
+  * files for build
+
+  * corrected text
+
+  * fix options
+
+  * added _validation_array, fix name internal subs
+
+  * first commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 06 Sep 2015 22:58:24 +0400
+
+libqbit-validator-perl (0.1) raring; urgency=low
+
+  * Initial commit

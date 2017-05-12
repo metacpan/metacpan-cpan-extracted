@@ -1,0 +1,8 @@
+Revision history for Perl extension QBitmap.
+
+0.03  Fri Apr 11 15:25:08 1997
+	- added the constructor prototypes taking a 'bits' argument
+
+0.01  Sun Mar 23 07:59:35 1997
+	- original version; created by h2xs 1.18
+

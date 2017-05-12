@@ -1,0 +1,32 @@
+---
+name: QML-File
+version: 0.02
+author:
+  - Zachary Blair <zblair@cpan.org>
+abstract: 'Basic parsing of the high-level structure of QML files.'
+license: perl
+distribution_type: module
+generated_by: 'Zachary Blair'
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  ExtUtils::MakeMaker: 0
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+requires:
+  Class::Accessor: 0
+  perl: 5.006
+no_index:
+  directory:
+    - t
+provides:
+  QML::File:
+    file: lib/QML/File.pm
+    version: 0.02
+keywords:
+  - QML
+  - Qt
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

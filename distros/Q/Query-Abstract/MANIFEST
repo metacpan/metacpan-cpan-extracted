@@ -1,0 +1,13 @@
+Makefile.PL
+Changes
+lib/Query/Abstract.pm
+lib/Query/Abstract/Driver/Base.pm
+lib/Query/Abstract/Driver/SQL.pm
+lib/Query/Abstract/Driver/ArrayOfHashes.pm
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/01-driver-array_of_hashes.t
+t/02-driver-sql.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

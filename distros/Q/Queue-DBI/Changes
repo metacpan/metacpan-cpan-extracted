@@ -1,0 +1,185 @@
+Revision history for Queue-DBI
+
+v2.7.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+
+v2.6.2  2015-03-28
+        - Explicitly disallowed enqueuing scalars (GH-3).
+        - Improved synopsis and documentation (GH-3).
+
+v2.6.1  2014-11-15
+        - Only use JSON::MaybeXS 1.001000 or above for testing (GH-2).
+
+v2.6.0  2014-10-28
+        - Added support for custom serializer methods, with Storable as the
+          backward-compatible default (GH-1). Thank you Oliver Paukstadt!
+        - Improved test coverage for Queue::DBI::Element->requeue_count().
+        - Cleaned up the wording of error messages for incorrect arguments
+          passed to Queue::DBI->new().
+
+v2.5.3  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - General cleanup.
+
+v2.5.2  2013-05-13
+        - Added missing prerequisite.
+
+v2.5.1  2013-05-08
+        - Moved release tests to xt/.
+        - Updated Build.PL to handle release tests as part of disttest.
+        - Added new release tests.
+        - Formatted readme with markdown.
+        - Added Test::FailWarnings to all tests.
+        - Added info on how to contribute examples.
+        - Updated links to point to MetaCPAN.
+        - Updated links to point to GitHub's issue tracker.
+
+v2.5.0  2012-10-31
+        - (RT #79676) Fixed detection of SQL errors in selectrow_arrayref()
+          calls.
+        - Added Queue::DBI::Admin->assert_tables_verified().
+        - (RT #79676) Queue::DBI::Admin now checks that the tables are
+          correctly set up before performing operations.
+
+v2.4.2  2012-10-10
+        - Added Queue::DBI::Admin->has_table().
+        - Added Queue::DBI::Admin->has_mandatory_fields().
+        - (RT #79676) Added check that tables have the mandatory fields before
+          deleting them, to prevent deletion of tables not related to
+          Queue::DBI.
+
+v2.4.1  2012-10-08
+        - (RT #80055) Added PostgreSQL to the list of supported database types
+          in the documentation.
+        - (RT #80040) Added 'exclude_locked_elements' parameter to
+          Queue::DBI->count().
+        - Minor documentation cleanup.
+
+v2.4.0  2012-10-06
+        - Added full PostgreSQL support.
+        - Refactored tests to allow testing against multiple database types.
+        - Set up integration with Travis-CI for continuous integration.
+        - Forced tests to be run recursively during build.
+
+v2.3.1  2012-10-01
+        - (RT #79676) Refactored Queue::DBI::Admin->has_tables() to check for
+          mandatory fields and to simplify its return value.
+        - (RT #79676) Force raising errors in try {} blocks.
+
+v2.3.0  2012-09-25
+        - (RT #79676) Added croak()s to propagate up all SQL errors.
+        - (RT #79676) Documented return value of Queue::DBI->purge().
+        - Added internal methods for Queue::DBI::Admin and tests.
+        - Refactored code to leverage the new internal methods.
+        - (RT #79676) Added Queue::DBI::Admin->drop_tables() and tests.
+        - (RT #79676) Added Queue::DBI::Admin->has_tables() and tests.
+        - POD cleanup.
+
+v2.2.1  2012-09-19
+        - Moved repository to GitHub.
+
+v2.2.0  2012-09-18
+        - (RT #78640) Fixed error message.
+        - Removed non-standard quotes for identifiers when creating tables.
+        - (RT #79676) Removed 'sqlite' parameter, create_tables() now detects
+          automatically the database type.
+        - (RT #79676) Fixed index names, to prevent conflicts.
+        - (RT #79676) Added list of supported database types in documentation.
+        - Drop tables in reverse creation order in create_tables(), to prevent
+          issues with constraints.
+        - (RT #79676) Fixed foreign key constraint when creating elements table
+          to refer to the actual queues table name.
+
+v2.1.1  2012-09-15
+        - (RT #78640) Fixed bug in Queue::DBI->cleanup().
+
+v2.1.0  2012-09-08
+        - Re-licensed as GPLv3, to allow inclusion in Fedora.
+
+v2.0.2  2012-08-31
+        - Added missing prerequisite.
+
+v2.0.1  2012-08-31
+        - Added missing prerequisite.
+
+v2.0.0  2012-08-31
+        - (RT #78985) Added Queue::DBI::Admin, an interface to manage queues
+          themselves. Thanks Sergey for suggesting this great extension!
+
+v1.8.2  2012-08-17
+        - (RT #78640) Deprecated dual-purpose methods to change Queue::DBI
+          properties, replaced them with separate get and set methods:
+            - replace max_requeue_count() with {get,set}_max_requeue_count();
+            - replace lifetime() with {get,set}_lifetime();
+            - replace verbose() with {get,set}_verbose().
+        - Renamed Queue::DBI::Element->queue() into get_queue().
+
+v1.8.1  2012-08-12
+        - (RT #78640) Added Queue::DBI::Element->is_over_lifetime().
+        - (RT #78640) Changed 'lifetime' parameter in Queue::DBI->purge() to be
+          more consistent with retrieve_batch() and 'max_requeue_count',
+          thanks Sergey for noticing!
+        - Fixed MySQL-specific reference when retrieving the inserted queue
+          element ID.
+        - Added Queue::DBI::Element->get_created_time().
+        - Fixed lifetime() to return undef if 'lifetime' is not set.
+        - Fixed max_requeue_count() to return undef when 'max_requeue_count' is
+          not set.
+        - Fixed incorrect table name used in a failure case of success().
+        - Cleaned up build_requires and requires.
+
+v1.8.0  2012-08-05
+        - (RT #78640) Added a 'lifetime' feature and a purge() function, thanks
+          Sergey for suggesting these improvements.
+        - Added purge() to clean queues.
+        - Fixed how the last inserted ID is retrieved, for portability.
+        - Added tests and code cleanup.
+        - Refactored tests to use Test::Exception and subtests.
+
+v1.7.3  2012-04-01
+        - (RT #76194) Fixed typo in table name, thanks Sergey!
+
+v1.7.2  2012-01-18
+        - Cleanup to pass PerlCritic 'harsh'.
+        - Fixed minor bug in error message.
+        - Added acknowledgements.
+
+v1.7.1  2011-12-16
+        - Added missing prerequisite.
+
+v1.7.0  2011-12-16
+        - Changed version number convention to always use two dots. This allows
+          correct conversion to integer for CPAN. Bumped to 1.7 to allow proper
+          indexing of the changes made in 1.6.1.
+
+v1.6.1  2011-12-16
+        - Corrected meta information, added list of prerequisites, minor
+          documentation corrections.
+
+v1.6.0  2011-12-16
+        - Added more documentation and tests.
+        - Public release.
+
+v1.5.0  2010-08-19
+        - Prevented locking twice a queue element.
+
+v1.4.0  2010-08-05
+        - Fixed problem with the internal max_id cache preventing runaway
+          dequeueing (dequeue-enqueue-dequeue would fail on the last dequeue to
+          see the last enqueued element when using the same $queue object).
+
+v1.3.0  2010-08-03
+        - Added option to limit how many times a queue element can be requeued
+          before it stops being pulled.
+
+v1.2.0  2010-06-28
+        - Modified requeue() - returns error without a die() to indicate a
+          problem that is not the responsibility of this module.
+        - Improved algorithm to detect possible parallelization conflicts.
+
+v1.1.0  2010-06-18
+        - Locking mechanism improvements, courtesy of Jamie McCarthy.
+
+v1.0.0  2009-11-21
+        - First version.

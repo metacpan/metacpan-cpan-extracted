@@ -1,0 +1,73 @@
+libqbit-webinterface-routing-perl (0.009) raring; urgency=low
+
+  * fix typo
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 29 Apr 2017 19:43:01 +0300
+
+libqbit-webinterface-routing-perl (0.008) raring; urgency=low
+
+  * exceptions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 20 Dec 2016 08:03:41 +0300
+
+libqbit-webinterface-routing-perl (0.007) raring; urgency=low
+
+  * two routes with difference methods
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Dec 2016 19:59:28 +0300
+
+libqbit-webinterface-routing-perl (0.006) raring; urgency=low
+
+  * fix dependency
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 10 Oct 2016 01:33:01 +0300
+
+libqbit-webinterface-routing-perl (0.005) raring; urgency=low
+
+  * fix README.md
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 18:33:57 +0300
+
+libqbit-webinterface-routing-perl (0.004) raring; urgency=low
+
+  * change placeholders : -> !, # -> :
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 18:26:34 +0300
+
+libqbit-webinterface-routing-perl (0.003) raring; urgency=low
+
+  * t_lib -> t/lib
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 08 Oct 2016 22:47:57 +0300
+
+libqbit-webinterface-routing-perl (0.002) raring; urgency=low
+
+  * TestWebInterface -> TWebInterface
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 08 Oct 2016 16:42:37 +0300
+
+libqbit-webinterface-routing-perl (0.001) raring; urgency=low
+
+  * upload to cpan
+
+  * fix README
+
+  * package - ok
+
+  * fix
+
+  * fix utf8
+
+  * use base -> use
+
+  * fix
+
+  * first commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 17:50:12 +0300
+
+libqbit-webinterface-routing-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 14 Feb 2016 20:18:03 +0400

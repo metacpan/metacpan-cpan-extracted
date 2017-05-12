@@ -1,0 +1,7 @@
+cp QWizard.pm                  	      windows/blib/lib/QWizard.pm
+cp Generator_base/Generator.pm 	      windows/blib/lib/QWizard/Generator.pm
+cp Storage/*.pm                	      windows/blib/lib/QWizard/Storage/
+cp Plugins/*.pm        	              windows/blib/lib/QWizard/Plugins/
+cp API/API.pm              	      windows/blib/lib/QWizard/API.pm
+cp Generator/*.pm              	      windows/blib/lib/QWizard/Generator/
+cp Generator/HTML/Vertical.pm         windows/blib/lib/QWizard/Generator/HTML/

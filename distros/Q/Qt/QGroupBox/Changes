@@ -1,0 +1,9 @@
+Revision history for Perl extension QGroupBox.
+
+0.02  Mon Apr 14 17:09:38 1997
+	- added %Align $SingleLine $DontClip $ExpandTabs $ShowPrefix $WordBreak
+$GrayText and $DontPrint to @EXPORT
+
+0.01  Fri Apr  4 10:21:15 1997
+	- original version; created by h2xs 1.18
+

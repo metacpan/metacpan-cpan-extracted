@@ -1,0 +1,32 @@
+Quota-OO version 0.0.1
+================================
+
+Object oriented interface to the Quota module
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+ perl -MCPAN -e 'install Quota::OO;'
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Quota
+  version
+  Class::Std
+  Class::Std::Utils
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

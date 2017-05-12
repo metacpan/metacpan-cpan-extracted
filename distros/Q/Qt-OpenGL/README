@@ -1,0 +1,13 @@
+This module provides access to the Qt/OpenGL extensions from Perl.
+
+Before installing, you must have these modules installed:
+PerlQt-2.103 compiled with Qt-1.4
+OpenGL-0.5 compiled with some version of MesaGL
+
+Also, you must compile and install the Qt OpenGL extension. It will create
+libqgl, which is required by this module.
+
+Included is a nice spinning gears demo app to demonstrate its use.
+
+If you have any questions, comments, suggestions or bug-fixes,
+please e-mail me, Ashley Winters, at jql@accessone.com.

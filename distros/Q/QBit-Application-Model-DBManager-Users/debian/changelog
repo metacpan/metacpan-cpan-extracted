@@ -1,0 +1,55 @@
+libqbit-application-model-dbmanager-users-perl (0.007) raring; urgency=low
+
+  * fix pre_process_fields
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 26 Jan 2017 09:23:10 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.006) raring; urgency=low
+
+  * use sub
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 03 Dec 2016 22:25:03 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.005) raring; urgency=low
+
+  * use cur_user
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 03 Dec 2016 21:52:05 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.004) raring; urgency=low
+
+  * use standart meta
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 28 Nov 2016 22:08:27 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.003) raring; urgency=low
+
+  * use number
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 23 Nov 2016 01:11:05 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.002) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 16:00:24 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.001) raring; urgency=low
+
+  * added files for build
+
+  * delete extra field if value undefined
+
+  * fix README.md
+
+  * delete all extra fields
+
+  * added QBit::Application::Model::DBManager::Users
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Dec 2015 01:41:42 +0300
+
+libqbit-application-model-dbmanager-users-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 12 Dec 2015 14:06:53 +0400

@@ -1,0 +1,199 @@
+#!/usr/bin/env perl
+use strict; use warnings;
+use Daemon::Generic;
+use File::Basename;
+use Class::Load qw(load_class);
+use Getopt::Long;
+use Pod::Usage;
+use Qless;
+use Qless::Worker;
+
+newdaemon(
+	progname => basename($0),
+);
+
+
+sub gd_preconfig {}
+
+sub gd_run {
+	my $self = shift;
+
+	my $opt = $self->{'qless_opt'};
+	unshift @INC, @{ $opt->{'include'} } if $opt->{'include'};
+	my $worker = Qless::Worker->new(%{ $opt });
+
+	# Preload modules
+	if ($opt->{'import'}) {
+		foreach my $class (@{ $opt->{'import'} }) {
+			load_class $class;
+		}
+	}
+
+	$worker->run;
+}
+
+sub gd_getopt {
+	my $self = shift;
+
+	my $opt = {};
+	GetOptions($opt,
+		'pid=s',
+		'host=s',
+		'socket=s',
+		'queue|q=s@',
+		'include|I=s@',
+		'interval|i=i',
+		'workers|w=i',
+		'name|n=s',
+		'import|m=s@',
+		'resume|r',
+		'debug',
+		'help|h',
+	) or exit($self->gd_usage);
+
+
+    if (@ARGV < ($self->{gd_args}{minimum_args} || 1)) {
+        exit($self->gd_usage());
+    }
+    if (@ARGV > ($self->{gd_args}{maximum_args} || 1)) {
+        exit($self->gd_usage());
+    }
+
+	my $do = $ARGV[0];
+	$opt->{'debug'} = $self->{'debug'} = 1 if $do eq 'debug';
+
+	if ($do =~ /^(?:(?:re)?start|debug)$/ && !$opt->{'queue'}) {
+		print "ERROR: Queues are not specified\n\n";
+		exit(gd_usage());
+	}
+	$opt->{'queue'} = [ split(/,/, join(',', @{ $opt->{'queue'} })) ] if $opt->{'queue'};
+	$self->{'gd_pidfile'} = $opt->{'pid'};
+	$self->{'qless_opt'} = $opt;
+}
+
+sub gd_pidfile {
+	my $self = shift;
+	$self->{gd_pidfile} = "$self->{gd_pidbase}.pid";
+}
+
+sub gd_usage {
+	my $self = shift;
+
+	pod2usage({
+			-verbose  => 99,
+			-sections => [ qw/USAGE OPTIONS COMMANDS/ ]
+		});
+
+	1;
+}
+
+sub gd_version {
+	my $self = shift;
+	print $Qless::VERSION;
+	exit(1);
+}
+
+__END__
+
+=head1 NAME
+
+qless-worker - Worker for Qless Job Queues
+
+=head1 USAGE
+
+qless-worker [options] { start | stop | restart | status | help | version | debug }
+
+=head1 OPTIONS
+
+=over 4
+
+=item --host, --socket
+
+  --host server:port
+  --socket unix_socket_path
+
+The host:port or unix_socket to connect to as the Redis server
+
+=item -q, --queue
+
+  -q queue_name
+
+The queues to pull work from
+
+=item -I, --include
+
+  -I path
+
+Path(s) to include when loading jobs
+
+=item -w, --workers
+
+  --workers count
+
+How many processes to run.
+
+=item -i, --interval
+
+  -i seconds
+
+The polling interval
+
+=item -n, --name
+
+  --name worker_name
+
+Name to identify your worker as
+
+=item -r, --resume
+
+Try to resume jobs when the worker agent is restarted
+
+=item -m, --import
+
+  -m module_name
+
+The modules to preemptively import
+
+=item --pid
+
+  --pid file
+
+PID file to use
+
+=back
+
+=head1 COMMANDS
+
+=over 4
+
+=item start
+
+Starts a new qless-worker if there isn't one running already
+
+=item stop
+
+Stops a running qless-worker
+
+=item restart
+
+Stops a running qless-worker if one is running. Starts a new one.
+
+=item status
+
+Show daemon state.
+
+=item help
+
+Display this usage info
+
+=item version
+
+Display the version of qless-worker
+
+=item debug
+
+Starts a new qless-worker in the foreground
+
+=back
+
+=cut

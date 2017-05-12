@@ -1,0 +1,12 @@
+Source: libqbit-application-model-dbmanager-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-class-perl, libtest-deep-perl, libqbit-application-perl, libparse-eyapp-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-dbmanager-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-class-perl, libqbit-application-perl, libparse-eyapp-perl
+Description: Class for smart working with DB.
+ Class for smart working with DB.

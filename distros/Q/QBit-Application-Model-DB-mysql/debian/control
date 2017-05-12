@@ -1,0 +1,12 @@
+Source: libqbit-application-model-db-mysql-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-model-db-perl, libdbd-mysql-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-db-mysql-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-model-db-perl (>=0.002), libdbd-mysql-perl
+Description: Class for working with MySQL DB.
+ Class for working with MySQL DB. It's not ORM.

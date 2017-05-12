@@ -1,0 +1,16 @@
+#########################
+
+use Test;
+BEGIN { plan tests => 1 };
+
+#########################
+
+use Qmail::Envelope;
+
+my $env = "Fcrunch\@168.com\0Tcloudnine\@ack.net\0Tsplorch\@asdf.com\0\0";
+$E = Qmail::Envelope->new( data => $env );
+
+my $host_list = $E->rcpt_hosts;
+ok (scalar(@$host_list), '2');
+
+

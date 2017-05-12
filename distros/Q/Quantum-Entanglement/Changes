@@ -1,0 +1,121 @@
+Revision history for Perl extension Quantum::Entanglement.
+
+0.32 - Wed Jun  5 17:43:42 BST 2002
+Changes    ~ added test suite
+
+0.31 -
+BUGFIXES:  Warnings in some eval()s removed.
+           -- was doing ++
+           New version of DESTRUCT was being a little over-zealous
+
+0.30 - Sun Mar 11 2001 22:00:00
+Changes    ~ show_states output has changed
+           ~ variables exist in independant universes until they interact
+           ~ (int) massive internal restructuring
+
+BUGFIXES:  nested entanglements no longer core dump during destruction
+
+0.26 - Sun Mar 03 2001 23:00:00
+(not released to CPAN)
+Changes    + atan2, ! and '&{}' also overloaded
+           ~ show_states doesn't stringify values
+           ~ (int) _rationalise_states no longer stringifies values
+
+BUGFIXES:  Some internal functions were stringifying things (by using them as
+           hash keys), this has been fixed.
+
+0.25 - Sat Feb 03 2001 23:00:00
+
+Changes    ~ Removed some duplicated internal code
+           + show_states now "official" and gives useful output, can be
+             invoked as object method.
+
+0.23 - Thu Jan 25 2001 00:00:00
+
+Changes    + Quantum Fourier Transform (QFT) function added
+           + export tags for same
+           + documentation for shor.pl, now uses QFT also
+
+BUGFIXES   stringyfying and the like could give "uninitialized value"
+             warnings when using complex amplitudes, this has now been sorted.
+
+0.23 - Wed Jan 24 2001 14:00:00
+
+Changes    ~ (int) search.CPAN podladtors ate my pod, fixed so things
+             look nice.  Nothing *actually* changed.  Bite me.
+
+0.22 - Tue Jan 23 2001 14:00:00
+
+Changes    + (int) under normal conditions, states will occasionally be
+             rationalised so that only unique states are left in the
+             state space.
+
+BUGFIXES   (int) internal changes to avoid memory leaking when destroying
+             previously saved states
+
+0.21 - Mon Jan 22 2001 20:00:00
+
+Changes    + (int) DESTRUCT method, to remove inaccesable states.
+           + (int) more sane way of keeping vars in touch with their values
+           + save_state and restore_state
+           + added "strive to be true" type of collapse
+           + ~/demo/calc_cache.pl demo of above
+
+BUGFIXES   bioop causing deep recursion though missing 2 on a var.
+
+0.20 - Fri Jan 19 2001 13:00:00
+  \--> Initial CPAN upload
+
+Changes    + root_not demo
+           + :complex so that you don't need to say use Math::Complex as well
+           ~ (int) probs stored internally as "numbers", M::C takes care of im
+           ~ (int) removed all the compile time eval fun
+           - can no longer seed states with annon arrays, must use M::C
+
+0.11 - Tue Jan 16 2001 20:00:00
+
+Changes    + (int) compilation evals sanity checked, those in run time left
+             alone.
+           + general internal clean up
+
+BUGFIXES   '~' is not a binary operator !!!
+
+0.10 - Tue Jan 16 2001 00:30:00
+
+Changes    + Documentation padded out with general info and more examples
+           + shor.pl prints out more information
+
+0.04 - Mon Jan 15 2001 01:00:00
+
+Changes    + ability to change way in which collapsed states are treated
+             by setting $Quantum::Entanglement::destroy
+           + first version of shor.pl, for factoring numbers
+
+BUGFIXES   Various reasons why the module didn't compile on some systems
+           Makefile.PL horribly b0rked
+
+0.03 - Sun Jan 14 2001 01:00:00
+
+Changes    + q_logic can act on more than one variable at a time
+           + Documentation now up to date
+           + (int) probability now stored internally as Math::Complex numbers
+           + entangle can be called with Math::Complex numbers
+           ~ show_states not exported
+
+BUGFIXES:  bool not returning false if all states false
+
+0.02 - Sat Jan 13 2001 03:00:00
+
+Changes:   + Internal structure made better, probability now sticks to
+           states in a more sensible way.
+           + q_logic function, so that I could write a root-not logic gate.
+
+BUGFIXES:  probability now works
+
+0.01 - Fri Jan 12 2001 19:00:00
+
+Initial archived version pending major rewrite
+
+--
+This module is copyright (c) Alex Gough, 2001.  It is also free software and
+may be used or redistributed under the same terms as perl itself.

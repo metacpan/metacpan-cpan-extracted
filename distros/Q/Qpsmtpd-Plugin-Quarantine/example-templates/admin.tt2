@@ -1,0 +1,71 @@
+[% INCLUDE header.inc title = "SPAM Quarantine admin zone" %]
+
+[% IF error %]
+	<h1>[% GET error %]</h1>
+	<p>
+	[% GET message %]
+	</p>
+[% END %]
+
+[% IF authorized %]
+
+	<form method="POST">
+	<table width="100%">
+	<tr><td align="right"><input 
+		type="submit" name="action" value="[% GET config.button_logout %]"></td></tr>
+	</table>
+	</form>
+
+	[% USE CGI %]
+
+	<form action="[% GET CGI.url() %]/admin" method="POST">
+	<input name="lookupemail" type="text" size="60">
+	<input type="submit" name="action" value="[% GET config.button_lookup_email %]">
+	[% GET hiddenstate %] 
+	</form>
+
+	[% IF email %]
+		<h2><a href="[% GET CGI.url() %]/admin?email=[% GET adminemail %]">[% GET email %]</a></h2>
+	[% END %]
+
+	[% IF sender %]
+		<h2><a href="[% GET sender_url %]">SENDER</a></h2>
+		[% IF smessage %]
+			<i>[% GET smessage %]</i>
+		[% END %]
+		[% INCLUDE sender_settings.inc %]
+		[% INCLUDE sender_messages.inc %]
+	[% END %]
+
+	[% IF recipient %]
+		<h2><a href="[% GET recipient_url %]">RECIPIENT</a></h2>
+		[% IF rmessage %]
+			<i>[% GET rmessage %]</i>
+		[% END %]
+		[% INCLUDE recipient_settings.inc %]
+		[% INCLUDE recipient_messages.inc %]
+	[% END %]
+
+[% ELSE %]
+
+	<form method="POST">
+	<p>
+	Login with a 
+	<br>
+	username
+	<input name="user" type="text" size="20">
+	<br>
+	and password <input name="pass" type="password" size="20">
+	<br>
+	<input type="submit" name="action" value="[% GET config.button_login %]">
+	</p>
+	[% GET hiddenstate %] 
+	</form>
+
+	<p>
+	Cookies are required so turn 'em on if they're off.
+	</p>
+
+[% END %]
+
+[% INCLUDE footer.inc %]

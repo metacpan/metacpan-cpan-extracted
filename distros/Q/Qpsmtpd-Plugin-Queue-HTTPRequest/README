@@ -1,0 +1,27 @@
+This is Perl module Qpsmtpd::Plugin::Queue::HTTPRequest.
+
+INSTALLATION
+
+Qpsmtpd::Plugin::Queue::HTTPRequest installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Qpsmtpd::Plugin::Queue::HTTPRequest
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Qpsmtpd::Plugin::Queue::HTTPRequest documentation is available as in POD. So you can do:
+
+    % perldoc Qpsmtpd::Plugin::Queue::HTTPRequest
+
+to read the documentation online with your favorite pager.
+
+Naoki Tomita

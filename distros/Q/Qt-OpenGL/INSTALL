@@ -1,0 +1,15 @@
+Before installing, you must have these modules installed:
+PerlQt-2.103 compiled with Qt-1.4
+OpenGL-0.5 compiled with some version of MesaGL
+
+Look at Makefile.PL and make sure the values are reasonable. The QTDIR
+environment variable should be properly set.
+
+MISSING LIBRARIES ARE NOT HARMLESS!
+
+perl Makefile.PL
+make
+make install
+
+Good luck!
+

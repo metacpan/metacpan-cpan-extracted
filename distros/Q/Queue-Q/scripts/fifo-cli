@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Queue::Q::ReliableFIFO::CLI;
+
+Queue::Q::ReliableFIFO::CLI->new->run();

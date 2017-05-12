@@ -1,0 +1,43 @@
+[% INCLUDE header.inc title = "SPAM Quarantine message center" %]
+
+<h2>SPAM Quarantine Controls</h2>
+
+[% IF ! $repeat %]
+<p>
+You're here because a message you sent looks like it's SPAM.  If it
+is not spam, then our apologies for this extra hassle.  If you didn't
+send it and someone faked your return address, then again, our apologies.
+
+</p><p>
+You may:
+	<ul>
+	<li>Release the message
+		<br />
+		Do not release SPAM messages.
+	</li>
+	<li>Discard the message</li>
+	<li>Choose to permanently change how messages from you are handled</li>
+	</ul>
+</p>
+<hr />
+[% END %]
+
+[% INCLUDE message_form.inc %]
+
+[% INCLUDE sender_messages.inc %]
+
+[% INCLUDE sender_options.inc %]
+
+[% IF ! $repeat %]
+<hr>
+<p>
+The reason for we are doing this is that some mail servers notice which
+mail servers send them spam and then block all mail from the sending servers.
+Some examples are the mail servers for AOL and Comcast.  If we want to 
+continue to be able to send mail to AOL and Comcast we must eliminate most
+of the spam that we send them.  This is how we're doing it.
+</p>
+
+[% END %]
+
+[% INCLUDE footer.inc %]

@@ -1,0 +1,18 @@
+Revision history for Quiz-Flashcards
+
+ 0.01   Date: 2009-03-06 18:03:36 +0100 (Fr, 06 Mrz 2009)
+        First version.
+
+ 0.02   Date: 2009-03-06 18:39:50 +0100 (Fr, 06 Mrz 2009)
+        New version for new archives without world-writable bits.
+
+ 0.03   Date: 2009-03-23 19:27:33 +0200 (Thu, 23 Apr 2009)
+        Adapted to load XRC files instead of creating the GUI in code.
+        Fixed boilerplate test.
+		Updated module dependencies.
+
+ 0.04   $Date: 2009-04-23 19:53:45 +0200 (Thu, 23 Apr 2009) $
+        Support added for:
+        - multiple choice sets
+        - sub-dividing sets into complexity levels
+

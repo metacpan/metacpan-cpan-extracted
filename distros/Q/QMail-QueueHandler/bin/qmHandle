@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+#
+# qmHandle
+#
+# Copyright (c) 2016 Dave Cross <dave@perlhacks.com>
+# Based on original version by Michele Beltrame <mb@italpro.net>
+#
+# This program is distributed under the GNU GPL.
+# For more information have a look at http://www.gnu.org
+
+use strict;
+use warnings;
+
+use QMail::QueueHandler;
+
+QMail::QueueHandler->new->run;

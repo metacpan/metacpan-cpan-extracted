@@ -1,0 +1,29 @@
+---
+##
+# This is a bitmap of the day number mod 7: [0..6] => [Sunday .. Saturday] that represent whether the exchange is open or not on that day.
+# All markets are traded in either of these three group . Example: Volatility Indices trade on everyday, Forex and most of the indices trade on weekedays and Middle east indices trade on Sun to Thurs.
+
+everyday:
+        - 1 # Sun
+        - 1 # Mon
+        - 1 # Tues
+        - 1 # Wed
+        - 1 # Thurs
+        - 1 # Fri
+        - 1 # Sat
+weekdays:
+        - 0 # Sun
+        - 1 # Mon
+        - 1 # Tues
+        - 1 # Wed
+        - 1 # Thurs
+        - 1 # Fri
+        - 0 # Sat
+sun_thru_thu:
+           - 1 # Sun
+           - 1 # Mon
+           - 1 # Tues
+           - 1 # Wed
+           - 1 # Thurs
+           - 0 # Fri
+           - 0 # Sat

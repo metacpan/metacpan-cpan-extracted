@@ -1,0 +1,14 @@
+Source: libqbit-validator-perl
+Section: perl
+Priority: extra
+Maintainer: Igor Sverdlov <igor-sverdlov@mail.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-class-perl, libtest-deep-perl
+Standards-Version: 3.9.4
+Vcs-Git: git@github.com:Madskill/QBit-Validator.git
+Vcs-Browser: https://github.com/Madskill/QBit-Validator
+
+Package: libqbit-validator-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-class-perl
+Description: QBit validator.
+ It is used for validation of input parameters.

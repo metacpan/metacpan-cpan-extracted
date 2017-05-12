@@ -1,0 +1,7 @@
+Revision history for Perl extension QML::File.
+
+0.01  Thur Jan 24 11:00:00 2013
+    - original version
+
+0.02  Thur Apr 9 11:00:00 2015
+    - corrected error in manifest

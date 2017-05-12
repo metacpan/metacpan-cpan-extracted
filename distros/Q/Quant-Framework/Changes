@@ -1,0 +1,40 @@
+Revision history for Quant-Framework
+
+0.01    1 Feb 2016
+        Initial version, contains corporate actions.
+0.02    4 Feb 2016
+        Fixing some unit-tests
+0.11    12 May 2016
+        Adding CorrelationMatrix and ExpiryConventions modules
+0.12    13 May 2016
+        Load yml file in BEGIN block
+0.16    18 May 2016
+        Adding Builder and UnderlyingConfig
+0.17    27 May 2016
+        Included dividend recorded_date
+0.18    30 May 2016
+        Moving Volatility Surface modules
+0.22    22 Jun 2016
+        Organize unit test files
+0.23    23 Jun 2016
+        Enable perlcritic and perltidy checks
+0.24    23 Jun 2016
+        Cleanup Builder module
+0.26    26 Jun 2016
+        Removing locale parameter from TradingCalendar and UnderlyingConfig
+0.27    30 Jun 2016
+        Remove unsed cache
+0.30    25 Jul 2016
+        Adding Spot and related modules
+0.31    2 Aug 2016
+        New algorithm for volatility calculation
+0.32    5 Aug 2016
+        Remove set smile functionality
+0.33    12 Aug 2016
+        Fixes minimum volatility spread bug.
+0.34    17 Aug 2016
+        Handles negative variance in get_volatility differently.
+0.35    29 Aug 2016
+        Dividend refactoring. (Remove Asset.pm and Rename Dividend.pm as Asset.pm).
+0.36    6 Sept 2016
+        Changed closing_tick_on function to accept only a date and sets validation error if get_volatility function is called with zero duration.

@@ -1,0 +1,154 @@
+#!/usr/bin/perl -w
+#
+# PerlQt Example Application: menu
+#
+# This example demonstrates how to use menus in PerlQt
+#
+
+package MenuExample;
+
+use QFrame;
+use QGlobal qw(%Key $CTRL);
+use QLabel;
+use QMenuBar;
+use Qt;
+
+use signals 'explain(const string)';
+use slots qw{
+    open()
+    save()
+    closeDoc()
+    undo()
+    redo()
+    normal()
+    bold()
+    underline()
+    about()
+    printer()
+    file()
+    fax()
+    printerSetup()
+};
+
+@ISA = qw(QWidget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    my $print = new QPopupMenu->setImmortal;
+    $print->insertItem('Print to printer', $self, 'printer()');
+    $print->insertItem('Print to file', $self, 'file()');
+    $print->insertItem('Print to fax', $self, 'fax()');
+    $print->insertSeparator();
+    $print->insertItem('Printer Setup', $self, 'printerSetup()');
+
+    my $file = new QPopupMenu->setImmortal;
+    $file->insertItem('Open', $self, 'open()', $CTRL+$Key{O});
+    $file->insertItem('Save', $self, 'save()', $CTRL+$Key{S});
+    $file->insertItem('Close', $self, 'closeDoc()', $CTRL+$Key{W});
+    $file->insertSeparator();
+    $file->insertItem('Print', $print, $CTRL+$Key{P});
+    $file->insertSeparator();
+    $file->insertItem('Exit', $qApp, 'quit()', $CTRL+$Key{Q});
+
+    my $edit = new QPopupMenu->setImmortal;
+    my $undoID = $edit->insertItem('Undo', $self, 'undo()');
+    my $redoID = $edit->insertItem('Redo', $self, 'redo()');
+    $edit->setItemEnabled($undoID, 0);
+    $edit->setItemEnabled($redoID, 0);
+
+    my $options = new QPopupMenu;
+    $options->insertItem('Normal Font', $self, 'normal()');
+    $options->insertSeparator();
+    my $boldID = $options->insertItem('Bold', $self, 'bold()');
+    my $underlineID = $options->insertItem('Underline', $self, 'underline()');
+    my $isBold = 0;
+    my $isUnderline = 0;
+    $options->setCheckable(1);
+
+    my $help = new QPopupMenu->setImmortal;
+    $help->insertItem('About', $self, 'about()', $CTRL+$Key{H});
+
+    my $menu = new QMenuBar($self);
+    $menu->insertItem('&File', $file);
+    $menu->insertItem('&Edit', $edit);
+    $menu->insertItem('&Options', $options);
+    $menu->insertSeparator();
+    $menu->insertItem('&Help', $help);
+
+    my $label = new QLabel($self);
+    $label->setGeometry(20, $self->rect()->center()->y()-20,
+			$self->width()-40, 40);
+    $label->setFrameStyle($QFrame{Box} | $QFrame{Raised});
+    $label->setLineWidth(1);
+    $label->setAlignment($Align{Center});
+
+    $label->connect($self, 'explain(const string)', 'setText(const string)');
+
+    $self->setMinimumSize(100, 80);
+
+    @$self{'menu', 'label', 'isBold', 'isUnderline', 'boldID', 'underlineID',
+	   'options'} =
+	       ($menu, $label, $isBold, $isUnderline, $boldID, $underlineID,
+		$options);
+    return $self;
+}
+
+sub open { emit shift->explain('File/Open selected') }
+sub save { emit shift->explain('File/Save selected') }
+sub closeDoc { emit shift->explain('File/Close selected') }
+sub undo { emit shift->explain('Edit/Undo selected') }
+sub redo { emit shift->explain('Edit/Redo selected') }
+
+sub normal {
+    my $self = shift;
+    my $options = $$self{'options'};
+
+    $$self{'isBold'} = 0;
+    $$self{'isUnderline'} = 0;
+    $options->setItemChecked($$self{'boldID'}, $$self{'isBold'});
+    $options->setItemChecked($$self{'underlineID'}, $$self{'isUnderline'});
+    emit $self->explain('Options/Normal selected');
+}
+
+sub bold {
+    my $self = shift;
+    my $options = $$self{'options'};
+
+    $$self{'isBold'} = !$$self{'isBold'};
+    $options->setItemChecked($$self{'boldID'}, $$self{'isBold'});
+    emit $self->explain('Options/Bold selected');
+}
+
+sub underline {
+    my $self = shift;
+    my $options = $$self{'options'};
+
+    $$self{'isUnderline'} = !$$self{'isUnderline'};
+    $options->setItemChecked($$self{'underlineID'}, $$self{'isUnderline'});
+    emit $self->explain('Options/Underline selected');
+}
+
+sub about { emit shift->explain('Help/About selected') }
+
+sub printer { emit shift->explain('File/Printer/Print selected') }
+sub file { emit shift->explain('File/Printer/Print To File selected') }
+sub fax { emit shift->explain('File/Printer/Print To Fax selected') }
+sub printerSetup { emit shift->explain('File/Printer/Printer Setup selected') }
+
+sub resizeEvent {
+    my $self = shift;
+    my $label = $$self{'label'};
+
+    $label->setGeometry(20, $self->rect()->center()->y()-20,
+			$self->width()-40, 40);
+}
+
+package main;
+
+use Qt;
+
+$m = new MenuExample;
+
+$qApp->setMainWidget($m);
+$m->show();
+exit $qApp->exec();

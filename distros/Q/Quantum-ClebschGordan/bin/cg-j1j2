@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Quantum::ClebschGordan;
+
+my $j1 = $ARGV[0] or die 'need a j1';
+my $j2 = $ARGV[1] or die 'need a j2';
+
+my $cg = Quantum::ClebschGordan->new( j1 => $j1, j2 => $j2 );
+
+print  "# note: CG and W3J listed as X where the\n";
+print  "#       real value is sign(X)*sqrt(abs(X))\n";
+print  "#       i.e.:  (+/-)X  ==>  (+/-)sqrt(X)\n";
+printf "# (j1, j2) = (%s, %s)\n", $cg->j1, $cg->j2;
+printf "# %6s %6s %6s %6s %6s %6s\n", qw/ m m1 m2 j CG W3J/;
+printf "  %6s %6s %6s %6s %6s %6s\n", $_->m, $_->m1, $_->m2, $_->j, $_->coeff, $_->wigner3j
+  for $cg->explode;
+

@@ -1,0 +1,3 @@
+[% WRAPPER page %]
+  [% text | html %]
+[% END %]

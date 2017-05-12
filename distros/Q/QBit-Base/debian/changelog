@@ -1,0 +1,21 @@
+libqbit-base-perl (0.002) raring; urgency=low
+
+  * fix for new DBManager
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 03 Dec 2016 20:13:42 +0300
+
+libqbit-base-perl (0.001) raring; urgency=low
+
+  * ingore build files
+
+  * redefine new
+
+  * first commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 28 Nov 2016 00:00:51 +0300
+
+libqbit-base-perl (0.2) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 31 Aug 2013 14:58:30 +0400

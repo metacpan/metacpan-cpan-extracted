@@ -1,0 +1,143 @@
+$Id: README,v 1.3 1998/02/10 01:43:02 ken Exp $
+
+
+			    Quilt for Perl
+
+		   A Perl 5 module for transforming
+		  and formatting SGML/XML documents.
+
+
+			     Ken MacLeod
+			 ken@bitsko.slc.ut.us
+
+WARNING
+
+    This is an early alpha!
+
+    Though, while this may be an early alpha it's only because I had a
+    brainstorm on how to handle the transformations -- I will be
+    ``porting'' my existing work to this framework and should have a
+    much more complete system in less time than one would normally
+    expect.
+
+    The areas undergoing a large amount of little changes are the
+    details of formatting and features of the Doc Objects (DO).  The
+    areas that are likely to change in big ways are the command line
+    utility, file and entity handling, helper-functions for hiding
+    most of the nitty-gritty of specs and transformation sequences,
+    subclassing styles and browser support, formatting options, and
+    further out, the language Specs are written in.
+
+INTRODUCTION
+
+    Quilt is a framework for loading SGML/XML documents or document
+    fragments, manipulating them in interesting ways, and displaying
+    or formatting them.
+
+    Quilt can also be used from code to generate document-like items
+    before formatting them -- tables for example.
+
+    There are specs for reading DocBook, LinuxDoc, and TEI Lite
+    documents, and formatters for plain Ascii and HTML (mostly 2.0).
+    There's a quick and dirty frontend script for formatting
+    documents.
+
+    Quilt was formerly called Generalized Document Objects (GDO) and
+    DTD Fragments.
+
+    See the file Changes for user-visible changes.  See the `examples'
+    directory for examples of using `Quilt'.
+
+    Newer versions of this module can be found at
+    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.  You can join the Quilt
+    mailing list by sending a message with the word `subscribe' in the
+    Subject: field to <quilt-request@bitsko.slc.ut.us>.
+
+    Copyright (C) 1997 Ken MacLeod
+    Quilt is distributed under the same terms as SP.  See the file
+    COPYING for distribution terms.
+
+OVERVIEW
+
+Formatting Documents
+
+    Before formatting documents, make sure you have the catalogs for
+    all DTDs, SPGrove's Simple Spec, and the ISO Entities in
+    SGML_CATALOG_FILES, for example:
+
+        export SGML_CATALOG_FILES=/usr/lib/sgml/docbook.2.2.1/CATALOG\
+        :/usr/lib/sgml/linuxdoc-1.5/linuxdoc.cat\
+        :/usr/lib/sgml/teilite-1.6/teilite.cat\
+        :/usr/lib/sgml/iso-entities-8879.1986/iso-entities.cat\
+        :/usr/lib/sgml/SGML-SPGrove-0.08/catalog
+
+    A simple test to make sure everything is going to work is to run
+    `nsgmls' on your document:
+
+        nsgmls MYDOCUMENT
+
+    Here is the synopsis for using the `tmpfront' script:
+
+        tmpfront { --docbook | --linuxdoc | --teilite }
+            { --html | --ascii }  [ --debug ]  DOCUMENT
+
+    For now, this will format DOCUMENT to either HTML or Ascii and
+    output on stdout.  `--debug' provides timing statistics.
+    `tmpfront' expects to be run from the source directory.  See
+    INSTALLATION below for variables to modify in `tmpfront.sh'.
+
+The Process
+
+              (4)         (5)              (6)          (7)
+    document  -->  grove  -->  docobjects  -->  format  -->  write
+               |           |                |            |
+            SPGrove      input          toFORMAT     wrFORMAT
+                        spec(1)          spec(2)      spec(3)
+
+
+     1) load input spec (docbook, linuxdoc, teilite)
+
+     2) load toFORMAT spec (format phase one)
+
+     3) load wrFORMAT spec (format phase two)
+
+     4) load document into grove
+
+     5) transform document into doc objects (DO)
+
+     6) transform DOs into general flow objects
+
+     7) transform general flow objects into output
+
+    (5), (6), and (7) are all performed with ``builders''.  A builder
+    is a Perl class that uses visitor functions on it's input to
+    transform the input to the output.  Most builders are generated
+    from spec files (See SGML::Simple::Spec).
+
+    The transform from document instance into DOs is almost
+    one-to-one.
+
+INSTALLATION
+
+    Quilt requires Perl 5, James Clark's SP, SGML::Grove,
+    SGML::SPGroveBuilder, Class::Visitor, Class::Template,
+    Text::EntityMap, and DTDs for the documents you want to transform.
+    Most of these, plus several DTDs and supporting files, are
+    available in the Quilt-Kit as a single download.
+
+<http://www.perl.com/>
+<http://www.jclark.com/>
+<ftp://ftp.uu.net/vendor/bitsko/gdo/>
+<ftp://ftp.uu.net/vendor/bitsko/entity-map/>
+<ftp://ftp.uu.net/vendor/bitsko/sgml-toolbox/>
+
+    After you get all that installed, modify the paths in `tmpfront'
+    so it can find any libraries not installed in Perl's normal spot
+    and point `$specs_dir' to Quilt's `specs' directory.
+
+    Quilt installs with just a Perl install:
+
+        perl Makefile.PL
+        make
+        make test
+        make install

@@ -1,0 +1,25 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Qstruct
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Int64: 0.27_04
+resources:
+  bugtracker: https://github.com/hoytech/Qstruct/issues
+  repository: git://github.com/hoytech/Qstruct.git
+version: 0.100

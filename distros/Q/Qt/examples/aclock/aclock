@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+#
+# PerlQt Example Application: aclock
+#
+# The analog clock widget in AnalogClock.pm demonstrates use of
+# world transformations and QTimer.
+#
+
+use Qt;
+use AnalogClock;
+
+$clock = new AnalogClock;
+$clock->resize(100, 100);
+$qApp->setMainWidget($clock);
+$clock->show();
+exit $qApp->exec();

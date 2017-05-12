@@ -1,0 +1,348 @@
+---
+corporate_action:
+  class_name: 'Quant::Framework::CorporateAction'
+  data:
+    symbol: 'USAAPL'
+    actions:
+      80004829: {type: 'DVD_CASH', flag: 'N', description: 'Test Corporate Action', modifier: 'divide', value: 1.234}
+
+currency:
+  class_name: 'Quant::Framework::InterestRate'
+  data:
+    symbol: USD
+    rates:
+      7: 2.686
+      30: 2.599
+      90: 2.599
+      180: 2.498
+      365: 2.339
+
+randomindex:
+  class_name: 'Quant::Framework::Asset'
+  data:
+    symbol: "R_100"
+    rates:
+      7: 0
+
+stock:
+  class_name: 'Quant::Framework::Asset'
+  data:
+    symbol: "USAAPL"
+    rates:
+      1: 0
+      2: 0
+      3: 0
+      4: 0
+      5: 2.22
+      6: 1.85
+      7: 1.58
+      8: 1.39
+      9: 1.23
+      10: 1.11
+      11: 1.01
+      12: 1.22
+      13: 1.12
+      180: 1.04
+      365: 0.73
+
+index:
+  class_name: 'Quant::Framework::Asset'
+  data:
+    symbol: FTSE
+    rates:
+      1: 0
+      2: 0
+      3: 0
+      4: 0
+      5: 2.22
+      6: 1.85
+      7: 1.58
+      8: 1.39
+      9: 1.23
+      10: 1.11
+      11: 1.01
+      12: 1.22
+      13: 1.12
+      14: 1.04
+      20: 0.73
+      30: 12.63
+      60: 6.32
+      90: 4.21
+      180: 2.11
+      365: 1.04
+
+holiday:
+  class_name: 'Quant::Framework::Holiday'
+  data:
+    calendar:
+        1420070400:
+          'New Year':
+            - EURONEXT
+            - USD
+
+economic_events:
+  class_name: 'Quant::Framework::EconomicEventCalendar'
+  data:
+    events:
+        - impact: 1
+          event_name: 'US GDP Announcement'
+          symbol: 'USD'
+          source: 'forexfactory'
+
+partial_trading:
+  class_name: 'Quant::Framework::PartialTrading'
+  data:
+    calendar: {}
+
+asset:
+  class_name: 'Quant::Framework::Asset'
+  data:
+    symbol: UKTSCO
+
+correlation_matrix:
+  class_name: 'Quant::Framework::CorrelationMatrix'
+  data:
+    symbol: indices
+    correlations:
+      FCHI:
+        GBP:
+          3M: 0.356
+          6M: 0.336
+          9M: 0.32
+          12M: 0.307
+        USD:
+          3M: 0.554
+          6M: 0.538
+          9M: 0.525
+          12M: 0.516
+      FTSE:
+        GBP:
+          3M: 0.356
+          6M: 0.336
+          9M: 0.32
+          12M: 0.307
+        USD:
+          3M: 0.554
+          6M: 0.538
+          9M: 0.525
+          12M: 0.516
+      GDAXI:
+        USD:
+          3M: 0.506
+          6M: 0.49
+          9M: 0.477
+          12M: 0.467
+      SASEIDX:
+        USD:
+          3M: 0.506
+          6M: 0.49
+          9M: 0.477
+          12M: 0.467
+
+volsurface_delta:
+  class_name: 'Quant::Framework::VolSurface::Delta'
+  data:
+    surface:
+      7:
+        smile:
+          25: 0.17
+          50: 0.16
+          75: 0.22
+        vol_spread: 
+          50: 0.01
+      14:
+        smile:
+          25: 0.17
+          50: 0.152
+          75: 0.18
+        vol_spread: 
+          50:  0.01
+      30:
+        smile:
+          25: 0.173
+          50: 0.15
+          75: 0.18
+        vol_spread: 
+          50:  0.01
+      60:
+        smile:
+          25: 0.183
+          50: 0.158
+          75: 0.213
+        vol_spread: 
+          50:  0.01
+      91:
+        smile:
+          25: 0.189
+          50: 0.167
+          75: 0.215
+        vol_spread: 
+          50:  0.01
+      182:
+        smile:
+          25: 0.202
+          50: 0.183
+          75: 0.217
+        vol_spread: 
+          50:  0.01
+
+volsurface_moneyness:
+  class_name: 'Quant::Framework::VolSurface::Moneyness'
+  data:
+    spot_reference: 7150
+    surface:
+      7:
+        smile:
+          30: 0.8823
+          40: 0.8586
+          60: 0.6762
+          80: 0.4885
+          90: 0.3968
+          95: 0.3303
+          97.5: 0.3032
+          100: 0.2761
+          102.5: 0.2559
+          105: 0.2428
+          110: 0.2544
+          120: 0.3193
+          130: 0.3624
+          150: 0.4045
+          175: 0.4279
+          200: 0.4394
+          250: 0.4518
+          300: 0.4642
+        vol_spread: 
+          100:  0.012
+      30:
+        smile:
+          30: 0.6668
+          40: 0.5976
+          60: 0.4509
+          80: 0.3925
+          90: 0.3262
+          95: 0.2952
+          97.5: 0.2797
+          100: 0.2642
+          102.5: 0.2495
+          105: 0.2368
+          110: 0.2228
+          120: 0.2243
+          130: 0.236
+          150: 0.2631
+          175: 0.2922
+          200: 0.3092
+          250: 0.3273
+          300: 0.3454
+        vol_spread: 
+          100:  0.005
+      61:
+        smile:
+          30: 0.5796
+          40: 0.5146
+          60: 0.4697
+          80: 0.3558
+          90: 0.3044
+          95: 0.2827
+          97.5: 0.2711
+          100: 0.2592
+          102.5: 0.2478
+          105: 0.2372
+          110: 0.2194
+          120: 0.199
+          130: 0.2132
+          150: 0.2656
+          175: 0.3059
+          200: 0.3311
+          250: 0.3613
+          300: 0.3778
+        vol_spread: 
+          100:  0.0048
+      92:
+        smile:
+          30: 0.5356
+          40: 0.5225
+          60: 0.4618
+          80: 0.3473
+          90: 0.3028
+          95: 0.28
+          97.5: 0.2684
+          100: 0.2572
+          102.5: 0.2468
+          105: 0.2373
+          110: 0.2212
+          120: 0.1975
+          130: 0.2065
+          150: 0.2246
+          175: 0.265
+          200: 0.2918
+          250: 0.3251
+          300: 0.3454
+        vol_spread: 
+          100:  0.005
+      184:
+        smile:
+          30: 0.5036
+          40: 0.4908
+          60: 0.4196
+          80: 0.3298
+          90: 0.2921
+          95: 0.2733
+          97.5: 0.2644
+          100: 0.2557
+          102.5: 0.2474
+          105: 0.2394
+          110: 0.2243
+          120: 0.2009
+          130: 0.1908
+          150: 0.1844
+          175: 0.1928
+          200: 0.214
+          250: 0.2443
+          300: 0.2635
+        vol_spread: 
+          100:  0.004
+      275:
+        smile:
+          30: 0.4406
+          40: 0.4337
+          60: 0.3881
+          80: 0.3184
+          90: 0.285
+          95: 0.2693
+          97.5: 0.2618
+          100: 0.2544
+          102.5: 0.2472
+          105: 0.2402
+          110: 0.2264
+          120: 0.2026
+          130: 0.189
+          150: 0.1824
+          175: 0.1878
+          200: 0.2035
+          250: 0.2297
+          300: 0.2558
+        vol_spread: 
+          100:  0.004
+      365:
+        smile:
+          30: 0.4508
+          40: 0.4342
+          60: 0.3762
+          80: 0.3103
+          90: 0.2808
+          95: 0.2671
+          97.5: 0.2605
+          100: 0.254
+          102.5: 0.2477
+          105: 0.2415
+          110: 0.2293
+          120: 0.2077
+          130: 0.1933
+          150: 0.1853
+          175: 0.1909
+          200: 0.2052
+          250: 0.2327
+          300: 0.2511
+        vol_spread: 
+          100:  0.0052
+

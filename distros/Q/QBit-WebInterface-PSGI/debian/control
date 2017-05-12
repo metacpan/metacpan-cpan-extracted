@@ -1,0 +1,12 @@
+Source: libqbit-webinterface-psgi-perl
+Section: perl
+Priority: extra
+Maintainer: Igor Sverdlov <igor-sverdlov@mail.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-webinterface-perl, liburi-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-webinterface-psgi-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-webinterface-perl, liburi-perl
+Description: Package for connect WebInterface with PSGI.
+ Package for connect WebInterface with PSGI.

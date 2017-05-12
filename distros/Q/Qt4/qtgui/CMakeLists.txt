@@ -1,0 +1,6 @@
+add_subdirectory( src )
+add_subdirectory( lib )
+add_subdirectory( t )
+if( ENABLE_GUI_TESTS )
+    add_subdirectory( examples )
+endif( ENABLE_GUI_TESTS )

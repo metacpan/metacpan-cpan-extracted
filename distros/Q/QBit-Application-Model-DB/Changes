@@ -1,0 +1,211 @@
+==================================================
+Changes from 2016-01-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.016 at 2017-01-22 11:55:43 +0000
+------------------------------------------
+
+  Change: d5147c6176b9ffc24ebb8ca0ef1ce475bfc0ab68
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-01-22 15:54:44 +0000
+
+    Merge pull request #18 from Madskill/added_accessors
+
+    added collate and engine into accessors 
+
+  Change: 0fdde6569326ef43f7a7125d5a5bcdeb0a3d4991
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-01-22 14:53:44 +0000
+
+    added collate and engine into accessors 
+
+------------------------------------------
+version 0.015 at 2016-12-18 23:03:49 +0000
+------------------------------------------
+
+  Change: d59c183690798aeb55d750de4aae2e4ed44bfbfc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:03:49 +0000
+
+    Version 0.015 
+
+  Change: eed3a06d0a9365303d280023f1101afd6db04ace
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:02:11 +0000
+
+    Merge pull request #17 from Madskill/fix_exceptions
+
+    Fix exceptions 
+
+  Change: da95faf45f98688e9a606dcbed3b63a67fccba8b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:00:42 +0000
+
+    Merge remote-tracking branch 'upstream/master' into fix_exceptions 
+
+  Change: a92eb97820e036335ff7210b049884fdd5b64d5e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:00:28 +0000
+
+    fix exceptions 
+
+------------------------------------------
+version 0.014 at 2016-12-17 15:48:02 +0000
+------------------------------------------
+
+  Change: 939fd3214a05e2ed5fd505b95ab59dc87210c0cd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:48:02 +0000
+
+    Version 0.014 
+
+  Change: 4f58db2540634b2ddb81f86cc68c8ad119eef436
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:46:58 +0000
+
+    Merge pull request #16 from Madskill/fix_transaction
+
+    fix rollback 
+
+  Change: 204b83ec7c08e95f86c6543baf66bcc277f2587a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:45:15 +0000
+
+    fix rollback 
+
+------------------------------------------
+version 0.013 at 2016-12-01 23:33:04 +0000
+------------------------------------------
+
+  Change: 2d23b43399fff79bf8d7ce3398236eac3f90dfe8
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-02 02:33:04 +0000
+
+    Version 0.013 
+
+  Change: 64ea918975444d5ab89de6cd537ebd9ba826ebe1
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-02 02:31:54 +0000
+
+    Merge pull request #15 from Madskill/delete_reconnect
+
+    deleted connect if transaction 
+
+  Change: 7835456378d87ede684439d37eaa6ebbd7439a0b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-02 02:28:51 +0000
+
+    deleted connect if transaction 
+
+------------------------------------------
+version 0.012 at 2016-10-09 12:09:28 +0000
+------------------------------------------
+
+  Change: 6fc5d082e717a99817f95fe48d73c2fcd189e24f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:09:28 +0000
+
+    Version 0.012 
+
+  Change: 2c330c7192a9346963254cbe35acc76285cff7c1
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 16:07:52 +0000
+
+    Merge pull request #14 from Madskill/fix_test
+
+    Fix test 
+
+  Change: f8c91ed9b89914c03135e607a3c69f0d47cf814c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:05:31 +0000
+
+    use TestTimeLog 
+
+  Change: cd14b8396e14401edf00e2427c61325e19e581de
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 14:56:38 +0000
+
+    added TestTimeLog 
+
+------------------------------------------
+version 0.011 at 2016-10-09 08:53:52 +0000
+------------------------------------------
+
+  Change: 3bcaac11c3dd018f194564d62aa748c0d9966441
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 11:53:52 +0000
+
+    Version 0.011 
+
+  Change: 2a4698f36f9e83fab1b13002623c6eb08df1c7f8
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 12:52:26 +0000
+
+    Merge pull request #13 from Madskill/fix_dependency
+
+    added DBD::Mock to depends 
+
+  Change: c8d38e9088198a4169d9b095df811ff58162541b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 11:45:48 +0000
+
+    added DBD::Mock to depends 
+
+------------------------------------------
+version 0.010 at 2016-10-08 19:58:21 +0000
+------------------------------------------
+
+  Change: 44a47f7f621f10e7fe702d2b5b298939e441b558
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-08 22:58:21 +0000
+
+    Version 0.010 
+
+  Change: 622ac9d8ccc88e277119510a23eb2ab20468f2c1
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-08 23:56:07 +0000
+
+    Merge pull request #12 from Madskill/move_t_lib
+
+    t_lib -> t/lib 
+
+  Change: 3101350fdb2972577c158cebb620f20ece57cc40
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-08 22:54:34 +0000
+
+    t_lib -> t/lib 
+
+------------------------------------------
+version 0.009 at 2016-06-05 17:45:12 +0000
+------------------------------------------
+
+  Change: 12b97a231f8c73e5ab07d410527e4fbea721cd3a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-06-05 20:45:12 +0000
+
+    Version 0.009 
+
+  Change: 95ad0026735b44d42f81226f2617fc2fbfaf00fe
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-06-05 21:33:18 +0000
+
+    Merge pull request #11 from Madskill/upload_to_cpan
+
+    Upload to cpan 
+
+  Change: f926b65e4e679807a72db1d3ae051e4437b0506b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-06-05 20:27:30 +0000
+
+    added README.md 
+
+  Change: 2c77082ed5cfe6f952d6fa7d7be6a58a5f79c0f9
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-06-05 20:06:59 +0000
+
+    upload to cpan 
+
+================================================
+Plus 8 releases after 2016-01-23 00:00:00 +0000.
+================================================

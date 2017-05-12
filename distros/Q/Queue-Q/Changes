@@ -1,0 +1,121 @@
+Revision history for Perl extension Queue::Q.
+
+0.31
+  - Add POD for queue_length() method
+
+0.30
+  - Repair broken CPAN upload (https://rt.cpan.org/Ticket/Display.html?id=109815)
+
+0.29
+  - Migrate fifo-cli to Term::ReadLine
+
+0.28
+  - Bring Queue::Q::ClaimFIFO::Redis in line with latest Redis::ScriptCache
+    changes
+
+0.27
+  - Add option warn_on_requeue to Queue::Q::ReliableFIFO::Redis to
+    make warnings introduced in 0.24 optional by default
+
+0.26
+  - Fix uninitialized warnings in the redis implementation of ReliableFIFO
+
+0.25
+  - Add cp command to the CLI (Andrey Frolov)
+  - Add new parameter ignore_config_file to run the CLI
+
+0.24
+  - don't modify the $options hash passed to ->consume
+  - ReliableFIFO: Serialize JSON to binary octets instead of unicode codepoints.
+  - Throw a warning when items are not properly removed from the 'busy'
+    queue when using the Chunk => 1 option (which is the default one).
+  - Lua: Make some error messages a bit more accurate
+
+0.23
+  - Repair broken CPAN upload
+
+0.22
+  - DieOnError option deprecated and renamed to ReturnOnDie
+  - Better lua error messages
+  - Disallow undefined server names or ports
+
+0.21 Wed Oct 16 08:38:12 CEST 2013
+  - bugfix introduced in 0.20 with requeue_failed_items when called without parameters
+
+0.20 Fri Oct 11 14:13:06 CEST 2013
+  - bugfixes for solving issues with very large number of failed items
+
+0.19 Wed Aug 14 16:44:45 CEST 2013
+  - bugfix to have ReliableFIFO::Redis working again in non blocking mode
+
+0.18 Thu Aug  8 21:48:00 CEST 2013
+  - Non-blocking ReliableFIFO::Redis claim_item_nonblocking
+  - ReliableFIFO::Redis: New option NoSigHandlers for the consume() method
+ 
+0.17 Fri May 24 13:27:47 CEST 2013
+  - bugfix with MaxItems in ReliableFIFO/Redis
+  - merged branch of ksurrent fixing inconsistent API for ClaimFIFO
+
+0.16 Wed May  8 17:23:59 CEST 2013
+  - added peek_item
+
+0.15 Tue Apr  9 10:28:19 CEST 2013
+  - added clone() method
+  - fixed cleanup bug with handle_expired_items
+  - fixed typo's in documentation
+
+0.14 Wed Mar 20 14:34:03 CET 2013
+  - solved bug with stop signal while handling a chunk of items
+
+0.13 Tue Mar 19 10:26:26 CET 2013
+  - added MaxSeconds option for consume()
+  - added t_created for Item objects, while default timestamp reflects the 
+    time the item was put in the queue (updated when requeuing).
+
+0.12 Mon Feb 18 12:01:34 CET 2013
+  - added option ReturnWhenEmpty, back to same defaults
+  - rolled back fix for unclaiming
+
+0.11 Fri Feb 15 16:00:00 CET 2013
+  - Added two options for get_and_flush_failed_items()
+  - Fix fifo-cli for non-system Perl usage
+  - Fix claim_wait_timeout being ignored in consume
+  - Attempt to fix bug with unclaiming/requeueing
+    __requeue_busy: used by unclaim, requeue_busy_item, and requeue_busy_error
+
+0.10 Fri Feb  1 16:40:49 CET 2013
+  - solved bug with negative sleep time
+
+0.09 Thu Jan 31 17:12:11 CET 2013
+  - removed bug with handle_expired_items()
+  - added requeue_busy_item() and requeue_failed_item()
+
+0.08 Wed Jan 23 11:41:49 CET 2013
+  - limit chunk size in claim_item(s) to queue length 
+    for ReliableFIFO and NaiveFIFO
+  - mark_as done more efficient in RelaibleFIFO (lrem starts
+    at the right side of the list).
+
+0.07 Tue Jan 22 15:12:04 CET 2013
+  - fifo-cli change
+
+0.06 Tue Jan 22 11:37:25 CET 2013
+  - added get_and_flush_failed_items()
+  - added added option Pause and ProcessAll for consume()
+
+0.05 Thu Dec 13 20:38:45 CET 2012
+  - MaxItems option for consume()
+
+0.04 Tue Dec 11 11:45:09 CET 2012
+  - EXEC_FILES correction in Makefile.PL
+
+0.03 Mon Dec 10 20:03:48 CET 2012
+  - added raw_items_* and memory_suage_perc() methods
+    to Queue:Q::ReliableFIFO::Redis
+
+0.02  Tue Dec  4 10:00:00 2012
+  - added age() method to Queue:Q::ReliableFIFO::Redis
+
+0.01  Mon Dec  3 16:00:00 2012
+  - original version
+

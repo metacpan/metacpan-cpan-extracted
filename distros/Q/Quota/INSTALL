@@ -1,0 +1,101 @@
+Installation Instructions
+-------------------------
+
+Usually all you have to do is:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	make clean
+
+If this fails, regard the following instructions step by step.
+Note that this module does not support installation by the CPAN(++) module.
+
+Options:
+
+-> Support for Solaris VxFS should be added automatically if the module
+   is installed. If not, #define or #undef SOLARIS_VXFS in myconfig.h
+
+-> If you want support for AFS, you need the OpenAFS package
+   (tested with OpenAFS on (SuSE) Linux, HP-UX10, Solaris 2.6, 2.8, AIX 4.3
+   and IRIX 6.5).
+   The Makefile.PL tries to detect automatically if AFS is preset on a
+   system. If that fails, edit the Makefile.PL to always define $hasafs
+   (and drop me a mail).
+
+
+1)  On Linux systems make sure you have configured your kernel with quota
+    support. You also need the quota utilities and headers. E.g., with
+    the SuSE Linux 6.0 distribution you'll find them in package ap::quota.
+    If your distribution doesn't include the package you can get it from
+    <URL:http://sourceforge.net/projects/linuxquota>. See also (6) below.
+
+2)  Link or create the hints file.
+
+ a) Should be done by Makefile.PL for all supported systems. If not, and
+    there is a file below hints/ for your operating system (maybe for a
+    previous release), just create a link named "myconfig.h" to that file:
+    ln -s hints/my-os.h myconfig.h
+
+ b) Else, use hints/none.h to create a myconfig.h of your own. Check which
+    #includes you need in the online manuals. Contact me before you invest
+    a lot of time, it might already be done.
+
+    Edit Makefile.PL to maybe add/delete some libraries. Usually you'll
+    need only librpcsvc for the quota RPC mechanism. If you don't have
+    this library or it lacks the quota routines, #define MY_XDR in
+    myconfig.h to include the routines provided with this module. If you
+    don't have /usr/include/rpcsvc/rquota.h, include "include/rquota.h"
+    instead. If you don't need RPC at all, just define NO_RPC.
+
+3)  Generate the Makefile: perl Makefile.PL
+
+4)  Compile the module: make
+
+5)  Run "make test" to check if the module routines do work correctly.
+    (Since release 1.0 you can test the module without installing)
+
+6)  Linux specials:
+
+ a) If you're using an ancient version of the Linux quota tools on a NFS
+    server, check Quota::query() results for block usage and limits.
+    Old versions of the rpc.rquotad did report a wrong block size, hence
+    all sizes were 4 times too large.  If your system shows this error,
+    you should uncomment #define LINUX_RQUOTAD_BUG in the hints file and
+    recompile. The better solution is to update your quota tools though.
+
+ b) If you're using RedHat 7.1 or later, or the Alan Cox (ac) branch of
+    the Linux 2.4.x kernels, you're victim of a new and completely
+    backwards incompatible Quota file format and quotactl API. If you've
+    downloaded the kernel separately, make sure to install the latest
+    version of the quota tools: see (1).
+
+    If the Quota module does not find quotas for any users anymore, the
+    reason may be you've not set up the new aquota.user/group files yet.
+    Remember: after creating these files with quotackeck(8) or
+    convertquota(8) you have to execute quotaon(8) another time. You'll
+    not see this requirement with quota(1) because that program reads the
+    quota files directly if the kernel query fails; the module however only
+    goes through the kernel.  If in doubt, do an strace(1) on the quota(1)
+    call. Normally you should see no access to the aquota files in the trace.
+    Alternatively, make the quota files readable for root only (recommended
+    anyway) and try quota -v again under a non-root login. If this fails,
+    the kernel has not enabled quota support.
+
+7)  To install the module in your perl tree:  "make install"
+    You may need to su root before this step.
+
+    The contrib directory contains some usage examples, donated by
+    users. No guarantee from me that they do anything useful or don't
+    format your hard drive.
+
+8)  Before you start for another OS, type "make clean"
+
+Please mail me any changes in the hints files or Makefile.PL you had to
+apply to get the package to compile. Please remember to include in your
+mail the name of used OS and version numbers of OS (uname -rs) and module.
+
+Tom
+---
+email: tomzo AT nefkom DOT net

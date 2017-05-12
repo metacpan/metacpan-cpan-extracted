@@ -1,0 +1,114 @@
+libqbit-application-model-db-perl (0.016) raring; urgency=low
+
+  * added collate and engine into accessors
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 22 Jan 2017 14:55:44 +0300
+
+libqbit-application-model-db-perl (0.015) raring; urgency=low
+
+  * fix exceptions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 19 Dec 2016 02:03:05 +0300
+
+libqbit-application-model-db-perl (0.014) raring; urgency=low
+
+  * fix rollback
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 17 Dec 2016 18:47:51 +0300
+
+libqbit-application-model-db-perl (0.013) raring; urgency=low
+
+  * deleted connect if transaction
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Fri, 02 Dec 2016 02:32:45 +0300
+
+libqbit-application-model-db-perl (0.012) raring; urgency=low
+
+  * use TestTimeLog
+
+  * added TestTimeLog
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 15:09:02 +0300
+
+libqbit-application-model-db-perl (0.011) raring; urgency=low
+
+  * added DBD::Mock to depends
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 11:53:22 +0300
+
+libqbit-application-model-db-perl (0.010) raring; urgency=low
+
+  * t_lib -> t/lib
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 08 Oct 2016 22:58:10 +0300
+
+libqbit-application-model-db-perl (0.009) raring; urgency=low
+
+  * added README.md
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 05 Jun 2016 20:44:14 +0300
+
+libqbit-application-model-db-perl (0.008) raring; urgency=low
+
+  * delete in_array
+
+  * create_sql for one or more tables
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Dec 2015 00:22:54 +0300
+
+libqbit-application-model-db-perl (0.007) raring; urgency=low
+
+  * Exception::DB::NoFieldsAvailable
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 30 Mar 2015 20:36:53 +0400
+
+libqbit-application-model-db-perl (0.006) raring; urgency=low
+
+  * Add tests for exception on simple fields with group by.
+
+  * Throw exception on not grouping fields with group_by.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 30 Jun 2014 17:01:35 +0400
+
+libqbit-application-model-db-perl (0.005) raring; urgency=low
+
+  * Delete DB DESTROY method.
+
+  * Do not disconnect on undefined value.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 03 Apr 2014 14:35:04 +0400
+
+libqbit-application-model-db-perl (0.004) raring; urgency=low
+
+  * fix test
+
+  * fix filters
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 26 Feb 2014 17:09:23 +0400
+
+libqbit-application-model-db-perl (0.003) raring; urgency=low
+
+  * Fixed build depends
+
+  * Create accessors once
+
+  * Test::DB::Table
+
+  * qbit-application-model-db.t
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 21 Nov 2013 16:48:32 +0400
+
+libqbit-application-model-db-perl (0.002) raring; urgency=low
+
+  * Fixed fork error: Each child must have its own connection
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 13 Oct 2013 18:22:24 +0400
+
+libqbit-application-model-db-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 14:06:53 +0400
+

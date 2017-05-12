@@ -1,0 +1,29 @@
+---
+abstract: 'Email to HTTP Request'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Qpsmtpd-Plugin-Queue-HTTPRequest
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  Email::Abstract: 0
+  Email::Abstract::QpsmtpdTransaction: 0
+  Email::Address: 0
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  URI: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

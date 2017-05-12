@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+Ref.xs
+lib/Quote/Ref.pm
+t/00-load.t
+t/01-bare.t
+t/02-unload.t
+t/03-unicode.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,22 @@
+# Class tests
+macro_prove(perlqt_qtgui4_load      ${CMAKE_CURRENT_SOURCE_DIR}/a_loading.t)
+macro_prove(perlqt_qpolygon         ${CMAKE_CURRENT_SOURCE_DIR}/qpolygon.t)
+macro_prove(perlqt_qpolygonf        ${CMAKE_CURRENT_SOURCE_DIR}/qpolygonf.t)
+macro_prove(perlqt_qstringlistmodel ${CMAKE_CURRENT_SOURCE_DIR}/qstringlistmodel.t)
+
+# GUI tests
+if( ENABLE_GUI_TESTS )
+    macro_prove(perlqt_itemviewspixelator       ${CMAKE_CURRENT_SOURCE_DIR}/itemviewspixelator.t       ${CMAKE_SOURCE_DIR}/qtgui/examples/itemviews/pixelator)
+    macro_prove(perlqt_itemviewspuzzle          ${CMAKE_CURRENT_SOURCE_DIR}/itemviewspuzzle.t          ${CMAKE_SOURCE_DIR}/qtgui/examples/itemviews/puzzle)
+    macro_prove(perlqt_helpcontextsensitivehelp ${CMAKE_CURRENT_SOURCE_DIR}/helpcontextsensitivehelp.t ${CMAKE_SOURCE_DIR}/qtgui/examples/help/contextsensitivehelp)
+    macro_prove(perlqt_mainwindowsmdi           ${CMAKE_CURRENT_SOURCE_DIR}/mainwindowsmdi.t           ${CMAKE_SOURCE_DIR}/qtgui/examples/mainwindows/mdi)
+    macro_prove(perlqt_networkbroadcast         ${CMAKE_CURRENT_SOURCE_DIR}/networkbroadcast.t         ${CMAKE_SOURCE_DIR}/qtgui/examples/network/broadcastsender)
+    macro_prove(perlqt_networkfortune           ${CMAKE_CURRENT_SOURCE_DIR}/networkfortune.t           ${CMAKE_SOURCE_DIR}/qtgui/examples/network/fortuneserver)
+    macro_prove(perlqt_networkgooglesuggest     ${CMAKE_CURRENT_SOURCE_DIR}/networkgooglesuggest.t     ${CMAKE_SOURCE_DIR}/qtgui/examples/network/googlesuggest)
+    macro_prove(perlqt_paintingfontsampler      ${CMAKE_CURRENT_SOURCE_DIR}/paintingfontsampler.t      ${CMAKE_SOURCE_DIR}/qtgui/examples/painting/fontsampler)
+    macro_prove(perlqt_richtextcalendar         ${CMAKE_CURRENT_SOURCE_DIR}/richtextcalendar.t         ${CMAKE_SOURCE_DIR}/qtgui/examples/richtext/calendar)
+    macro_prove(perlqt_sqlquerymodel            ${CMAKE_CURRENT_SOURCE_DIR}/sqlquerymodel.t            ${CMAKE_SOURCE_DIR}/qtgui/examples/sql/querymodel)
+    macro_prove(perlqt_widgetscalculator        ${CMAKE_CURRENT_SOURCE_DIR}/widgetscalculator.t        ${CMAKE_SOURCE_DIR}/qtgui/examples/widgets/calculator)
+    macro_prove(perlqt_widgetswiggly            ${CMAKE_CURRENT_SOURCE_DIR}/widgetswiggly.t            ${CMAKE_SOURCE_DIR}/qtgui/examples/widgets/wiggly)
+    macro_prove(perlqt_xmlstreambookmarks       ${CMAKE_CURRENT_SOURCE_DIR}/xmlstreambookmarks.t       ${CMAKE_SOURCE_DIR}/qtgui/examples/xml/streambookmarks)
+endif( ENABLE_GUI_TESTS )

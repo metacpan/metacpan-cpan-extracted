@@ -1,0 +1,22 @@
+Revision history for Perl extension Queue::Mmap.
+
+0.01  Wed Sep  8 09:20:54 2010
+	- original version; created by h2xs 1.23
+
+0.06  Mon Sep  13 12:30:00 2010
+	- impruved perfomans for fragmented records by preallocated memory for poped value
+    - extend documentation
+
+0.08  Wed May  18 14:20:00 2011
+    - added new methods
+	- impruved perfomance
+	- documentation
+
+0.09  Wed May  26 10:20:00 2011
+    - set file mode if any
+
+0.10  Wed May  27 10:00:00 2011
+    - rewrite Mmap.pm
+
+0.11  Wed May  26 10:20:00 2011
+    - return awiting time from push()

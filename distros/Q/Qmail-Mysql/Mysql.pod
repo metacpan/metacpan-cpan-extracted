@@ -1,0 +1,245 @@
+=head1 NAME
+
+Qmail::Mysql - A perl module for mysql database used by qmail-mysql
+
+=head1 SYNOPSIS
+
+  use Qmail::Mysql
+  
+  my $qmail = new Qmail::Mysql(  
+                     sql_control_file    => '/var/qmail/control/sqlserver',
+                     mailbox_base        => '/var/spool/pop/users',
+                     password_type       => 'Password',
+                     multihosting        => 0,
+                     multihosting_join   => '@'
+                               );
+
+  # add new domain as deliver local
+  $qmail->rcpt_add('bar.com')
+  # check if domain is a local domain
+  $qmail->rcpt_exists('bar.com')
+  # remove a domain as delivel local
+  $qmail->rcpt_del('bar.com');
+
+  # add new mailbox (foo@bar.com) with pop3 password 'mypass'
+  # pop3 user account is
+  # 'foo'         if multihosting => 0 or
+  # 'foo@bar.com' if multihosting => 1 
+  # (the '@' in the pop3 account can be changed using multihosting_join)
+  # This command creates also a Maildir directory in
+  # mailbox_base/xxxxxx
+  # where xxxxxx is
+  # 'foo'         if multihosting => 0 or
+  # 'bar.com/foo' if multihosting => 1
+  $qmail->mail_add('foo','bar.com','mypass');
+  # check to see if a mailbox already exists
+  $qmail->mail_exists('foo','bar.com')
+  # remove mailbox
+  $qmail->mail_del('foo','bar.com');
+  
+  # add an alias (alias@bar.com) is an alias for (real@bar.com)
+  $qmail->alias_add('alias@bar.com','real@bar.com');
+  # check if this alias exists
+  $qmail->alias_exists('alias@bar.com','real@bar.com')
+  # remove this alias
+  $qmail->alias_del('alias@bar.com','real@bar.com');
+  
+
+=head1 DESCRIPTION
+
+The purpose of this module is to interface with the database structure
+used by the mysql patch of the qmail mailer daemon developed by Iain Patterson.
+
+This patch transfer the mailbox information of the smtp protocol and
+the authentication information of the pop3 protocol from some file in the
+filesystem into some tables of a mysql database.
+
+So lists of local deliver domains, the mail addresses, the aliases, 
+the mailboxes of the smtp/pop3 qmail daemon if controlled by database tables
+instead of file.
+
+This module can be used to add/remove local deliver domains, to add/remove
+real local mailbox, to add/remove alias and mailing-lists.
+
+Thanks to Iain patch, all changes will be immediately see by qmail processes.
+
+To have more info about qmail-mysql patch take a look at Iain Patterson
+web site (http://iain.cx/qmail/).
+
+To connect to database this module uses the same account used by qmail 
+processes. In the qmail-mysql patch documentation this user is set
+with "SELECT" only privilege over qmail database.
+
+To permit this module to read,add and delete qmail records standard
+privileges must be extended to "INSERT" and "DELETE" and "UPDATE".
+
+As mysql administrator user you can execute this sql query to extend 
+the qmail privilage supposing that qmail user is 'qmail', that database
+is local and it's named 'qmail' too.
+
+  mysql> GRANT SELECT,INSERT,UPDATE,DELETE ON `qmail` . * 
+          TO "qmail"@"localhost";
+
+
+=head1 CLASS INTERFACE
+
+=head2 CONSTRUCTORS
+
+The C<new> constructor return an istance of C<Qmail::Mysql> object. 
+
+  $qmail = new Qmail::Mysql(  
+                        [ mailbox_base        => $mbox_base_path ] ,
+                        [ multihosting        => ( 0 | 1 )       ] ,
+                        [ multihosting_join   => $mjoin_string   ] ,
+                        [ password_type       => ( 
+                                               'Password'       | 
+                                               'Crypt-Password' |
+                                               'MySQL-Password' 
+                                                              )  ] ,
+               			[ sql_control_file    => $sqlserver_path ] ,
+                           );
+
+=over 4 
+
+=item B<PARAMETERS>
+
+=item mailbox_base
+
+It's the parent path of all Maildir folders that is under this path
+will be created the user mailbox folders under which users e-mails will be
+stored
+
+Default value is '/var/spool/pop/users'
+
+=item multihosting
+
+It's a boolean value that set if the mail server offers mailbox for only
+one domain or it's a multihosting server and accept mail for more that one
+domain. 
+
+In a single hosting there isn't possibility of confusion between user mailboxes.
+A mailbox for user 'foo' will be created under C<mailbox_base>/foo and
+pop3 user account will be 'foo'.
+
+In a multi hosting there can be more that one user with name 'foo' one for
+domain 'bar1.com' and the other for domain 'bar2.com' as an example. 
+To avoid confusion, in this environment the mailbox for use 'foo' of the
+domain 'bar1.com' will be created under C<mailbox_base>/bar1.com and
+his pop3 user account will be 'foo@bar1.com' while for user of 'bar2.com'
+domain ia mailbox will be created undef C<mailbox_base>/bar2.com and
+his pop3 user account will be 'foo@bar2.com'.
+
+Default value is a single hosting mode that is 0.
+
+=item multihosting_join
+
+When multihosting is true this option set the string for building pop3
+user account joined username,this value and the domain name.
+
+Default value is '@' so pop3 user account coincides with user e-mail.
+
+=item password_type
+
+In agreement with mailbox table, this value is used to set Password-type
+mailbox field that indicates what kind of password is set in the 
+Password field in the same table.
+
+If password_type is 'Password', the password parameter of the 
+C<mail_add> method must be a clean text password;
+if password_type is 'Crypt-Password' the password parameter
+must be a string returned by unix crypt function; 
+if password_type is 'MySQL-Password' the password parameter
+must be set as the value returned by mysql internal password function.
+
+In the database password field will be stored a clean text password, a
+crypt unix password or a mysql password value.
+
+Default value is 'Password' and therefore clean password will be used.
+
+=item sql_control_file
+
+To connect to qmail database, this module uses the same login account
+of the qmail process. In the qmail process, following qmail-mysql
+documentetion, the database login access information is stored in a file
+located at ~qmail/control/sqlserver. 
+
+With this parameter you set the path to sqlserver file to permit this 
+module to read and use qmail database connection.
+
+Default value is '/var/qmail/control/sqlserver'
+
+=back
+
+=head2 PUBLIC METHODS
+
+=over 4
+
+=item connect
+
+???
+
+=item disconnect
+
+???
+
+=item rcpt_add( $rcpt_host )
+
+???
+
+=item rcpt_exists( $rcpt_host )
+
+???
+
+=item rcpt_del( $rcpt_host )
+
+???
+
+=item mail_add( $username , $domain , $password )
+
+???
+
+=item mail_exists( $username , $domain )
+
+???
+
+=item mail_del( $username , $domain )
+
+???
+
+=item alias_add( $alias_mail , $real_mail )
+
+???
+
+=item alias_exists( $alias_mail , $real_mail )
+
+???
+
+=item alias_del( $alias_mail , $real_mail )
+
+???
+
+=back
+
+=head1 DIAGNOSTICS
+
+No diagnostics error returned.
+
+=head1 EXPORT
+
+Nothing exported
+
+
+=head1 REQUIRES 
+
+DBI, DBD::mysql, File::Path
+
+
+=head1 AUTHOR
+
+Emiliano Bruni, E<lt>info/at/ebruni_dot_itE<gt>
+
+=head1 SEE ALSO
+
+The Iain Patterson web site http://iain.cx/qmail/
+
+=cut

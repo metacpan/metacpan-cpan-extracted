@@ -1,0 +1,110 @@
+{
+   "abstract" : "Queue like low-level interface for Gearman.",
+   "author" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Queue-Gearman",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Digest::MD5" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0.98",
+            "Test::SharedFork" : "0",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Queue::Gearman" : {
+         "file" : "lib/Queue/Gearman.pm",
+         "version" : "0.01"
+      },
+      "Queue::Gearman::Job" : {
+         "file" : "lib/Queue/Gearman/Job.pm"
+      },
+      "Queue::Gearman::Message" : {
+         "file" : "lib/Queue/Gearman/Message.pm",
+         "version" : "0.01"
+      },
+      "Queue::Gearman::Pool" : {
+         "file" : "lib/Queue/Gearman/Pool.pm"
+      },
+      "Queue::Gearman::Select" : {
+         "file" : "lib/Queue/Gearman/Select.pm"
+      },
+      "Queue::Gearman::Socket" : {
+         "file" : "lib/Queue/Gearman/Socket.pm"
+      },
+      "Queue::Gearman::Task" : {
+         "file" : "lib/Queue/Gearman/Task.pm"
+      },
+      "Queue::Gearman::Taskset" : {
+         "file" : "lib/Queue/Gearman/Taskset.pm"
+      },
+      "Queue::Gearman::Util" : {
+         "file" : "lib/Queue/Gearman/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/Queue-Gearman/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/Queue-Gearman",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/Queue-Gearman.git",
+         "web" : "https://github.com/karupanerura/Queue-Gearman"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KARUPA",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

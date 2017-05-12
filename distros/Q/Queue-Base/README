@@ -1,0 +1,206 @@
+NAME
+    Queue::Base - Simple OO style queue implementation.
+
+VERSION
+    version 2.203
+
+SYNOPSIS
+        use Queue::Base;
+
+        # construction
+        my $queue = new Queue::Base;
+        # or
+        my $queue = new Queue::Base(\@elements);
+
+        # add a new element to the queue
+        $queue->add($element);
+
+        # remove the next element from the queue
+        if (! $queue->empty) {
+            my $element = $queue->remove;
+        }
+
+        # or
+        $element = $queue->remove;
+        if (defined $element) {
+            # do some processing here
+        }
+
+        # add/remove more than just one element
+        $queue->add($elem1, $elem2 ...)
+        # and
+        @elements = $queue->remove(5);
+
+DESCRIPTION
+    The Queue::Base is a simple implementation for queue structures using an
+    OO interface. Provides basic functionality: nothing less - nothing more.
+
+METHODS
+  new [ELEMENTS]
+    Creates a new empty queue.
+
+    ELEMENTS is an array reference with elements the queue to be initialized
+    with.
+
+  add [LIST_OF_ELEMENTS]
+    Adds the LIST OF ELEMENTS to the end of the queue.
+
+  remove [NUMBER_OF_ELEMENTS]
+    In scalar context it returns the first element from the queue.
+
+    In array context it attempts to return NUMBER_OF_ELEMENTS requested;
+    when NUMBER_OF_ELEMENTS is not given, it defaults to 1.
+
+  remove_all
+    Returns an array with all the elements in the queue, and clears the
+    queue.
+
+  size
+    Returns the size of the queue.
+
+  empty
+    Returns whether the queue is empty, which means its size is 0.
+
+  clear
+    Removes all elements from the queue.
+
+  copy_elem
+    Returns a copy (shallow) of the underlying array with the queue
+    elements.
+
+  peek
+    Returns the value of the first element of the queue, wihtout removing
+    it.
+
+CAVEATS
+    The module works only with scalar values. If you want to use more
+    complex structures (and there's a big change you want that) please use
+    references, which in perl5 are basically scalars.
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Queue::Base
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/Queue-Base>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annonations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/Queue-Base>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/Queue-Base>
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/Queue-Base>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/Queue-Base>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/Q/Queue-Base>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual way to
+        determine what Perls/platforms PASSed for a distribution.
+
+        <http://matrix.cpantesters.org/?dist=Queue-Base>
+
+  Email
+    You can email the author of this module at "RUSSOZ at cpan.org" asking
+    for help with any problems you have.
+
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and join this
+        channel: #sao-paulo.pm then talk to this person for help: russoz.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to "bug-queue-base
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Queue-Base>. You will be
+    automatically notified of any progress on the request by the system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <https://github.com/russoz/Queue-Base>
+
+      git clone https://github.com/russoz/Queue-Base
+
+AUTHOR
+    Alexei Znamensky <russoz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Farkas Arpad, Alexei Znamensky.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

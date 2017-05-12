@@ -1,0 +1,20 @@
+---
+abstract: 'Hierarchical time logging (XS)'
+author:
+  - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
+build_requires:
+  Test::LeakTrace: 0
+  Test::More: 0
+  qbit: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: QBit-TimeLog-XS
+requires:
+  QBit::TimeLog: 0
+  XSLoader: 0
+  base: 0
+version: 0.008

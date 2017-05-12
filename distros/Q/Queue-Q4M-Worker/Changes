@@ -1,0 +1,36 @@
+Revision history for Perl module Queue::Q4M::Worker
+
+0.06 2013-11-15T00:56:45Z
+  * Add callbacks 'before_loop_cb' and 'loop_iteration_cb'.
+    'before_loop_cb' gets called before the main loop (so is called only
+    once per worker process), and 'loop_iteration_cb' is called for every
+    iteration of the worker loop.
+    Both callbacks may optionally return a guard object. This is useful,
+    for example, to apply changes that are only applicable for 1 loop
+    iteration, and you want to reset it again on the next iteration
+  * Change loop structure so that database handle is fetched for each
+    iteration of the loop. This means that if you're providing a callback
+    for 'dbh' parameter and you want to keep using the same handle,
+    you need to cache it somehow.
+  * Delays between loop iterations are randomized. This means that if
+    you specify a 1 second delay, the actual amount of sleep time is
+    rand(1), not 1.
+
+0.05 2013-11-12T01:55:38Z
+  * Implement delay between jobs
+
+0.04 2013-11-05T11:38:26Z
+  * Properly call queue_end()
+  * Implement min_requests_per_child and max_requests_per_child so
+    that each child worker terminates at random points
+  * Fix various typos
+
+0.03 2013-11-05T06:30:23Z
+  * Fix silly typo
+
+0.02 2013-11-05T05:21:42Z
+  * Migrate to Minilla
+
+0.00001 2011-04-17
+  * Initial release
+

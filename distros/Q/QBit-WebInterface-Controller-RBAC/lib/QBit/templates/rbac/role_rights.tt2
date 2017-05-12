@@ -1,0 +1,35 @@
+[% WRAPPER page %]
+[% form.start_form_html %]
+  [% FOREACH group = right_groups.keys %]
+  <h3>[% right_groups.${group}.name | html %]</h3>
+  <table class="table table-striped table-condensed">
+    <thead>
+      <tr>
+        <th style="width: 25%">[% gettext('Right') %]</th>
+        [% FOREACH role = roles %]
+        <th style="width: [% s = 75 / roles.size; s %]%">[% role.name | html %]</th>
+        [% END %]
+      </tr>
+    </thead>
+    [% FOREACH right = right_groups.${group}.rights %]
+    [%
+      right_fields_hs = {};
+      field_name = 'right__' _ right.id;
+      FOREACH field = form.get_fields_hs.${field_name};
+        right_fields_hs.${field.value} = field;
+      END;
+    %]
+    <tr>
+      <td>[% right.name | html %]<span class="muted">&nbsp;([% right.id | html %])</span></td>
+      [% FOREACH role = roles %]
+      <td>[% right_fields_hs.${role.id}.control_html() %]</td>
+      [% END %]
+    </tr>
+    [% END %]
+    </table>
+    [% END %]
+  [% form.get_fields_hs.submit.0.control_html() %]
+[% form.end_form_html %]
+
+[%# dumper(form) %]
+[% END %]

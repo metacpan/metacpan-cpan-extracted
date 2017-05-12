@@ -1,0 +1,12 @@
+Source: libqbit-application-model-db-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, liblib-abs-perl, libtest-differences-perl, libdbd-mock-perl, libqbit-perl, libqbit-class-perl, libqbit-application-perl, libdbi-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-db-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, liblib-abs-perl, libqbit-perl, libqbit-class-perl, libqbit-application-perl, libdbi-perl
+Description: Base class for working with databases.
+ Base class for working with databases. Use only it's descendants.

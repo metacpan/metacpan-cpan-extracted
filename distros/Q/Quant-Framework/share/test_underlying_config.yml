@@ -1,0 +1,263 @@
+---
+frxEURUSD:
+  symbol: frxEURUSD
+  system_symbol: frxEURUSD
+  market_name: forex
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'USD'
+  volatility_surface_type : 'delta'
+  exchange_name : 'FOREX'
+  uses_implied_rate_for_asset : 1
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 1.12345
+  asset_symbol : 'EUR'
+  quoted_currency_symbol : 'USD'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    atm_setting : 'atm_delta_neutral_straddle'
+    bf : '2_vol'
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+    rr : 'call-put'
+  asset_class : 'currency'
+GDAXI:
+  symbol: GDAXI
+  system_symbol: GDAXI
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'EUR'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'FSE'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 10071.94
+  asset_symbol : 'GDAXI'
+  quoted_currency_symbol : 'EUR'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'
+frxUSDJPY:
+  symbol: frxUSDJPY
+  system_symbol: frxUSDJPY
+  market_name: forex
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'USD'
+  volatility_surface_type : 'delta'
+  exchange_name : 'FOREX'
+  uses_implied_rate_for_asset : 1
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 1.12345
+  asset_symbol : 'EUR'
+  quoted_currency_symbol : 'USD'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    atm_setting : 'atm_delta_neutral_straddle'
+    bf : '2_vol'
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+    rr : 'call-put'
+  asset_class : 'currency'
+frxXAUUSD:
+  symbol: frxXAUUSD
+  system_symbol: frxXAUUSD
+  market_name: commodities
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'USD'
+  volatility_surface_type : 'delta'
+  exchange_name : 'METAL'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 1202.74,
+  asset_symbol : 'XAU'
+  quoted_currency_symbol : 'USD'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    atm_setting : 'atm_delta_neutral_straddle'
+    bf : '2_vol'
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+    rr : 'call-put'
+  asset_class : 'currency'
+SPC:
+  symbol: SPC
+  system_symbol: SPC
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'USD'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'NYSE_SPC'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 10071.94
+  asset_symbol : 'SPC'
+  quoted_currency_symbol : 'USD'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'
+AS51:
+  symbol: AS51
+  system_symbol: AS51
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'AUD'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'ASX'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 10071.94
+  asset_symbol : 'AS51'
+  quoted_currency_symbol : 'AUD'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'
+R_50:
+  symbol: R_50
+  system_symbol: R_50
+  market_name: volidx
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'R_50'
+  volatility_surface_type : 'flat'
+  exchange_name : 'RANDOM'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 7378.12345
+  asset_symbol : 'R_50'
+  quoted_currency_symbol : ''
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'synthetic'
+FCHI:
+  symbol: FCHI
+  system_symbol: FCHI
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'EUR'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'EURONEXT'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 3563.07
+  asset_symbol : 'FCHI'
+  quoted_currency_symbol : 'EUR'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'
+frxGBPNOK:
+  symbol: frxGBPNOK
+  system_symbol: frxGBPNOK
+  market_name: forex
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'GBP'
+  volatility_surface_type : 'delta'
+  exchange_name : 'FOREX'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 1
+  spot : 12.1930
+  asset_symbol : 'GBP'
+  quoted_currency_symbol : 'NOK'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    atm_setting : 'atm_delta_neutral_straddle'
+    bf : '2_vol'
+    delta_premium_adjusted : 1
+    delta_style : 'spot_delta'
+    rr : 'call-put'
+  asset_class : 'currency'
+FTSE:
+  symbol: FTSE
+  system_symbol: FTSE
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'GBP'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'LSE'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 7000.00
+  asset_symbol : 'FTSE'
+  quoted_currency_symbol : 'GBP'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'
+frxEURGBP:
+  symbol: frxEURGBP
+  system_symbol: frxEURGBP
+  market_name: forex
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'EUR'
+  volatility_surface_type : 'delta'
+  exchange_name : 'FOREX'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 1
+  spot : 0.88062
+  asset_symbol : 'EUR'
+  quoted_currency_symbol : 'GBP'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    atm_setting : 'atm_delta_neutral_straddle'
+    bf : '2_vol'
+    delta_premium_adjusted : 1
+    delta_style : 'spot_delta'
+    rr : 'call-put'
+  asset_class : 'currency'
+IBEX35:
+  symbol: IBEX35
+  system_symbol: IBEX35
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'EUR'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'BM'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 10069.30
+  asset_symbol : 'IBEX35'
+  quoted_currency_symbol : 'EUR'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'
+HSI:
+  symbol: HSI
+  system_symbol: HSI
+  market_name: indices
+  market_prefer_discrete_dividend: 0
+  quanto_only : 0
+  rate_to_imply_from : 'HKD'
+  volatility_surface_type : 'moneyness'
+  exchange_name : 'HKSE'
+  uses_implied_rate_for_asset : 0
+  uses_implied_rate_for_quoted_currency : 0
+  spot : 7000.00
+  asset_symbol : 'HSI'
+  quoted_currency_symbol : 'HKD'
+  extra_vol_diff_by_delta : 5
+  market_convention:
+    delta_premium_adjusted : 0
+    delta_style : 'spot_delta'
+  asset_class : 'index'

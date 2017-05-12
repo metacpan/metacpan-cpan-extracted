@@ -1,0 +1,216 @@
+==================================================
+Changes from 2016-04-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2017-04-23 11:45:45 +0000
+------------------------------------------
+
+  Change: 6b3e345e20830081f2bd6ce922bb33c2d76c36e6
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-04-23 14:44:44 +0000
+
+    Merge pull request #13 from Madskill/fix_bug
+
+    next => return and use ref 
+
+  Change: f77bbf5be72ffa0fec2da8a44617a63a31a867f9
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-04-23 14:42:28 +0000
+
+    next => return and use ref 
+
+------------------------------------------
+version 0.009 at 2016-12-11 00:01:18 +0000
+------------------------------------------
+
+  Change: fe25c25283723f01485b33da23d329a3abc881c2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-11 03:01:18 +0000
+
+    Version 0.009 
+
+  Change: 0ca56e6184ea8114f0024c4af7a47f963696a381
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-11 03:00:11 +0000
+
+    Merge pull request #12 from Madskill/any_of_for_hash
+
+    added documentation 
+
+  Change: 0f2f881f936087b003c4ffc754eb8395e5c5391b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-11 02:59:19 +0000
+
+    added documentation 
+
+  Change: 5d9367adca21717ba48f4b2b03492a7cb520dc8e
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-11 02:57:27 +0000
+
+    Merge pull request #11 from Madskill/any_of_for_hash
+
+    added new option 'any_of' for hash 
+
+  Change: f4443da4a328687624e55f5c98ac78f01a4479a1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-11 02:56:13 +0000
+
+    added new option 'any_of' for hash 
+
+------------------------------------------
+version 0.008 at 2016-11-19 15:12:34 +0000
+------------------------------------------
+
+  Change: 9898ee802b79be5fbcd181126aad9c83ae86c172
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 18:12:34 +0000
+
+    Version 0.008 
+
+  Change: 7e463956d40ca050e942acbb2fe1fea8c3666747
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 19:11:19 +0000
+
+    Merge pull request #10 from Madskill/fix_skip
+
+    Fix skip 
+
+  Change: e640d60a155c1d0d572e00efbc10c339eb4a092a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 18:09:09 +0000
+
+    move check error 
+
+  Change: 5014822a11fbf65a5be088faf796a26a4a7e3c24
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 18:03:40 +0000
+
+    last if error 
+
+  Change: 6d4a091920f9a7581fa220c3aae46f1ded6178c8
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 17:46:26 +0000
+
+    Merge remote-tracking branch 'upstream/master' into upload_to_cpan 
+
+  Change: 4ea38339a7f9dbcf438571c57ed3fba5c3eab1f4
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 17:44:08 +0000
+
+    last 
+
+  Change: 189d82a6951bb2e56592d7f34d52e175f7afdfe8
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 17:28:06 +0000
+
+    move logic into type 
+
+------------------------------------------
+version 0.007 at 2016-10-09 11:16:17 +0000
+------------------------------------------
+
+  Change: 6eeef30ce7ec19555c611bf637e22d6bcf848f1d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 14:16:17 +0000
+
+    Version 0.007 
+
+  Change: 959c7e87c78660c3e22cdbcb9d5fa700d5c8f5b4
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:15:23 +0000
+
+    Merge pull request #9 from Madskill/upload_to_cpan
+
+    added pod 
+
+  Change: eab4e27f35e6f2c8c1fa5c0ef2c70c026483af41
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 14:13:43 +0000
+
+    added pod 
+
+  Change: 77014bbe05e0b89f3f2673ed6b9ebe8670e7a540
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 14:29:35 +0000
+
+    Merge pull request #8 from Madskill/upload_to_cpan
+
+    upload to cpan and fix error for scalar 
+
+  Change: 3af04727c198be63733b7e51751f2bcdc63eedb2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 13:27:02 +0000
+
+    upload to cpan and fix error for scalar 
+
+  Change: 4b65348558d727eca62ecce4138176aac093a0a6
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-03-04 20:35:40 +0000
+
+    Merge pull request #7 from Madskill/master
+
+    added super_check 
+
+  Change: ea4367f6073e130586cb747e1e3c4d7ca418fa08
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-03-04 20:33:39 +0000
+
+    Merge pull request #8 from Madskill/add_test_with_deps
+
+    Add test with deps 
+
+  Change: 45cf0249625f17f5f8b777cbaeb41d4fc42436c8
+  Author: Igor Sverdlov <blizzard@yandex-team.ru>
+  Date : 2016-03-04 20:31:58 +0000
+
+    Merge branch 'master' of https://github.com/Madskill/QBit-Validator
+    into add_test_with_deps 
+
+  Change: e97f3e1dafa197ee8f63f1bf3e0e21c0c91d2238
+  Author: Igor Sverdlov <blizzard@yandex-team.ru>
+  Date : 2016-03-04 20:31:22 +0000
+
+    adde super_check 
+
+  Change: c876993b6300b8c90f6fd5bbd03bacb616414c21
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-03-04 15:06:00 +0000
+
+    Merge pull request #7 from Madskill/add_test_with_deps
+
+    Add test with deps 
+
+  Change: 0c3c5d63c1de56e591f1e7c6a733980d67b2496e
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-03-04 14:55:48 +0000
+
+    Merge pull request #6 from QBitFramework/master
+
+    Merge pull request #6 from Madskill/add_test_with_deps 
+
+  Change: 950dfbfc5d3efe6168ac78ecaadf98e11bd8fee4
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-03-04 14:54:50 +0000
+
+    Merge pull request #6 from Madskill/add_test_with_deps
+
+    Add test with deps 
+
+  Change: 69db778a200d3cee56853e96acdfa6c7eb44b523
+  Author: Igor Sverdlov <blizzard@yandex-team.ru>
+  Date : 2016-03-04 14:52:55 +0000
+
+    added tests 
+
+  Change: b6d9819bf1024b4b1eccf5efeb900268de995b38
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2015-12-13 00:47:59 +0000
+
+    Merge pull request #5 from QBitFramework/master
+
+    version 0.06 
+
+================================================
+Plus 6 releases after 2016-04-23 00:00:00 +0000.
+================================================

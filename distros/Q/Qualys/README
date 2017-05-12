@@ -1,0 +1,50 @@
+Qualys version 0.05
+===================
+
+Connect to the Qualys scanner API with perl
+
+This module is a wrapper for connecting and using the QualysGuard API for all Qualys partners. It
+will take care of authentication and creating the correct uri based on the options provided and
+the selected API script.
+
+Using the Qualys (specifically QualysGuard) API one can integrate QualysGuard into
+individual appplications using perl. The QualysGuard partners can access security auditing, network discovery, preferences,
+remediation ticket updates, and user enrollment functions using this interface.
+
+INSTALLATION
+
+MANUAL INSTALL
+
+Download the file and unpack. This is usually done by:
+
+   tar zxvf Qualys-x.xx.tar.gz
+
+Where x.xx is the version number. Next change into the newly created directory.
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you would like to install in a different directory (or if you do
+not have root access use 'perl Makefile.PL PREFIX=/install/path', where
+/install/path is the directory in which you want to install the module. Note
+that you should then use the "use lib '/install/path'" in your scripts.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTTP::Request
+  LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+QualysGuard is a registered trademark of Qualys, Inc. Qualys and the Qualys logo are trademarks of
+Qualys, Inc. All other trademarks are the property of their respective owners.
+

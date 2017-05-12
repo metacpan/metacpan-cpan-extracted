@@ -1,0 +1,39 @@
+TYPEMAP
+Qstruct_Definitions      T_PTROBJ_SPECIAL
+Qstruct_Builder      T_PTROBJ_SPECIAL
+int64_t         T_INT64
+uint64_t        T_UINT64
+int32_t         T_INT
+uint32_t        T_U_INT
+int16_t         T_SHORT
+uint16_t        T_U_SHORT
+int8_t         T_SHORT
+uint8_t        T_U_SHORT
+
+
+## cribbed from perlxstypemap and Math::Int64::C_API::Sample
+
+INPUT
+T_PTROBJ_SPECIAL
+    if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")){
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type, tmp);
+        }
+        else
+            croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+T_INT64
+        $var = SvI64($arg);
+
+T_UINT64
+        $var = SvU64($arg);
+
+
+OUTPUT
+T_PTROBJ_SPECIAL
+    sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+                              (void*)$var);
+T_INT64
+        $arg = newSVi64($var);
+
+T_UINT64
+        $arg = newSVu64($var);

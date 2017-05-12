@@ -1,0 +1,37 @@
+Changes
+gen_getters.pl
+gen_setters.pl
+lib/Qstruct.pm
+lib/Qstruct/Array.pm
+lib/Qstruct/Spec.pod
+libqstruct/compiler.c
+libqstruct/LICENSE
+libqstruct/Makefile
+libqstruct/parser.rl
+libqstruct/qstruct/builder.h
+libqstruct/qstruct/compiler.h
+libqstruct/qstruct/loader.h
+libqstruct/qstruct/uthash.h
+libqstruct/qstruct/utils.h
+libqstruct/README.md
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+perl_math_int64.c
+perl_math_int64.h
+Qstruct.xs
+t/00-system.t
+t/dev-test.sh
+t/empty.t
+t/evolution.t
+t/malformed.t
+t/portable-msgs/basic-nums.msg
+t/portable-msgs/strings-and-arrays.msg
+t/portable.t
+t/README
+t/roundtrip.t
+t/schema.t
+t/zerocopy.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

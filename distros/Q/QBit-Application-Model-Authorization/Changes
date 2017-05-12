@@ -1,0 +1,207 @@
+==================================================
+Changes from 2015-11-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2016-11-19 13:15:06 +0000
+------------------------------------------
+
+  Change: 25776686a4a15d0dda91567313e8bd732b15d35d
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 17:14:03 +0000
+
+    Merge pull request #5 from QBitFramework/change_keysize
+
+    change keysize 
+
+  Change: feea79a73acfa628bb680390779303fa56244a21
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-19 16:12:13 +0000
+
+    change keysize 
+
+------------------------------------------
+version 0.006 at 2016-10-09 12:29:24 +0000
+------------------------------------------
+
+  Change: ab5b5921aaf66d137680b9e297eea739da515199
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:29:24 +0000
+
+    Version 0.006 
+
+  Change: 247659e94af4b73dd93d752042eb34f2d8fc6b8e
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 16:28:06 +0000
+
+    Merge pull request #4 from QBitFramework/test_time_log
+
+    Test time log 
+
+  Change: 0a6ad9bcd6c09bab84a2b9c5877eb3677841a789
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 16:22:35 +0000
+
+    Merge pull request #3 from QBitFramework/use_crypt_blowfish
+
+    use Crypt::Blowfish 
+
+  Change: fd8cfb71d8d237486fa026655bf9090ec6f11b70
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:20:22 +0000
+
+    use Crypt::Blowfish 
+
+  Change: 1ff342a30e10b7adc9f229b23844010fe99c8e27
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:16:24 +0000
+
+    added TestTimeLog for tests 
+
+------------------------------------------
+version 0.005 at 2016-10-09 11:29:15 +0000
+------------------------------------------
+
+  Change: 2a709dce5dfc2872965fcaecd3578f1d54ca561f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 14:29:15 +0000
+
+    Version 0.005 
+
+  Change: 49dcbe925ffab10d937e939412911f01174a07d2
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 15:28:35 +0000
+
+    Merge pull request #2 from QBitFramework/move_t_lib
+
+    t_lib -> /t/lib 
+
+  Change: 83c7a6ba2683f2f059ab895b549d94ac13a8f01e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 14:25:40 +0000
+
+    t_lib -> /t/lib 
+
+------------------------------------------
+version 0.004 at 2016-09-11 13:19:37 +0000
+------------------------------------------
+
+  Change: 8757d84fbdfbc53419401762efd5f9b35946650c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:19:37 +0000
+
+    Version 0.004 
+
+  Change: d6a34b68c35a789f600659141c56cf2c8ba7fd86
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:18:47 +0000
+
+    Merge pull request #1 from QBitFramework/upload_to_cpan
+
+    upload to cpan 
+
+  Change: 5a1ec29d0ca0215c9cfcb080837628aa6307452d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:17:44 +0000
+
+    upload to cpan 
+
+------------------------------------------
+version 0.003 at 2015-12-31 18:09:56 +0000
+------------------------------------------
+
+  Change: a28b6b718dcda097e8893d92d18f161ea574f6b9
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 21:09:56 +0000
+
+    Version 0.003 
+
+  Change: 0e7a8ea0b645da4f49f57cb6e18763f953e91608
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 21:08:31 +0000
+
+    added in depends blowfish 
+
+------------------------------------------
+version 0.002 at 2015-12-31 16:03:39 +0000
+------------------------------------------
+
+  Change: 703df39a84990d93ec1e791f8b09e66d7ab96a45
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 19:03:39 +0000
+
+    Version 0.002 
+
+  Change: f156e4125aae60b104bad2715597defece01b2d1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 19:02:16 +0000
+
+    Merge remote-tracking branch 'origin/master' 
+
+  Change: 5d9747012eb6a85a1fd4e15fc6c9cbb96ed1f096
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 19:00:55 +0000
+
+    added in depends libtets-deep-perl 
+
+------------------------------------------
+version 0.001 at 2015-12-31 13:15:56 +0000
+------------------------------------------
+
+  Change: 2bce2de3cebbf6c23c450c6112413f9426176b7a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 16:15:56 +0000
+
+    Version 0.001 
+
+  Change: 475427ab3bc6086ed88a43e5791816378a6c097b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 16:14:32 +0000
+
+    use lib::abs 
+
+  Change: ae4e76811585f68a34e3437e334b59946b524b60
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 15:57:37 +0000
+
+    fix README.md 
+
+  Change: 91a638a02cda8e23ee2b65d9a7fcc0d2f791c062
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-31 15:51:36 +0000
+
+    deleted rights 
+
+  Change: 6ad9113079f7505cc9eb1cf95f46e42a0c29baa5
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-20 23:09:22 +0000
+
+    corrected README.md 
+
+  Change: 79aba2db6c62712721105683f123716bab22f651
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-20 23:06:46 +0000
+
+    fix test 
+
+  Change: c8a635d7d3dbf24e5d02359b73530d91663dd515
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-20 23:04:44 +0000
+
+    added about rights into README.md 
+
+  Change: 56118af4dd35f177d24cb3573329941f3e1529fd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-20 22:59:48 +0000
+
+    added rights and fix README.md 
+
+  Change: f732ccae41c94ed85298fa4d2b08584bfe725f33
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-20 22:47:01 +0000
+
+    authorization 
+
+================
+End of releases.
+================

@@ -1,0 +1,31 @@
+[% INCLUDE header.inc title = 'SPAM Quarantine Recipient Unauthorized' %]
+
+[% IF error %]
+<h1>[% GET error %]</h1>
+<p>
+[% GET error_detail %]
+</p>
+[% END %]
+
+<h1>Unauthorized recipient</h2>
+
+<p>
+This web site allows recipients who have accounts with ISPs
+that do reactive blacklisting to have some control over what
+happens to mail coming for them.
+</p><p>
+Before starting, we have to authorize you.  To do so, we send you an
+email.  That email will have a link in it.  Use that link to 
+show that you have permission to speak for yourself.
+</p><p>
+<form method="POST">
+	<ul>
+	Email address:
+	<input type="text" name="recipient" value="[% GET recipient %]" size=60>
+	<br>
+	<input type="submit" name="action" value="[% GET config.button_recipient_url %]">
+	</ul>
+[% GET hiddenstate %]
+</form>
+
+[% INCLUDE footer.inc %]

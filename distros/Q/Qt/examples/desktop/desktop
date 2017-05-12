@@ -1,0 +1,275 @@
+#!/usr/bin/perl -w
+
+use QApplication;
+use QColor;
+
+$seed = 0.353535353535;
+sub KINDA_RAND_MAX () { 32767 }
+
+sub kindaRand {
+    $seed *= 147;
+    $seed = $seed - int($seed);
+    return int($seed * (KINDA_RAND_MAX+1));
+}
+
+{
+    my $velmax = 15;
+    my $velmin = 4;
+
+    sub velocity {
+	my $i = shift;
+	if($i == 1 || $i == 2) {
+	    $i = (kindaRand()&0x7fff % $velmax)/3 + $velmin;
+	} else {
+	    $i = (kindaRand()&0x7fff % $velmax) + $velmin;
+	}
+	return $i;
+    }
+}
+
+#
+# Draw polygon on desktop
+#
+
+{
+    my $maxpoints = 5;
+    my $maxcurves = 8;
+    my @xvel;
+    my @yvel;
+
+    sub poly {
+	my $d = QApplication::desktop();
+	$d->setBackgroundColor($white);
+
+	my $head = 0;
+	my $tail = -$maxcurves + 2;
+	my @a;
+	for(1..$maxcurves) { $a[$_-1] = new QPointArray }
+	my $p;
+	my $r = $d->rect();
+
+	my $i;
+	for($i = 0; $i < $maxcurves; $i++) { $a[$i]->resize($maxpoints) }
+	$p = 0;
+	for($i = 0; $i < $maxpoints; $i++) {
+	    $a[$p]->setPoint($i, (kindaRand()&0x7fff) % $r->width(),
+			         (kindaRand()&0x7fff) % $r->height());
+	    $xvel[$i] = velocity($i);
+	    $yvel[$i] = velocity($i);
+	}
+
+	my $paint = new QPainter;
+	$paint->begin($d);
+
+	{
+	    my($ntimes, $minx, $maxx, $miny, $maxy, $x, $y);
+
+	    for($ntimes = 0; $ntimes < 2000; $ntimes++) {
+		$paint->setBrush(new QColor(kindaRand()%360, 180, 255,
+					    $Spec{Hsv}));
+		$paint->drawPolygon($a[$head]);
+		$tail = 0 if ++$tail >= $maxcurves;
+
+		$minx = $r->left(); $maxx = $r->right();
+		$miny = $r->top(); $maxy = $r->bottom();
+		$p = $head;
+		$head = 0 if ++$head >= $maxcurves;
+		for($i = 0; $i < $maxpoints; $i++) {
+		    $a[$p]->point($i, $x, $y);
+		    $x += $xvel[$i];
+		    $y += $yvel[$i];
+		    if($x >= $maxx) {
+			$x = $maxx - ($x - $maxx + 1);
+			$xvel[$i] = -velocity($i);
+		    }
+		    if($x <= $minx) {
+			$x = $minx + ($minx - $x + 1);
+			$xvel[$i] = velocity($i);
+		    }
+		    if($y >= $maxy) {
+			$y = $maxy - ($y - $maxy + 1);
+			$yvel[$i] = -velocity($i);
+		    }
+		    $a[$head]->setPoint($i, $x, $y);
+		}
+	    }
+	}
+	$paint->end();
+    }
+}
+
+#
+# Rotate pattern on desktop.
+#
+
+#{
+#    my $w = 64;
+#    my $h = 64;
+#
+#    sub rotate {
+#	my $i;
+#	my $image = new QImage($w, $h, 8, 128);
+#	for($i = 0; $i < 128; $i++) { $image->setColor($i, qRgb($i,0,0)) }
+#	for(my $y = 0; $y < $h; $y++) {
+#	    
+#    }
+#}
+
+sub generateStone {
+    my($pm, $c1, $c2, $c3) = @_;
+    my $p = new QPainter;
+    my $p1 = new QPen($c1, 0);
+    my $p2 = new QPen($c2, 0);
+    my $p3 = new QPen($c3, 0);
+
+    $p->begin($pm);
+    for(my $i = 0; $i < $pm->width(); $i++) {
+	for(my $j = 0; $j < $pm->height(); $j++) {
+	    my $r = kindaRand();
+	    if($r < KINDA_RAND_MAX / 3) {
+		$p->setPen($p1);
+	    } elsif($r < KINDA_RAND_MAX / 3 * 2) {
+		$p->setPen($p2);
+	    } else {
+		$p->setPen($p3);
+	    }
+	    $p->drawPoint($i, $j);
+	}
+    }
+    $p->end();
+}
+
+sub drawShadeText {
+    my($p, $x, $y, $text, $topColor, $bottomColor, $sw) = @_;
+
+    return unless $y->isActive();
+
+    $p->setPen($bottomColor);
+    $p->drawText($x+$sw, $y+$sw, $text);
+    $p->setPen($topColor);
+    $p->drawText($x, $y, $text);
+}
+
+package DesktopWidget;
+
+use QPixmap;
+use QWidget;
+
+@ISA = qw(QWidget);
+
+sub new {
+    my $self = shift->SUPER::new($_[1], $_[2], $WFlags{Type}{Desktop} |
+					       $WFlags{PaintDesktop});
+    $$self{'text'} = shift;
+    return $self;
+}
+
+sub paintEvent {
+    my $self = shift;
+    my $c1 = $self->backgroundColor();
+    my $c2 = $c1->light(104);
+    my $c3 = $c1->dark(106);
+    unless(exists $$self{'pm'}) {
+	my $pm = $$self{'pm'} = new QPixmap(64, 64);
+	generateStone($pm, c1, c2, c3);
+	$self->setBackgroundPixmap($pm);
+	$self->update();
+    }
+    my $br = $self->fontMetrics()->boundingRect($text);
+    my $offscreen = new QPixmap($br->width(), $br->height());
+    my $x = $self->width()/2 - $br->width()/2;
+    my $y = $self->height()/2 - $br->height()/2;
+    $offscreen->fill($self, $x, $y);
+    my $p = new QPainter;
+    $p->begin($offscreen);
+    drawShadeText($p, -$br->x(), -$br->y(), $text, $c2, $c3, 3);
+    $p->end();
+    $self->bitBlt($x, $y, $offscreen);
+}
+
+package main;
+
+use Qt;
+
+sub desktopWidget {
+    my $s = shift || 'PerlQt rocks';
+    my $t = new DesktopWidget($s);
+    $t->update();
+    $qApp->exec();
+}
+
+sub desktopText {
+    my $s = shift || 'PerlQt rocks';
+    my $border = 20;
+
+    my $c1 = $qApp->palette()->normal()->background();
+    my $c2 = $c1->light(104);
+    my $c3 = $c1->dark(106);
+
+    my $pm = new QPixmap(10, 10);
+
+    my $p = new QPainter;
+    $p->begin($pm);
+    my $r = $p->fontMetrics()->boundingRect($s);
+    $p->end();
+
+    my $appWidth = $qApp->desktop()->width();
+    my $appHeight = $qApp->desktop()->height();
+    if($r->width() > $appWidth - $border*2) {
+	$r->setWidth($appWidth - $border*2);
+    }
+    if($r->height() > $appHeight - $border*2) {
+	$r->setHeight($appHeight - $border*2);
+    }
+
+    $pm->resize($r->size() + new QSize($border*2, $border*2));
+    generateStone($pm, $c1, $c2, $c3);
+    $p->begin($pm);
+    drawShadeText($p, -$r->x() + $border, -$r->y() + $border, $s, $c2, $c3);
+    $p->end();
+
+    $qApp->desktop()->setBackgroundPixmap($pm);
+}
+
+#
+# The program starts here.
+#
+
+use QFont;
+
+if(@ARGV) {
+    my $f = new QFont("Charter", 96, $Weight{Black});
+    $f->setStyleHint($StyleHint{Times});
+    $qApp->setFont($f);
+}
+
+$validOptions = 0;
+
+if(@ARGV == 1) {
+    $_ = $ARGV[0];
+    $validOptions = 1;
+    if($_ eq '-poly') { poly() }
+    elsif($_ eq '-rotate') { rotate() }
+    elsif($_ eq '-perlqt') { desktopText() }
+    elsif($_ eq '-perlqtwidget') { desktopWidget() }
+    else { $validOptions = 0 }
+}
+if(@ARGV == 2) {
+    $_ = $ARGV[0];
+    $validOptions = 1;
+    if($_ eq '-shadetext') { desktopText($ARGV[1]) }
+    elsif($_ eq '-shadewidget') { desktopWidget($ARGV[1]) }
+    else { $validOptions = 0 }
+}
+unless($validOptions) {
+    die <<ENDDIE;
+Usage:
+	$0 -poly
+	$0 -rotate
+	$0 -perlqt
+	$0 -perlqtwidget
+	$0 -shadetext <text>
+	$0 -shadewidget <text>
+ENDDIE
+}
+exit(0);

@@ -1,0 +1,81 @@
+[% MACRO NavLink(path, file, type, add_text) BLOCK %]
+    [% IF type == 3 %]
+      [% file | html %]
+    [% ELSE %]
+      <a href="?path=[% path | uri %]&amp;file=[% file | uri %]" [% IF type == 4 %]style="color: red"[% END %]>[% file | html %][% add_text | html %]</a>
+    [% END %]
+[% END %]
+
+[% WRAPPER page %]
+<style>
+  .pod h1 {
+      color: #006699;
+      font-size: 150%;
+ }
+
+  .pod h2 {
+      color: #006699;
+      font-size: 130%;
+  }
+
+  .pod h3 {
+      color: #006699;
+      font-size: 120%;
+      font-style: italic;
+  }
+
+  .pod h4 {
+      color: #006699;
+      font-size: 110%;
+      font-weight: normal;
+  }
+</style>
+
+<ul class="breadcrumb">
+  <li>
+    <a href="[% cmd_link() %]"><i class="icon-home"></i></a>
+    <span class="divider">&nbsp;</span>
+  </li>
+  [%
+    folder_arr = data.path.split('/');
+    full_path = '/';
+  %]
+
+  [% FOREACH folder = folder_arr %]
+    [% NEXT UNLESS folder %]
+    <li>
+      [% IF loop.last && data.type == 1 %]
+        <li class="active">[% folder | html %]</li>
+        <span class="divider" style="color: #999;">::</span>
+      [% ELSE %]
+        [% NavLink(full_path, folder, 1) %]
+        <span class="divider" style="color: #08c;">::</span>
+      [% END %]
+    </li>
+    [% full_path = full_path _ '/' _ folder %]
+  [% END %]
+
+  [% IF data.type == 2 %]
+    <li class="active">[% data.fname | html %]</li>
+  [% END %]
+</ul>
+
+[% IF data.type == 1 %]
+  <ul class="unstyled">
+  [% FOREACH folder = data.folders.sort %]
+      <li>[% NavLink(data.path, folder, 1, '::') %]</li>
+  [% END %]
+
+  [% FOREACH file = data.files.sort('name') %]
+      <li>[% NavLink(data.path, file.name, file.type) %]</li>
+  [% END %]
+  </ul>
+[% END %]
+
+[% IF data.type == 2 %]
+  <div class="pod">
+    [% data.data %]
+  </div>
+[% END %]
+
+[% END %]

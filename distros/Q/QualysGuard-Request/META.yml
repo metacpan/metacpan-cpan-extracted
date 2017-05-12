@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               QualysGuard-Request
+version:            0.04
+abstract:           Simple interface to QualysGuard API
+author:
+    - Patrick Devlin <pdevlin@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:            1.04
+    HTTP::Request:   1.4
+    IO::File:        1.13
+    LWP::UserAgent:  2.036
+    Net::IP:         1.25
+    Net::SSL:        2.84
+    Scalar::Util:    1.19
+    Test::More:      0.78
+    URI::Escape:     3.28
+    XML::Simple:     2.18
+    XML::XPath:      1.13
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

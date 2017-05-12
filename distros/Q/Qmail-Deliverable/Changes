@@ -1,0 +1,52 @@
+# Revision history for Perl extension Qmail::Deliverable.
+# The format for this changelog is described at http://use.perl.org/~hex/journal/34882
+
+VERSION:      1.07
+fix:          default@example.org in vpopmail/valias now works as intended.
+new:          Support for vpopmail user-ext (disabled by default).
+change:       The plugin check_qmail_deliverable lost its "check_" prefix.
+info:         This version was provided by Matt Simerson.
+
+VERSION:      1.06
+new:          Support for vpopmail vaddaliasdomain.
+
+VERSION:      1.05
+new:          Support for vpopmail valias address extensions (foo-default).
+
+VERSION:      1.04
+new:          Support for vpopmail valias addresses.
+new:          Support for vpopmail "big dir" (hashed directory structure).
+change:       qmail-deliverabled now uses GNU style long options; old style
+              argument passing is deprecated.
+new:          qmail-deliverabled can now stay in the foreground for use with
+              DJB's daemontools.
+security:     Made qmail-deliverabled safer and taint mode compliant for
+              Perl 5.10.
+
+VERSION:      1.03
+new:          qmail-deliverabled now takes a pidfile on the command line, and can
+              stop itself using that.
+docs:         Qmail::Deliverable::Comparison, a document to compare with other
+              Qmail deliverability checkers.
+fix:          Now correctly loads "me" if "locals" does not exist.
+new:          An example init.d script.
+
+VERSION:      1.02
+new:          Support for bouncesaying, although without using the configured
+              error message. Plesk puts |bouncesaying in .qmail-default.
+
+VERSION:      1.01
+change:       qpsmtpd plugin check_qmail_deliverable installs as a binary, so
+              that it has a manpage. If you execute it, you get installation
+              instructions.
+new:          $Qmail::Deliverable::Client::SERVER can be a callback now.
+change:       Plugin now uses the callback option for cleaner code.
+fix:          Plugin now allows hostnames instead of IP adresses only.
+fix:          Exclusions now enabled for smtproutes.
+incompatible: ::Client::qmail_local no longer returns undef on connection error,
+              because undef already meant something else.
+new:          qmail-deliverabled has basic statistics in $0.
+docs:         Minor documentation updates.
+
+VERSION:      1.00
+new:          First CPAN release.

@@ -1,0 +1,9 @@
+My wishes for future versions:
+
+- Put plugin or smtproutes functionality in a module
+- Put status descriptions in a module
+- Provide more detailed info for what's now just 0x00
+- Write a qmail-spp plugin
+- Change the qpsmtpd plugin to a module based plugin
+- Use real daemonization instead of fork && exit
+- Write a test suite; is this even possible?

@@ -1,0 +1,21 @@
+Revision history for Quote-Reference
+
+1.0.0   2009-02-18
+
+        * Initial release
+
+1.0.1   2009-03-02
+
+        * Fixed version for dependency of Filter::Simple
+
+1.0.2   2012-07-10
+
+        * Updated contact info, license
+
+1.0.3   2012-07-10
+
+        * Fixed documentation, formatting
+
+1.0.4   2012-08-30
+
+        * Added FAQ

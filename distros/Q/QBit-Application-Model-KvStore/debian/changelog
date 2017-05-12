@@ -1,0 +1,26 @@
+libqbit-application-model-kvstore-perl (0.004) raring; urgency=low
+
+  * fix description
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 14 Mar 2017 08:38:06 +0300
+
+libqbit-application-model-kvstore-perl (0.003) raring; urgency=low
+
+  * Fixed debian/changelog
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 27 Mar 2014 19:59:58 +0400
+
+libqbit-application-model-kvstore-perl (0.002) raring; urgency=low
+
+  * Added base DB class
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Sep 2013 18:48:29 +0400
+
+libqbit-application-model-kvstore-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Sep 2013 18:43:56 +0400
+

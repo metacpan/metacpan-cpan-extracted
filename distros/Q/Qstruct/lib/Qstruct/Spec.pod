@@ -1,0 +1,350 @@
+=encoding utf-8
+
+=head1 QSTRUCT SPECIFICATION
+
+Qstruct - Design objectives and format specification
+
+
+=head1 DESCRIPTION OF QSTRUCT
+
+B<Qstruct> is a binary data serialisation format. Unlike L<Storable>, L<Data::MessagePack>, L<Sereal>, L<CBOR::XS> etc, qstruct data requires schemas. This makes it more like L<ASN.1|http://www.itu.int/en/ITU-T/asn1/Pages/introduction.aspx>, L<Thrift::XS>, or L<Google::ProtocolBuffers>.
+
+In addition to the above, Qstruct is similar to L<Simple Binary Encoding|https://github.com/real-logic/simple-binary-encoding/wiki> and L<Blink Protocol|http://www.blinkprotocol.org/>'s "native binary format".
+
+Qstruct is most similar to L<Cap'n Proto|http://kentonv.github.io/capnproto/>. I am indebted to Kenton Varda for publishing many insights related to this type of serialisation. Qstructs originally came about as an attempt to port Cap'n Proto to perl which explains the similarities in their schema languages.
+
+
+=head1 GOALS
+
+The goal of Qstruct is to provide as close as possible performance to C C<struct>s -- even ones containing pointers -- while also being portable, extensible, and safe.
+
+With Qstructs, the "in-memory" representation is the same as the "wire" representation. Because it's redundant to distinguish between these two formats, this documentation will only refer to B<the Qstruct format> which covers both in-memory and wire representations.
+
+C<Portable>: All integers and floating point numbers are stored in little-endian byte order and aren't necessarily stored at aligned offsets. Despite these restrictions, Qstructs can be used on any CPU, even ones that are big-endian and/or have strict alignment requirements.
+
+C<Extensible>: New fields can be added to qstruct schemas as needed without invalidating already created messages. Existing fields can be renamed or re-ordered so long as the types or C<@> ids aren't changed.
+
+C<Safe>: Accessing data from untrusted sources should never cause the program to read or write out of bounds (causing a segfault or worse). The Qstruct format is designed to be simple in order to help with the verifying and testing of this. There is a canonicalisation specification being developed so canonicalised Qstructs will be cache and diff-friendly and suitable for digital signing.
+
+C<Efficient>: Because there is no difference between in-memory versus wire formats, there is no encoding/decoding needed. Even for extremely large messages, loading is instantaneous (it just does some basic sanity checking of the message size and header information). If you only access a few fields of a message you don't pay any deserialisation costs for the fields you didn't access. In other words, you only pay for what you use because messages accessors are B<lazy>. Furthermore, all operations are inherently B<zero-copy>: The values you extract will always be pointers into the message data. The only copying that occurs is what you copy out manually (see below).
+
+=head1 SCHEMA LANGUAGE
+
+The schema language is modeled after the Cap'n Proto schema language.
+
+A schema is a series of qstructs. Each qstruct contains 0 or more fields. Each field is 3 items: The name, the C<@> id, and the type specifier. Qstruct names must start with upper-case letters and item names must start with lower-case letters.
+
+Whitespace is insignificant. C and perl-style comments are supported.
+
+Here is an example schema:
+
+      qstruct User {
+        id @0 uint64;
+        active @4 bool;
+        name @2 string;
+        email_addrs @3 string[]; # dynamic array (pointer-based)
+        sha256_checksum @1 uint8[32]; # fixed array (inlined in body)
+        accounts @5 Account[]; # array of nested Account qstructs
+      }
+
+      qstruct Some::Package::Junk {
+        /* There can be multiple qstructs in a schema.
+         * And this one is... empty!
+         */
+      }
+
+
+=head1 PRIMITIVE TYPES
+
+=over 4
+
+=item  int
+
+A family of types that differ in signedness, size, and alignment: C<int8>, C<int16>, C<int32>, C<int64>, C<uint8>, C<uint16>, C<uint32>, C<uint64>.
+
+Always stored in little-endian byte order (even in-memory on big-endian machines).
+
+Default: 0
+
+Alignment: 1 (unaligned), 2, 4, or 8 bytes
+
+=item  float/double
+
+IEEE-754 floating point numbers in little-endian byte order. C<float> and C<double> occupy 4 and 8 bytes respectively.
+
+Default: 0.0
+
+Alignment: 4 bytes for a float, 8 bytes for a double
+
+=item  bool
+
+A single-bit "flag". This is the only type where multiple values get packed together inside a single-byte.
+
+bool is the one type that can't be stored in any sort of array. However, you can store your own bit-fields in integers, arrays of integers, strings, or blobs.
+
+Default: 0 (false)
+
+Alignment: N/A
+
+
+=item  string/blob
+
+A (size, offset) tuple referring to a subsequent part of the message. These fields consume at least 16 bytes each. The only difference between B<string>s and B<blob>s is that blobs are aligned at 8 bytes and are therefore suitable for maintaining message alignment. Strings are unaligned.
+
+Strings and blobs are both considered arbitrary sequences of bytes and neither type enforces any character encoding. I don't believe it is necessary for (or even the place of) a serialisation format to dictate encoding policies. Of course you are free to enforce a common encoding for all of I<your> messages. Qstruct may eventually have an C<:encoding> field modifer that directs implementations to enforce character encodings.
+
+Neither strings nor blobs are NUL-byte terminated. They may also contain NUL-bytes in mid-sequence. Failure to use the associated sizes of strings or blobs is a serious bug in your code. In high-level languages such as perl you should never need to worry about this but you do need to be careful when using the L<libqstruct|https://github.com/hoytech/libqstruct> C API and C/C++ code generated by L<Qstruct::Compiler>.
+
+Qstruct strings employ a space optimisation called B<tagged-sizes>. This is the only "clever" packing trick in the Qstruct format and it benefits a fairly common work-load where qstructs contain many small strings.
+
+String sizes are encoded specially to support tagged sizes. If the least-significant nibble of the first byte is zero then the whole 64-bit size is bit-shifted down 8 bits and this value is used as the size and the offset into the heap of the string's location are stored in the following 8 offset bytes. If however the least-significant nibble of the first byte is non-zero, this nibble is taken to be an inline length and the string's offset is to the following byte. Because there are 7 remaining bytes in the size and 8 following bytes in the now un-needed offset, strings of 15 (0xF) or fewer bytes can be stored in tagged-sizes.
+
+Blobs never use tagged-sizes because of their alignment requirements.
+
+Default: "" (empty string: size=0, pointer=NULL)
+
+Alignment: The pointers to strings/blobs are aligned at 8. String data is aligned at 1 (unaligned), blob data is aligned at 8.
+
+=back
+
+
+
+
+=head1 FORMAT
+
+=head2 MESSAGE
+
+A message is a block of data representing a Qstruct. It is either in the process of being built or is read-only and suitable for accessing.
+
+The message data should be considered a binary blob. It may contain NUL bytes so its length must be stored separately (ie, you can't count on a terminating NUL).
+
+Messages can in theory be any size representable by an unsigned 64 bit number. However, on 32-bit machines some messages are too large to access and attempting to build, load, or access these messages will throw exceptions (not that you'd be able to load such messages into memory anyway). There are other size constraints as well: Arrays can't contain more than C<2**32 - 1> elements, and qstruct bodies can't be more than C<2**32 - 1> bytes large.
+
+Messages are not self-delimiting so when transmitting or storing they need to be framed in some fashion. For example, when sending across a socket you might choose to send an 8-byte little-endian integer before the message data to indicate the size of the message that follows. When you apply framing be aware that it may impact data alignment at the receiving end which is OK except that misaligned messages may degrade performance on some machines (not modern x86-64 processors).
+
+
+=head2 HEADER
+
+All Qstructs and arrays start with a 16 byte C<header>:
+
+    00000000  00 00 00 00 00 00 00 00  15 2f 00 00 01 00 00 00
+              |-------magic id------|  |body size| |body count|
+
+The first 8 bytes are the B<magic id> of the qstruct type (by default all 0s). The magic id is useful for dynamic typing and schema versioning.
+
+The next 4 bytes represent a little-endian unsigned 32-bit integer that indicates the C<body size> of the message. Different schema versions of the same qstruct (ie ones with more/fewer C<@> ids) may have different body sizes.
+
+The following 4 bytes represent a little-endian unsigned 32-bit integer that indicates the C<body count>. This is the number of bodies present in the message. The root qstruct will typically have a body count of 1, as will nested qstructs. Arrays of nested qstructs will have a body count of 0 or more.
+
+
+
+=head2 CONTENT
+
+The B<content> immediately follows the header. Its exact layout depends on the schema. For example, consider the following schema:
+
+    qstruct User {
+      id @0 uint64;
+      is_admin @1 bool;
+      name @2 string;
+      is_locked @3 bool;
+    }
+
+Suppose we create a message with the following data:
+
+    my $user = User->build;
+    $user->name("hello world!")
+         ->id(100)
+         ->is_admin(1)
+         ->is_locked(1);
+    my $message = $user->encode;
+
+Here is the hexdump of the resulting message:
+
+    00000000  00 00 00 00 00 00 00 00  20 00 00 00 01 00 00 00  |........ .......|
+              |---------------------header-------------------|
+
+    00000010  64 00 00 00 00 00 00 00  03 00 00 00 00 00 00 00  |d...............|
+              |--------id (@0)------|  || |----free space----|
+                                       ||
+                                       |->is_admin|is_locked (@1|@3)
+
+    00000020  0c 68 65 6c 6c 6f 20 77  6f 72 6c 64 21 00 00 00  |.hello world!...|
+              || |--------inline string data--------| |--pad-|
+              ||
+              |-> name (@2) tag byte indicating length of inline string
+
+
+When computing the offsets, the Qstruct compiler will always try to find the first location in the message that a data type will fit into while still respecting the alignment requirement of the data type. The algorithm is equivalent to a B<first-fit> memory allocator.
+
+In the case of arrays, multiple B<bodies> will be stored adjacent in the content as determined by the C<body_size> and C<body_count> values from the header. There may be padding between bodies to maintain alignments. Bodies can't be more than C<2**32 - 1> bytes large.
+
+The body size needs to be stored in the header because the size of the body will change depending on the version of the schema. If a field that has an end offset beyond a body's bounds is accessed, a default value is returned (see the types section for the list of default values).
+
+
+=head2 HEAP
+
+When a tagged size cannot be used because of a string exceeding 15 bytes in length or a type that prohibits it (ie blob or dynamic array), the value will be appended onto the B<heap>.
+
+Heap locations are referenced by "pointers" which are actually offsets from the beginning of the header in bytes. For example, given the schema from the previous section, if the name is instead C<"too long for tagged size"> then it must be stored in the heap: 
+
+    HDR:  00000000  00 00 00 00 00 00 00 00  20 00 00 00 01 00 00 00  |........ .......|
+    CONT: 00000010  64 00 00 00 00 00 00 00  03 00 00 00 00 00 00 00  |d...............|
+    CONT: 00000020  00 18 00 00 00 00 00 00  30 00 00 00 00 00 00 00  |........0.......|
+                    |-------size << 8-----|  |----start offset-----|
+    HEAP: 00000030  74 6f 6f 20 6c 6f 6e 67  20 66 6f 72 20 74 61 67  |too long for tag|
+    HEAP: 00000040  67 65 64 20 73 69 7a 65                           |ged size|
+
+The heap is also used for dynamic arrays. In contrast to fixed-size inline arrays which are allocated in the content, dynamic arrays point to a variable number of sequential elements in the heap.
+
+In the case of dynamic arrays of strings, blobs, or nested qstructs, the heap may contain additional pointers which refer to the string, blob, or message contents.
+
+Qstruct messages are designed to be traversable without recursion or looping so there is nothing to configure with respect to stack overflows or cyclic data-structures.
+
+Pointers must always point forwards (ie be larger than the offset of the pointer's offset). In a single operation, the maximum pointer traversal depth is 2 (the case of accessing an element from a dynamic array). If the contents is a nested qstruct or a blob with embedded pointers, you may choose to traverse the contained pointers also, but that is up to you.
+
+
+
+=head1 ARRAYS
+
+As mentioned above, there are two different types of arrays: B<dynamic arrays> and B<fixed arrays>.
+
+
+=head2 DYNAMIC ARRAYS
+
+Dynamic arrays have empty bracketed array specifiers.
+
+Dynamic arrays can be of any type except for bool.
+
+Examples:
+
+    account_ids @0 uint64[];
+    profile_pictures @1 blob[];
+    comments @2 MyApp::Comment[];
+
+Dynamic arrays are the most flexible type of arrays since they can contain from C<0> to C<2**32 - 1> elements or at least up to available memory and address space limitations.
+
+The size and offset of a dynamic array are stored in the body of a message, meaning dynamic arrays consume 16 bytes even when empty. Additionally, accessing them requires an indirection through the offset pointer.
+
+Dynamic arrays are stored on the heap. Because in addition to the offset pointer and length, arrays also contain information that encodes how wide each element is, it is possible to evolve a schema by changing a dynamic array of a primitive into a dynamic array of qstructs as long as the first element in the qstruct is the same type as the original primitive.
+
+There is no such thing as a "null pointer" in qstructs so if a dynamic array isn't populated it is implicitly set to be an empty array. The same applies for schema evolution. If you read an old message created before an array was added, the array is read as an empty array.
+
+Arrays can't contain more than C<2**32 - 1> elements and no element can be larger than C<2**32 - 1> bytes large.
+
+
+=head2 FIXED ARRAYS
+
+Fixed arrays have numbers inside their bracketed array specifiers.
+
+Only numeric (ie integer or floating point) types may be used in fixed arrays: Strings, blobs, bools, and qstructs cannot be stored in fixed arrays.
+
+Examples:
+
+    sha256_checksum @0 uint8[32];
+    rainfall_by_month @1 float[12];
+
+Fixed arrays are stored inline in the body of the message which avoids 32 bytes of overhead per array. Their size and offset from the start of the message is always known exactly so there is no need to store/compute offset pointers or lengths. However, you can never change the size of the array so they should only be used when you are 100% certain that you will never want to expand, shrink, or remove this field. Additionally, unlike dynamic arrays, you can't change your mind later and convert them into arrays of qstructs.
+
+
+
+=head1 NESTED QSTRUCTS
+
+Once a qstruct type is defined, subsequent qstruct definitions may use them as types, either as scalars or arrays:
+
+    qstruct Account {
+      id @0 uint64;
+      balance @1 double;
+    }
+
+    qstruct User {
+      username @0 string;
+      primary_account @1 Account;
+      sub_accounts @2 Account[];
+    }
+
+Note that there is no way a qstruct name can collide with a primitive type because qstruct names always begin with upper-case letters and primitive types always being with lower-case letters.
+
+Since there is no such thing as a "null pointer" in qstructs, if a nested qstruct isn't populated then its fields are implicitly set to their default values. The same applies for schema evolution: If you read from an old message created before the qstruct was added, default values will be returned. As with all arrays, unpopulated arrays of qstructs are considered to be empty (0-length).
+
+Nested qstructs are encoded in the same way as blobs: a pointer exists in the body at a fixed offset which references a section of the heap where the data is stored. At the start of this section is a header that is the same format as the root header. For a single nested qstruct, the number of bodies will be 1. However, for an array of qstructs the number of bodies will be 0 or more. The purpose of this design is to not need a full 16-byte header for every element in a qstruct array. If your qtstruct elements are only 1 byte long, then each element will take only 1 byte. Note that due to alignment, sometimes padding (at most 3 bytes) needs to separate elements in the array.
+
+Currently, qstructs must be declared before use and there is no such thing as "forward declarations". We're still thinking of the best way to implement this, but if you need tree-like or mutually-referential qstructs you can embed them in blobs for now.
+
+
+
+=head1 SCHEMA EVOLUTION
+
+Comments and extra whitespace can be added/removed anywhere in the schema.
+
+The qstruct definitions can be shuffled around in any order in the schema (currently as long as no qstruct depends on a definition that comes after it).
+
+You can add new fields to a qstruct as long as you don't change existing fields' types or C<@> ids and there are no collisions or gaps in the C<@> id numbers. Any messages that were created with the old schema will still be loadable: Accessing new fields in old messages will return default values.
+
+You can change the name of any field as long as you don't change its C<@> id.
+
+You can re-arrange the fields in a qstruct: only the types and C<@> ids influence the packing order.
+
+You can change a dynamic array of a primitive type into a dynamic array of a qstruct providing that the qstruct has an element of the primitive type as its C<@0> id.
+
+You can change the signedness of integer types as long as you are OK with effectively re-casting the data (negative ints become large positive ints and large positive ints become negative ints).
+
+You can change a blob to a string (though this impacts canonicalisation) but you can't change a string to a blob (due to alignment).
+
+
+=head1 SAFETY
+
+=head2 SAFETY OF SCHEMA PARSING
+
+Do not process schemas from potentially malicious sources. There are trivial memory consumption attacks possible. That said, the ragel finite state machine parser is very precise so there should be no code-execution attacks possible.
+
+=head2 SAFETY OF LOADING/ACCESSING
+
+If the message has been corrupted by a malicious attacker (or you accidentally use the wrong schema) then there should be no possibility of a segfault or reading/writing out of bounds. However, the message data will be garbage (but of course malicious messages can encode garbage data anyway).
+
+When loading or accessing a message there should be no way to make this module consume any more memory than you explicitly copy out of it. In any one operation this will be at most the size of the message. With zero-copy accessors none of the message data is copied at all.
+
+Unlike Cap'n Proto, the simplistic nature of the Qstruct format does not provide list-like/tree-like/nested data-structures so there is nothing to configure in the Qstruct implementation to prevent stack overflows, cycles, or recursion.
+
+However, nested qstructs and blobs (or arrays of them) can be manually traversed if you choose. If you do this in some data-directed fashion (as opposed to code-directed) your program may be vulnerable to resource-exhaustion attacks if it processes malicious messages. I suggest using purely code-directed message traversal if possible.
+
+
+=head1 CANONICALISATION
+
+This is not implemented yet but, subject to some constraints I will document here, messages can be efficiently converted into canonical forms. The C<copy> method will return a canonicalised version of a message. The biggest complication is canonicalisation across schema changes.
+
+There is a lot to think about for this so don't rely on this feature for security until at least all the following points are fleshed out:
+
+    * Null out all free and unallocated space
+    * Make sure 0-length strings/blobs/arrays always point to NULL
+    * Make sure that all pointers point forwards and are strictly
+      increasing when traversed in a designated order
+    * Make sure tagged-size optimisation is always applied when possible
+    * Zero-out high bytes and high nibble in tagged-sizes
+    * Fields and arrays of fields must always be at correct alignment
+    * Normalise floating point NaN representations (qNaN/sNan)
+    * Ensure body is the right size for the current schema version
+    * Ensure no extra padding on end of message
+    * Recursively canonicalise nested qstructs
+
+
+=head1 SEE ALSO
+
+L<Qstruct> - The perl module reference dynamic-implementation
+
+L<Qstruct::Compiler> - The reference compiler implementation
+
+L<libqstruct|https://github.com/hoytech/libqstruct> - Shared C library
+
+L<Qstruct github repo|https://github.com/hoytech/Qstruct>
+
+=head1 AUTHOR
+
+Doug Hoyte, C<< <doug@hcsw.org> >>
+
+=head1 COPYRIGHT
+
+Copyright 2014 Doug Hoyte.
+
+This specification can be redistributed, alternately rendered, and otherwise remixed without restriction so long as all alterations are prominently described.
+
+All other rights reserved.

@@ -1,0 +1,6 @@
+[% INCLUDE header.inc title = 'SPAM Quarantine Unauthorized' %]
+
+An email has been sent to [% GET recipient %].  Please click the
+URL included in the email.
+
+[% INCLUDE footer.inc %]

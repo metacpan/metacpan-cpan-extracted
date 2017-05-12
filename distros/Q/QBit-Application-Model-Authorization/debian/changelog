@@ -1,0 +1,63 @@
+libqbit-application-model-authorization-perl (0.007) raring; urgency=low
+
+  * change keysize
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 19 Nov 2016 16:15:06 +0300
+
+libqbit-application-model-authorization-perl (0.006) raring; urgency=low
+
+  * use Crypt::Blowfish
+
+  * added TestTimeLog for tests
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 15:28:55 +0300
+
+libqbit-application-model-authorization-perl (0.005) raring; urgency=low
+
+  * t_lib -> /t/lib
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 14:29:06 +0300
+
+libqbit-application-model-authorization-perl (0.004) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 16:19:29 +0300
+
+libqbit-application-model-authorization-perl (0.003) raring; urgency=low
+
+  * added in depends blowfish
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 31 Dec 2015 21:09:49 +0300
+
+libqbit-application-model-authorization-perl (0.002) raring; urgency=low
+
+  * added in depends libtets-deep-perl
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 31 Dec 2015 19:03:32 +0300
+
+libqbit-application-model-authorization-perl (0.001) raring; urgency=low
+
+  * use lib::abs
+
+  * fix README.md
+
+  * deleted rights
+
+  * corrected README.md
+
+  * fix test
+
+  * added about rights into README.md
+
+  * added rights and fix README.md
+
+  * authorization
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 31 Dec 2015 16:15:35 +0300
+
+libqbit-application-model-authorization-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 12 Dec 2015 14:06:53 +0400

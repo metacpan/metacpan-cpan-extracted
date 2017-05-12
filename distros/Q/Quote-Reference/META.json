@@ -1,0 +1,47 @@
+{
+   "abstract" : "Create array refs with qwr(...), hash refs with qhr{...}",
+   "author" : [
+      "Anthony Kilna <anthony@kilna.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Quote-Reference",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Simple" : "0.80",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Quote::Reference" : {
+         "file" : "lib/Quote/Reference.pm",
+         "version" : "v1.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.4"
+}

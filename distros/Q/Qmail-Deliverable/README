@@ -1,0 +1,36 @@
+Qmail-Deliverable
+=================
+
+qmail-smtpd does not know if a user exists. Lots of resources are wasted by
+scanning mail for spam and viruses for addresses that do not exist anyway.
+
+A replacement smtpd written in Perl could use this module to quickly verify
+that a local email address is (probably) actually in use.
+
+This module comes with a daemon program called qmail-deliverabled and a module
+called Qmail::Deliverable::Client that copies the entire public interface, but
+queries the daemon. Typically, the daemon runs as the root user, and the client
+is used by the unprivileged smtpd.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires a functional qmail installation in its standard location,
+/var/qmail.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Juerd Waalboer
+
+Released into the public domain, without warranty or guarantee of any kind.
+Use at your own risk.

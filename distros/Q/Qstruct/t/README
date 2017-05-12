@@ -1,0 +1,9 @@
+# Before release:
+
+sudo cpanm Test::ZeroCopy
+
+# Run the test-suite with address sanitizer library (requires gcc 4.8+):
+
+XCFLAGS=-fsanitize=address XLDLIBS=-lasan perl Makefile.PL
+XCFLAGS=-fsanitize=address make
+make test

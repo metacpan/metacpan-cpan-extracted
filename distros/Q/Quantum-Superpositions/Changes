@@ -1,0 +1,52 @@
+Revision history for Perl extension Quantum::Superpositions.
+
+0.01  Wed Sep 10 10:34:42 1997
+	- original version; created by h2xs 1.18
+
+
+
+1.01	Thu Aug 10 09:28:34 2000
+
+	- Fixed pod bug (=haed2 -> =head2)
+
+	- Added Makefile.pm PREREQ_PM for Class::Multimethods
+
+	[Still working on 5.6.0 compatibility]
+
+
+1.02	Thu Aug 10 10:19:30 2000
+
+	- Fixed 5.6.0 compatibility
+
+	- Added ability to superimpose subroutine references.
+
+
+1.03	Fri Aug 11 05:49:28 2000
+
+	- Fixed argument passing to superimposed subroutines.
+
+1.04
+1.05
+	- Doc bugs, change ownership.
+
+2.00	Sat Apr  5 23:41:39 CST 2003
+
+- Replaced the cross product with an iterator. this means
+  that any(@these) != all(@those) does not need to generate
+  the full cartesian product up front. The prime sieve 
+  (demo/demo_Primes) now runs in reasonable time/memory.
+
+- Added comments to the code.
+
+- Shuffled a bit of the code so that globals are defined
+  towards the top of the code. This is a maintinence 
+  issue only.
+
+- Turned on my friend and yours: strict.
+
+- Replaced naked strings with qw's necessary to accomodate
+  strict.
+
+2.01	Tue Apr 22 17:45:31 CDT 2003
+
+- Added diskfree to the demos.

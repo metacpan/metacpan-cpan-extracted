@@ -1,0 +1,12 @@
+Source: libqbit-graphviz-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libgraphviz-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-graphviz-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libgraphviz-perl
+Description: QBit wrapper on Graphviz.
+ QBit wrapper on Graphviz. It work with UTF-8 characters.

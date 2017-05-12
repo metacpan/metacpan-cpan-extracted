@@ -1,0 +1,156 @@
+README
+
+      Qmail/Control      version 0.01
+      Qmail/Control/Lock version 0.01
+      ===============================
+
+    This module is not finished. Only the methods listed in the section on
+    "METHODS" have been implemented, but at least these have been completed.
+
+    This module's interface will change before the next minor release.
+    Specifically, the current nasty error return scheme will be replaced
+    with a better one, similar to DBI's.
+
+    This version is being uploaded to get feedback. Version 0.02 will have a
+    stable interface, support for most of Qmail's control files, [hopefully]
+    a better and more portable locking system, and should be ready for
+    production use.
+
+INSTALLATION
+
+    Use the following to install this module:
+
+        shell$ perl Makefile.PL
+        shell$ make
+        shell$ make test
+        shell# make install
+    
+NAME
+
+    Qmail::Control - Perl extension for interfacing with Qmail's control
+    files.
+
+DESCRIPTION
+
+    Qmail::Control provides an interface for reliably modifying Qmail's
+    control files from your Perl programs. It only provides an object
+    oriented interface.
+
+SYNOPSIS
+
+      use Qmail::Control;
+
+      my $control = Qmail::Control->new();
+
+      # Get a shared lock on the control system.  This is important, because
+      # when we're making decisions based on the return values of multiple
+      # methods, we don't want to be fooled by a race condition.
+      my $lock = $control->lock('shared');
+
+      # Print all hosts which we accept mail for.
+      my @rcpthosts = $control->get_rcpthosts();
+      foreach (@rcpthosts) {
+        print "Found a rcpthost for $_->{'host'}.";
+        }
+
+      # Print the list of virtual domains.
+      my @virtualdomains = $control->get_virtualdomains();
+      foreach (@virtualdomains) {
+        print "Found a vdom for $_->{'domain'}, user is $_->{'user'}.";
+        }
+
+      # Get our default domain name.
+      my $defaultdomain = $control->defaultdomain();
+
+      # Now, we're going to start changing things in the system.  We must
+      # get an exclusive lock before we do.
+      $control->relock($lock, 'exclusive');
+
+      # Add a rcpthost.
+      # Multiple hash references are legal.
+      $control->add_rcpthosts( {host => 'domain2.com'} );
+
+      # Add a virtualdomain entry.
+      # Multiple hash references are legal.
+      $control->add_virtualdomain({
+        domain => 'domain2.com',
+        user   => 'domain2systemaccount',
+        }); 
+
+      # Set our default domain name.
+      # Also, this works with defaulthost, and me.
+      # Setting this to undef for any control file (except 'me', which is
+      # required) will delete that file.  Use '' to clear out a file.
+      $control->defaultdomain({ set => 'domain.com' }); 
+ 
+      $control->unlock($lock);
+
+METHODS
+
+    Qmail::Control->new()         Creates a new Qmail::Control object.
+
+                                  Returns a reference to the newly created
+                                  object.
+
+                                  Takes no arguments, currently. This may
+                                  change, but the argumentless form will
+                                  always exist.
+
+    $control->lock();             Locks the Qmail control file subsystem.
+                                  Note that currently, only Qmail::Control
+                                  itself uses this locking system, and that
+                                  it is entirely advisory. You should always
+                                  lock the control file system before
+                                  getting information from more than one
+                                  Qmail control file.
+
+                                  Returns a Qmail::Control::Lock object. You
+                                  must keep track of this.
+
+                                  Takes a single argument, either 'shared'
+                                  or 'exclusive'. The Qmail::Control::Lock
+                                  object that is returned will be locked in
+                                  the way specified. If no argument is
+                                  given, the lock object returned will not
+                                  be locked at all!
+
+                                  It's ok to use the relock() and unlock()
+                                  methods provided by the lock object.
+
+    $control->get_rcpthosts();    Gets the list of hosts the system is set
+                                  to accept mail for.
+
+                                  Returns a list of strings, each
+                                  corresponding to a host that the system
+                                  accepts mail for. If an error occurs, a
+                                  list will be returned in which the first
+                                  element is undef, the second element is a
+                                  numeric error code, and the third argument
+                                  is a detailed text explaining the error.
+
+                                  Takes no arguments at the current time.
+
+                                  The numeric error code is 0 for a system
+                                  error or 1 for a control file syntax
+                                  error.
+
+    $control->get_virtualdomains();
+                                  Gets the list of virtualdomains on this
+                                  system, and the user associated with each.
+
+                                  Returns a list, each element representing
+                                  one virtual domain. Each element is also a
+                                  hash reference, with the keys 'domain' and
+                                  'user'. It can also return an error code,
+                                  like the one for get_rcpthosts().
+
+                                  Takes no arguments.
+
+AUTHOR
+
+    Paul Prince, <princep@charter.net>
+
+SEE ALSO
+
+    the perl manpage. the Qmail::Control::Lock manpage.
+

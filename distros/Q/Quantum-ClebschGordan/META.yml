@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Quantum-ClebschGordan
+version:             0.01
+abstract:            Calculate/list Clebsch-Gordan Coefficients
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              David Westbrook <dwestbrook@gmail.com>
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Class::Accessor:               0
+    Memoize:                       0
+    Number::Fraction:              1.09
+    Test::More:                    0.44
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

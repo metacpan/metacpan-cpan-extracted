@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl çä¸çäºå­å¨ API",
+   "author" : [
+      "fukai (æ¶å¯) <iakuf@163.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Qiniu",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "0",
+            "Mojolicious" : "0",
+            "Moo" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iakuf/Qiniu/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/iakuf/Qiniu.git"
+      }
+   },
+   "version" : "0.07"
+}

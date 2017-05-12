@@ -1,0 +1,12 @@
+Source: libqbit-webinterface-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libtest-deep-perl, libqbit-perl, libqbit-class-perl, libqbit-application-perl, libwww-perl, libtemplate-perl, libcgi-pm-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-webinterface-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-class-perl, libqbit-application-perl, libwww-perl, libtemplate-perl, libcgi-pm-perl
+Description: Base class for creating web interface.
+ Base class for creating web interface.

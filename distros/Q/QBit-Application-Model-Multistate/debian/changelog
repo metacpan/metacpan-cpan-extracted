@@ -1,0 +1,60 @@
+libqbit-application-model-multistate-perl (0.008) raring; urgency=low
+
+  * fix exceptions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 19 Dec 2016 02:08:53 +0300
+
+libqbit-application-model-multistate-perl (0.007) raring; urgency=low
+
+  * fix depends
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 07 Dec 2016 22:26:25 +0300
+
+libqbit-application-model-multistate-perl (0.006) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Sep 2016 23:06:01 +0300
+
+libqbit-application-model-multistate-perl (0.005) raring; urgency=low
+
+  * Removed smartmatching
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 27 Apr 2014 20:19:37 +0400
+
+libqbit-application-model-multistate-perl (0.004) raring; urgency=low
+
+  * Fix coding style and use gettext.
+
+  * Simplify the unreachable statuse check.
+
+  * Exclude __EMPTY__ state from check.
+
+  * Revert old wrong change.
+
+  * Die if there are unreachable statuses.
+
+  * Do not shift __BIT_HS__ by empty state.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 23 Jan 2014 15:10:55 +0400
+
+libqbit-application-model-multistate-perl (0.003) raring; urgency=low
+
+  * Rollback pull request
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 19 Nov 2013 18:09:52 +0400
+
+libqbit-application-model-multistate-perl (0.002) raring; urgency=low
+
+  * Add __EMPTY__ multistate to __BIT__ package_stash.
+
+  * Removed alias with misspell
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 18 Nov 2013 18:54:52 +0400
+
+libqbit-application-model-multistate-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 14:43:47 +0400
+

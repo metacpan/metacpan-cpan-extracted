@@ -1,0 +1,51 @@
+{
+   "abstract" : "Simple OO style queue implementation.",
+   "author" : [
+      "Alexei Znamensky <russoz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Queue-Base",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "homepage" : "https://github.com/russoz/Queue-Base",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/russoz/Queue-Base",
+         "web" : "https://github.com/russoz/Queue-Base"
+      }
+   },
+   "version" : "2.203"
+}
+

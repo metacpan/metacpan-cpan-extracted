@@ -1,0 +1,83 @@
+==================================================
+Changes from 2015-12-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.017 at 2016-12-01 19:46:35 +0000
+------------------------------------------
+
+  Change: 9904af3cb024e8d61996018f9f53c4444dfbd595
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 22:45:25 +0000
+
+    Merge pull request #24 from Madskill/speed_up
+
+    Speed up 
+
+  Change: b8b3c6524848c8a2d5dcec8115520dfdc65c48fa
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 22:42:09 +0000
+
+    all_locales and process fields in new 
+
+  Change: 101df05762ea702e45961ea1841c5dbb07565f88
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-29 21:28:17 +0000
+
+    unique delete fields and process_data if need delete fields 
+
+  Change: 3dc3d85d7dc032675f198865121b633ca423df02
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-27 04:11:17 +0000
+
+    cached_locales 
+
+  Change: 442a699d7ede2b19bcba20285a054f8422a0c7e1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-27 03:22:52 +0000
+
+    speed up 
+
+------------------------------------------
+version 0.016 at 2016-09-04 19:53:49 +0000
+------------------------------------------
+
+  Change: 8e5a3c30e3ae08e8ae8f1f79349e2538c5df325e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 22:53:49 +0000
+
+    Version 0.016 
+
+  Change: 2f6bab75c752552eb0ec7c3338100c53e0ebaef8
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:47:28 +0000
+
+    Merge pull request #23 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: dd4f3470f5d5732f99bcd1eea41528ba8214da0a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 22:46:27 +0000
+
+    upload to cpan 
+
+------------------------------------------
+version 0.015 at 2016-01-31 10:23:53 +0000
+------------------------------------------
+
+  Change: 872bd889d1efceda3d737e94ab9a775416dca9cf
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-01-31 13:23:53 +0000
+
+    Version 0.015 
+
+  Change: 3df66ecbf970baf9af4571738487541c83807a6d
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-01-31 13:02:11 +0000
+
+    Fix warning "keys on reference is experimental" 
+
+=================================================
+Plus 14 releases after 2015-12-02 00:00:00 +0000.
+=================================================

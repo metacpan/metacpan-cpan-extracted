@@ -1,0 +1,48 @@
+Revision history for QDBM_File
+
+1.12    Sat Apr 25 11:44:31 2009
+        * Fixed typemap: Added SvGETMAGIC
+        * ppport.h version 3.17
+        * Changed SvPVbyte to SvPV_const
+
+1.11    Sun Apr 5 10:36:36 2009
+        * Added Tie::Hash package declaration to quiet warnings
+
+1.10    Sat Apr 4 11:14:29 2009
+        * Possible to work with DBM_Filter.pm
+
+1.00    Sun Oct 26 06:57:35 2008
+        * QDBM_File::Multiple::LOB is obsoleted. Use store_lob(), fetch_lob(),
+          delete_lob(), exists_lob() instead.
+        * Added method: new(), store_keep(), store_cat(), store_dup(),
+          store_dupr(), store_keep_lob(), store_cat_lob()
+        * Changed iterator_init() to init_iterator()
+        * Overlap flags (QD_xxxx) is obsoleted.
+        * CLEAR() implemented
+        * SCALAR() implemented
+        * Makefile.PL asks static or dynamic link
+        * Changed tests: skip repair() test
+        * ppport.h version 3.14
+
+0.05    Tue Dec 11 21:49:34 2007
+        * Added method: get_error()
+        * Fixed QDBM_File.pm: Fixed typo in get_scores()
+        * Changed QDBM_File.xs: Deleted error messages. Use get_error() instead.
+        * Changed QDBM_File.xs: FETCH() receives start/offset arguments
+
+0.04    Wed Dec 5 19:01:58 2007
+        * Fixed QDBM_File.xs: Improved backward compatibility
+          Added #define NEED_sv_2pvbyte for 5.6.1
+          Now works on 5.6.1 (tested with ActivePerl 5.6.1 Build 638)
+
+0.03    Tue Dec 4 19:42:13 2007
+        * Fixed QDBM_File.xs: Improved backward compatibility
+          gv_stashpvs changed to gv_stashpv
+          Added DBM_setFilter and DBM_ckFilter for older XS
+
+0.02    Mon Dec 3 18:54:26 2007
+        * Fixed db_hash_multi_lob.t: Empty key test fixed
+        * Fixed typemap: Added const char*
+
+0.01    Sun Dec 2 17:42:36 2007
+        * First version, released on an unsuspecting world.

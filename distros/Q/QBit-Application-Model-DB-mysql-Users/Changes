@@ -1,0 +1,53 @@
+==================================================
+Changes from 2015-09-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-09-11 13:08:02 +0000
+------------------------------------------
+
+  Change: 272cb8fce7bde0eb7110a31ccfad02e9f6a2340a
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:07:24 +0000
+
+    Merge pull request #1 from QBitFramework/upload_to_cpan
+
+    upload to cpan 
+
+  Change: c2277fcd23c1f97a6aa36f26552b57ef26dd58e8
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:06:40 +0000
+
+    upload to cpan 
+
+------------------------------------------
+version 0.001 at 2015-12-12 22:25:01 +0000
+------------------------------------------
+
+  Change: c03e34972e6d90c1d465ce7322a58b4819677c9b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-13 01:25:01 +0000
+
+    Version 0.001 
+
+  Change: cbd9e606f9e180dcd4d1f031932b5dd8a0fb89bb
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-13 01:19:39 +0000
+
+    added file for build 
+
+  Change: aeec0920a80c71e89ae6b6d1fadbe621691925a4
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-06 23:15:13 +0000
+
+    README.md 
+
+  Change: 5c5987748d133c94f4a73345a951140dcaf855e4
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-06 23:13:12 +0000
+
+    added QBit::Application::Model::DB::mysql::Users 
+
+================
+End of releases.
+================

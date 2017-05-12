@@ -1,0 +1,12 @@
+Revision history for Perl extension QPainter.
+
+0.03  Mon Apr 14 17:15:17 1997
+	- changed from exporting the $Align* constants to exporting %Align
+
+0.02  Mon Apr  7 11:18:39 1997
+	- Eliminated the type-check in QPainter::begin() because of the
+updated typemap for QPaintDevice
+
+0.01  Fri Mar 14 16:06:22 1997
+	- original version; created by h2xs 1.18
+

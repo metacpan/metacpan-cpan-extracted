@@ -1,0 +1,12 @@
+libqbit-application-model-db-mysql-rbac-perl (0.002) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 15:32:34 +0300
+
+libqbit-application-model-db-mysql-rbac-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 20:28:53 +0400
+

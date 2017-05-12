@@ -1,0 +1,24 @@
+libqbit-webinterface-controller-multistate-perl (0.004) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 18:22:33 +0300
+
+libqbit-webinterface-controller-multistate-perl (0.003) raring; urgency=low
+
+  * Fixed for QBit::WebInterface 0.010
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 16 Jan 2014 19:25:26 +0400
+
+libqbit-webinterface-controller-multistate-perl (0.002) raring; urgency=low
+
+  * Switched to SVG
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 17 Nov 2013 17:42:41 +0400
+
+libqbit-webinterface-controller-multistate-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 17 Sep 2013 13:36:43 +0400
+

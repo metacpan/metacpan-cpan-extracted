@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 560e05aa37a3b9a348f29e9ee46f0e986f72f70c Changes
+SHA1 e2901503cb533ad2cd7dd566cdcb316329a3f5d9 INSTALL
+SHA1 c9466aa28dcea89ded9e1aab08bbe51ecb0fc055 LICENSE
+SHA1 b4173a2688a5b2e81a295483a244f780f104cd6a MANIFEST
+SHA1 dbeb1d13b909146576b337d8570f18f18d3a410d META.json
+SHA1 0c7e55013e97dbfa3a7011932c3cf3517541501b META.yml
+SHA1 9bfa743fb979217600ecd51ed93e734adfca8bf6 Makefile.PL
+SHA1 6076bd05e3731400fce8dd4f69e091401512358f README
+SHA1 7e6436e8c9a91bd898f8a4f7402e34357f751777 dist.ini
+SHA1 0fa4f59b987ed29c1ab98637fa87f1e72c3008a0 lib/Queue/Base.pm
+SHA1 dd729107f22582796aa0af9acb0f1e975f2251a5 t/00-compile.t
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 4ace1294d431c41c83edf1df6bf3f98b5184817d t/000-report-versions-tiny.t
+SHA1 ba8febd9d3654714c84733f0e78c60b2a38d1045 t/001-load.t
+SHA1 f796de0d89b17b74e26fde2be3e9cfde46b74a1d t/002-queue.t
+SHA1 88c8ec8b58be35bb493b3669018748b82273655c t/003-copying.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 48d42cc9f55d5ce8ae812dab536a9d17f1c3f98d t/release-dist-manifest.t
+SHA1 9e4c697537049f3151d38c81d5080be36b600771 t/release-distmeta.t
+SHA1 52f8153d160cb76d2ba52d0a9c8e8dff928145ee t/release-eol.t
+SHA1 083d9cf27e0bc6a123241fb0a361a2c029983b0c t/release-kwalitee.t
+SHA1 d10a4c4f4a6c10595f86bd7acf935ae72354f8d0 t/release-meta-json.t
+SHA1 978fcdcd038d17814e4a2429f19795a77894f1a1 t/release-minimum-version.t
+SHA1 b567cfd8c64cdcda2a465f38a1dc2fd971904ee4 t/release-mojibake.t
+SHA1 a95be7f18c2443b36947e6a2888ff14742899350 t/release-no-tabs.t
+SHA1 ecd6305379975ecc5ce20f4c3e76bfcfe462e2d4 t/release-pod-coverage.t
+SHA1 c3bec8aa8475c5ec46a0bad17a20d44d4ea1b1b8 t/release-pod-linkcheck.t
+SHA1 7eb3492f9c47f10f80d4f285e96536e9192026dc t/release-pod-syntax.t
+SHA1 4bca0ddd8e339fe70776a13cb4551864fbe09797 t/release-portability.t
+SHA1 dd1999e108eb2093fa41692a0a72b4b84ce8ef4e t/release-test-version.t
+SHA1 731040bf250fd7f91217bde7998666bc60ca8e90 t/release-unused-vars.t
+SHA1 1105abbe7674e8cd044515f631e689e13ab20431 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOLMR2AAoJEMZvtcdxyp88H+cP/AuERZnKDPQkqFYFurI9pIns
+zLqd4N4tgvcsVMoFkVKsd2CvoYyWwg9mG3dXsH1AhHtZWaDdSJtGhDx1nZ7xge19
+3I9dflf3qfY/7+RTPvBaCAwcAf8Fd2S72vWoow8RRAvdkqcA8A2FMHO0WGYdTWBA
+m3yuo1QnqBB5+nAMPnjeADiXc+onLBdmJhIStfZwLH8gIX6FWvR7DuC2HVKwSv2Y
+bOzdsOdHXPu/FVktoUc6AYI40YF5R1jtyhGZ7y1htPF+8g0uUhGX/zrV4gxFin3H
+zxURRAcng3Kft+7rnezXel8XrQD6m64ed7rG40FM1Jch0aZrGrsp/lFAC+GRM560
+gD5viRKQADlZgq+R2HyIR6lHdZ3UnT5HX76OIlSX6BSR4GxNnO+SvadvrSIBT8MY
+RSVqfceXyRo9uOZq/343P+CX+is5Yc/zJbNGEL7prNPTr4QJnLTtYHShmLEZ4eFA
+6cmzWBF33SfWJA/ef1uG//oqavb4YoLzV6jPOMdWFk+dTgixBP7PuAeZpLRd22Wp
+3Vs4WXJujeqjbaTrf9y9kZiRwgMzPuuO/b3bc1DQtVWQeMcklTIiAtyUGW/RZUgH
+EPI5fl9PztPqawYPp2KygEn21zTqOWFDgJUgp065ds/EcKXk8z5Le/i1eZkYL+vx
+UstpwcqJAtfDSpEuRfRg
+=hwzH
+-----END PGP SIGNATURE-----

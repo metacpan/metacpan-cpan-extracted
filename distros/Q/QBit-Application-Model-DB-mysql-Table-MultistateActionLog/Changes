@@ -1,0 +1,25 @@
+==================================================
+Changes from 2015-09-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-09-04 20:29:25 +0000
+------------------------------------------
+
+  Change: 7b1ea5a59f57ecfabe5469f9c09ba268eb4e3944
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-05 00:26:05 +0000
+
+    Merge pull request #1 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: d169cfe189c3067275a35d7233f510caf936cd2b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:25:29 +0000
+
+    upload to cpan 
+
+===============================================
+Plus 1 release after 2015-09-05 00:00:00 +0000.
+===============================================

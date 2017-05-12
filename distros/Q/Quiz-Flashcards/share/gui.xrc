@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxFrame" name="frame">
+		<style>wxDEFAULT_FRAME_STYLE|wxCLIP_CHILDREN|wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL</style>
+		<bg>#d4d0c8</bg>
+		<title></title>
+		<object class="wxFlexGridSizer">
+			<rows>0</rows>
+			<cols>1</cols>
+			<vgap>0</vgap>
+			<hgap>0</hgap>
+			<growablecols>0</growablecols>
+			<growablerows>8</growablerows>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxFlexGridSizer">
+					<rows>1</rows>
+					<cols>0</cols>
+					<vgap>0</vgap>
+					<hgap>0</hgap>
+					<growablecols>0</growablecols>
+					<growablerows></growablerows>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxChoice" name="set_selector">
+							<selection>0</selection>
+							<content />
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL</flag>
+						<border>5</border>
+						<object class="wxButton" name="set_status_toggle">
+							<style>wxBU_EXACTFIT|wxNO_BORDER</style>
+							<enabled>0</enabled>
+							<label>?</label>
+							<default>0</default>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="question_description">
+					<hidden>1</hidden>
+					<label></label>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="question">
+					<hidden>1</hidden>
+					<label></label>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="correct_answer">
+					<hidden>1</hidden>
+					<label></label>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxTextCtrl" name="answer">
+					<style>wxTE_CENTRE|wxTE_PROCESS_ENTER</style>
+					<enabled>0</enabled>
+					<hidden>1</hidden>
+					<value></value>
+					<maxlength>0</maxlength>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxGridSizer">
+					<rows>0</rows>
+					<cols>3</cols>
+					<vgap>0</vgap>
+					<hgap>0</hgap>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_7">
+							<hidden>1</hidden>
+							<label>7</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_8">
+							<hidden>1</hidden>
+							<label>8</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_9">
+							<hidden>1</hidden>
+							<label>9</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_4">
+							<hidden>1</hidden>
+							<label>4</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_5">
+							<hidden>1</hidden>
+							<label>5</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_6">
+							<hidden>1</hidden>
+							<label>6</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_3">
+							<hidden>1</hidden>
+							<label>3</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_2">
+							<hidden>1</hidden>
+							<label>2</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_1">
+							<hidden>1</hidden>
+							<label>1</label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALL</flag>
+						<border>5</border>
+						<object class="wxStaticText" name="spacer">
+							<hidden>1</hidden>
+							<label></label>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxButton" name="answer_0">
+							<bg>#ff9999</bg>
+							<hidden>1</hidden>
+							<label>don&apos;t know</label>
+							<default>0</default>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxALIGN_CENTER|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxGridSizer">
+					<rows>0</rows>
+					<cols>3</cols>
+					<vgap>0</vgap>
+					<hgap>0</hgap>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL</flag>
+						<border>5</border>
+						<object class="wxAnimationCtrl" name="animator" />
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL</flag>
+						<border>5</border>
+						<object class="wxButton" name="start_next_button">
+							<enabled>0</enabled>
+							<hidden>1</hidden>
+							<label></label>
+							<default>0</default>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_CENTER|wxALL</flag>
+						<border>5</border>
+						<object class="wxStaticText" name="answer_time">
+							<hidden>1</hidden>
+							<label></label>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxALIGN_CENTER|wxALL</flag>
+				<border>5</border>
+				<object class="wxStaticText" name="set_status_summary">
+					<hidden>1</hidden>
+					<label>MyLabel</label>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxListCtrl" name="set_status">
+					<style>wxLC_SMALL_ICON|wxALWAYS_SHOW_SB|wxCLIP_CHILDREN|wxNO_BORDER</style>
+					<hidden>1</hidden>
+				</object>
+			</object>
+		</object>
+	</object>
+</resource>

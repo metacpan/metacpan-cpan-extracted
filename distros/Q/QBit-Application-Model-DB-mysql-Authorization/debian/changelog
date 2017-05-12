@@ -1,0 +1,15 @@
+libqbit-application-model-db-mysql-authorization-perl (0.001) raring; urgency=low
+
+  * fix typo
+
+  * upload to cpan
+
+  * MySql table for Authorization
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 16:31:34 +0300
+
+libqbit-application-model-db-mysql-authorization-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 12 Dec 2015 14:06:53 +0400

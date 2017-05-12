@@ -1,0 +1,25 @@
+[% WRAPPER page %]
+<ul class="nav nav-pills">
+  [% FOR accessor = accessors %]
+  <li [% IF request.param('accessor') == accessor +%] class="active"[% END %]>
+    <a href="[% cmd_link('', '', accessor => accessor) | html %]">[% accessor | html %]</a>
+  </li>
+  [% END %]
+</ul>
+
+<div class="row">
+  <div class="pull-right">
+    <form action="[% cmd_link('', '') | html %]">
+      <div class="btn-group" data-toggle="buttons-radio">
+        <input type="hidden" name="accessor" value="[% accessor | html %]">
+        <input id="private_names_hidden" type="hidden" name="private_names">
+        <button type="submit" class="btn btn-mini btn-success [% IF request.param('private_names') +%] active[% END %]" onclick="$('#private_names_hidden').val(1)">[% gettext('Show') %]</button>
+        <button type="submit" class="btn btn-mini btn-danger [% IF !request.param('private_names') +%] active[% END %]" onclick="$('#private_names_hidden').val('')">[% gettext('Hide') %]</button>
+      </div>
+      <span>[% pgettext('Show/Hide', 'private names') %]</span>
+    </form>
+  </div>
+</div>
+
+[% graph_svg %]
+[% END %]

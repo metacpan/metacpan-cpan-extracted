@@ -1,0 +1,26 @@
+Revision history for Quote-Code
+
+1.0102  2017-03-16
+        Explicitly document supported escape sequences.
+        Update internal build/test infrastructure.
+
+1.0101  2015-12-16
+        Clean up and fix L<...> links in POD.
+        Update internal build/test infrastructure.
+
+1.01    2013-09-18
+        Implement qcw(...).
+
+1.00    2013-06-16
+        Support \N{...}.
+
+0.03    2012-07-12
+        Add qc_to heredoc keyword.
+
+0.02    2012-06-29
+        Make sure to enable qc only where Quote::Code is loaded
+        instead of globally.
+
+0.01    2012-06-28
+        First version, released on an unsuspecting world.
+

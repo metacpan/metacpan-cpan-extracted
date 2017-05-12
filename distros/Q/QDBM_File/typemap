@@ -1,0 +1,65 @@
+TYPEMAP
+
+datum_key   T_DATUM_K
+datum_value T_DATUM_V
+QDBM_File   T_QDBM
+ODEUM*      T_ODEUM
+ODDOC*      T_ODDOC
+const char* T_PV
+
+INPUT
+
+T_DATUM_K
+    DBM_ckFilter($arg, filter_store_key, \"filter_store_key\");
+    SvGETMAGIC($arg);
+    sv_utf8_downgrade($arg, 0);
+    $var = $arg;
+
+T_DATUM_V
+    DBM_ckFilter($arg, filter_store_value, \"filter_store_value\");
+    SvGETMAGIC($arg);
+    sv_utf8_downgrade($arg, 0);
+    $var = $arg;
+
+T_ODEUM
+    if ( sv_isobject($arg) && sv_derived_from($arg, \"QDBM_File::InvertedIndex\") ) {
+        $var = (ODEUM*)SvIV( (SV*)SvRV($arg) );
+    }
+    else {
+        croak(\"scalar is not of type QDBM_File::InvertedIndex\");
+    }
+
+T_QDBM
+    if ( sv_isobject($arg) && sv_derived_from($arg, \"$Package\") ) {
+        $var = (QDBM_File)SvIV( (SV*)SvRV($arg) );
+    }
+    else {
+        croak(\"scalar is not of type %s\", \"$Package\");
+    }
+
+T_ODDOC
+    if ( sv_isobject($arg) && sv_derived_from($arg, \"QDBM_File::InvertedIndex::Document\") ) {
+        $var = (ODDOC*)SvIV( (SV*)SvRV($arg) );
+    }
+    else {
+        croak(\"scalar is not of type QDBM_File::InvertedIndex::Document\");
+    }
+
+OUTPUT
+
+T_DATUM_K
+    $arg = $var;
+    DBM_ckFilter($arg, filter_fetch_key, \"filter_fetch_key\");
+
+T_DATUM_V
+    $arg = $var;
+    DBM_ckFilter($arg, filter_fetch_value, \"filter_fetch_value\");
+
+T_QDBM
+    sv_setref_pv( $arg, dbtype, (void*)$var );
+
+T_ODEUM
+    sv_setref_pv( $arg, dbtype, (void*)$var );
+
+T_ODDOC
+    sv_setref_pv( $arg, \"QDBM_File::InvertedIndex::Document\", (void*)$var );

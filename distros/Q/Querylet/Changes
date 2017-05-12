@@ -1,0 +1,63 @@
+Revision history for Querylet
+
+0.401     2013-10-30 22:34:45 America/New_York
+        - fix spelling of repo!  oops
+
+0.400     2013-10-30 22:30:27 America/New_York
+        - repackage with Dist::Zilla
+
+0.324   2008-09-14
+        fix regex for Perl5 v10
+
+0.323   2006-11-16
+        machine readable license added
+
+0.322   2006-11-15
+        add prereq/skip to 01-makedb.t
+
+0.321   2006-11-14
+        generate test data at test time; this should make tests pass again
+        packaging improvements
+
+0.32    2005-02-04
+        added "write handlers" to change how rendered output is written
+
+0.30    2005-01-12
+        options are now block items with lead/trail space trimmed
+
+0.28    2004-12-??
+        column headers added
+
+0.26    2004-09-23
+        TT2 is no longer strictly required
+        options and "set option" directive
+
+0.24    2004-09-21
+        pass output filename to coderef output handler
+        binmode output filehandle
+
+0.22    2004-09-20 14:45
+        added query parameterization (bind values)
+
+0.20    2004-09-19 17:25
+        added input handler bass class
+        added input and input type directives
+        added "delete columns where"
+
+0.16    2004-09-18 15:45
+        added output handler base class (and tests)
+        updated tests to require DBD::SQLite 1+
+
+0.14    2004-09-17 19:30
+        rewrote output routines
+        100% coverage - lots of simple new tests
+        coderef as output type!
+
+0.12    2004-09-17 08:00
+        a few errors in docs fixed
+        default handling of "database: " is no longer useless
+        tests added using SQLite (coverage still low)
+
+0.10    2004-09-16
+        initial release!
+        testing woefully inadequate!

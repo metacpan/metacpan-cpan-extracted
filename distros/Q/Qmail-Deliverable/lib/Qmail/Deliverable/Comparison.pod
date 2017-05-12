@@ -1,0 +1,398 @@
+=head1 NAME
+
+Qmail::Deliverable::Comparison - Overview of recipient checkers for qmail
+
+=head1 SYNOPSIS
+
+    There is more than one way to do it
+    -- Larry Wall
+
+=head1 DESCRIPTION
+
+Qmail::Deliverable is not the only software for qmail that stops backscatter by
+checking recipient addresses. Other solutions have existed for a long time, but
+after evaluating them, I felt more comfortable rolling my own.
+
+While exploring the existing options, I learned their strengths and weaknesses.
+I revisited them all again after writing Q::D, and now share my findings.
+
+It is most amazing, though, that no other solution provides a re-usable
+library. One comes very close, by providing a daemon that you can query via a
+very simple protocol. Q::D has both a library and a daemon. Also, good support
+for dot-qmail files like .qmail-ext-default, is rare, but absolutely essential
+for interoperability with, for example, ezmlm.
+
+The main problem with checking address validity during the SMTP transaction, is
+one of permissions and separation. Root access is required to peek into home
+directory of system users. Privilege separation is one of the classic strengths
+of qmail, and it would be unwise to break that. Additional mechanisms are needed
+to keep things separate, but as you can see, this wheel has been invented plenty
+of times.
+
+Qmail's modular design made replacing the SMTP daemon very simple, and because
+development on qmail stopped with version 1.03 in 1998, several replacement
+daemons have been released. There is a patch for qmail-smtpd, to make it
+extensible with plugins, called qmail-spp. Then, there is a daemon called
+magic-smtpd. My favourite, however, is the very extensible Perl based qpsmtpd.
+
+http://cr.yp.to/qmail.html
+
+http://qmail-spp.sourceforge.net/
+
+http://www.linuxmagic.com/opensource/magicmail/magic-smtpd
+
+http://smtpd.develooper.com/
+
+=head2 Using qmail logic
+
+Any solution that is to integrate well with existing qmail systems, has to copy
+the delivery logic that qmail itself uses.
+
+They need to use the files C<control/virtualdomains>, and C<users/assign> or
+C<users/assign.cdb>, and some mechanism to detect local users (getpw). For use
+on a relaying server, or "smart host", accepting I<all> email for domains not
+listed in C<control/virtualdomains> or C<control/locals> is also required.
+
+Vpopmail support can be added by checking dot-qmail files for the presence of
+C<vdeliver> and C<bounce-no-mailbox>. In a similar fashion, fastforward and
+bouncesaying can be supported at SMTP level. Bouncesaying is used by Plesk.
+
+=head2 List of patches and plugins for qmail SMTP daemons
+
+I've divided the solutions into qmail support levels. Level 0 supports only
+lists of specific email addresses, level 4 solutions are (almost) drop-in
+compatible with existing setups.
+
+Before installing any solution, carefully read the documentation (if there is
+any) and/or source code to determine if everything you need is sufficiently
+supported.
+
+As you know, programmers start counting at 0 :)
+
+=head3 Level 0
+
+Level 0 solutions are limited to checking specific user@domain, without support
+for catch-all addresses.
+
+=over 4
+
+=item db/user plugin for qpsmtpd
+
+Written in Perl, checks against an SQL database
+
+http://dienstleistung-kultur.de/qpsmtpd/
+
+=item magic-smtpd, support built in
+
+Written in C, checks against a Berkely DB.
+
+http://www.linuxmagic.com/opensource/magicmail/magic-smtpd
+
+=item check_user_cdb plugin for qpsmtpd
+
+Written in Perl, checks against a CDB
+
+http://ankh-morp.org/~vetinari/projects/qpsmtpd/
+
+=item check_vuser plugin for qpsmtpd
+
+Written in Perl, checks against a directory tree.
+
+http://ankh-morp.org/~vetinari/projects/qpsmtpd/
+
+=back
+
+=head3 Level 1
+
+Level 1 solutions are limited to checking user@domain and also provide support
+for catch-all domains (anything@domain) and sometimes catch-all extensions
+(user-anything@domain), but not specific user extensions
+(user-extension@domain).
+
+=over 4
+
+=item goodrcptto patch for qmail-smtpd
+
+Written in C, checks against a text file or CDB.
+
+http://web.netdevice.com:9080/qmail/patch/
+
+=item validrcppto patch for qmail-smtpd
+
+Written in C, checks against a text file.
+
+http://www3.sympatico.ca/humungusfungus/code/validrcptto.html
+
+=item validrcptto.cdb patch for qmail-smtpd
+
+Written in C, checks against a CDB.
+
+http://qmail.jms1.net/patches/validrcptto.cdb.shtml
+
+=item aliases plugin for qpsmtpd
+
+Written in Perl, checks against a text file with aliases and expands them.
+
+http://www.hjp.at/projekte/qpsmtpd/aliases/
+
+=item check_dns_user plugin for qpsmtpd
+
+Written in Perl, checks against a DNS zone. Supports catch-all domains if you
+use wildcard hostnames in the zone.
+
+http://ankh-morp.org/~vetinari/projects/qpsmtpd/
+
+=item check_goodrcptto plugin for qpsmtpd
+
+Written in Perl, checks against a text file. Supports catch-all extensions, but
+not specific extensions.
+
+http://www.openfusion.com.au/labs/qpsmtpd/check_goodrcptto
+
+=item qmail-ldap suite
+
+Written in C, checks against an LDAP database.
+
+http://www.qmail-ldap.org/
+
+=back
+
+=head3 Level 2
+
+Level 2 solutions do everything that level 1 solutions do, but also provide
+support for prefixed wildcards, like user-anything@domain. Level 2 is the
+minimum level of support needed for good integration with existing qmail
+installations and things like EZMLM, but may still require a certain specific
+setup like a user database or vpopmail.
+
+Dot-qmail files belonging to users may not be accessible to the SMTP daemon.
+This limitation can be lifted by pregenerating a list or database, by using a
+special purpose setuid root program, or a daemon that runs as root.
+
+=over 4
+
+=item vpopmail_check_recipient-wm plugin for qmail-spp
+
+Written in sh, checks against vpopmail executables and dot-qmail.
+
+Supports .qmail-default, of course handling vpopmail's vdeliver, and has hard
+coded support for ezmlm, and resulting from the way that was written, limited
+support for .qmail-ext-default. It assumes a strictly vpopmail-ized setup with
+no local users or local aliases. Requires that the vpopmail utilities are
+setuid, including vuserinfo which displays user passwords, clear text if
+available. That makes it unsafe for use on any system that has local users
+other than the system administrators.
+
+http://www.maiers.de/qmail/art38,71.html
+
+=item local_check_recipient plugin for qmail-spp
+
+Written in sh, checks against a directory tree and dot-qmail.
+
+This is like vpopmail_check_recipient, but for local users only. It does not
+actually query /var/qmail/users/assign or getpw for home directories, but
+requires /home/username, where username is directly taken from the email
+address. Probably needs to be suid root to function correctly.
+
+http://www.maiers.de/qmail/art38,72.html
+
+=item check_recipient plugin for qmail-spp
+
+Written in Perl, checks against partial qmail-local logic.
+
+Uses virtualdomains and users/assign logic, but does not query getpw for local
+users not listed there. With its limited set of allowed characters, it would
+immediately disqualify a local-part like the C<#####> in my email address.
+Having ~alias/.qmail-default turns everything into one big catch all with this
+script, disregarding users/assign logic and .qmail-ext for local users.
+Supports .qmail-default, but not .qmail-ext-default.
+
+Cannot be used for relay servers, because a bug causes it to disallow all
+remote addreses. (It should read locals and virtualdomains to find out if a
+domain is local).
+
+Not networked.
+
+http://perolo.vantage.at/qmail-spp/check_recipient.pl
+
+=item vpopmail-check-user script for magic-smtpd
+
+Written in sh, checks against vpopmail executables.
+
+Appears to be a proof of concept only, since it does not support domain
+catch-alls. (If I were strict, it wouldn't even classify as level 1.)
+Has to run setuid vpopmail.
+
+http://www.linuxmagic.com/opensource/magicmail/magic-smtpd
+
+=item rcpt_regexp plugin for qpsmtpd.
+
+Written in Perl, checks against a text file with regular expressions or static
+strings.
+
+http://ankh-morp.org/~vetinari/projects/qpsmtpd/
+
+=item rcpt_ldap plugin for qpsmtpd
+
+Written in Perl, checks against an LDAP database. Supports extensions if you
+craft an ldap filter that does.
+
+http://ankh-morp.org/~vetinari/projects/qpsmtpd/
+
+=back
+
+=head3 Level 3
+
+Level 3 solutions do everything that level 2 solutions do, but fully support
+qmail-local logic, and can be added to existing local delivery mailservers
+without changing their setup. This does, of course, assume that the mail setup
+is based on qmail's structure and not a heavily patched system that changes the
+delivery rules, as is the case with qmail-ldap (although that has its own
+recipient checking).
+
+=over 4
+
+=item check_delivery plugin for qpsmtpd
+
+Written in Perl, checks against qmail-local logic using a suid root program.
+
+No longer developed or maintained. The documentation says that .qmail-default
+files are only fully supported for the alias user, but there does seem to be
+code for supporting .qmail-ext-default.
+
+It requires an external suid root program, dot-qmail-exists.pl, that seems to
+have vanished from the web. Even a re-implementation because the original could
+not be found, is either no longer there, or very well hidden.
+
+Does not reach level 4 because it checks rcpthosts, not locals+virtualhosts
+(which would be okay if it also checked smtproutes, but it doesn't).
+
+http://www.nntp.perl.org/group/perl.qpsmtpd/2005/06/msg3174.html
+
+http://www.redhotpenguin.com/check_delivery
+
+=back
+
+=head3 Level 4
+
+Level 4 solutions do everything that level 3 solutions do, but also support
+qmail-send logic. That is: non-local email is I<accepted>, so that it can be
+relayed to another server. This makes the solutions (almost) drop-in compatible
+with most qmail setups.
+
+=over 4
+
+=item qmail-realrcptto patch for qmail-smtpd
+
+Written in C, checks against qmail-local logic.
+
+Runs under the same user as qmail-smtpd and as such may not be able to access
+users' files. It does not have any special support for vpopmail, fastforward,
+or bouncesaying, i.e. all .qmail-default files are considered catch all.
+
+http://code.dogmap.org/qmail/
+
+=item qmail-verify daemon + patch for qmail-smtpd
+
+Written in C, checks against qmail-local logic and dot-qmail using a daemon.
+
+In hindsight, my solution was probably mostly inspired by this nice piece of
+software. A light weight daemon works together with a patched qmail-smtpd, and
+they communicate through UDP. A single bit, 0 or 1, determines the fate of the
+current message. While possibly susceptible to spoofing and race conditions,
+that's unlikely because all the malicious hacker can probably accomplish, is
+that email is rejected.
+
+Unfortunately it has no support for vpopmail, bouncesaying, or fastforward.
+
+This solution is networked and lets you pick the server based on the connecting
+host. That's almost sufficient for using the client on a mail hub, which
+requires some kind of domain to qmail-verify host mapping.
+
+http://www.nwdb.co.uk/email/qmail-verify.html
+
+=item check_validrcptto_cdb plugin for qpsmtpd
+
+Written in Perl, checks against a CDB. Together with mkvalidrcptto, qualifies
+as level 4.
+
+http://robinbowes.com/projects/check_validrcptto_cdb
+
+=item check_qmail_deliverable plugin for qpsmtpd
+
+Written in Perl, checks against qmail-send and qmail-local logic and dot-qmail
+using a daemon.
+
+This is the plugin that comes with the Qmail::Deliverable distribution. It uses
+the bundled qmail-deliverabled daemon which is like qmail-verify, but heavier.
+It inherits all supported features from Qmail::Deliverable::deliverable, which
+means that it works well with vpopmail and bouncesaying, but not fastforward.
+
+Its networking can be configured to look in the smtproutes configuration file
+to find the server to query, so it can easily be used on a mail hub.
+
+This is the only solution that I know of, that separates the core functionality
+and provides it as a software library -- in this case, a Perl module. This
+makes writing a similar plugin for qmail-spp or magic-smtpd relatively simple.
+
+http://search.cpan.org/~juerd/Qmail-Deliverable/
+
+=back
+
+=head3 Unknown support level
+
+=over 4
+
+=item chkrcptto plugin for qmail-spp
+
+Closed source, distributed with Plesk. I have no idea how well it would work
+with a non-plesk setup.
+
+http://www.swsoft.com/plesk/
+
+=back
+
+=head2 Recipient list generators
+
+These programs read your qmail configuration files and generate a list of valid
+recipients.
+
+=over 4
+
+=item mkvalidrcptto
+
+Written in Perl, generates according to qmail-local logic and dot-qmail.
+
+Has support for vpopmail and fastforward, but not for bouncesaying. It
+understands domain aliases, but keeps .qmail-ext-default as ext-default@domain,
+which only the check_validrcptto_cdb plugin for qpsmtpd handles.
+
+http://qmail.jms1.net/scripts/mkvalidrcptto.shtml
+
+=back
+
+=head1 COMMENTS
+
+Please contact me if any information listed here is wrong, or if you know of
+other alternatives for qmail that reduce backscatter by checking if a recipient
+is valid.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to all the authors of the tools listed on this page. I've used them for
+inspiration while thinking about writing my solution, and their software has
+already prevented a lot of CPU usage, memory consumption, queue capacity, data
+traffic, and personal annoyance that spam backscatter causes.
+
+Thanks to people who have contributed information for this document. They are,
+in chronological order: Robin Bowes, Hanno Hecker, Guy Hulbert, Ernesto, Peter
+J. Holzer.
+
+=head1 AUTHOR
+
+Juerd Waalboer <#####@juerd.nl>
+
+=head1 SEE ALSO
+
+L<Qmail::Deliverable>, L<http://web.netdevice.com:9080/qmail/rcptck/>,
+L<http://spamlinks.net/prevent-secure-backscatter.htm>

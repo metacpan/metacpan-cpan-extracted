@@ -1,0 +1,143 @@
+libqbit-application-model-dbmanager-perl (0.017) raring; urgency=low
+
+  * all_locales and process fields in new
+
+  * unique delete fields and process_data if need delete fields
+
+  * cached_locales
+
+  * speed up
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 01 Dec 2016 22:46:36 +0300
+
+libqbit-application-model-dbmanager-perl (0.016) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Sep 2016 22:53:30 +0300
+
+libqbit-application-model-dbmanager-perl (0.015) raring; urgency=low
+
+  * Fix warning "keys on reference is experimental"
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 31 Jan 2016 13:23:26 +0300
+
+libqbit-application-model-dbmanager-perl (0.014) raring; urgency=low
+
+  * Use ternary operator instead of || as 0 field name is valid.
+
+  * Use || and quote hash keys.
+
+  * Expand forced fields dependencies.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 19 Jan 2015 13:30:52 +0400
+
+libqbit-application-model-dbmanager-perl (0.013) raring; urgency=low
+
+  * Define token IS and remote excess quotes.
+
+ -- Ivan Bessarabov <ivan@bessarabov.ru>  Wed, 22 Oct 2014 19:33:58 +0400
+
+libqbit-application-model-dbmanager-perl (0.012) raring; urgency=low
+
+  * Add dependancy on Test::Deep.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 17 Oct 2014 16:38:08 +0400
+
+libqbit-application-model-dbmanager-perl (0.011) raring; urgency=low
+
+  * Don't call database on undefined primary key in get method.
+
+  * Add test for is filters.
+
+  * Implement is null expressions for number and dictionary.
+
+  * Implement IS NULL and IS NOT NULL filter for text type.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 17 Oct 2014 16:05:47 +0400
+
+libqbit-application-model-dbmanager-perl (0.010) raring; urgency=low
+
+  * Rename 'result' to 'data'.
+
+  * Get meta_opts in arrayref.
+
+  * Implement 'get_all_with_meta' method.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 06 May 2014 13:20:14 +0400
+
+libqbit-application-model-dbmanager-perl (0.009) raring; urgency=low
+
+  * Mark subfilter as preprocessed just for recursion descendants.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 28 Apr 2014 11:24:42 +0400
+
+libqbit-application-model-dbmanager-perl (0.008) raring; urgency=low
+
+  * Allow escaped ^ and $ symbols.
+
+  * Add ^$ metasymbols for begin and end of matched string.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 17 Feb 2014 16:52:06 +0400
+
+libqbit-application-model-dbmanager-perl (0.007) raring; urgency=low
+
+  * Escape by '\' SQL metasymbols: '%', '_'.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 17 Feb 2014 14:56:19 +0400
+
+libqbit-application-model-dbmanager-perl (0.006) raring; urgency=low
+
+  * Set last fields at the end of 'get_all'.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 13 Feb 2014 17:54:36 +0400
+
+libqbit-application-model-dbmanager-perl (0.005) raring; urgency=low
+
+  * Add 'for_update' option to 'get_all' method.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 10 Feb 2014 13:38:30 +0400
+
+libqbit-application-model-dbmanager-perl (0.004) raring; urgency=low
+
+  * Fix db_filter_fields opts recurcion bug with fields param.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 22 Jan 2014 13:39:01 +0400
+
+libqbit-application-model-dbmanager-perl (0.003) raring; urgency=low
+
+  * Remove group_by.
+
+  * Fix perltidy errors.
+
+  * Revert wrong change.
+
+  * Add group_by to models and do not load the all fields without need.
+
+  * Replace 'die' by 'throw'.
+
+  * Remove excess spaces added by perltidy.
+
+  * Add __EMPTY__ multistate to filter.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 13 Dec 2013 19:45:24 +0400
+
+libqbit-application-model-dbmanager-perl (0.002) raring; urgency=low
+
+  * Remove excess code and fix coding style.
+
+  * Fix the problem of dependent but prohibited fields.
+  * In the case when the field is prohibited for the role, but it is in
+    forced_depends_on list, the field will be removed from the sql query,
+    so another one field which is dependant on the first one will not be
+    able to be computed. The problem described above is resolved in the
+    commit.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 06 Dec 2013 12:39:13 +0400
+
+libqbit-application-model-dbmanager-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 21:00:33 +0400
+

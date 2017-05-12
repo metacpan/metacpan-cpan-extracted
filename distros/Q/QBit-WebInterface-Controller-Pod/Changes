@@ -1,0 +1,49 @@
+==================================================
+Changes from 2015-10-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2016-10-08 13:47:28 +0000
+------------------------------------------
+
+  Change: 749465cb8c7b05a25545b8f962dcc8f5c2f372d6
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-09-12 09:47:55 +0000
+
+    Merge pull request #2 from Madskill/fix_permission_missing
+
+    fix permission missing 
+
+  Change: d36c7afaab5d9282b403db5311278cb260f03427
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 18:29:28 +0000
+
+    fix permission missing 
+
+------------------------------------------
+version 0.003 at 2016-09-11 15:06:40 +0000
+------------------------------------------
+
+  Change: 50b819db1bba3d9ba850bf9b20fd84b344db5598
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 18:06:40 +0000
+
+    Version 0.003 
+
+  Change: ffbc1bf0c2f731172207246a27ed134a2fd40cdf
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 19:05:42 +0000
+
+    Merge pull request #1 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: 1152ee1117ed67369b6f7381b20f239d84fd7870
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 18:04:56 +0000
+
+    upload to cpan 
+
+================================================
+Plus 2 releases after 2015-10-09 00:00:00 +0000.
+================================================

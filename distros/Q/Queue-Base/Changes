@@ -1,0 +1,178 @@
+Revision History for Queue-Base
+===============================
+
+2.203
+-----
+
+commit 1656f141d296fd61277c006e2e1719ca47a77b70
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added method peek, improved POD
+
+v2.202 2011-06-21
+-----------------
+
+commit 377bd305ddae79095578dbfe4fa4229ba085fafc
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    multiple changes
+
+commit f0ce634cbb652bbefc0225a18a79fea9d8b82545
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    fixed twitter url
+
+v2.201 2011-04-14
+-----------------
+
+commit cef4997bc688574215fac7c1c8abaa5f9e0a434b
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    changed encoding plugin for pod weaver
+
+commit 0d59a67a779b78dabc79b0105883ec46afe93a8a
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added some options to dist.ini, renamed test files
+
+v2.200 2011-03-08
+-----------------
+
+commit 4324250bef60cf5929adbb01d11c9d6e740f79c2
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    no deal. bumping version to 2.200
+
+v2.1.10 2011-03-08
+------------------
+
+commit 9bfbe5379aabf49c4b021ed06778a8fa1f049cf8
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    version 2.1.10
+
+v2.1_04 2011-02-27
+------------------
+
+commit 93776478af644d2ba05ff8b1803711fb51ef0784
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Moved to Pod::Weaver, improved dist.ini
+
+v2.1_03 2011-02-20
+------------------
+
+commit dc6d6e62dd55a2f5e08b0fe3105827ae4eee40ad
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    changes for Dist::Zilla
+
+commit 943008325c86ab780f02a182b5a348e06817f63a
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    fixes to make perlcritic happy
+
+commit 8ee06efcf3d80008218fd6d90251d5f22c07fb2a
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added .build* to .gitignore
+
+v2.1_02 2011-02-17
+------------------
+
+commit 17cd4bcea69d7c1405a544e926c10951858a5340
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    v2.1_02
+
+v2.1_01 2011-02-17
+------------------
+
+commit 4e51c33775efa7ea147c7e79e1bad66c16cc5464
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    renamed ignore.txt to .gitignore, added [@Git] to dist.ini
+
+commit f3ea25a4303016c4e792a0e367bc8adf1d8a22fa
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    releasing version 2.1, based on Dist::Zilla
+
+commit ef0dd66fb33c7dbefc0d31fdb0cfb5434c228dc0
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added more plugins to Dist::Zilla
+
+commit 08b367f7307bf87ad1607bff7f8c00e1577946f2
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added settings for @Git
+
+commit 3702c381595c0dfa6e7644bd945987b95af2e20c
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    move to Dist::Zilla
+
+commit 0c956de604201e54f52cd033772e4a801a542be2
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    bumped to version 2.0.1
+
+commit 9f4f74b8dfbeb976d1c5343771ccc45884dd0832
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    renamed test file, fixed manifest
+
+commit 61ce2c014d52194c53f24d3db38c1d9d5d2bd91f
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    bumped up the version number to 2.0
+
+commit ec01392ebabf99f4aead69d64155f8a74080eeb0
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    improved docs, bumped version to 1.2
+
+commit e7eeb7b50c164adee43929e5f32f51857984d810
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    bumped the version up
+
+commit 77b777672a78faa5a4135c847d13c58da622c586
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    clearer authoring statement
+
+commit b5649fd44a4014cd81a5d579a5d4ffcb197adf04
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    i'm going through change-e-e-es
+
+commit 9c1af15fc9c7d6cb23420a7ca6ae71b49d5e5bb7
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    adjusted version to sane value
+
+commit 4ff17e3aec2122b1ad18ebc5b3550dc81d3cae22
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    moved to Module::Install
+
+commit 53d44bac66d16737ed265bad49d8967bd39b8fdb
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    improved the test suite
+
+commit c362127aff8c532d4fefa373ffd8bd33e51bd555
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    some changes to documentation
+
+commit 660dcd1053b8491261823f2e4faae2ae3a6f9f3e
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added first modified version
+
+===================================
+End of changes in the last 365 days
+===================================

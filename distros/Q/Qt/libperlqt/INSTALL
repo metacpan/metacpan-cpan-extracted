@@ -1,0 +1,40 @@
+This file contains the installation instructrions for libperlqt.
+
+libperlqt need to know your QTDIR with either
+
+export QTDIR=/usr/lib/qt
+
+before compiliation, or with a
+
+make QTDIR=/usr/lib/qt
+
+instead of a plain 'make'
+
+
+First, you need to create a Makefile using the command
+
+perl Makefile.PL
+
+Then you need to compile the library using
+
+make
+
+This builds a shared library named libperlqt.so somewhere in blib/ that is
+linked with all of the PerlQt modules.
+
+By default, libperlqt installs into /usr/local/lib and the only way to
+change that is to edit the Makefile.PL at the point where it says
+
+	cp $(INST_DYNAMIC) /usr/local/lib
+
+and change the location from /usr/local/lib to wherever you'd prefer it be
+installed. I'll try to fix this later. Oh, and you have to run
+perl Makefile.PL after you edit Makefile.PL, or the change will not be
+honored.
+
+Finally, install it with:
+
+make install
+
+Once you have installed libperlqt, you may continue with the main PerlQt
+compiliation.

@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+
+use qbit;
+
+use Getopt::Long;
+use Pod::Usage;
+use FCGI;
+use FCGI::ProcManager;
+use Proc::Daemon;
+
+my %args = ();
+GetOptions(
+    \%args,     'help|?',    'daemonize!', 'lib-path=s@',    'workers=i',     'pid=s',
+    'listen=s', 'backlog=i', 'user=s',     'process-name=s', 'max-requests=i'
+);
+
+pod2usage(1) if $args{'help'} || !exists($ARGV[0]);
+
+if ($args{'lib-path'}) {
+    require lib;
+    lib->import(@{$args{'lib-path'}});
+}
+
+my $class_fname = $ARGV[0];
+$class_fname =~ s/::/\//g;
+$class_fname .= '.pm';
+require $class_fname;
+
+if ($args{'daemonize'}) {
+    my $uid;
+    if ($args{'user'}) {
+        $uid = getpwnam($args{'user'});
+        unless ($uid) {
+            print gettext('User "%s" doesn\'t exists') . "\n";
+            exit(1);
+        }
+    }
+
+    my $daemon = Proc::Daemon->new(($uid ? (setuid => $uid) : ()));
+    $daemon->Init();
+}
+
+my $proc_manager = FCGI::ProcManager->new(
+    {
+        n_processes => (exists($args{'workers'}) ? $args{'workers'} : 10),
+        pm_title => $args{'process-name'} || 'qbit_fcgi_starter',
+        ($args{'pid'} ? (pid_fname => $args{'pid'}) : ())
+    }
+);
+
+my $socket = FCGI::OpenSocket($args{'listen'} || ':9000', $args{'backlog'} || 5);
+my $request = FCGI::Request(\*STDIN, \*STDOUT, \*STDERR, \%ENV, $socket);
+
+my $web_interface = $ARGV[0]->new();
+
+$proc_manager->pm_manage();
+
+my $n = 0;
+while ($request->Accept() >= 0) {
+    $proc_manager->pm_pre_dispatch();
+    $web_interface->run($request);
+    $proc_manager->pm_post_dispatch();
+    exit(0) if $args{'max-requests'} && ++$n >= $args{'max-requests'};
+}
+
+FCGI::CloseSocket($socket);
+
+__END__
+
+=head1 NAME
+
+qbit_fcgi_starter
+
+=head1 SYNOPSIS
+
+qbit_fcgi_starter [options] class_name
+
+Class "class_name" must be QBit::WebInterface::FastCGI descendant.
+
+=head1 OPTIONS
+
+=over 15
+
+=item B<--daemonize>
+
+Use if you want run as daemon.
+
+=item B<--process-name>
+
+Change process manager process name.
+
+=item B<--lib-path>
+
+Directories with perl modules. Use several times if need.
+
+=item B<--workers>
+
+Count of process, default 10.
+
+=item B<--pid>
+
+Write pid file.
+
+=item B<--listen>
+
+C<:port> - TCP connection or
+
+C</path/filename> - UNIX socket.
+
+=item B<--backlog>
+
+Maximum length of the queue of pending connections.
+
+=item B<--user>
+
+Set daemon owner. (Only wiith --daemonize and run under root).
+
+=item B<--max-requests>
+
+Set max requests per child.
+
+=item B<--help>
+
+Show help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+Extract translatable strings from given input files.

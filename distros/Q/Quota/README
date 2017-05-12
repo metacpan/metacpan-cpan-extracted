@@ -1,0 +1,295 @@
+Quota extension module for Perl
+-------------------------------
+
+Author:    Tom Zoerner (tomzo AT users.sourceforge.net)
+
+Version:   1.7.2
+Date:      May 2015
+DLSIP-Code:Rcdfg
+           - stable release
+           - C compiler required for installation
+           - support by developer
+           - plain functions, no references used
+           - licensed under the Perl Artistic License or
+             (at your option) version 2 or later of the
+             GNU General Public License
+Location:  http://www.perl.com/CPAN/authors/Tom_Zoerner/
+
+Supported: SunOS 4.1.3,
+           Solaris 2.4 - 2.10,
+           HP-UX 9.0x & 10.10 & 10.20 & 11.00,
+           IRIX 5.2 & 5.3 & 6.2 - 6.5,
+           OSF/1 & Digital Unix 4,
+           BSDi 2, FreeBSD 3.x - 4.9, OpenBSD & NetBSD (no RPC),
+           Linux - kernel 2.0.30 and later, incl. Quota API v2 and XFS,
+           AIX 4.1, 4.2 and 5.3.
+           AFS (Andrew File System) on many of the above (see INSTALL),
+	   VxFS (Veritas File System) on Solaris 2.
+
+Documentation is in pod format at the end of Quota.pm,
+installation hints are in a file named INSTALL inside this package.
+See also CHANGES for a history of updates to this module.
+
+-----------------------------------------------------------------------------
+  THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+  WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+-----------------------------------------------------------------------------
+
+
+NAME
+     Quota - Perl interface to file system quotas
+
+SYNOPSIS
+         use Quota;
+
+         ($block_curr, $block_soft, $block_hard, $block_timelimit,
+          $inode_curr, $inode_soft, $inode_hard, $inode_timelimit) =
+         Quota::query($dev [,$uid [,kind]]);
+
+         ($block_curr, $block_soft, $block_hard, $block_timelimit,
+          $inode_curr, $inode_soft, $inode_hard, $inode_timelimit) =
+         Quota::rpcquery($host, $path [,$uid]);
+
+         Quota::rpcpeer([$port [,$use_tcp [,timeout]]]);
+
+         Quota::setqlim($dev, $uid, $block_soft, $block_hard,
+                        $inode_soft, $inode_hard [,$tlo [,kind]]);
+
+         Quota::sync([$dev]);
+
+         $arg = Quota::getqcarg([$path]);
+
+         Quota::setmntent();
+         ($dev, $path, $type, $opts) = Quota::getmntent();
+         Quota::endmntent();
+
+
+DESCRIPTION
+     The Quota module provides access to file system quotas.  The
+     quotactl system call or ioctl is used to query or set quotas
+     on the local host, or queries are submitted via RPC to a
+     remote host.  Mount tables can be parsed with getmntent and
+     paths can be translated to device files (or whatever the
+     actual quotactl implementations needs as argument) of the
+     according file system.
+
+     Functions
+
+     ($bc,$bs,$bh,$bt, $ic,$is,$ih,$it) = Quota::query($dev, $uid, $kind)
+         Get current usage and quota limits for a given file
+         system and user.  The user is specified by its numeric
+         uid; defaults to the process' real uid.
+
+         The type of $dev varies from system to system. It's the
+         argument which is used by the quotactl implementation to
+         address a specific file system. It may be the path of a
+         device file (e.g. /dev/sd0a) or the path of the mount
+         point or the quotas file at the top of the file system
+         (e.g. /home.stand/quotas). However you do not have to
+         worry about that; use Quota::getqcarg to automatically
+         translate any path inside a file system to the required
+         $dev argument.
+
+         $dev may also be in the form of hostname:path, which has
+         the module transparently query the given host via a
+         remote procedure call (RPC). In case you have NFS (or
+         similar network mounts), this type of argument may also
+         be produced by Quota::getqcarg. Note: RPC queries
+         require rquotad(1m) to be running on the target system.
+         If the daemon or host are down, the timeout is 12
+         seconds.
+
+         In $bc and $ic the current usage in blocks and inodes is
+         returned.  $bs and $is are the soft limits, $bh and $ih
+         hard limits. If the soft limit is exceeded, writes by
+         this user will fail for blocks or inodes after $bt or
+         $it is reached. These times are expressed as usual, i.e.
+         in elapsed seconds since 00:00 1/Jan/1970 GMT.
+	 
+	 Note: When the quota limits are not exceeded, the timestamps
+	 are meaningless and should be ignored. When hard and soft
+	 limits are zero, there is no limit for that user. On most
+	 systems Quota::query will return undef in that case and
+	 errno will be set to ESRCH.
+
+         When $kind is given and set to 1, $uid is taken as gid
+         and group quotas are queried. This is not supported across
+         RPC and even locally only on a few architectures (e.g. Linux
+         and other BSD based Unix variants, OSF/1 and AIX - check the
+         quotactl(2) man page on your systems).  When $kind is set
+         to 2, project quotas are queried; this is currently only
+         supported for XFS.  When unsupported, this flag is ignored.
+
+     Quota::setqlim($dev, $uid, $bs,$bh, $is,$ih, $tlo, $kind)
+         Sets quota limits for the given user. Meanings of $dev,
+         $uid, $bs, $bh, $is and $ih are the same as in
+         Quota::query.
+
+         For file systems exceeding 2 TB: To allow passing block or
+         inode values larger or equal to 2^32 on 32-bit Perl versions,
+         pass them either as strings or floating point.
+
+         $tlo decides how the time limits are initialized:  0:
+         The time limits are set to NOT STARTED, i.e. the time
+         limits are not initialized until the first write attempt
+         by this user.  This is the default.  1: The time limits
+         are set to 7.0 days.  More alternatives (i.e. setting a
+         specific time) aren't available in most implementations.
+
+         When $kind is given and set to 1, $uid is taken as gid
+         and group quota limits are set. This is supported only on a
+         few architectures (see above).  When I<$kind> is set to 2,
+         project quotas are modified; this is currently only supported
+         for XFS.  When unsupported, this flag is ignored.
+
+         Note: if you want to set the quota of a particular user
+         to zero, i.e.  no write permission, you must not set all
+         limits to zero, since that is equivalent to unlimited
+         access. Instead set only the hard limit to 0 and the
+         soft limit for example to 1.
+
+         Note that you cannot set quotas via RPC.
+
+     Quota::sync($dev)
+         Have the kernel update the quota file on disk or all
+         quota files if no argument given (the latter doesn't
+         work on all systems, in particular on HP-UX 10.10).
+
+         The main purpose of this function is to check if quota
+         is enabled in the kernel and for a particular file
+         system. Read the quotaon(1m) man page on how to enable
+         quotas on a file system.
+
+         Note: on some systems this function always returns a
+         success indication, even on partitions which do not
+         have quotas enabled (e.g. Linux).  This is not a bug
+         in this module; it's a limitation in certain kernels.
+
+     ($bc,$bs,$bh,$bt, $ic,$is,$ih,$it) =
+         Quota::rpcquery($host,$path,$uid)
+
+         This is equivalent to Quota::query("$host:$path",$uid),
+         i.e.  query quota for a given user on a given remote
+         host via RPC.  $path is the path of any file or
+         directory inside the wanted file system on the remote
+         host.
+
+     Quota::rpcpeer($port,$use_tcp,timeout)
+         Configure parameters for subsequent RPC queries; all
+         parameters are optional.  By default the portmapper on
+         the remote host is used (i.e. default port is 0,
+         protocol is UDP)  The default timeout is 4 seconds.
+
+     Quota::rpcauth($uid,$gid,$hostname)
+        Configure authorization parameters for subsequent 
+        RPC queries; all parameters are optional. By default 
+        uid and gid are taken from owner of the process and 
+        hostname is the host name of current machine.
+    
+     $arg = Quota::getqcarg($path)
+         Get the required $dev argument for Quota::query and
+         Quota::setqlim for the file system you want to operate
+         on. $path is any path of an existing file or directory
+         inside that file system. The path argument is optional
+         and defaults to the current working directory.
+
+         The type of $dev varies between operating systems, i.e.
+         different implementations of the quotactl functionality.
+         Hence it's important for compatibility to always use
+         this module function and not really pass a device file
+         to Quota::query (as returned by Quota::getdev).  See
+         also above at Quota::query
+
+     $dev = Quota::getdev($path)
+         Returns the device entry in the mount table for a
+         particular file system, specified by any path of an
+         existing file or directory inside it. $path defaults to
+         the working directory. This device entry need not really
+         be a device. For example on network mounts (NFS) it's
+         "host:mountpath", with amd(1m) it may be something
+         completely different.
+
+         NEVER use this to produce a $dev argument for other
+         functions of this module, since it's not compatible. On
+         some systems quotactl does not work on devices but on
+         the quotas file or some other kind of argument. Always
+         use Quota::getqcarg.
+
+     Quota::setmntent()
+         Opens or resets the mount table. This is required before
+         the first invocation of Quota::getmntent.
+
+         Note: on some systems there is no equivalent function in
+         the C library.  But you still have to call this module
+         procedure for initialization of module-internal
+         variables.
+
+     ($dev, $path, $type, $opts) = Quota::getmntent()
+         Returns the next entry in the system mount table. This
+         table contains information about all currently mounted
+         (local or remote) file systems.  The format and location
+         of this table (e.g. /etc/mtab) vary from system to
+         system. This function is provided as a compatible way to
+         parse it. (On some systems, like OSF/1, this table isn't
+         accessible as a file at all, i.e. only via
+         Quota::getmntent).
+
+     Quota::endmntent()
+         Close the mount table. Should be called after the last
+         use of Quota::getmntent to free possibly allocated file
+         handles and memory.  Always returns undef.
+
+     Quota::strerr()
+         Translates $! to a quota-specific error text. You should
+         always use this function to output error messages, since
+         the normal messages don't always make sense for quota
+         errors (e.g. ESRCH: No such process, here: No quota for
+         this user)
+
+         Note that this function only returns a defined result if
+         you called a Quota command directly before which returned
+         an error indication.
+
+RETURN VALUES
+     Functions that are supposed return lists or scalars, return
+     undef upon errors. As usual $! contains the error code (see
+     Quota::strerr).
+
+     Quota::endmntent always returns undef.  All other functions
+     return 0 upon success, non-zero integer otherwise.
+
+EXAMPLES
+     An example for each function can be found in the test script
+     test.pl. See also the contrib directory, which contains 
+     some longer scripts, kindly donated by users of the module.
+
+BUGS
+     With remote quotas we have to rely on the remote system to
+     state correctly which block size the quota values are
+     referring to. Old versions of the Linux rpc.rquotad
+     reported a block size of 4 kilobytes, which was wildly
+     incorrect. For more info on this and other Linux bugs please
+     see INSTALL.
+
+AUTHORS
+     This module was created 1995 by Tom Zoerner
+     (email: tomzo AT users.sourceforge.net)
+     and since then continually improved and ported to
+     many operating- and file-systems. Numerous people
+     have contributed to this process; for a complete
+     list of names please see the CHANGES document.
+
+     The quota module was in the public domain 1995-2001. Since 2001
+     it is licensed under both the Perl Artistic License and version 2
+     or later of the GNU General Public License as published by the
+     Free Software Foundation.  For a copy of these licenses see
+     <http://www.opensource.org/licenses/>.  The respective authors
+     of the source code are it's owner in regard to copyright.
+
+SEE ALSO
+     perl(1), edquota(1m), quotactl(2) or quotactl(7I),
+     mount(1m), mtab(4) or mnttab(4), quotaon(1m), setmntent(3),
+     getmntent(3) or getmntinfo(3), endmntent(3), rpc(3),
+     rquotad(1m).
+

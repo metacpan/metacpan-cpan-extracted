@@ -1,0 +1,33 @@
+language: perl
+perl:
+    - "5.24"
+    - "5.22"
+    - "5.18"
+    - "5.14"
+services:
+    - redis-server
+    - postgresql
+before_install:
+    - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+    - source ~/travis-perl-helpers/init
+    - build-perl
+    - perl -V
+    - "cpanm -n File::ShareDir::Install"
+    - "cpanm -n --installdeps ."
+    - "cpanm -n Moose"
+    - "cpanm -n Date::Utility" 
+    - "cpanm -n Data::Chronicle::Reader"
+    - "cpanm -n Data::Chronicle::Writer"
+    - "cpanm -n Data::Chronicle::Mock"
+    - "cpanm -n YAML::XS"
+    - "cpanm -n File::ShareDir"
+    - "cpanm -n Test::Manifest"
+    - "cpanm -n Test::MockModule"
+    - "cpanm -n Test::MockObject::Extends"
+    - "cpanm -n Date::Utility" 
+    - "cpanm -n Memoize"
+    - "cpanm -n Memoize::HashKey::Ignore"
+    - "cpanm -n Time::Duration::Concise"
+    - "cpanm -n MooseX::Types::Moose"
+script:
+  perl Makefile.PL && RELEASE_TESTING=1 make test

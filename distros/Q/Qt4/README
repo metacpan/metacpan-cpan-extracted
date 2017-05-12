@@ -1,0 +1,50 @@
+PerlQt version 0.96
+===================
+
+This module provides bindings to the Qt 4 libraries for Perl.
+
+PREREQUISITES
+
+Perl > 5.  I've tested on Perl 5.8.6 and 5.10.0.
+Qt > 4.0.  I've tested on Qt 4.4.3, 4.5.0, 4.5.1, 4.5.2, 4.6.3, and 4.7.2.
+SmokeQt.  Avaliable as part of the kdebindings package, or Alien::SmokeQt on CPAN.
+cmake
+
+INSTALLATION
+
+I recommend building the bindings in their own directory.  From the top level
+directory, type:
+
+    mkdir build
+    cd build
+
+To install the bindings, type:
+
+    cmake ..
+    make
+    make install
+
+For more information, see the INSTALL file.
+
+EXAMPLES
+
+The bindings currently come with a number of example scripts that are direct
+ports of the examples that ship with the Qt library.  You can view the
+documentation for the examples on the Qt website, and compare them with the
+exmaple code to get a feel for the bindings.  The project aims to have all
+examples fully functional.  As of the 0.96 release, 96% of the Qt examples that
+ship with Qt 4.5.0 are functional.
+
+COPYRIGHT AND LICENCE
+
+PerlQt-4 is copyright (C) 2008 by Chris Burel
+
+Based on the work of PerlQt-3, (C) Ashley Winters 2002, and (C) Germain Garand
+2003.  Also based on the work of QtRuby4, (C) 2003-2004 Richard Dale.
+
+The Smoke binding library was conceived by Ashley Winters.  It uses the
+Kalyptus Parser by Richard Dale, with a module implemented by David Faure.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.8 or, at your option,
+any later version of Perl 5 you may have available.

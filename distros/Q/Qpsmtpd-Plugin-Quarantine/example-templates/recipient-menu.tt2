@@ -1,0 +1,23 @@
+[% INCLUDE header.inc title = 'SPAM Quarantine Controls - Recipients' %]
+
+<strong>Spam Quarantine controls for mail bound for [% GET recipient %]</strong>
+
+[% IF message %]
+	<p><em>
+	[% GET message %]
+	</em></p>
+[% END %]
+
+[% INCLUDE recipient_settings.inc %]
+
+<p>
+Mail forwarding will only be allowed when the destination does
+not engage in sender-IP blacklisting that can be triggered by 
+forwarded mail.  Example destinations <em>not</em> 
+allowed: AOL, Comcast, AT&T.
+Example destinations allowed: Gmail, Yahoo, Hotmail.
+</p>
+
+[% INCLUDE recipient_messages.inc %]
+
+[% INCLUDE footer.inc %]

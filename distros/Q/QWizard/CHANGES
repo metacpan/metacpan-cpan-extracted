@@ -1,0 +1,14 @@
+* 3.15:
+  - Multiple misc perl warnings squashed
+  - Allow a 'runcode' option to buttons for at least Gtk2; use sparingly
+  - Make the back-button gray if there is no state to go back to
+
+* 3.14:
+  HTML Generator:
+    - defaults to using minimal included css
+    - the "nocss" option can turn this off
+    - file downloads supported, though it currently creates the file
+      at screen creation time and thus can't be affected by parameter
+      changes on the current screen, unlike other backends...
+
+  - Misc other bug fixes

@@ -1,0 +1,27 @@
+---
+abstract: 'Module to manage QMail message queues'
+author:
+  - 'Dave Cross <dave@perlhacks.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: QMail-QueueHandler
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: '0'
+  Term::ANSIColor: '0'
+  perl: '5.006000'
+resources:
+  repository: git://github.com/davorg/qmail-queuehandler.git
+version: v2.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,20 @@
+NAME
+    Quine - extension for creating quines
+
+SYNOPSIS
+      #!/usr/bin/perl -w
+
+      use Quine;
+
+      # rest of code here
+
+DESCRIPTION
+    This module simply prints the content of the program using the
+    module. This type of program is called a "quine".
+
+AUTHOR
+      Jeff "japhy" Pinyan
+      CPAN ID: PINYAN
+      japhy@pobox.com
+      http://www.pobox.com/~japhy/
+

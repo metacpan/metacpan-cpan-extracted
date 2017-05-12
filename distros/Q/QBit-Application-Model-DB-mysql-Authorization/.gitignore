@@ -1,0 +1,5 @@
+/.project
+/.includepath
+/.build/*
+/QBit-Application-Model-DB-mysql-Authorization*
+/qbit-application-model-db-mysql-authorization*

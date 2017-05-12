@@ -1,0 +1,244 @@
+NAME
+     Qpsmtpd::Plugin::Quarantine - filter outbound email to prevent blacklisting
+
+SYNOPSIS
+    Qpsmtpd quarantine plugin:
+
+     use Qpsmtpd::Plugin::Quarantine;
+
+    The quarantine.cgi web page:
+
+     use Qpsmtpd::Plugin::Quarantine::CGI; 
+     main();
+
+    In crontab or nightly:
+
+     perl -MQpsmtpd::Plugin::Quarantine::Batch -e 'cronjob()'
+
+    In crontab (every five minutes?):
+
+     perl -MQpsmtpd::Plugin::Quarantine::Batch -e 'sendqueued()'
+
+    From the command line:
+
+     perl -MQpsmtpd::Plugin::Quarantine::Batch -e 'mailq()'
+
+DESCRIPTION
+    Qpsmtpd::Plugin::Quarantine implements and outbound mail filter. A
+    substantial number of internet sites will blacklist senders if they send
+    too much spam. Most will do this without providing enough feedback for
+    you (the sender) to figure out where the spam is coming from or why you
+    were blacklisted.
+
+    I run ISPs and I've been blacklisted by AOL. I've been blacklisted by
+    Comcast. Why? Sometimes its because someone is exploting an insecure
+    formmail CGI on my system and sometimes its simply because I allow users
+    to forward email and when they do, they end up forwarding spam.
+
+    Qpsmtpd::Plugin::Quarantine understands that sometimes the sender is the
+    victim and sometimes not. The normal situation is that
+    Qpsmtpd::Plugin::Quarantine will bounce things that it thinks are spammy
+    back to the sender with a URL to allow the sender to push the message
+    onwards. However if the particular recipient is on an override list or
+    is very popular (maybe because someone is forwarding their mail to the
+    recipient or maybe they're on a mailing list) then instead of bouncing
+    to the sender, it will send a note to the recipient letting them know
+    there is a message waiting for them.
+
+    Qpsmtpd::Plugin::Quarantine will only send bounces or notifications
+    every so often (configurable). Both senders and recipients have the
+    option (via the website) to have their mail silently discarded so that
+    they don't get bothered again.
+
+    Qpsmtpd::Plugin::Quarantine uses OOPS to store it's persistent data in
+    mysql or PostgreSQL.
+
+INSTALATION
+    Qpsmtpd::Plugin::Quarantine is a Qpsmtpd plugin and a web page and a
+    shell command and cron jobs. Installation will require some work.
+
+    Start with the standard "perl Makefile.PL" and "make install".
+
+  Prerequisites
+    Install Qpsmtpd. I reccomend using it with postfix. Qpsmtpd should be
+    the main SMTP listener. It will become your smarthost for your other
+    mail servers. You can relegate postfix to just handling local mail by
+    adding "inet_interfaces = 127.0.0.1" to it's "main.cf".
+
+    Install mysql or PostgreSQL. Provide the DBI_DSN in either
+    /etc/default/qpsmtpd-quarantine.pl or the Qpsmtpd plugins file (below).
+
+  Qpsmtpd plugin
+    Installing the Qpsmtpd plugin is easy. Create a file,
+    "/usr/share/qpsmtpd/plugins/quarantine" (or wherever they are) with the
+    following contents:
+
+     use Qpsmtpd::Plugin::Quarantine;
+
+    That's it.
+
+    In "/etc/qpsmtpd/plugins", create an entry:
+
+     #
+     # quarantine
+     #
+     #      All of these may be set in the /etc/default/qpsmtpd-quarantine.pl.  The defaults
+     #      for these may be found in the Qpsmtpd::Plugin::Quarantine::Common module.  More
+     #      things to set can be found there too.
+     #
+     #      dbi_dsn                 database DSN (eg: DBI:mysql:database=quarantine;host=localhost)
+     #      username                database username
+     #      password                database password
+     #      baseurl                 URL of quarantine.cgi
+     #      templates               templates directory for email & web
+     #      send_from               Email address notifications are sent from
+     #      renotify_recipient_days How often should recipients be re-notified of mail waiting (days)
+     #      renotify_sender_ip      On a per-sending-IP basis, how often should senders be renotified (days)
+     #      notify_other_senders    Should non-local senders be notified at all?
+     #      notify_recipients       How many messages should a recipient get before we prefer to notify
+     #                              the recipeint instead of the sender.  Disable most sender 
+     #                              notifications if 0.
+     #      notify_recipient_only   DB hash file of recipients we notify in preference to senders
+     #
+
+     quarantine
+
+    This should come before the Queue/delivery plugins like
+    "queue/postfix-queue".
+
+  /etc/default/qpsmtpd-quarantine.pl
+    Create a perl file, "/etc/default/qpsmtpd-quarantine.pl" to override the
+    defaults that can be found in the first part of the
+    "Qpsmtpd::Plugin::Quarantine::Common" module.
+
+    For example:
+
+     package Foobar;
+
+     use Qpsmtpd::Plugin::Quarantine::Common qw(%base_defaults);
+
+     $base_defaults{send_from} = 'quarantine-sender@out-limit.internet-mail-service.net';
+
+  /etc/qpsmtpd/recipient.special.db (optional)
+    This file is a Berkeley DB HASH file that should contain the email
+    addresses of everywhere that mail is sent on a regualar basis due to
+    forwarding. When these addresses are used as recipients, the recipient
+    will be notified in preference to the sender. Collect up all addresses
+    from ".forward" files, ".procmailrc" and "/etc/aliases" files from your
+    sytems. Dump them into a file and turn them into a DB HASH. With
+    postfix, this is done with the "postmap
+    hash:/etc/qpsmtpd/recipient.special" command.
+
+  /etc/qpsmtpd/sender.special.db (optional)
+    This file is a Berkeley DB HASH file that should contain the email
+    addresses of senders that trigger spam checking. Unless the config
+    parameter "check_all_recipients" is set, we won't spam-check all
+    messsages. This database is the set of senders which trigger a forced
+    spam check.
+
+  /etc/qpsmtpd/filter_domains
+    This file lists the domains (one per line) that we want to avoid sending
+    spam to. This should include AOL (aol.com aim.com cs.com netscape.net)
+    and Comcast (comcast.com comcast.net) at a bare minimum. This file is
+    required. Do not include the entire Internet (.com .net .org) as
+    recipients need to provide a an address that isn't in the list in order
+    to get their mail forwarded.
+
+  /etc/qpsmtpd/our_domains
+    This file lists the domains that we receive mail as. Depending on other
+    configuration options, we'll only bounce back to senders that are in
+    this list.
+
+  /etc/qpsmtpd/our_networks
+    This file lists the IP addresses that make up our network. Most standard
+    notations are recognized (eg: "216.240.40.0/25"). Depending on other
+    configuration options, we'll only bounce back to senders that are in
+    this list.
+
+  /etc/qpsmtpd/ignore_networks
+    Qpsmtpd::Plugin::Quarantine has a notion of what's an internal IP
+    address (our_networks) and what is an external IP address. This file
+    lists IP addresses that are neither. The list starts out with the
+    non-routables.
+
+  quarantine.cgi
+    Create a CGI somewhere. It's a very simple program:
+
+     use Qpsmtpd::Plugin::Quarantine::CGI; 
+     main();
+
+    The URL for the CGI needs to be configured as "baseurl" in your choice
+    of config files.
+
+    Alternatively, you can set this up using mod_perl. Apache::Registry
+    provides what is needed to hook it in. The CGI remains the same.
+
+  /etc/qpsmtpd/quarantine-templates
+    Copy the "example-templates" directory to
+    "/etc/qpsmtpd/quarantine-templates". Modify as you like. All should work
+    as-is.
+
+  /etc/qpsmtpd/quarantine.access
+    This is a htpasswd-style password file that controls access to the admin
+    web page. Create it with "htpasswd -c /etc/qpsmtpd/quarantine.access
+    adminuser".
+
+  Cron jobs
+    Install two cron jobs:
+
+     7    7 * * * perl -MQpsmtpd::Plugin::Quarantine::Batch -e cronjob
+     */10 * * * * perl -MQpsmtpd::Plugin::Quarantine::Batch -e sendqueued
+
+  Starting it up.
+    To fire it up, send a spammy message to a user at one of the filtered
+    domains. The main database will auto-initialize.
+
+ADMINISTRATION
+    There is a admin web page for looking at senders and recipients. The URL
+    is "baseurl"/admin. Cookies must be enabled.
+
+    Qpsmtpd::Plugin::Quarantine has an internal mail queue. The following
+    command will dispay what's in it. Messages in quarantine are not in the
+    mail queue.
+
+     perl -MQpsmtpd::Plugin::Quarantine::Batch -e mailq
+
+DEVELOPMENT STATUS
+    This is green code, just put into production by its author.
+
+THANK THE AUTHOR
+    You can thank the author of this code by giving the author a chance to
+    sell you services. Either perl programming or Internet-related services
+    like Transit T1s, T3s, OC3s, etc. Additionally, the author is
+    considering offering this outgoing spam filter as a service.
+
+    Perl programming rates vary from $50/hr (working at home on something
+    open source that the author wanted to build anyway) to $500/hr (working
+    on-site in a different time zone on something proprietary).
+
+    The author runs multiple ISPs and has acess to very good pricing for
+    T1s, T3s, OC3s, wholesale DSL, and wholesale dialup. Please send
+    requests for quotes to: quarantine-rfq@trust.idiom.com.
+
+LICENSE
+    This software is available with and without the GPL: please write if you
+    need a non-GPL license. All submissions of patches must come with a
+    copyright grant so that David Sharnoff remains able to change the
+    license at will.
+
+    Copyright(C) 2006 David Muir Sharnoff <muir@idiom.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+

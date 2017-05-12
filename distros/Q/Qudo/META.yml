@@ -1,0 +1,96 @@
+---
+abstract: 'simple and extensible job queue manager'
+author:
+  - 'Atsushi Kobayashi <nekokak _at_ gmail dot com>'
+build_requires:
+  Test::More: '0'
+  Test::Output: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Qudo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Qudo:
+    file: lib/Qudo.pm
+    version: '0.0214'
+  Qudo::Driver::Skinny:
+    file: lib/Qudo/Driver/Skinny.pm
+  Qudo::Driver::Skinny::Row::ExceptionLog:
+    file: lib/Qudo/Driver/Skinny/Row/ExceptionLog.pm
+  Qudo::Driver::Skinny::Row::Func:
+    file: lib/Qudo/Driver/Skinny/Row/Func.pm
+  Qudo::Driver::Skinny::Row::Job:
+    file: lib/Qudo/Driver/Skinny/Row/Job.pm
+  Qudo::Driver::Skinny::Row::JobStatus:
+    file: lib/Qudo/Driver/Skinny/Row/JobStatus.pm
+  Qudo::Driver::Skinny::Schema:
+    file: lib/Qudo/Driver/Skinny/Schema.pm
+  Qudo::Hook:
+    file: lib/Qudo/Hook.pm
+  Qudo::Hook::Serialize::JSON:
+    file: lib/Qudo/Hook/Serialize/JSON.pm
+  Qudo::Hook::Serialize::MessagePack:
+    file: lib/Qudo/Hook/Serialize/MessagePack.pm
+  Qudo::Hook::Serialize::Storable:
+    file: lib/Qudo/Hook/Serialize/Storable.pm
+  Qudo::Job:
+    file: lib/Qudo/Job.pm
+  Qudo::Manager:
+    file: lib/Qudo/Manager.pm
+  Qudo::Plugin:
+    file: lib/Qudo/Plugin.pm
+  Qudo::Test:
+    file: lib/Qudo/Test.pm
+  Qudo::Worker:
+    file: lib/Qudo/Worker.pm
+recommends:
+  Data::MessagePack: '0'
+  JSON::XS: '0'
+requires:
+  DBI: '0'
+  DBIx::Skinny: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  UNIVERSAL::require: '0'
+  YAML: '0'
+resources:
+  bugtracker: https://github.com/nekokak/qudo/issues
+  homepage: https://github.com/nekokak/qudo
+  repository: git://github.com/nekokak/qudo.git
+version: '0.0214'
+x_authority: cpan:NEKOKAK
+x_contributors:
+  - '小林 篤 <nekokak@snow.local>'
+  - 'Kobayashi <atsushi@atsushi.dev.intra>'
+  - 'User <filsturas@www1487.sakura.ne.jp>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Masaru Hoshino <masartz@gmail.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'Atsushi Kobayashi <nekokak@gmail.com>'
+  - 'memememomo <memememomo@gmail.com>'
+  - 'ktat <ktat.is@gmail.com>'
+  - 'dokechin <user@user-PC.(none)>'
+  - 'Tim Retout <tim@retout.co.uk>'
+  - 'Daniel Green <ddgreen@gmail.com>'
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+  - 'karupanerura <karupa@cpan.org>'

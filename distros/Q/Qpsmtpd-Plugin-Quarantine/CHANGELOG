@@ -1,0 +1,44 @@
+
+=2007/05/10	1.02
+
+Fixed a few things in the documentation.
+
+=2007/05/09	1.01
+
+Rewrote parts of Batch.pm to use OOPS's new walk_hash().
+
+Fixed bugs in Batch.pm so that senders and recipients
+actually get deleted.
+
+=2007/01/21	0.36
+
+Fixed a problem with the example template for displaying
+recipient messages.
+
+=2007/01/03	0.35
+
+Old messages weren't getting cleared out properly. 
+Now fixed.
+
+=2006/11/15	0.34
+
+The size of the message store is now configurable
+(in addition to the maximum age)
+
+=2006/11/03	0.32
+
+Send new sender token didn't work.  It does now.
+
+Recipients created through the CGI were broken.
+
+The message store schema was broken: thought there were 
+3600 hours in a day...  cronjob() will repair.
+
+=2006/10/26	0.31
+
+Add Mail::SendVarious to prerequisites.  Remove Fork.pm
+(now located elsewhere)
+
+=2006/10/26	0.3	
+
+Initial release

@@ -1,0 +1,10 @@
+#!/usr/bin/perl -w
+
+use Qt;
+use DigitalClock;
+
+$clock = new DigitalClock;
+$clock->resize(170, 80);
+$qApp->setMainWidget($clock);
+$clock->show();
+exit $qApp->exec();

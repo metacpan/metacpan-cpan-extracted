@@ -1,0 +1,6 @@
+Revision history for Perl extension Qmail::Control.
+
+0.01  Sun Jul  7 14:27:12 2002
+	- original version; created by h2xs 1.5 with options
+		-X -n Qmail::Control
+

@@ -1,0 +1,18 @@
+libqbit-graphviz-perl (0.003) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 07 Dec 2016 22:20:54 +0300
+
+libqbit-graphviz-perl (0.002) raring; urgency=low
+
+  * Fixed dot path
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 10 Jan 2014 18:30:06 +0400
+
+libqbit-graphviz-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 14:35:06 +0400
+

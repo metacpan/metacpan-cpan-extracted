@@ -1,0 +1,10 @@
+<SOFTPKG NAME="QWizard" VERSION="3,15,0,0">
+    <TITLE>QWizard</TITLE>
+    <ABSTRACT>Ask the user questions, get answers, and act on the answers</ABSTRACT>
+    <AUTHOR>Wes Hardaker (hardaker AT users DOT sourceforge DOT net)</AUTHOR>
+    <IMPLEMENTATION>
+        <OS NAME="MSWin32" />
+        <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+        <CODEBASE HREF="QWizard-{VERSION}.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,9 @@
+Revision history for Perl extension QRangeControl.
+
+0.03  Mon Apr 14 14:42:53 1997
+	- added value(), addPage(), subtractPage(), addLine(), subtractLine(),
+minValue(), maxValue(), lineStep(), pageStep(), and setSteps() interfaces
+
+0.01  Thu Mar 13 02:35:54 1997
+	- original version; created by h2xs 1.18
+

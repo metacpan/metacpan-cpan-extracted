@@ -1,0 +1,35 @@
+libqbit-timelog-perl (0.5) saucy; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 17 May 2016 22:32:13 +0300
+
+libqbit-timelog-perl (0.4) saucy; urgency=low
+
+  * Don't stringify timelog object in boolean context.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 30 Sep 2014 14:19:39 +0400
+
+libqbit-timelog-perl (0.3) saucy; urgency=low
+
+  * Delete changelog
+
+  * Use 'exists' when it's enough and do not stringify an object excess
+    time.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 11 Dec 2013 11:52:22 +0400
+
+libqbit-timelog-perl (0.2) saucy; urgency=low
+
+  * Fixed debian dependses
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 01 Sep 2013 21:18:22 +0400
+
+libqbit-timelog-perl (0.1) saucy; urgency=low
+
+  * Version 0.1
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 31 Aug 2013 18:22:48 +0400
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Queue::Beanstalk.
+
+0.02  Wed Jan 16 03:48:21 2008
+	- Changed protocol version from 0.5 to 0.6 of the
+	  beanstalk protocol.
+	- Automatic next-server when confronted with "DRAINING".
+
+0.01  Thu Dec 13 03:18:08 2007
+	- First public version. In alpha stage.

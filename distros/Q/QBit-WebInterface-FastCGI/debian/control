@@ -1,0 +1,12 @@
+Source: libqbit-webinterface-fastcgi-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libfcgi-perl, libqbit-webinterface-perl, libfcgi-procmanager-perl, libproc-daemon-perl, liburi-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-webinterface-fastcgi-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libfcgi-perl, libqbit-webinterface-perl, libfcgi-procmanager-perl, libproc-daemon-perl, liburi-perl
+Description: Package for connect WebInterface with FastCGI.
+ Package for connect WebInterface with FastCGI.

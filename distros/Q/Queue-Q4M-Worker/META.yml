@@ -1,0 +1,47 @@
+---
+abstract: 'Worker Object Receiving Items From Q4M'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::mysqld: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Queue-Q4M-Worker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Queue::Q4M::Worker:
+    file: lib/Queue/Q4M/Worker.pm
+    version: 0.06
+recommends:
+  Scope::Guard: 0
+requires:
+  DBI: 0
+  POSIX: 0
+  Parallel::Prefork: 0
+  Time::HiRes: 0
+resources:
+  bugtracker: https://github.com/lestrrat/Queue-Q4M-Worker/issues
+  homepage: https://github.com/lestrrat/Queue-Q4M-Worker
+  repository: git://github.com/lestrrat/Queue-Q4M-Worker.git
+version: 0.06
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

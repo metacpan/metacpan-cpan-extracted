@@ -1,0 +1,5 @@
+/.project
+/.includepath
+/.build/*
+/QBit-QueryData-*
+/qbit-querydata-*

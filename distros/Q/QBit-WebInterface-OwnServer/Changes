@@ -1,0 +1,41 @@
+==================================================
+Changes from 2015-09-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2016-09-11 14:56:18 +0000
+------------------------------------------
+
+  Change: 1227ea4301b24476451db9ee23a8ce9a6f3bf41f
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 18:55:41 +0000
+
+    Merge pull request #3 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: 41a10ccc2dc5b68e503ff115a9a9195629fbadcd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:54:51 +0000
+
+    upload to cpan 
+
+  Change: fb36aa59776c09a451676c1c76d8b5a3f3012d97
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2014-05-28 17:36:37 +0000
+
+    Merge pull request #2 from QBitFramework/allow_head_request
+
+    Allowing HEAD request 
+
+  Change: a127d4485400cabcaf6d059bbaba66801653269a
+  Author: Ivan Bessarabov <ivan@bessarabov.ru>
+  Date : 2014-05-28 17:25:19 +0000
+
+    Allowing HEAD request
+
+    To make `curl -I http://127.0.0.1:5000` work 
+
+================================================
+Plus 6 releases after 2015-09-12 00:00:00 +0000.
+================================================

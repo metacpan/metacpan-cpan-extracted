@@ -1,0 +1,35 @@
+Date: Sun, 20 Oct 2002 17:35:11 +0800
+From: Ziaur Rahman
+To: tomzo@
+Subject: Contrib: Quota warning based on threshold.
+X-Sender: ziaur.rahman
+User-Agent: Internet Messaging Program (IMP) 4.0-cvs
+X-Webmail-Company: QALA Singapore Pte Ltd.
+
+Hi,
+
+First, let me thank you from the bottom of my heart for writing this fantastic 
+module that saved my life.
+
+I wrote a script to send warning message if user's disk usage is close to or 
+over their quota limit. As I couldn't find a perl script or any script which 
+can handle threshold, I had to come up with this script. It uses your Quota 
+module and also some code snippets from test.pl that is included with the 
+module. Administrators can run this and get a full report of disk usage with a 
+predefined threshold status of all users or a particular user. They can also 
+use it in the crontab to send out warning messages to users whose disk usage 
+reached their threshold.
+
+Hope you consider this as worthy enough to include in your contrib directory.
+
+I have attached the script (tar file), with a sample quotawarn.msg file which 
+is a configurable template for sending mails to user. You can also download it 
+from:
+
+http://mzrahman.com/codes/quotadm.tar
+
+Regards,
+
+Ziaur Rahman
+Systems Engineer
+Singapore.

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+Makefile
+README.md
+cpanfile
+lib/Queue/Q4M/Worker.pm
+t/001_basic.t
+xt/001_basic.t
+META.yml
+MANIFEST

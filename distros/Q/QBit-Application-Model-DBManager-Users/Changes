@@ -1,0 +1,145 @@
+==================================================
+Changes from 2016-01-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2017-01-26 06:23:10 +0000
+------------------------------------------
+
+  Change: 4d0fb4cea6d1521c64be4563c722d08f8f3b400a
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-01-26 10:22:05 +0000
+
+    Merge pull request #6 from QBitFramework/fix_pre_process
+
+    fix pre_process_fields 
+
+  Change: ae3d18ea39b9abbe93584a4b57602b5888fb0a12
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-01-26 09:17:41 +0000
+
+    fix pre_process_fields 
+
+------------------------------------------
+version 0.006 at 2016-12-03 19:25:12 +0000
+------------------------------------------
+
+  Change: c0cefc9021edceae44d6109ca5d2b2af59dbf36e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-03 22:25:12 +0000
+
+    Version 0.006 
+
+  Change: baf86bc27dd78cd25d261951453a8093463b253f
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-03 22:24:03 +0000
+
+    Merge pull request #5 from QBitFramework/added_sub_like
+
+    use sub 
+
+  Change: 4618922aae3a1dfa10406fd91306d61b8abd69c1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-03 22:22:46 +0000
+
+    use sub 
+
+------------------------------------------
+version 0.005 at 2016-12-03 18:52:34 +0000
+------------------------------------------
+
+  Change: b6365023a5f1553f829034db4e908fb2978b9044
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-03 21:52:34 +0000
+
+    Version 0.005 
+
+  Change: a30d3f42b1dae50a992945b9fe734ae9bd0259d4
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-03 21:51:04 +0000
+
+    Merge pull request #4 from QBitFramework/use_cur_user
+
+    use cur_user 
+
+  Change: 09e57e5258ccd6385043b09e68c296bbc1cbe2fc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-03 21:50:08 +0000
+
+    use cur_user 
+
+------------------------------------------
+version 0.004 at 2016-11-28 19:08:54 +0000
+------------------------------------------
+
+  Change: 0de9e990e8d6a6cc71fb2b31180ab7c8988736a6
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-28 22:08:54 +0000
+
+    Version 0.004 
+
+  Change: bfca00be2e277e0ee0cbdc30f4e898e52d127729
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-11-28 22:07:23 +0000
+
+    Merge pull request #3 from QBitFramework/use_meta
+
+    use standart meta 
+
+  Change: 36aa3ba96f4577e51ea8080ccc26e1400a7ee333
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-28 22:04:01 +0000
+
+    use standart meta 
+
+------------------------------------------
+version 0.003 at 2016-11-22 22:11:26 +0000
+------------------------------------------
+
+  Change: e022b06ca55d7e6a503196fedcd42251a6541838
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-23 01:11:26 +0000
+
+    Version 0.003 
+
+  Change: 499bae0d537f0dcb1850f04d7fa3089f7d5358bf
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-11-23 02:10:02 +0000
+
+    Merge pull request #2 from QBitFramework/use_number
+
+    use number 
+
+  Change: 39685d828a50243d93a6bf9abd7cc1d72bbb7379
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-23 01:08:48 +0000
+
+    use number 
+
+------------------------------------------
+version 0.002 at 2016-09-11 13:00:37 +0000
+------------------------------------------
+
+  Change: 9716c2914589a5f4902d2f1ebaca157ca39f96df
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:00:37 +0000
+
+    Version 0.002 
+
+  Change: 3018d7ea65fa1b3f9577bb7d5306efb51b701960
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:59:24 +0000
+
+    Merge pull request #1 from QBitFramework/upload_to_cpan
+
+    upload to cpan 
+
+  Change: 227f6b22d9844d8d523187beae2c9541df6f86f1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 15:58:16 +0000
+
+    upload to cpan 
+
+===============================================
+Plus 1 release after 2016-01-27 00:00:00 +0000.
+===============================================

@@ -1,0 +1,21 @@
+Changes
+lib/Quote/Code.pm
+Makefile.PL
+Makefile_PL_settings
+MANIFEST
+MANIFEST.SKIP
+README
+Code.xs
+t/00-load.t
+t/01-bare.t
+t/02-unload.t
+t/03-context.t
+t/04-heredoc.t
+t/05-heredoc-code.t
+t/06-heredoc-code.t
+t/07-charnames.t
+t/08-utf8.t
+t/09-words.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

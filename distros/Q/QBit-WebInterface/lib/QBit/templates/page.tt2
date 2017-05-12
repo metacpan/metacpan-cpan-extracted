@@ -1,0 +1,68 @@
+[% BLOCK page %]
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    [% IF page_title.defined %]<title>[% page_title | html %]</title>[% END %]
+    <link href="/qbit/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/qbit/css/qbit.css" rel="stylesheet">
+    [% TRY; INCLUDE qbit/head.tt2; CATCH; ''; END %]
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row-fluid header">
+        <div class="span2"><img src="/qbit/i/logo.png" class="logo"></div>
+        <div class="span8">
+          [% top_menu = get_option('top_menu', []) %]
+          [% IF get_option('application_title').defined || top_menu.size %]
+          <div class="navbar">
+            <div class="navbar-inner">
+
+              [% IF get_option('application_title').defined.defined %]
+              <a class="brand" href="/">[% get_option('application_title') | html %]</a>
+              [% END %]
+
+              [% IF top_menu.size %]
+              <ul class="nav">
+                [% FOR link = top_menu %]
+                <li [% IF link.path == get_option('cur_cmdpath') %] class="active"[% END %]>
+                  <a href="[% cmd_link(link.cmd, link.path) | html %]">[% link.caption | html %]</a>
+                </li>
+                [% END %]
+              </ul>
+              [% END %]
+            </div>
+          </div>
+          [% END %]
+          [% TRY; INCLUDE qbit/header_area.tt2; CATCH; ''; END %]
+        </div>
+      </div>
+
+
+      <div class="row-fluid">
+        <div class="span2">
+          [% left_menu = get_option('left_menu', []) %]
+          [% IF left_menu.size %]
+          <div class="well left_menu">
+            <ul class="nav nav-list">
+              [% FOR link = left_menu %]
+                <li [% IF get_option('cur_cmd') == link.cmd %] class="active"[% END %]>
+                  <a href="[% cmd_link(link.cmd, link.path) | html %]">[% link.caption | html %]</a>
+                </li>
+              [% END %]
+            </ul>
+          </div>
+          [% END %]
+        </div>
+        <div class="span10">
+          [% content %]
+        </div>
+      </div>
+    </div>
+
+    <script src="/qbit/js/jquery-1.7.2.min.js"></script>
+    <script src="/qbit/js/bootstrap.min.js"></script>
+    [% TRY; INCLUDE qbit/endbody.tt2; CATCH; ''; END %]
+  </body>
+</html>
+[% END %]

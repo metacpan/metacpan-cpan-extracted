@@ -1,0 +1,7 @@
+Revision history for Perl extension Qpsmtpd::Plugin::EmailAddressLoose
+
+0.02  Thu Sep  4 12:02:53 JST 2008
+        - first CPAN release
+
+0.01  Fri Jul 11 10:50:44 JST 2008
+        - original version

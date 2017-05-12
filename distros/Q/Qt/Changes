@@ -1,0 +1,62 @@
+Revision history for Perl extension Qt.
+
+0.03  Wed Apr 16 16:46:34 1997
+	- created examples/ and added a few ports of the Qt-1.2 examples
+
+0.03  Wed Apr 16 16:27:26 1997
+	- changed all referenced to $Align* to %Align in the tutorials
+
+0.03  Sat Apr 12 14:42:02 1997
+	- Added a QPrinter interface module
+
+0.03  Thu Apr 10 13:43:18 1997
+	- Added a method to determine the Qt version being compiled with
+involving qslider.h
+
+0.03  Thu Apr 10 13:37:43 1997
+	- Changed the -I order to make $(QTDIR) searched first
+
+0.03  Thu Apr 10 11:38:15 1997
+	- Added a QToolTip interface module
+
+0.03  Tue Apr  8 12:33:18 1997
+	- Edited INSTALL to describe configuration through Qt.config
+
+0.02  Mon Apr  7 17:43:44 1997
+	- released version 0.02
+
+0.02  Sun Apr  6 22:28:25 1997
+	- Added typemap entries which allow QMenuData, QPaintDevice,
+and QRangeControl methods to work properly when called via sub-classes
+which inherit them and some other class through multiple-inheritance
+
+0.02  Sun Apr  6 19:26:22 1997
+	- Created a Qt.config in the main PerlQt directory which will be
+required by all module Makefile.PL's, and contains user-editable build
+configuration information. 
+
+0.02  Fri Apr  4 12:13:43 1997
+	- Added 20 new interface modules. QButtonGroup, QCheckBox, QComboBox,
+QDialog, QFileDialog, QGroupBox, QLayout, QLineEdit, QListBox, QMenuBar,
+QMenuData, QMessageBox, QMultiLineEdit, QPopupMenu, QRadioButton, QTabBar,
+QTabDialog, QTableView, QTimer and QWindow
+
+0.02  Thu Apr  3 14:52:55 1997
+	- added a note in INSTALL about setting QTDIR before compiliation
+
+0.02  Thu Apr  3 10:37:29 1997
+	- changed all references to '/usr/lib/qt' to '$(QTDIR)'
+
+0.02  Thu Apr  3 10:03:53 1997
+	- created a CREDITS file
+
+0.02  Thu Apr  3 09:54:57 1997
+	- updated README to match the 0.01 release-notice, and added a note
+	  about binary incomatibility with perl5.003
+
+0.01  Tue Apr  1 00:00:00 1997
+	- released version 0.01
+
+0.01  Tue Mar  4 13:44:30 1997
+	- original version; created by h2xs 1.18
+

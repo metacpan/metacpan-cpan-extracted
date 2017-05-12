@@ -1,0 +1,5 @@
+Changes from 0.01 to 0.02  (2000-Feb-5)
+-------------------------
+
+- Requires PerlQt-2.104 compiled with Qt-1.4
+- Included the upgraded Pig.pm

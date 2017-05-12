@@ -1,0 +1,25 @@
+---
+abstract: 'Create array refs with qwr(...), hash refs with qhr{...}'
+author:
+  - 'Anthony Kilna <anthony@kilna.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Quote-Reference
+provides:
+  Quote::Reference:
+    file: lib/Quote/Reference.pm
+    version: v1.0.4
+requires:
+  Filter::Simple: 0.80
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.0.4

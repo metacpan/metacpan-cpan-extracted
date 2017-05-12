@@ -1,0 +1,57 @@
+==================================================
+Changes from 2015-12-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2016-12-04 19:50:54 +0000
+------------------------------------------
+
+  Change: aa200f9d3ea2723ac604c8457419ab98c761d6d1
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-04 22:50:23 +0000
+
+    Merge pull request #2 from Madskill/fix_request
+
+    fix request 
+
+  Change: 01c2a903c2c5987664560c8bdcbc344502dce185
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-04 22:49:19 +0000
+
+    fix request 
+
+------------------------------------------
+version 0.002 at 2016-09-11 13:48:26 +0000
+------------------------------------------
+
+  Change: 4fa0671f93cdc93098712c5360a5af257d4dac15
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:48:26 +0000
+
+    Version 0.002 
+
+  Change: 9cbc1c528be7d81591d8088dd0035910d6b93552
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:47:31 +0000
+
+    Merge pull request #1 from Madskill/master
+
+    upload to cpan 
+
+  Change: 7b0c08d1699db37d96e13f169c1e9924e5678b75
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:44:57 +0000
+
+    Merge pull request #1 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: 2500ef389400c6f87172fe61e074644536577f81
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:44:07 +0000
+
+    upload to cpan 
+
+===============================================
+Plus 1 release after 2015-12-05 00:00:00 +0000.
+===============================================

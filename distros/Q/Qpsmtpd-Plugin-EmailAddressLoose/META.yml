@@ -1,0 +1,21 @@
+---
+abstract: 'Override all Email::Address->parse() used in Qpsmtpd::Plugin'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Qpsmtpd-Plugin-EmailAddressLoose
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Email::Address::Loose: 0
+  Qpsmtpd::Plugin: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

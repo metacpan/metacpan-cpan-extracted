@@ -1,0 +1,9 @@
+lib/Qiniu.pm
+lib/Qiniu/Auth.pm
+lib/Qiniu/Storage.pm
+lib/Qiniu/Util.pm
+Makefile.PL
+Changes
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

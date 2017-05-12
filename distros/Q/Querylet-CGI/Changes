@@ -1,0 +1,19 @@
+Revision history for Querylet-CGI
+
+0.143     2013-11-14 22:40:05 America/New_York
+          update bugtracker, etc.
+
+0.142   2006-11-16
+        added machine-readable license
+
+0.141   2006-11-14
+        packaging improvements
+
+0.14    2004-12-16 11:00
+        respect column headers
+
+0.12    2004-09-20 14:40
+        added Querylet::CGI::Auto
+
+0.10    2004-09-19 14:00
+        first crude attempt

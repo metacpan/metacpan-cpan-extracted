@@ -1,0 +1,14 @@
+Daniel J Mitchell
+	- reported a problem involving binary incompatibility with perl5.003
+
+Richard Moore
+	- pointed out that I should be using $(QTDIR) instead of /usr/lib/qt
+
+Randy J. Ray
+	- drove me to centralize configuration data to make a single
+configuration modification affect all of PerlQt, hopefully leading a
+path to a configuration script...
+
+Chris Leach
+	- pointed out Solaris' choking on modification of string constants
+in parse_clname()

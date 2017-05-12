@@ -1,0 +1,28 @@
+Revision history for Perl extension Qudo::Parallel::Manager
+
+0.06
+   2010-07-16
+        - FIXED: default admin host (thanks shoichimasuhara)
+
+0.05
+   2010-07-13
+        - MOD: can set admin_host.
+
+0.04
+   2010-07-09
+        - FIXED: do not reuse port.
+        - FIXED: Makefile.pl
+
+0.03
+   2010-07-08
+        - FIXED: Makefile.pl
+
+0.02
+   2010-07-06
+        - use Sub::Throttle.
+        - when generate the instance, can specify admin_port.
+
+0.01
+   2010-07-05
+        - original version
+

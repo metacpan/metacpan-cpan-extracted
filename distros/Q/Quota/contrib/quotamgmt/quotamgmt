@@ -1,0 +1,158 @@
+#!/usr/drwho/local/bin/perl -w
+use Quota;
+select(STDERR); $|=1;
+select(STDOUT);$|=1;
+setpwent;
+my($cfg) = &ReadCfg;
+my($user) = &ReadUsers;
+my($fses) = &AllQuotaFs;
+
+print "Here we go\n";
+# go through all quota fses
+foreach $fs (@{$fses}) {
+  print "FS: $fs\n";
+  for($i=0;defined($$user[$i]{user});$i++) {
+    my($block_soft,$block_hard,$inode_soft,$inode_hard,$tlo);
+    for($ii=0;defined($$cfg[$ii][0]);$ii++){
+      # try match for username
+      my($reg) = '';
+      if ($$cfg[$ii][0] =~/^g:(.+)/) {
+	$reg = $1;
+      }
+
+      next unless ($$user[$i]{user} eq $$cfg[$ii][0]) or
+	($reg and ($$user[$i]{gcos} =~ /$reg/));
+      
+      # try match for Filesystem
+      my($fsr) = '';
+      if ($$cfg[$ii][1] =~/^f:(.+)/) {
+	$fsr = $1;
+      }
+
+      my($homp) = '';
+      if ($$cfg[$ii][1] eq 'HOME') {
+	$homp = $$user[$i]{home};
+      }
+
+      next unless ($fs eq $$cfg[$ii][1]) or
+	($fsr and ($fs =~ /$fsr/)) or
+	  ($homp and ($fs eq $homp));
+      
+      # if we come till here we set the defaults
+      $block_soft = $$cfg[$ii][2];
+      $block_hard = $$cfg[$ii][3];
+      $inode_soft = $$cfg[$ii][4];
+      $inode_hard = $$cfg[$ii][5];
+      $tlo = $$cfg[$ii][6];
+    }
+
+    my($qbc,$qbs,$qbh,$qic, $qis,$qih)= 
+      (Quota::query($fs, $$user[$i]{uid}))[0,1,2,4,5,6];
+
+    if (not defined $qbc) {
+      $qbc=0;$qbs=0;$qbh=0;$qic=0;$qis=0;$qih=0;}
+
+    if (($qbs != $block_soft) ||
+	($qbh != $block_hard) ||
+	($qis != $inode_soft) ||
+	($qih != $inode_hard)) {
+      Quota::setqlim($fs, 
+		     $$user[$i]{uid}, 
+		     $block_soft, $block_hard, $inode_soft, $inode_hard, $tlo);
+      printf "%-20s %-20s %6.0f %6.0f %6.0f %6.0f\n", 
+      $fs, "$$user[$i]{user}-".(split ',', "$$user[$i]{gcos}")[1],
+      $block_soft, $block_hard, $inode_soft, $inode_hard;
+    };
+
+    if (($qbc > $block_hard) ||
+	($qic > $inode_hard)) {
+      printf "Oops %-20s %-20s %6.0f %6.0f %6.0f %6.0f\n", 
+      $fs, "$$user[$i]{user}-".(split ',', "$$user[$i]{gcos}")[1],
+      $qbc, $block_hard, $qic, $inode_hard;      
+    }
+    
+  }
+  Quota::sync($fs);
+}
+
+
+
+exit;
+
+sub Physical{
+  my($dir)=$_[0];
+  
+  while (1) { 
+    if (-l $dir) { $dir=readlink($dir);} 
+    else {last; }
+  }
+  
+  if (! -e $dir) { 
+    return -1; } 
+  else {
+    return $dir; 
+  }
+
+}
+
+
+sub AllQuotaFs {
+  my(@Fs);
+  my($dev, $path, $type, $opts) = ();
+  Quota::setmntent;
+  
+  while (($dev, $path, $type, $opts) = Quota::getmntent()) {
+    push @Fs , $path  if $opts =~ /quota/;
+  } 
+  return \@Fs;
+}
+
+sub ReadCfg{
+  my(@cfg,$i);
+  $i=0;
+  my($qfs) = &AllQuotaFs;
+  my($cfgfile)="./quotacfg";
+  warn "Reading $cfgfile ...\n";
+  open (CFG, "./quotacfg") ||
+    die ("Can't open /usr/local/etc/quotacfg");
+  while (<CFG>) {
+    next if /^\s*\#/ or /^\s*$/;
+    s/^\s+//;
+    push @{$cfg[$i++]}, split (/\s+/);
+    my($entry)=$#cfg;
+    
+    die ("Error on Line $.: UserName '$cfg[$entry][0]' does not make sense") 
+      unless ($cfg[$entry][0] =~ /^g:/) or
+	getpwnam($cfg[$entry][0]);
+    
+    die ("Error on Line $.: Filesystem '$cfg[$entry][1]' does not exist")
+      unless ($cfg[$entry][1] eq 'HOME') or
+	($cfg[$entry][1] =~ /^f:/) or
+	grep ($cfg[$entry][1], @{$qfs});
+
+    my($i);
+    for ($i=2;$i<7;$i++) {
+      die ("Error on Line $.: Element $1 should be a number\n")
+	unless $cfg[$entry][$i] =~ /^\d+$/ ;
+      
+    }  
+  }
+  close CFG;
+  return \@cfg;
+}
+
+sub ReadUsers {
+  my(@Users);
+  warn "Reading Userdata ...\n";
+  while (($user,$uid,$gcos,$home)=(getpwent)[0,2,6,7]) {
+    %{$Users[$#Users+1]} = 
+      ( 'user' => $user,
+	'uid' => $uid,
+	'gcos' => $gcos,
+	'home' => Quota::getqcarg(&Physical($home)));
+#    last if $#Users>50;
+  }
+  return \@Users;
+}
+
+

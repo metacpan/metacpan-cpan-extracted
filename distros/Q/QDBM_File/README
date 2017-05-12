@@ -1,0 +1,33 @@
+QDBM_File 1.12
+
+QDBM_File is a module which allows Perl programs to make use of the
+facilities provided by the qdbm library. If you use this module, you
+should read QDBM manual pages.
+
+Quick Database Manager is a high performance dbm library maintained by
+Mikio Hirabayashi. QDBM_File provides various API, Depot, Curia, Villa,
+Vista and Odeum. Documents are available at http://qdbm.sourceforge.net/
+
+PREREQUISITES
+
+    QDBM 1.8.77 or later
+
+The official web site for QDBM is http://qdbm.sourceforge.net/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL INC="-I/build/qdbm-1.8.77" LIBS="-L/build/qdbm-1.8.77 -lqdbm"
+    make
+    make test
+    make install
+
+If you built QDBM on Windows, change -lqdbm to -lqdbm_t_static etc.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2009 Toshiyuki Yamato <toshiyuki.yamato@gmail.com>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

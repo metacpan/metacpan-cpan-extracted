@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+Mmap.xs
+README
+t/Queue-Mmap.t
+lib/Queue/Mmap.pm
+queue_internal.h
+queue_internal.c
+
+META.yml                                 Module meta-data (added by MakeMaker)

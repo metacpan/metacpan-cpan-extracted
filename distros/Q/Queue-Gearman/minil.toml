@@ -1,0 +1,6 @@
+name = "Queue-Gearman"
+# badges = ["travis"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

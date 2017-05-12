@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+package MyWidget;
+
+use Qt;
+use QFont;
+use QLCDNumber;
+use QPushButton;
+
+use LCDRange;
+
+@ISA = qw(QWidget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    my $value;
+
+    $self->setMinimumSize(200, 300);
+
+    my $quit = new QPushButton('Quit', $self, 'quit');
+    $quit->setGeometry(10, 10, 75, 30);
+    $quit->setFont(new QFont('Times', 18, $Weight{Bold}));
+    $qApp->connect($quit, 'clicked()', 'quit()');
+
+    for(0..15) {
+	$$value[$_] = new LCDRange($self);
+	$$value[$_-1]->connect($$value[$_], 'valueChanged(int)',
+			       'setValue(int)') if $_;
+    }
+
+    @$self{'quit', 'value'} = ($quit, $value);
+    return $self;
+}
+
+sub resizeEvent {
+    my $self = shift;
+    my($quit, $value) = @$self{'quit', 'value'};
+    my $startx      = 10;
+    my $starty      = $quit->y() + $quit->height() + 10;
+    my $valueWidth  = ($self->width()  - $startx - 10 - 3*5)/4;
+    my $valueHeight = ($self->height() - $starty - 10 - 3*5)/4;
+    for(0..15) {
+	$$value[$_]->setGeometry($startx + ($_%4)*(5+$valueWidth),
+				 $starty + int($_/4)*(5+$valueHeight),
+				 $valueWidth, $valueHeight);
+    }
+}
+
+package main;
+
+use Qt;
+
+$w = new MyWidget;
+$w->setGeometry(100, 100, 400, 400);
+$qApp->setMainWidget($w);
+$w->show();
+exit $qApp->exec();

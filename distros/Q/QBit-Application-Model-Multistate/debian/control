@@ -1,0 +1,12 @@
+Source: libqbit-application-model-multistate-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-perl,  libqbit-graphviz-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-multistate-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-perl,  libqbit-graphviz-perl
+Description: Class for working with multistates.
+ Class for working with multistates.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Quota::OO.
+
+0.0.1  Wed Jan 11 09:34:27 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Quota::OO
+

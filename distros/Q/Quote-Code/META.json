@@ -1,0 +1,64 @@
+{
+   "abstract" : "quoted strings with arbitrary code interpolation",
+   "author" : [
+      "Lukas Mai <l.mai@web.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Quote-Code",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.014000",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "charnames" : "0",
+            "if" : "0",
+            "strict" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mauke/Quote-Code",
+         "web" : "https://github.com/mauke/Quote-Code"
+      }
+   },
+   "version" : "1.0102",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

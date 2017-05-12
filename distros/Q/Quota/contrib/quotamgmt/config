@@ -1,0 +1,52 @@
+# user 	 . a username
+#        . g:regexp matched to gcos
+#
+# filesystem	. path to a filesystem
+#		. f:<regexp> (matched on mountpath)
+#		. HOME filesystem holding the users homedirectory
+#
+# space		. space on the fs in Bloks (1024)
+#
+# inodes	. number of inodes 
+#
+# tlo		. 0 - NOT Started
+#		. 1 - 7 Days
+#
+
+
+#user		filesystem		space (soft/hard) 	inodes (soft/hard)	tlo
+
+g:.		f:.			1	1		1	1		0
+g:.		HOME			20000	21000		2000	2100		0
+g:,staff,	HOME			30000	30000		3000	3000		0
+g:,proj,	HOME			50000	51000		5000	5100		0
+g:,syst,	f:.			0	0		0	0		0
+g:,ueb,		HOME			0	0		0	0		0
+
+
+
+# individual settings
+
+ahartman	HOME			30000	30000		2000	2000		0
+bodermat	HOME			50000	50000		2000	2000		0
+cbachofn	/usr/tardis/stud7	20000	20000		2000	2000		0
+cmaeder		HOME			30000	30000		2000	2000		0
+csrandaz	HOME			50000	50000		2000	2000		0
+dgallegr	HOME			30000	30000		2000	2000		0
+dweseman	HOME			40000	40000		10000	10000		0
+fpvass		HOME			30000	30000		2000	2000		0	
+jgfluri		/usr/tardis/stud7	20000	20000		1000	1000		0
+jhaeflig	HOME			150000	150000		10000	10000		0
+jpchauny	HOME			50000	50000		10000	10000		0
+mastreif	HOME			50000	50000		2000	2000		0
+mcgastpa	HOME			40000	40000		4000	4000		0
+mdbraend	HOME			60000	60000		2000	2000		0
+mtibolla	HOME			40000	40000		1000	1000		0
+pmzwimpf	HOME			30000	30000		3000	3000		0
+uefleisc	HOME			30000	30000		3000	3000		0
+dip94w1		HOME			230000	230000		23000	23000		0
+gisrael		HOME			150000	151000		15000	15000		0
+sem94w8		HOME			100000	100000		10000	10000		0
+sem94w5		HOME			60000	60000		6000	6000		0
+# till 30.3.97 because of diplom arbeit
+ktschmid	HOME			60000	60000		6000	6000	0

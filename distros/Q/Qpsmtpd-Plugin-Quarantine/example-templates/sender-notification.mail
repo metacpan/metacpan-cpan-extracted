@@ -1,0 +1,12 @@
+[% SET renotify = sender.renotify_days %][% DEFAULT renotify = config.renotify_sender_ip %]From: [% GET config.send_from %]
+To: [% GET sender %]
+Date: [% GET now %]
+Subject: New sender authentication token
+
+We have recevied a request from [% GET request_ip %] to send you
+($sender) a new authentication token.
+
+Here it is:
+
+ [% GET sender_url %]
+

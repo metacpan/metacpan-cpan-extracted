@@ -1,0 +1,10 @@
+
+Revision history for Perl extension Qualys.
+
+0.05
+	- changed the way attributes are created with AUTOLOAD
+		
+0.02
+	- original version; created by h2xs 1.23 with options
+		-A -X Qualys
+

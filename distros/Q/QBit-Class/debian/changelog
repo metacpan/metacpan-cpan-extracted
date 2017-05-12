@@ -1,0 +1,22 @@
+libqbit-class-perl (0.3) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Mar 2016 21:17:29 +0300
+
+libqbit-class-perl (0.2) raring; urgency=low
+
+  * Fixed build dependses
+
+  * Fixed architecture of package
+
+  * Version 0.1
+
+  * Added basic tests
+
+  * Debianize
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 31 Aug 2013 14:58:30 +0400
+

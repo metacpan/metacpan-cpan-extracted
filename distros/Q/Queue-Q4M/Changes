@@ -1,0 +1,91 @@
+Changes
+=======
+
+0.00019 - 13 Apr 2009
+  - No code change
+  - Change test table name, so default mysql setup picks it up as a test db
+
+0.00018 - 26 Feb 2009
+  - There was a  class_type problem for __res causing problems. shikes.
+  - Properly call queue_abort() on demolish. otherwise we lose the last result
+
+0.00017 - 20 Feb 2009
+  - s/Squirrel/Any::Moose/g
+
+0.00016 - 13 Jan 2009
+  - At least in my environment (Moose 0.64, Mouse 0.14), using 
+    Queue::Q4M::Result in a union type causes Moose to complain, but not Mouse.
+    The fix is to explicitly declare it as a class_type('Queue::Q4M::Result'),
+    which isn't quite elegant (this release does a very silly workaround to 
+    overcome this).
+
+0.00015 - 06 Jan 2009
+  - Unintended test went into the dist. For now, just skip the test
+    all together.
+  - Unintended .pm went into the dist. remove Fast.pm
+
+0.00014 - 22 Dec 2008
+  - Per popular demand for less dependency, we shall use Squirrel.
+    Unless you explicitly loaded Moose, it will fall back to
+    the lighter Mouse
+  - Refactor tests
+
+0.00013 - 08 Sep 2008
+  - Recent versions of Moose (properly) unimport confess(), which breaks
+    my code depending on it.
+
+0.00012 - 13 Aug 2008
+  - Implement Queue::Q4M::Status
+  - Require q4m 0.8 or greater
+
+0.00011 - 28 Jul 2008
+  - Always check for minimum required verion of q4m at connect time.
+    (the same check will fail if the connected database does not support q4m)
+
+0.00010 - 18 Jul 2008
+  - Be slightly be more paranoid about checking parameter type for
+    fetch_*() methods.
+
+0.00009 - 09 Jul 2008
+  - Various tweaks for performance improvement. Probably 3 times as fast
+    compared to 0.00002.
+  - Recent versions of q4m no longer needed to specify the tables
+    as database.table, so removed that logic.
+  - Inline fetch_* methods, so that they can utilize the selectraw_* methods
+  - Remove unnecessary caching.
+
+0.00008 - 08 Jul 2008
+  - Correctly auto-reconnect after a database disconnect.
+    Fixed by Taro Funaki.
+
+0.00007 - 08 Jul 2008
+  - Add extended benchmarks under misc
+  - No code change
+
+0.00006 - 07 Jul 2008
+  - Add clear() method
+
+0.00005 - 02 Jul 2008
+  - Fix a problem where conditional tables specifiers weren't handled
+    correctly. Patched by Taro Funaki.
+
+0.00004 - 24 Jun 2008
+  - Fix a silly problem where passing arguments to next() wouldn't
+    invalidate the previously executed statement
+  - Fix a problem where $rv was being checked against success.
+    The truth is, $rv is always a success - q4m returns 1 row regardless.
+
+0.00003 - 23 Jun 2008
+  - Fix a nasty bug in next()
+  - Experimental: You can omit the table name if it's right after ->next call
+    and you're still in the same scope
+
+0.00002 - 23 Jun 2008
+  - API incompatiblity! I tried to avoid it, but sorry, this version breaks
+    compatiblity, so that you need to keep passing the target table name
+    for each operation.
+  - Moose!
+  - Support multi table_cond queue_wait() calls
+
+0.00001 - 09 Jan 2008
+  - Initial release

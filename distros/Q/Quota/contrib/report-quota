@@ -1,0 +1,113 @@
+#!/usr/local/bin/perl
+
+# Report Quota
+# 
+# Please keep my name associated with this program. If you add features to it, 
+# please drop me a copy.
+#
+# This is a little util I wrote to report users who have NO quotas.
+# use at your own risk as I could only test on a BSDI 2.1 machine
+# It does not modify any quotas, just reads each users quota...
+# And email you the results.
+#
+# Written by Jim Hribnak (hribnak@nucleus.com) Aug 28 1997
+#
+
+use Quota;
+
+$mailprog = '/usr/sbin/sendmail';   # change path to sendmail
+$email = 'hribnak@nucleus.com';     # put your email address here
+$from = 'root@nucleus.com';	    # put root@yourdomain here
+$subject = "User Quota Report\n";   
+$dev1= "/";                         #filesystem with quota
+$dev2="/usr";                       #filesystem with quota
+$dev3="/bbsusers";                  #filesystem with quota
+&Email;
+
+#
+# uncomment format if you wish to use this header
+#
+
+#format STDOUT_TOP = 
+#Quota's for @<<<<<<<<<<<<<<<< UID[@>>>>>>]
+#$user, $uid
+#             Blocks   Quota    Quota  
+#Filesystem    Used             Limit  
+#----------------------------------------------------------------------------
+#.
+
+format STDOUT =
+@<<<<<<<<<  @###### @>>>>>>  @>>>>>>   Username: @<<<<<<<<<<<<<<<<
+$dev,       $bc,    $bs,      $bh,             $user
+.
+open (PW, "/etc/passwd") || die "Error opening password file";
+while (<PW>) {
+($user,$passwd,$uid)=split(/:/);
+
+#
+# Change $dev to match a filesystem with Quotas
+#
+
+$dev=$dev1;
+
+($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::query($dev, $uid);
+if(defined($bc)) {
+
+&Sub1;
+
+write ;
+}
+else {
+  warn Quota::strerr,"\n\n";
+}
+#
+# Change $dev to match a filesystem with Quotas
+#
+
+$dev=$dev2;
+($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::query($dev, $uid);
+if(defined($bc)) {
+&Sub1;
+write;
+}
+else {
+  warn Quota::strerr,"\n\n";
+}
+#
+# Change $dev to match a filesystem with Quotas
+#
+$dev=$dev3;
+($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::query($dev, $uid);
+if(defined($bc)) {
+&Sub1;
+write;
+print "----------------------------------------------------------------------------";
+print "\n"; 
+}
+else {
+  warn Quota::strerr,"\n\n";
+}
+
+}
+
+close(MAIL);
+exit;
+
+sub Sub1
+{
+if (($bh eq "0") && ($bs eq "0")) {
+	$bh = "None";
+	$bs = "None";
+	print MAIL "$user does not have a quota on $dev\n"
+	}
+}
+
+sub Email
+{
+open(MAIL,"|$mailprog -t"); # open accessto Sendmail
+print MAIL "To: $email\n";
+print MAIL "From: $from\n";
+print MAIL "Subject: $subject \n\n";
+print MAIL "\n";
+}
+

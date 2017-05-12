@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+use Qt;
+use QFont;
+use QPushButton;
+
+$quit = new QPushButton('Quit');
+$quit->resize(75, 30);
+$quit->setFont(new QFont('Times', 18, $Weight{Bold}));
+
+$qApp->connect($quit, 'clicked()', 'quit()');
+
+$qApp->setMainWidget($quit);
+$quit->show();
+exit $qApp->exec();

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Quantum/Superpositions.pm
+test.pl
+demo/demo_Factors.pl
+demo/demo_GCD.pl
+demo/demo_Index.pl
+demo/demo_Max.pl
+demo/demo_Odder.pl
+demo/demo_Primes.pl
+demo/diskfree

@@ -1,0 +1,288 @@
+Changes in 1.7.2 (May 2015)
+- Adapted platform detection for Linux 4.*
+  Thanks to C. Affolter for reporting the issue (CPAN ticket 104652)
+
+Changes in 1.7.1 (September 2013)
+- "make test" now aborts if STDOUT is not a terminal, same as already
+  for STDIN. Suggested by Alexandr Ciornii via CPAN ticket 82564.
+
+Changes in 1.7.0 (August 2013)
+- Added support for the new NetBSD 6.0 quota system (libquota)
+  Thanks to David Holland and Edgar Fuss
+- To support limits and usage >= 2^32 on 32-bit clients, Quota::setqlim
+  and Quota::query interfaces were changed to use double (NV) instead
+  of integer (IV). This should be transparent to users of the module.
+
+Changes in 1.6.7 (November 2011)
+- Added support to detect 3.x Linux kernels
+  Thanks to Salvatore Bonaccorso of the Debian Perl Group
+
+Changes in 1.6.6 (June 2011)
+- Ignore "rootfs" filesystem in Quota::getqcarg() on Linux, which always
+  is a duplicate.  Thanks to "abaturin" for providing this patch.
+- Made test.pl exit immediately when AUTOMATED_TESTING is set in the
+  environment (same as when called not from a tty), as all tests require
+  user interaction. Changed on request of TODDR of cpan.org
+
+Changes in 1.6.5 (January 2011)
+- Fixed syntax error and missing init for params to setqlim()
+  Thanks to Heinrich Mislik for reporting the bugs
+
+Changes in 1.6.4 (January 2010)
+- Fixed RPC quota block count truncation to 32bit (CPAN ticket 52813 )
+  Thanks to Lloyd Brown for reporting the bug
+
+Changes in 1.6.3 (December 2008)
+- Fixed SEG fault for 32-bit Linux clients on top of 64-bit kernels
+  Thanks to Jani Ollikainen (pronetko.fi) for reporting and debugging this.
+  Thanks to Thomas Rzipa for reporting this issue, too.
+- Fixed setqlim to allow setting limits exceeding 2^32 blocks or files.
+  The current solution will work only for perl executables which support
+  64-bit wide integers (e.g. x86-64)
+
+Changes in 1.6.2 (January 2008)
+- Fixed memory leak in RPC authentication
+  Thanks again to Kostik (koc at rol.ru)
+
+Changes in 1.6.1 (November 2007)
+- Adapted hints/bsd.h to use statvfs instead of statfs in NetBSD 3.0
+- Added support for extended quota RPC to allow querying group quotas.
+  Thanks to Kostik (koc AT rol.ru) for the suggestion.
+
+Changes in 1.6.0 (October 2007)
+- Work-around for different getmntent() semantics for linux loop mounts
+  Thanks Wouter de Jong (wouter@widexs.nl) for reporting this issue.
+- (late) version bump due to the interface change in 1.5.2
+
+Changes in 1.5.2 (October 2007)
+- Added support for new quotactl() parameters in JFS2 on AIX 5.3.
+  Thanks to Joshua Frigerio (joshua@uic.edu) for providing a development
+  account.  (Note: also prepared support for JFS2 quota classes; this is
+  yet unfinished and untested. See sub-directory contrib/aix_jfs2_class)
+- Added support for XFS project quotas on request of
+  Sten Spans (sten@blinkenlights.nl); received no feedback it if works.
+  Changed the "isgrp" param to Quota::query() and setqlim() from boolean
+  into an enum: 0:=user, 1:=group, 2:=project quotas.
+- Added a copyright notice to the main module and the manual page on
+  request of the Debian maintainer.
+
+Changes in 1.5.1 (July 2005)
+- Added new API function rpcauth: use non-default authentication for RPC
+  Patch submitted by Karol Lassak
+- Makefile fix for Linux: compile linuxapi.c with default CFLAGS
+  because for 64-bit systems -fPIC is required.  Patches submitted
+  by David Lee and James Olin Oden; used a different solution though.
+
+Changes in 1.5.0 (Nov 2004)
+- Added new API function rpcpeer: set port and protocol for RPC queries.
+  On request by Sten Spans (sten@blinkenlights.nl)
+
+Changes in 1.4.11 (Aug 2004)
+- Updated VxFS detection in Makefile.PL for recent Solaris/VxFS versions
+  Thanks to Joshua Frigerio for the info and to Keith Clay for verification.
+- tiny syntax cleanup in linuxapi.c
+
+Changes in 1.4.10 (Jan 2004)
+- Applied patch by Antti Tapaninen (aet at cc.hut.fi) to add support
+  for MacOS X (based on BSD config) and NFS3 support for AIX.
+- Applied patch by Chris Adams (cmadams at hiwaay.net) to avoid warning
+  in Quota::getqcarg() on systems where getmntent(3) may return invalid
+  mount points, e.g. Tru64 UNIX
+
+Changes in 1.4.9 (Aug 2003)
+- Applied patch by Wolfgang.Friebel@desy.de: Changed AFS quota support,
+  now based on OpenAFS instead of arla and Kerberos4.
+
+Changes in 1.4.8 (May 2003)
+- fixed bug in linuxapi.c, thanks to Shane DeRidder
+
+Changes in 1.4.7 (May 2003)
+- adapted for the latest fashion of Linux quota APIs (version 6.5.1)
+  Thanks to Jay R. Wren, Shane DeRidder, Roman "romke" and Geoffrey Pan
+  for your infos and feedback.
+- added quota threshold monitoring script to the contrib directory.
+  Thanks to Ziaur Rahman.
+
+Changes in 1.4.6 (August 2002)
+- changed the test script to exit if STDIN is not a terminal device.
+  This is an interactive script which cannot be run by CPANPLUS.
+
+Changes in 1.4.5 (July 2002)
+- replaced use of macro BCOPY with libc function memcpy() because of build
+  problems on Solaris 2.8 (bcopy is depreciated now anyways)
+  Thanks to Jost Krieger and Paul Sand for reporting this problem.
+
+Changes in 1.4.4 (June 2002)
+- bugfix in Quota::getqcarg(): the function failed if the device id returned
+  by stat(2) for the queried path was zero (e.g. for the root fs on NetBSD)
+  Thanks to Jake Fan (jake@chaogic.com) for reporting this bug.
+
+Changes in 1.4.3 (May 2002)
+- updated for new version of Solaris VxFS (Veritas Filesystem)
+  by David Lee (T.D.Lee@durham.ac.uk)
+
+Changes in 1.4.2 (Jan. - Mar. 2002)
+- fixed test.pl to allow uids with more than 5 digits.
+  Thanks to Neil Prockter (perl@iamafreeman.com) for the fix.
+- updated Linux quota version detection with quota-tools 3.04;
+  removed compile-time version detection because it caused problems;
+  added switch LINUX_API_VERSION to hints/linux.h to allow to hard-wire
+  the API in case the automatic version detection fails.
+
+Changes in 1.4.1 (Sep. 2001 - Jan. 2002)
+- added support for an older (intermediate?) version of the new Linux Quota
+  API which contains a mixture of v1 and v2 command ids (uses the old GETSTAT
+  id, however with the new and larger struct as argument). Required for
+  RedHat-7.1.  Thanks to Andy Choi (andy@ensim.com) for pointing this out.
+- enabled RPC in hints/bsd.h
+  Confirmed to work on FreeBSD by Alex Batko (abatko@cs.mcgill.ca)
+- fixed several glitches in the manual page.
+
+Changes in 1.4 (August 2001)
+- added support for the Alan Cox (ac) branch of the Linux kernel which uses a
+  new and completely backwards incompatible Quota API.  The API version is
+  determined dynamically by use of Q_GETSTATS/v2, i.e. the same module
+  binary will work on kernels with either API. Since the Linux quota API now
+  needs some very special handling, I moved it into a separate file called
+  linuxapi.c.  NOTE: internally the module still uses the old (v1) dqblk
+  structure, so any advantages the new struct mem_dqblk might have are not
+  present here.  Let me know if this is a problem for you.
+- commented out #define LINUX_RQUOTAD_BUG in hints/linux.h as this should
+  no longer be needed on most systems. Updated INSTALL and README accordingly.
+- removed the Linux syscall wrapper in quotactl.c as this is now in libc.
+- changed copyright from "none/public domain" to Artistic License (not to
+  restrict usage, but simply to include the legal disclaimers)
+- fixed bug in Quota::query() and setqlim(): when argument isgrp was present
+  but 0, the functions still did work on group quotas instead of user quotas.
+  Thanks to Szymon Juraszczyk (szymon@ssk.pl) for pointing this out.
+
+Changes in 1.3.4 (May 2001)
+- added support for SGI XFS on Linux.  Thanks to Brian Johnson
+  (brian@dev.brianj.com) for providing a development account.
+
+Changes in 1.3.3 (May 2001)
+- bugfix Quota::query, branch NO_RPC: forgot to set error flag, arbitrary
+  results were returned; Pointed out by Mahlon Smith <reich@internetcds.com>
+- fixed declaration of GQR_* macros for RPC in hints/bsd.h
+  RPC still untested for BSD though
+- fixed OpenBSD2.7 fix from last release: replaced macro OpenBSD2_7 with
+  __OpenBSD__ because the former is not defined in 2.8 anymore.
+  Reported by Lou Hevly (lou@visca.com)
+- fixed hints/linux.h for RedHat 7.1: use sys/quota.h instead of linux/quota.h
+  because the former has an incompatible definition of struct dqblk.
+  [NOTE: this change proved to be wrong and was undone in 1.4]
+  Reported by Waldemar Krotkiewicz (wk@brenet.de), Andy Choi (andy@ensim.com)
+  and Brian Johnson (brian@dev.brianj.com).
+
+Changes in 1.3.2 (February 2001)
+- please note my new email address: tomzo AT nefkom DOT net
+- fixed AFS detection in Makefile.PL for Perl 5.6
+  thanks to Wolfgang Friebel <friebel@ifh.de>
+- adapted getmntent for incompatible change of struct statfs in OpenBSD 2.7
+  thanks to andrew@ugh.net.au
+- adapted getqcarg for for OpenBSD and BSDi: define QCARG_MNTPT for all BSD os
+  as reported by andrew@ugh.net.au and Chee-Wai Yeung <cheewai@cs.ust.hk>
+- fixed block to kB conversion in Quota::query() for VxFS
+  as reported by Rui Monteiro <rmonteiro@whatevernet.pt>
+- renamed config.h symlink to myconfig.h to avoid conflict with Perl config
+
+Changes in 1.3.1 (October 2000)
+- added support for NetBSD, merged hints for BSD-based systems
+  by Jaromir Dolecek <jdolecek@NetBSD.org>
+- fixed include file name for vxquotactl.h
+  changed quota block factors Q_DIV/Q_MUL from 1 to 2 for Veritas fs
+  Thanks to David Lee (T.D.Lee@durham.ac.uk)
+- added automatic recognition of HPUX B.11 in Makefile.PL
+  by Albert Chin (china@thewrittenword.com)
+
+Changes in 1.3:  (January 2000)
+- bugfix/enhanced support for OSF/1 and Digital Unix:
+  getqcarg used wrong path to quotas file and
+  NFS file systems were not recognized when in "/path@host" format in mtab
+  provided by Victor Mora (Victor.Mora@ac.upc.es) and
+  Alessandro Miotto (Alessandro.Miotto@cern.ch)
+- added support for FreeBSD.
+  provided by Kurt Jaeger (pi@complx.LF.net)
+  and Jon Schewe (schewe@tcfreenet.org)
+- added support for Veritas file system (VxFS) on Solaris
+  provided by David Lee (T.D.Lee@durham.ac.uk),
+  Michael Gerdts (gerdts@cae.wisc.edu) and
+  Daniel Hagerty (hag@shore.net).
+  Beta-tested by John Randell Smith (jrsmith@eng.utah.edu).
+- added workaround for yet another bug in Linux rpc.rquotad:
+  rquotad reports grace times as absolute values instead of relative
+  bug found by Seth Vidal (skvidal@phy.duke.edu)
+- fixed grace time output for Y2K in test.pl
+- fixed bug in group-quota patch as pointed out by asun@cobaltnet.com
+  incorporated the patch into the distribution.
+- fixed possible integer overflow in RPC quota block size conversions for
+  very large quota limits; pointed out by Peter.Pickford (ppickfor@jaguar.com)
+- added warning to Makefile.PL if config.h symlink already exists
+
+Changes in 1.2.3:  (April 1999)
+- added patch-file "group-quota.patch" that provides optional
+  support for group-quotas (on some OS versions and localhost only)
+- added auto-detection for AFS by Wolfgang Friebel
+- fixed include path for AFS in Quota.xs
+
+Changes in 1.2.2:  (December 1998)
+- fixed 2 problems in getqcarg()
+  thanks to py@ecst.csuchico.edu for pointing those out.
+
+Changes in 1.2:  (November 1998)
+- added support for AIX 4.1 (thanks to Wolfgang Friebel (friebel@ifh.de)
+  for providing a development account)
+- added support for AFS (Andrew File System) by arla-0.13
+  on the following platforms: AIX, SunOS, Solaris, HP-UX, IRIX 6, Linux
+  with much help from Wolfgang Friebel.
+
+Changes in 1.1.2:  (August 1998)
+- changed names of tar archive and module directory
+- fixed message for getqcarg failure in test.pl
+- compatibility with sfio (moved fopen and fclose to seperate file)
+  suggested by Christoph Lupe (lupe@alanya.m.isar.de) - yet UNTESTED
+- fixed problems with Solaris automounter (ignore lofs mounts in getqcarg)
+
+Changes in 1.1:  (August 1998)
+- added support for Linux (thanks to Steve Nolan (nolansj@bookmark.com)
+  for providing a development account)
+- added OpenBSD 2.2 support, provided by James Shelburne (reilly@eramp.net)
+- added syntax fixes (2 additional #includes) for IRIX 6.4
+  provided by Subhendu Ghosh (sghosh@menger.eecs.stevens-tech.edu)
+- support for IRIX xfs filesystems (additional to the older efs fs)
+  provided by David Lloyd (cclloyd@monotreme.cc.missouri.edu)
+
+
+Changes in 1.0:
+(That's the version that's been released with O'Reillys Perl Resource Books)
+- improved documentation, now provided in pod format inside Quota.pm
+- finally fixed errno.h problem in Quota.pm
+  Thanks to Tobias Oetiker (oetiker@ee.ethz.ch)
+- added BSDI port by Jim Hribnak (hribnak@nucleus.com)
+  unfortunately without RPC support.
+- small fixes for OSF/1
+- more hints in hints/none.h
+- I've again received requests for Linux ports. However since I don't
+  have access to an installation with quota support, I can't do this
+  myself. I've included a config file that compiles without warnings
+  on our system ("Red Hat for Sparc" or something), but I can't run it.
+  If anyone gets it to work with or without RPC, please contact me.
+
+Changes in 0.3a:
+- started port for Linux 2.0; still needs some work.
+  Compiles correctly, but RPC call fails.
+- workarounds for HP-UX/10 bug in test script
+  (SYNC without arguments doesn't work)
+- some cleanup in Query.pm
+  fixes 0.2a's problems with the autoloader under perl-5.003
+
+Changes in 0.2a:
+- need generic getqcarg instead of getdev, because:
+- added support for Solaris, OSF/1 (which operate without access to
+  the according block device) Required extensive code changes.
+- getqcarg recognizes if path points into a NFS file system
+- query() may take NFS path as argument (in form host:/path)
+
+  Thanks to David Lee <T.D.Lee@durham.ac.uk> for alpha-testing on Solaris
+  and suggesting the two latter improvements.
+

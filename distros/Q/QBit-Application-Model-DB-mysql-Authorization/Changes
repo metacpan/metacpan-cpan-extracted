@@ -1,0 +1,45 @@
+==================================================
+Changes from 2015-09-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2016-09-11 13:31:34 +0000
+------------------------------------------
+
+  Change: e14bf06fcd170abb360680bc9ad444259be7b701
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:31:00 +0000
+
+    Merge pull request #2 from QBitFramework/upload_to_cpan
+
+    fix typo 
+
+  Change: a554fe498ae256c6c97fa7a577b4774e045642ee
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:29:46 +0000
+
+    fix typo 
+
+  Change: 5f3576c63f25dfccf92e251f8832b517ad9b72ba
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 17:25:33 +0000
+
+    Merge pull request #1 from QBitFramework/upload_to_cpan
+
+    upload to cpan 
+
+  Change: b41a635e85678bcc9a20362b7f81fd2f04aa97d7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-11 16:24:42 +0000
+
+    upload to cpan 
+
+  Change: 09d880a6212501d87219a2f05573571fadc0a43f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2015-12-20 23:28:55 +0000
+
+    MySql table for Authorization 
+
+================
+End of releases.
+================

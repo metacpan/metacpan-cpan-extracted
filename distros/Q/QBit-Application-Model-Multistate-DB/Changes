@@ -1,0 +1,149 @@
+==================================================
+Changes from 2015-12-19 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2016-12-18 23:12:18 +0000
+------------------------------------------
+
+  Change: c7433a389261e3af04e46cc695ee23a7c6ac7596
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:11:46 +0000
+
+    Merge pull request #8 from Madskill/fix_exceptions
+
+    Fix exceptions 
+
+  Change: 353b0c074450708af147b167f451ea94b6a0ab5f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:10:58 +0000
+
+    Merge remote-tracking branch 'upstream/master' into fix_exceptions 
+
+  Change: f5e2d32fe7de16916d93743c327a1efa7673c4e7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-19 02:10:25 +0000
+
+    fix exceptions 
+
+------------------------------------------
+version 0.009 at 2016-12-07 19:35:46 +0000
+------------------------------------------
+
+  Change: 6a098fdb7151e144797e81f8b47c738bdaf25111
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-07 22:35:46 +0000
+
+    Version 0.009 
+
+  Change: 0a807d94a3c573081112e4bd648109246c2a50d9
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-07 22:34:58 +0000
+
+    Merge pull request #7 from Madskill/fix_depends
+
+    fix depends 
+
+  Change: 497e0667c813ed427e32b4f3479084e6a72746d6
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-07 22:33:28 +0000
+
+    fix depends 
+
+------------------------------------------
+version 0.008 at 2016-12-01 19:05:36 +0000
+------------------------------------------
+
+  Change: 403515c4b43275614d3bb9138eed8f7710387884
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 22:05:36 +0000
+
+    Version 0.008 
+
+  Change: 4dd53f537794641b6075afda2c93fc6d7024d095
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 22:04:48 +0000
+
+    Merge pull request #5 from Madskill/speed_up
+
+    Speed up 
+
+  Change: b2c06e2f572b7250fe2cf4a2276b4794b106d169
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-26 21:48:36 +0000
+
+    fix logs 
+
+  Change: 3cfe41edc1c62f7d413bc7941cd514b514365ed9
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-26 21:23:00 +0000
+
+    speed up 
+
+------------------------------------------
+version 0.007 at 2016-09-04 20:17:38 +0000
+------------------------------------------
+
+  Change: 00461c49b9bc1fba68fe1655af2aec0b6272adeb
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:17:38 +0000
+
+    Version 0.007 
+
+  Change: cf4c4110a7a984972cfda91e3c769e16aedfb4aa
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-05 00:13:38 +0000
+
+    Merge pull request #4 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: 2c1931b214c9aeda273c3a31906b6c63b6495a6c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:12:54 +0000
+
+    upload to cpan 
+
+------------------------------------------
+version 0.006 at 2016-07-03 15:33:50 +0000
+------------------------------------------
+
+  Change: 18f84a027a5418f0e08a69d9d6d6786aca2e43f8
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-07-03 18:33:50 +0000
+
+    Version 0.006 
+
+  Change: 68b99d4f7f03f2e140427d72750dc2000cd2528a
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-06-27 23:49:39 +0000
+
+    Merge pull request #3 from Madskill/fix_multistate
+
+    change multistate 
+
+  Change: d68293a69100c67ec79a1fa68863aab33a207991
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-06-27 22:23:38 +0000
+
+    change multistate 
+
+------------------------------------------
+version 0.005 at 2016-01-31 10:28:58 +0000
+------------------------------------------
+
+  Change: 752d95c41c48ef576c8f77929ede70ba18cfce41
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-01-31 13:28:58 +0000
+
+    Version 0.005 
+
+  Change: b52d6b3564bd2c8013b46396210ca3e1768f20a9
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-01-31 13:28:22 +0000
+
+    Fix warning "keys on reference is experimental" 
+
+================================================
+Plus 4 releases after 2015-12-19 00:00:00 +0000.
+================================================

@@ -1,0 +1,16 @@
+Revision history for Querylet-Output-Text
+
+0.113     2013-11-14 22:53:19 America/New_York
+          update bugtracker and repo metadata
+
+0.112   2006-11-16
+        add machine-readable license
+
+0.111   2006-11-14
+        packaging improvements
+
+0.11    2004-12-16 11:00
+        use column headers from $query
+
+0.10    2004-09-18 16:00
+        first post!

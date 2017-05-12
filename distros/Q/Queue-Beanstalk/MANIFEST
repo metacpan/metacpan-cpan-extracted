@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+MANIFEST.skip
+README
+t/Queue-Beanstalk.t
+lib/Queue/Beanstalk.pm
+META.yml

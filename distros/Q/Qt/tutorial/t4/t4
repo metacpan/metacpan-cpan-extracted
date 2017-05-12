@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+package MyWidget;
+
+use Qt;
+use QFont;
+use QPushButton;
+
+@ISA = qw(QWidget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+
+    $self->setMinimumSize(200, 120);
+    $self->setMaximumSize(200, 120);
+
+    my $quit = new QPushButton('Quit', $self, 'quit');
+    $quit->setGeometry(62, 40, 75, 30);
+    $quit->setFont(new QFont('Times', 18, $Weight{Bold}));
+
+    $qApp->connect($quit, 'clicked()', 'quit()');
+
+    return $self;
+}
+
+package main;
+
+use Qt;
+
+$w = new MyWidget;
+$w->setGeometry(100, 100, 200, 120);
+$qApp->setMainWidget($w);
+$w->show();
+exit $qApp->exec();

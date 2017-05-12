@@ -1,0 +1,65 @@
+---
+abstract: 'Gateway to fetch market-data from Quant::Framework'
+author:
+  - 'Binary.com <support@binary.com>'
+build_requires:
+  Data::Chronicle::Mock: '0'
+  Data::Chronicle::Reader: '0'
+  Data::Chronicle::Writer: '0'
+  Date::Utility: '0'
+  File::ShareDir: '0'
+  Format::Util::Numbers: '0'
+  Moose: '0'
+  Test::CheckManifest: '1.29'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  YAML::XS: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Quant-Framework
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cache::RedisDB: '0'
+  Carp: '0'
+  Clone: '0'
+  Data::Chronicle::Reader: '0'
+  Data::Chronicle::Writer: '0'
+  Date::Utility: '0'
+  Digest::MD5: '0'
+  File::Find::Rule: '0'
+  File::ShareDir: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Math::Business::BlackScholes::Binaries: '0'
+  Math::Function::Interpolator: '0'
+  Memoize: '0'
+  Memoize::HashKey::Ignore: '0'
+  Moose: '0'
+  MooseX::StrictConstructor: '0'
+  Number::Closest::XS: '0'
+  Scalar::Util: '0'
+  Scalar::Util::Numeric: '0'
+  Storable: '0'
+  Test::Strict: '0'
+  Test::Syntax::Aggregate: '0'
+  Text::CSV: '0'
+  Text::SimpleTable: '0'
+  Time::Duration::Concise: '0'
+  Try::Tiny: '0'
+  VolSurface::Utils: '0'
+  YAML::XS: '0'
+  perl: '5.014'
+version: '0.36'

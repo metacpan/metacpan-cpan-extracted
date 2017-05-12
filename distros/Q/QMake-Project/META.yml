@@ -1,0 +1,35 @@
+---
+abstract: 'evaluate qmake project files'
+author:
+  - 'Rohan McGovern <rohan@mcgovern.id.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.141520'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: QMake-Project
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  File::chdir: '0'
+  IO::File: '0'
+  List::MoreUtils: '0'
+  ReleaseAction: '0'
+  Scalar::Defer: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  Text::ParseWords: '0'
+version: '0.85'

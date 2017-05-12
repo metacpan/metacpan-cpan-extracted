@@ -1,0 +1,64 @@
+libqbit-application-model-multistate-db-perl (0.010) raring; urgency=low
+
+  * fix exceptions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 19 Dec 2016 02:12:19 +0300
+
+libqbit-application-model-multistate-db-perl (0.009) raring; urgency=low
+
+  * fix depends
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 07 Dec 2016 22:35:33 +0300
+
+libqbit-application-model-multistate-db-perl (0.008) raring; urgency=low
+
+  * fix logs
+
+  * speed up
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 01 Dec 2016 22:05:28 +0300
+
+libqbit-application-model-multistate-db-perl (0.007) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Sep 2016 23:17:20 +0300
+
+libqbit-application-model-multistate-db-perl (0.006) raring; urgency=low
+
+  * change multistate
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 03 Jul 2016 18:33:41 +0300
+
+libqbit-application-model-multistate-db-perl (0.005) raring; urgency=low
+
+  * Fix warning "keys on reference is experimental"
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 31 Jan 2016 13:28:49 +0300
+
+libqbit-application-model-multistate-db-perl (0.004) raring; urgency=low
+
+  * Remove ARRAY primary key recognition.
+
+  * Allow to change getting method in childrens.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 11 Feb 2014 12:43:03 +0400
+
+libqbit-application-model-multistate-db-perl (0.003) raring; urgency=low
+
+  * Update DB.pm
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 06 Dec 2013 15:19:26 +0400
+
+libqbit-application-model-multistate-db-perl (0.002) raring; urgency=low
+
+  * Fixed bug with lock
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 13 Oct 2013 18:26:39 +0400
+
+libqbit-application-model-multistate-db-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 14 Sep 2013 20:40:42 +0400
+

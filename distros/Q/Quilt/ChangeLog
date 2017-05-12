@@ -1,0 +1,182 @@
+Sun Mar  8 21:04:05 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* release 0.08
+
+	* MANIFEST, Quilt.spec (%files): add PROJECTS, TOC.pm
+
+	* lib/Quilt/DO/Author.pm (name): take an iter and use the $builder
+ 	to format children
+
+	* lib/Quilt.pm: use Quilt::DO::Author
+
+Fri Mar  6 18:04:12 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Quilt/Objs.pm: added `generated_id' to objects using `id'
+
+Thu Mar  5 19:04:45 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/toAscii.spec, specs/toHTML.spec: filled out info on title
+ 	page
+	(TOC): added
+
+	* lib/Quilt/TOC.pm: added
+
+Tue Feb 24 21:56:38 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/docbook.spec, specs/linuxdoc.spec, specs/teilite.spec: use
+	iterator as parent, create iterator when creating children
+
+	* tmpfront.sh: pass iter for parent when building ot
+
+	* specs/linuxdoc.spec (LABEL): add ref id to a parent
+
+	* specs/toHTML.spec (XRef_End): typo
+
+Mon Feb 23 10:04:44 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* PROJECTS (The Unix Library): added ref to TkMan
+
+Sun Feb 22 19:25:58 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* PROJECTS (diff): added
+
+	* ToDo: added all items
+
+	* PROJECTS: added
+
+Mon Feb  9 12:33:14 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* release 0.07
+	
+	* README: note Quilt-Kit
+
+	* lib/Quilt/Objs.pm (Author): add org_name
+
+Sun Feb  8 12:02:01 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Quilt.spec (SPEC_DIR): configure `/bin/perl'
+
+	* tmpfront.sh: add `#! /bin/perl'
+
+	* MANIFEST: renamed gdo-spec.cat to catalog
+
+	* Quilt.spec (SPEC_DIR): install specs in /usr/lib/sgml
+	install tmpfront.sh as bin/sroff
+
+	* specs/catalog: added ident
+
+	* gdo-spec.cat: renamed to `catalog'
+
+Mon Feb  2 13:05:02 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Quilt.spec (%files): add Objs.pm, XRef.pm
+
+Sat Jan 17 18:38:26 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* all specs: rename DTD SPGrove to Grove
+
+	* lib/Quilt/XRef.pm (AUTOLOAD): use `children_accept_ports'
+
+	* tmpfront.sh: rename SGML::SPGrove into SGML::SPGroveBuilder and
+ 	SGML::Grove
+	temp add `children_accept_ports' to Class::Iter
+	
+Sat Dec  6 16:39:20 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/wrHTML.spec(Quilt_HTML_NoFill): use cool TABLE look
+
+	* lib/Quilt/XRef.pm: added
+
+	* specs/toHTML.spec(Quilt_DO_Block_NoFill): turn off quoting
+
+	* lib/Quilt/DO/Struct.pm (type): added
+
+	* specs/toAscii.spec(Quilt_DO_Block_NoFill): turn off quoting
+	(Quilt_DO_XRef_End): display references
+
+	* MANIFEST: added Objs.pm, XRef.pm
+
+	* lib/Quilt.pm: moved class definitions to Objs.pm
+
+	* lib/Quilt/Objs.pm: added
+
+Tue Nov  4 21:46:15 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/toHTML.spec: use SGML::Element
+
+	* specs/wrHTML.spec: use $self->print_
+
+Sun Nov  2 21:53:50 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/toAscii.spec: fix spacing in `ABSTRACT', add quotes in mail URLs
+	(Quilt_DO_XRef_End): added
+	
+	* specs/linuxdoc.spec: fix `REF' and `LABEL'
+
+	* specs/teilite.spec, specs/docbook.spec, specs/linuxdoc.spec:
+ 	use-gi
+
+	* tmpfront.sh: mv `no_gi' to spec's `use-gi'
+
+	* lib/Quilt.pm: add `id' to classes
+	Quilt::DO::Document: remove redundant copy
+	Quilt::DO::Author: add `url' and `blurb'
+	
+Sat Nov  1 15:29:42 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/docbook.spec: change `sub_title' to `subtitle', change
+ 	`author_blurb' to `blurb'
+
+Fri Oct 31 12:24:37 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Quilt.pm (Quilt::Flow): add `id'
+
+Sat Oct 25 14:45:09 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* Quilt.spec (%files): correct pathnames
+
+	* specs/wrHTML.spec: correct several element names
+	(Table_Data): check for empty cell and use &nbsp;
+	
+	* specs/toHTML.spec (Table): allow table made of multiple parts
+
+	* specs/toAscii.spec (List_Item): allow list items outside of
+ 	lists
+
+	* lib/Quilt/HTML.pm: added `frame' to HTML::Table
+
+	* README: added info about Quilt mailing list
+
+	* lib/Quilt/Writer/Ascii.pm (row_sep): added
+	(format_table): add framing
+
+Fri Oct 24 10:58:49 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* specs/toAscii.spec, specs/wrAscii.spec: added tables
+
+
+	* lib/Quilt/Writer/Ascii.pm (format_table, merge_entries): added
+
+	* lib/Quilt/Flow/Table.pm: add part, row, and column counting
+ 	methods
+
+	* lib/Quilt.pm: use Quilt::Flow::Table;
+
+	* specs/wrHTML.spec: use cool TABLE look for PRE
+
+	* specs/toHTML.spec: use `make' syntax on some elements
+
+	* specs/linuxdoc.spec: DESCRIP moves stray content into Items
+
+	* specs/toHTML.spec, specs/wrHTML.spec, lib/Quilt/HTML.pm,
+ 	specs/linuxdoc.spec: added table support
+
+	* specs/teilite.spec: use new-style transform
+
+Wed Oct 22 16:13:02 1997  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST: added Quilt.spec
+
+	* Quilt.spec: added
+
+	* MANIFEST: fill out

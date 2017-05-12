@@ -1,0 +1,54 @@
+libqbit-timelog-xs-perl (0.008) saucy; urgency=low
+
+  * added Test::LeakTrace in TEST_REQUIRES
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 12:16:54 +0300
+
+libqbit-timelog-xs-perl (0.007) saucy; urgency=low
+
+  * g++ -> c++
+
+  * Version 0.006
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 08 Oct 2016 23:10:45 +0300
+
+libqbit-timelog-xs-perl (0.006) saucy; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 18 May 2016 02:16:07 +0300
+
+libqbit-timelog-xs-perl (0.005) saucy; urgency=low
+
+  * Added POD
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 17 Jan 2014 17:12:38 +0400
+
+libqbit-timelog-xs-perl (0.004) saucy; urgency=low
+
+  * Fixed text
+
+  * Fixed architecture
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Dec 2013 11:30:56 +0400
+
+libqbit-timelog-xs-perl (0.003) saucy; urgency=low
+
+  * Fixed libraries for old series
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 13 Dec 2013 18:53:03 +0400
+
+libqbit-timelog-xs-perl (0.002) saucy; urgency=low
+
+  * Fixed depends
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 13 Dec 2013 18:44:14 +0400
+
+libqbit-timelog-xs-perl (0.001) saucy; urgency=low
+
+  * Fixed memory leaks
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 13 Dec 2013 18:33:57 +0400
+

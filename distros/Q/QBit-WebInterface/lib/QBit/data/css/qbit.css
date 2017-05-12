@@ -1,0 +1,28 @@
+body {
+    background-image: url("/qbit/i/background.png");
+    background-repeat: repeat-x;
+}
+
+div.header .logo {
+    padding: 10px 0;
+}
+
+div.header .navbar {
+    padding: 25px 0 0;
+}
+
+div.left_menu .nav-list > .active > a {
+    background-color: #4A4A7A;
+}
+
+div.left_menu a {
+    color: #4A4A7A;
+}
+
+.control-group .control-label:after {
+    content: ':';
+}
+
+.control-group.required .control-label:after {
+    content: '*:';
+}

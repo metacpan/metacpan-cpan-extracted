@@ -1,0 +1,15 @@
+[% INCLUDE header.inc title = 'SPAM Quarantine Controls - Senders' %]
+
+<strong>Spam Quarantine controls for mail sent by [% GET sender %]</strong>
+
+[% IF message %]
+	<p><em>
+	[% GET message %]
+	</em></p>
+[% END %]
+
+[% INCLUDE sender_settings.inc %]
+
+[% INCLUDE sender_messages.inc %]
+
+[% INCLUDE footer.inc %]

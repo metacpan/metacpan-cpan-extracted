@@ -1,0 +1,52 @@
+libqbit-application-model-sendmail-perl (0.007) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 05 Sep 2016 00:09:38 +0300
+
+libqbit-application-model-sendmail-perl (0.006) raring; urgency=low
+
+  * Add reply_to header if given.
+
+ -- Ivan Bessarabov <ivan@bessarabov.ru>  Fri, 11 Jul 2014 16:22:11 +0400
+
+libqbit-application-model-sendmail-perl (0.005) raring; urgency=low
+
+  * Fix templaters misprint.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 30 May 2014 16:48:18 +0400
+
+libqbit-application-model-sendmail-perl (0.004) raring; urgency=low
+
+  * Use \s instead of ' ' in regexp.
+
+  * Use standard regexp: //, not qr().
+
+  * Check emails one by one, but not both as one.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 07 Feb 2014 11:31:10 +0400
+
+libqbit-application-model-sendmail-perl (0.003) raring; urgency=low
+
+  * Use hash_transform instead of one to one assigning.
+
+  * Do not warn on empty headers.
+  * Often and often fields cc, bcc and source_spot are empty. Indeed they
+    have undef value. When new MIME object is created it warns about
+    undefined value in string concatenation. This commit resolves the
+    described problem.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 31 Oct 2013 17:15:36 +0400
+
+libqbit-application-model-sendmail-perl (0.002) raring; urgency=low
+
+  * Add _before_send and _after_send methods to send one.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 15 Oct 2013 17:00:01 +0400
+
+libqbit-application-model-sendmail-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 16 Sep 2013 18:49:52 +0400
+

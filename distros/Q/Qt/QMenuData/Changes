@@ -1,0 +1,18 @@
+Revision history for Perl extension QMenuData.
+
+0.02  Sun Apr 13 14:43:49 1997
+	- fixed the insertItem() prototype which didn't assign to RETVAL
+
+0.02  Sun Apr 13 14:16:54 1997
+	- added (is|set)itemChecked()
+
+0.02  Sun Apr 13 13:29:41 1997
+	- added a missing prototype to insertItem(), and checked the items
+variable first in all CASEs in insertItem()
+
+0.02  Sun Apr 13 10:55:01 1997
+	- upgraded signal/slot handling
+
+0.01  Fri Apr  4 10:20:51 1997
+	- original version; created by h2xs 1.18
+

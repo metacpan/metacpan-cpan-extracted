@@ -1,0 +1,32 @@
+---
+abstract: 'WebInterface with own HTTP server'
+author:
+  - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
+build_requires:
+  FindBin: 0
+  QBit::Application: 0
+  QBit::WebInterface::Controller: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: QBit-WebInterface-OwnServer
+requires:
+  Exception: 0
+  Getopt::Long: 0
+  IO::Socket: 0
+  MIME::Types: 0
+  Pod::Usage: 0
+  QBit::WebInterface: 0
+  QBit::WebInterface::Request: 0
+  QBit::WebInterface::Response: 0
+  URI::Escape: 0
+  base: 0
+  lib: 0
+  qbit: 0
+version: 0.007

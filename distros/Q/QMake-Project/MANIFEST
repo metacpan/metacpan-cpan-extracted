@@ -1,0 +1,31 @@
+Changes
+lib/QMake/Project.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+META.yml
+META.json
+t/00-load.t
+t/01-QMake-Project.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test_projects/01-typical/01-typical.pro
+t/test_projects/01-typical/main.cpp
+t/test_projects/02-default-target/02-default-target.pro
+t/test_projects/02-default-target/main.cpp
+t/test_projects/03-list/03-list.pro
+t/test_projects/03-list/main.cpp
+t/test_projects/04-error/04-error.pro
+t/test_projects/04-error/main.cpp
+'t/test_projects/05 space in path/05 space in path.pro'
+'t/test_projects/05 space in path/main.cpp'
+'t/test_projects/05 space in path/space in source.cpp'
+t/test_projects/06-ordering/06-ordering.pro
+t/test_projects/06-ordering/main.cpp
+t/test_projects/07-no-project-file/dummy
+t/test_projects/08-different-named-project-file/somefile.pro
+t/test_projects/09-multiple-project-files/09-multiple-project-files.pro
+t/test_projects/09-multiple-project-files/notloaded.pro
+SIGNATURE                                Public-key signature (added by MakeMaker)

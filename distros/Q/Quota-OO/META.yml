@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Quota-OO
+version:      v0.0.1
+version_from: lib/Quota/OO.pm
+installdirs:  site
+requires:
+    Class::Std:                    0
+    Class::Std::Utils:             0
+    Quota:                         0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

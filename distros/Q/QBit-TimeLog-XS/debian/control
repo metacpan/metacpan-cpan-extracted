@@ -1,0 +1,12 @@
+Source: libqbit-timelog-xs-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), g++, perl, libqbit-timelog-perl, libtest-leaktrace-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-timelog-xs-perl
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-timelog-perl
+Description: Short description.
+ Long description.

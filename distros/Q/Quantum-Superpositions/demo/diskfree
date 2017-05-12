@@ -1,0 +1,101 @@
+#!/usr/local/bin/perl -w
+
+########################################################################
+# (C) 2001, Workhorse Computing
+# All rights reserved.
+# This code is released under the same terms as Perl, see the
+# Artistic License for a complete definition.
+########################################################################
+
+########################################################################
+# housekeeping
+########################################################################
+
+# matches the file name:  diskfrie.pm
+
+local $/;
+
+use Parse::RecDescent;
+use Quantum::Superpositions;
+
+{
+	package Quantum::Duality;
+
+	use overload
+		q{""}	=> sub { $_[0] },
+		q{+0}	=> sub { $_[1] },
+		q{cmp}	=> sub { $_[2] ? $_[1]->[0] cmp $_[0] : $_[0]->[0] cmp $_[1] },
+		q{<=>}	=> sub { $_[2] ? $_[1]->[1] <=> $_[0] : $_[0]->[1] <=> $_[1] },
+	;
+}
+
+########################################################################
+# real work begins here
+########################################################################
+
+# generate a parser from the __DATA__ section of this
+# file (see below) then call its "input" rule passing
+# it the result of running "df -k" on the system.  the
+# parser hands back a reference to an array of blessed
+# disk informatin.
+
+my $mountz = 
+	Parse::RecDescent->new( <DATA> )->input( qx(df -k) )
+	or die "Roadkill:  bad data";
+
+# display df on the mount points that are over the threshold.
+
+if( my $overz = any( @$mountz ) > 90 )
+{
+	print "\n", qx(df -k @$overz), "\n";
+}
+
+# keep the shell happy
+
+0
+
+__DATA__
+
+########################################################################
+#
+# df -k on a bsd system looks like:
+#
+# Filesystem            kbytes    used   avail capacity  Mounted on
+# /proc                      0       0       0     0%    /proc
+# /dev/md/dsk/d2       1987399 1034737  893041    54%    /
+# fd                         0       0       0     0%    /dev/fd
+# /dev/md/dsk/d11      3009327   55418 2893723     2%    /var
+#
+# on a linux box with devfs it might look like:
+#
+# Filesystem           1k-blocks      Used Available Use% Mounted on
+# /dev/scsi/host0/bus0/target0/lun0/part2
+#                         323536    179936    127216  59% /var
+# /dev/scsi/host0/bus0/target0/lun0/part3
+#                        2070736    309308   1656572  16% /scratch
+# /lvm/vg00/lvol1         486344    418760     43008  91% /opt/src
+# /lvm/vg00/lvol2         258832      2060    243668   1% /backup
+#
+#
+# problem is to figure out which drives are over the threshold
+# and need to be reported.
+#
+########################################################################
+
+{ $::HD_HINT = $::HD_TRACE = 1 if $^P }
+
+input	:	<rulevar: local @dir>
+
+input	:	line(s)	{ $return = \@dir }
+
+line	:	path number(s) '%' path
+			{
+				push @dir,
+					bless [ $item[-1], $item{number}->[-1] ], 'Quantum::Duality'
+			}
+
+		|	/.+/	{ 1 }
+
+path	:	m{/\S+}	{ $return = $item[1] }
+
+number	:	/\d+/	{ $return = $item[1] }

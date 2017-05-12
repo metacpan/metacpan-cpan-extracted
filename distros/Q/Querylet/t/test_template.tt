@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>THIS IS A TEST</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+      [% FOREACH column = query.columns %]
+        <th>[%column%]</th>
+      [% END %]
+      </tr>
+      [% FOREACH row = query.results %]
+      <tr>[% FOREACH column = query.columns -%]<td>[%- row.$column -%]</td>[%- END %]</tr>[% END %]
+    </table>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+libqbit-webinterface-ownserver-perl (0.007) saucy; urgency=low
+
+  * upload to cpan
+
+  * Allowing HEAD request
+  * To make `curl -I http://127.0.0.1:5000` work
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 11 Sep 2016 17:56:18 +0300
+
+libqbit-webinterface-ownserver-perl (0.006) saucy; urgency=low
+
+  * Fixed utf8 data
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 24 Jan 2014 17:44:29 +0400
+
+libqbit-webinterface-ownserver-perl (0.005) saucy; urgency=low
+
+  * Fixed POST
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 24 Jan 2014 16:31:41 +0400
+
+libqbit-webinterface-ownserver-perl (0.004) saucy; urgency=low
+
+  * Fixed statuses
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 24 Jan 2014 15:10:55 +0400
+
+libqbit-webinterface-ownserver-perl (0.003) saucy; urgency=low
+
+  * Fixed uri_escape_utf8 error, added text respomse code
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 19 Jan 2014 17:14:53 +0400
+
+libqbit-webinterface-ownserver-perl (0.002) saucy; urgency=low
+
+  * Fixed port argument
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 19 Jan 2014 16:35:02 +0400
+
+libqbit-webinterface-ownserver-perl (0.001) saucy; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 19 Jan 2014 16:14:14 +0400
+

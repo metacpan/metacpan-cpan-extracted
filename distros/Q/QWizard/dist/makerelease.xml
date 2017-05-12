@@ -1,0 +1,120 @@
+<!-- this is a makerelease script: http://makerelease.sourceforge.net/ -->
+<makerelease>
+  <steps>
+
+    <step type="system" title="Pre-Checks">
+      <commands>
+	<command>svn status -q</command>
+	<command>grep VERSION QWizard.pm</command>
+      </commands>
+    </step>
+
+    <step type="prompt" prompt="Enter the new version number:"
+      title="Pick A Version Number"
+      parameter="VERSION" values="^[\.\d]+$"
+      />
+
+    <step type="system" title="Updating auto-docs">
+      <commands>
+	<command>perl QWizard_Widgets.pl > QWizard_Widgets.pod</command>
+	<command>svn commit -m "Updating Widgets pod for version {VERSION}" QWizard_Widgets.pod</command>
+      </commands>
+    </step>
+
+    <step type="modify" title="Updating version number">
+      <modifications>
+	<modify
+	  find="(VERSION\s*=\s*.)([0-9]+\.[0-9]+)"
+	  replace="${1}{VERSION}">
+	  <files>
+	    <file>*.pm</file>
+	    <file>Generator_base/*.pm</file>
+	    <file>Generator/*.pm</file>
+	    <file>Generator/*/*.pm</file>
+	    <file>Storage/*.pm</file>
+	    <file>API/*.pm</file>
+	    <file>Plugins/*.pm</file>
+	  </files>
+	</modify>
+      </modifications>
+    </step>
+
+	<step type="system" title="modifying the windows ppd">
+	  <commands>
+	    <command>perl windows/ppdupdate {VERSION}</command>
+	    <command>svn diff windows/QWizard.ppd</command>
+	  </commands>
+	</step>
+
+    <step type="system" title="Check the version number changes">
+      <commands>
+	<command ignoreerror="1">svn diff | egrep '^[-\+]'</command>
+      </commands>
+    </step>
+
+    <step type="system" title="SVN Commit the changes"
+    interactive="1">
+      <commands>
+	<command>svn commit -m "Update Version Number: {VERSION}"</command>
+      </commands>
+    </step>
+
+    <step type="system" title="Make Test">
+      <commands>
+	<command>make clean</command>
+	<command>perl Makefile.PL</command>
+	<command>make test</command>
+      </commands>
+    </step>
+
+    <step type="section" interactive="1" title="Create Release">
+      <text>
+	We'll now:
+         - create the SVN tag
+         - export the results to a tar ball.
+         - upload it to CPAN
+
+	Quit now if you're not ready to finish the release.
+      </text>
+    
+      <steps>
+	<step type="system" title="svn tag the release">
+	  <commands>
+	    <command>svn copy -m "tag of version {VERSION}" https://net-policy.svn.sourceforge.net/svnroot/net-policy/trunk/net-policy/perl/QWizard https://net-policy.svn.sourceforge.net/svnroot/net-policy/tags/QWizard-{VERSION}-CPAN</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="make dist">
+	  <commands>
+	    <command>make dist</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="upload to cpan">
+	  <commands>
+	    <command>cpan-upload -mailto wjhns117@hardakers.net -user hardaker -verbose QWizard-{VERSION}.tar.gz</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="make updated windows ppm">
+	  <commands>
+	    <command>tcsh windows/blibupdate</command>
+	    <command>cd windows ; tar czf QWizard-{VERSION}.tar.gz blib</command>
+	  </commands>
+	</step>
+
+	<step type="system" interactive="1" title="commit the ppd">
+	  <commands>
+	    <command>svn commit -m "ppd version update: {VERSION}" windows/QWizard.ppd</command>
+	  </commands>
+	</step>
+
+	<step type="system" title="publish ppm to geoqo site">
+	  <commands>
+	    <command>scp windows/QWizard.ppd windows/QWizard-{VERSION}.tar.gz www.geoqo.org:geoqo/htdocs/ppm/</command>
+	  </commands>
+	</step>
+      </steps>
+    </step>
+  </steps>
+</makerelease>

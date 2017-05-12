@@ -1,0 +1,29 @@
+---
+abstract: 'qw for array/hash references'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  Test::More: 0
+  charnames: 0
+  if: 0
+  strict: 0
+  utf8: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Quote-Ref
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  XSLoader: 0
+  perl: 5.012000
+  warnings: 0
+resources:
+  repository: git://github.com/mauke/Quote-Ref.git
+version: 0.03

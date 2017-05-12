@@ -1,0 +1,140 @@
+Qt is a complete and well-developed object-oriented framework for
+developing graphical user interface (GUI) applications using C++.
+
+This release, Qt 1.2, is free for free software development on all
+operating systems that support the X Window System and includes the
+complete Qt source code for X and makefiles for Linux, Solaris, SunOS,
+FreeBSD, OSF/1, Irix, BSD/OS, NetBSD, SCO and HP-UX. New platforms may be
+added in the future.
+
+Qt has excellent documentation: 450 pages of postscript and fully
+cross-referenced online html documentation. See it on the web:
+http://www.troll.no/qt/
+
+Qt is easy to learn, with consistent naming across all the classes and a
+14-chapter on-line tutorial with links into the rest of the documentation.
+
+Qt dramatically cuts down on development time and complexity in writing
+user interface software for the X Window System. It allows the programmer
+to focus directly on the programming task, and not mess around with
+low-level X11 code.
+
+Qt is fully object-oriented. All widgets and dialogs are C++ objects,
+and, using inheritance, creation of new widgets is easy and natural.
+
+Qt's revolutionary signal/slot mechanism provides true component
+programming. Reusable components can work together without any knowledge
+of each other, and in a type-safe way.
+
+Qt has a very fast paint engine, in some cases ten times faster than
+most other toolkits. You have full access to low-level painting
+functionality. Painting is device independent, so the same code that draws
+on the screen can generate printer output.  You can also do arbitrary
+clipping, rotation, and scaling - simply and fast.
+
+Qt is very fast and compact because it is based directly on Xlib and uses
+neither Motif nor X Intrinsics.	 Qt's widgets (user interface objects)
+emulate the Motif look and feel, with slight improvements.
+
+Qt is available under several licenses:
+
+	- for commercial use
+	- for use with free software (X only)
+	- for shareware developers (X only)
+
+Note that the toolkit is the same, only the licenses differ.
+
+The Qt GUI toolkit is copyright Troll Tech AS.	It is available (at the
+time of writing) for Windows 95/NT and several variations of Unix (X11
+release 5 or later).  See http://www.troll.no/ for more availability
+information, or fax Troll Tech at +47 22646949.
+
+Qt can be downloaded from http://www.troll.no/dl/ or via anonymous FTP
+from ftp.troll.no.
+
+Join the qt-interest mailing list by sending a message containing the
+single word "subscribe" to qt-interest-request@troll.no.
+
+You can contact Troll Tech at
+
+	Troll Tech AS
+	Postboks 6133 Etterstad
+	N-0602 Oslo
+	Norway
+
+	fax: +47 22646949
+	email: sales@troll.no
+
+
+Here is the license intended for free software:
+
+		     TROLL TECH FREE SOFTWARE LICENSE
+
+Copyright (C) 1992-1997 Troll Tech AS.  All rights reserved.
+
+This is the free software license for Qt version 1.2; it covers private
+use, use of third-party application programs based on Qt, and development
+of free software for the free software community.
+
+
+			COPYRIGHT AND RESTRICTIONS
+
+The Qt toolkit is a product of Troll Tech AS. This license is limited to
+use with the X Window System.
+
+You may copy this version of the Qt toolkit provided that the entire
+archive is distributed unchanged and as a whole, including this notice.
+
+You may use this version of the Qt toolkit to compile, link and use
+application programs and reusable components legally developed by
+third parties.
+
+You may use the Qt toolkit to create application programs provided that:
+  - You accept this license.
+  - Your software does not require modifications to Qt.
+  - You satisfy ONE of the following three requirements
+    EITHER
+      Users of your software can obtain source code for the software, freely
+      modify the source code (possibly with restrictions on copyright
+      notices, attributions and legal responsibility), and freely
+      redistribute original or modified versions of the software.
+    OR
+      Your software is distributed under the GNU GENERAL PUBLIC LICENSE,
+      version 2 or later, as defined by the Free Software Foundation.
+    OR
+      Your software is distributed under the GNU LIBRARY GENERAL PUBLIC
+      LICENSE, version 2 or later, as defined by the Free Software Foundation.
+
+If you are paid to develop something with Qt or it is a part of your job
+the following conditions also apply:
+  - Your software must not require libraries, programs, data or
+    documentation that are not available outside your organization in
+    order to compile or use.
+  - If and when your organization starts using the software, you must
+    notify Troll Tech AS of the following:
+       * Your organization's name and purpose.
+       * The software's name and purpose.
+       * The software's license.
+       * That your organization considers the software to be free software.
+
+You may also use the Qt toolkit to create reusable components (such as
+libraries) provided that you accept the terms above, and in addition that:
+  - Your components' documentation includes the following text:
+	[Your package] requires the Qt library, which is copyright
+	Troll Tech AS.	Freely distributable programs may generally
+	use Qt for free, see [README.QT] for details.
+  - README.QT is distributed along with your components.
+  - Qt is not distributed as an integral part of your components.
+
+
+		       LIMITATIONS OF LIABILITY
+
+Troll Tech AS makes no obligation under this license to support or upgrade
+Qt, or assist in the use of Qt.
+
+In no event shall Troll Tech AS be liable for any lost revenue or profits
+or other direct, indirect, special, incidental or consequential damages,
+even if Troll Tech has been advised of the possibility of such damages.
+
+QT IS PROVIDED AS IS WITH NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY
+OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.

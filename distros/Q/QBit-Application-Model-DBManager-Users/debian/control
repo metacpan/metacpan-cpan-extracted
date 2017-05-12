@@ -1,0 +1,12 @@
+Source: libqbit-application-model-dbmanager-users-perl
+Section: perl
+Priority: extra
+Maintainer: Igor Sverdlov <igor-sverdlov@mail.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl, libqbit-application-model-dbmanager-perl, libqbit-application-model-db-perl, libdata-rmap-perl
+Standards-Version: 3.9.4
+
+Package: libqbit-application-model-dbmanager-users-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-application-model-dbmanager-perl, libqbit-application-model-db-perl, libdata-rmap-perl
+Description: Model for work with users in QBit application.
+ Model for work with users in QBit application.

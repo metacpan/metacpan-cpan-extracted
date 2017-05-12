@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+#
+# History:
+#
+# 17-10-02		Z	Written.
+# 20-10-02		Z	Modified to give QMAIL support.
+#
+# Author:		Ziaur Rahman <zia@qalacom.com>
+#
+# Synopsis:
+#
+# File			quotadm
+#
+# Program Name		Quota Administration (QUOTA ADMinistration).
+#
+# Description		This script will show user quotas in the system, and if --email is mentioned
+#			it will email a warning msg to users when the threshold is reached or exceeded.
+#
+# Variables		$msgfile - Default: /etc/quotawarn.msg, this file contains the email that will
+#			be sent to the users whose quota has reached or exceeded $threshold.
+#			Inside this file you can use %user to mention the Username, %print to print the
+#			table of quota information, %quota to how much quota is assigned to the user.
+#
+#			$mta - Default: /usr/lib/sendmial, this is where you set the location of
+#			of your MTA. Currently, this script only supports SENDMAIL and QMAIL. If you
+#			are using QMAIL, please enter the location of your qmail-inject. 
+#
+#			$echo - Default: /bin/echo, this is the location of the echo command which
+#			is used to send mail for QMAIL.
+# 
+#			$threshold - Default: 90, this is the "high water mark" for the users. When
+#			user's disk usage equals/exceeds [>=] user's quota threshold, i.e. more
+#			than or equal to 90% of user's quota, then the script will send a warning
+#			message (/etc/quotawarn.msg) to the user.
+
+use Quota;
+
+#
+# Configurable Global variables start here...
+#
+# Define the global variables here
+$msgfile	=	"/etc/quotawarn.msg";
+$mta		=	"/usr/lib/sendmail"; # define your MTA location here.
+$echo		=	"/bin/echo";
+$threshold	=	90;
+#
+# Configurable Global variables end here...
+#
+
+while(1) {
+  $path = "/";
+
+  while(1) {
+    $dev = Quota::getqcarg($path);
+    if(!$dev) {
+      warn "$path: mount point not found\n";
+    }
+    last;
+  }
+  redo if !$dev;
+
+##  Check if quotas are present on this filesystem
+
+  if($dev =~ m#^[^/]+:#) {
+    print "$dev is a remote file system\n";
+    last;
+  }
+  elsif(Quota::sync($dev) && ($! != 1)) {  # ignore EPERM
+    warn "Quota::sync: ".Quota::strerr."\n";
+    warn "Choose another file system - quotas not functional on this one\n";
+  }
+  else {
+    #Quotas are present on this filesystem (sync ok)
+    last;
+  }
+}
+
+sub sendemail
+{
+
+local ($user,$printit,$quotaa) = @_;
+
+$quotadec = sprintf("%0.2d",$quotaa);
+
+open (MSGFILE, "$msgfile") or die "can not open $msgfile\n";
+while (<MSGFILE>) {
+
+	$line = $_;
+	$line =~ s/%user/$user/;
+	$line =~ s/%print/$printit/;
+	$line =~ s/%quota/$quotadec/;
+	$msg .= $line;
+
+}
+
+if ($mta =~ "sendmail") {
+
+open (SENDMAIL, "| $mta -t -n") or die "Cannot open sendmial from $sendmail\n";;
+print SENDMAIL <<End_of_Mail2;
+$msg
+
+End_of_Mail2
+close(SENDMAIL);
+
+} elsif ($mta =~ "qmail-inject") {
+
+`$echo -e "$msg" |$mta`;
+
+} else {
+	print "Sorry, I only support SENDMAIL or QMAIL at the moment to send mails\n";
+}
+
+}
+
+## Get the user quota. 
+sub doquota
+{
+	local($user,$email,$pargv) = @_;
+	my $thresholds = "$threshold" . "%";
+	($name,$coded_pwd,$uid,$gid,$x,$y,$z,$gcos,$home,$shell) = getpwnam($user);
+	($bc,$bs,$bh,$bt,$fc,$fs,$fh,$ft) = Quota::query($dev, $uid);
+	if(defined($bc)) {
+		my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($bt);
+		$bt = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $bt;
+		($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($ft);
+		$ft = sprintf("%04d-%02d-%02d/%02d:%02d", $year+1900,$mon+1,$mday,$hour,$min) if $ft;
+
+		#print "Usage and limits for $user are $bc ($bs,$bh,$bt) $fc ($fs,$fh,$ft)\n\n";
+		goto ALL if $pargv eq "--all"; 
+		if ($bs != 0) {
+		ALL:{
+			$usageinMB = $bc/1024;
+			$quotainMB = $bs/1024;
+			$percentUsage = (($bc/$bs)*100) if $bs != 0;
+			$perUsage = sprintf ("%.2f%s",$percentUsage,"%");
+			if ($percentUsage >= $threshold) {
+				$diffth = ($percentUsage - $threshold);
+				$diffthresh = sprintf ("%.2f%s%s",$diffth,"%","+");
+			} elsif ($threshold >= $percentUsage) {
+				$diffth = ($threshold - $percentUsage);
+				$diffthresh = sprintf ("%.2f%s%s",$diffth,"%","-");
+			}
+			if ($email eq "--email") {
+				$printem .= sprintf ("%15s%15s%15s%15s%15s%15s\n\n","UserName","Usage(MB)","Quota(MB)","Usage(%)","ThreshHold(%)","Diff(+/-)");
+				$printem .= sprintf ("%15s%15.2f%15.2f%15s%15s%15s\n",$user,$usageinMB,$quotainMB,$perUsage,$thresholds,$diffthresh);
+				&sendemail($user,$printem,$quotainMB) if $bs != 0;
+			} else {
+				printf ("%15s%15.2f%15.2f%15s%15s%15s\n",$user,$usageinMB,$quotainMB,$perUsage,$thresholds,$diffthresh);
+			}
+		    }
+		}
+	}
+	else {
+		warn "Quota::query($dev,$uid): ",Quota::strerr,"\n\n";
+	}
+
+}
+
+sub doall
+{
+	local($argvp,$mail) = @_;
+	open(PASSWD,"/etc/passwd");
+	while(<PASSWD>)
+	{
+		chop;
+		($userid,$dpw,$uin) = split (':',$_);
+		&doquota($userid,$mail,$argvp);
+	}
+	close PASSWD;
+
+}
+
+sub usage
+{
+	print "\nUsage: quotadm [OPTION]...\n";
+	print "Show quota information of particular user or all users.\n\n";
+	print "-u <username>	Single user's quota information with threshold info.\n";
+	print "--all-quota	Show those user's quota information whose quota is on.\n";
+	print "--all		Show all user's quota information.\n";
+	print "--email		Email the user if he/she has reached/exceeded threshold for quota.\n";
+	print "\n";
+	print "Examples of combining OPTIONS:\n\n";
+	print "Example 1: \n\"quotadm -u tom --email\" \n- will send an email to tom if his quota has reached or exceeded the threshold.\n\n";
+	print "Example 2: \n\"quotadm --all-quota --email\" \n- will send an email to each user whose quota has reached or exceeded the threshold.\n";
+	print "\n";
+	exit;
+}
+
+
+#
+# The main program starts here.
+#
+$argv1 = $ARGV[0];
+$argv2 = $ARGV[1];
+$argv3 = $ARGV[2];
+chomp ($argv1);
+chomp ($argv2);
+chomp ($argv3);
+
+
+if ($argv1 eq "-u") {
+	printf ("%15s%15s%15s%15s%15s%15s\n\n","UserName","Usage(MB)","Quota(MB)","Usage(%)","ThreshHold(%)","Diff(+/-)") if $argv3 ne "--email";
+	&doquota($argv2,$argv3);
+} elsif ($argv1 eq "--all-quota" || $argv1 eq "--all") {
+	&usage if defined($argv3);
+	printf ("%15s%15s%15s%15s%15s%15s\n\n","UserName","Usage(MB)","Quota(MB)","Usage(%)","ThreshHold(%)","Diff(+/-)") if $argv2 ne "--email";
+	&doall($argv1,$argv2);
+} else {
+	&usage();
+}
+

@@ -1,0 +1,79 @@
+==================================================
+Changes from 2016-01-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2017-01-22 11:50:15 +0000
+------------------------------------------
+
+  Change: 6f5186d0571bbdf81df7022b1d6771214aa40d40
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-01-22 15:49:33 +0000
+
+    Merge pull request #8 from Madskill/added_collate_and_engine
+
+    added collate, engine and length for text column in index 
+
+  Change: 0698871b13e7cdcbe4ea8d8dfc6bffd9d8cd489d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-01-22 14:46:37 +0000
+
+    added collate, engine and length for text column in index 
+
+------------------------------------------
+version 0.009 at 2016-10-30 10:40:58 +0000
+------------------------------------------
+
+  Change: 4b3c3428d15ae74f535898effb0819cadff84bc1
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-30 13:40:58 +0000
+
+    Version 0.009 
+
+  Change: 331de5303c3de7e92d2db4e4fb8c19dcf07a38ad
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-30 14:39:43 +0000
+
+    Merge pull request #7 from Madskill/delete_require
+
+    deleted require 
+
+  Change: bbe04c8ef3b0d42e9340eee174191b82a44b5848
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-30 13:38:02 +0000
+
+    deleted require 
+
+------------------------------------------
+version 0.008 at 2016-09-04 19:16:05 +0000
+------------------------------------------
+
+  Change: 5c88c2e240b6b7b5a72bc38dcec226c918d6b546
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 22:16:05 +0000
+
+    Version 0.008 
+
+  Change: d5d7e43f78b56158f5989bf3ed9045449fb6f780
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-09-04 23:13:38 +0000
+
+    Merge pull request #6 from Madskill/upload_to_cpan
+
+    Upload to cpan 
+
+  Change: 2ca5f251351aed940cb0e10ca09b801b9caf5f61
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-07-17 18:54:03 +0000
+
+    use __END__ 
+
+  Change: 6fe936f9283f4d90feb434d9a25ba1eb09f0f77d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-07-17 17:26:30 +0000
+
+    added pod documentation and upload to cpan 
+
+================================================
+Plus 7 releases after 2016-01-23 00:00:00 +0000.
+================================================

@@ -1,0 +1,76 @@
+Revision history for Perl extension Quilt.
+
+0.08  Sun Mar  8 21:16:55 CST 1998
+	* transformation specs (docbook, linuxdoc, teilite) now take
+	  an iterator as the $parent and need to create an iterator
+	  when passing a new object to `accept_children_gi'.  There's
+          a corresponding change in SGML-Grove.
+	- Objs: add a `generated_id' to all objects with an `id'
+	- toAscii, toHTML: fill out info on title page, add TOC
+	- Quilt::TOC: added -- Quilt::TOC is a visitor class to
+	  support creating Tables of Contents.
+	- Quilt::DO::Author: name() now takes a spec/builder to assist
+	  in formatting the author info
+	- LinuxDoc: add LABEL's ref to nearest parent element
+	- PROJECTS: added
+	- ToDo: filled out
+	- fixes
+	  - toHTML: typo in references
+
+0.07  Mon Feb  9 19:34:26 CST 1998
+	* renamed `specs/gdo-spec.cat' to `catalog'
+	- add `org_name' to Author
+	- install specs in $PREFIX/lib/sgml/Quilt-VERSION
+	- install tmpfront.sh as bin/sroff, for now
+	- fixes
+	  - Quilt.spec: add Objs.pm, XRef.pm
+
+0.06  Sat Jan 17 18:41:04 CST 1998
+	- tmpfront: rename SGML::SPGrove to SGML::SPGroveBuilder and SGML::Grove
+	- all specs: rename DTD SPGrove to Grove
+
+0.05  Sat Dec  6 19:01:07 CST 1997
+	- Quilt::XRef: added
+	- moved object declarations from Quilt.pm to new
+          Quilt::Objs.pm to allow subs to be overridden
+	- toHTML: use TABLE style for NoFill as well
+	- added `--sgml' option to `tmpfront.sh' to use `SGML::Writer'
+          to write a normalized copy of a doc -- see SGML::Writer for
+          current limitations
+	- Quilt::Writer::HTML, wrHTML: print to stream instead of stdout
+	- Struct.pm: add `type' sub to default to ``Section'' if no
+	  explicit type
+	- linuxdoc.spec: test for `@@URLNAM' and ignore
+	- toAscii, toHTML: add references
+	- toHTML: added internal links
+
+0.04  Mon Nov  3 11:45:07 CST 1997
+	- toAscii.spec: fix space between `ABSTRACT' title and text,
+          add quotes in mail URLs, add XRef::End
+	- linuxdoc.spec: `REF' now uses `NAME' attribute as contents,
+          and `LABEL' is now an anchor
+	- docbook.spec, linuxdoc.spec, teilite.spec: use `use-gi' and
+          `copy-id' flags
+	- added `id' member to all classes, supported by
+          `SGML::Simple::Spec's `copy-id' flag
+	- fixes
+	  - docbook.spec: change `sub_title' to `subtitle', change
+            `author_blurb' to `blurb'
+
+0.03  Sat Oct 25 16:46:18 CDT 1997
+        - add info about Quilt mailing list
+	- toAscii: allow list items outside of lists
+	- HTML, Ascii: add table frame support
+        - fixes
+          - correct %files pathnames in RPM spec
+
+0.02  Fri Oct 24 18:58:51 CDT 1997
+	- wrHTML: use cool TABLE look for PRE
+	- toHTML: use `make' syntax on some elements
+	- added table support (LinuxDoc input, HTML and Ascii output)
+	- fixes
+	  - LinuxDoc: DESCRIP moves stray content into Items
+
+0.01  Sun Oct 19 21:33:11 1997
+	- original version; created by h2xs 1.16
+

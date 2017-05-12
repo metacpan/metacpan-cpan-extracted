@@ -1,0 +1,22 @@
+---
+abstract: 'Model for work with users in QBit application.'
+author:
+  - 'Igor Sverdlov <igor-sverdlov@mail.ru>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: QBit-Application-Model-DBManager-Users
+requires:
+  Data::Rmap: 0
+  QBit::Application::Model::DB: 0
+  QBit::Application::Model::DBManager: 0
+  QBit::Application::Model::DBManager::Filter::text: 0
+  base: 0
+  qbit: 0
+version: 0.007

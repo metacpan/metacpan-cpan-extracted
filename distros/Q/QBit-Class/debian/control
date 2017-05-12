@@ -1,0 +1,14 @@
+Source: libqbit-class-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), perl, libqbit-perl
+Standards-Version: 3.9.4
+Vcs-Git: git@github.com:QBitFramework/QBit-Class.git
+Vcs-Browser: https://github.com/QBitFramework/QBit-Class
+
+Package: libqbit-class-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, libqbit-perl
+Description: Base class for QBit framework.
+ Base class for QBit framework. All classes must inherit it.

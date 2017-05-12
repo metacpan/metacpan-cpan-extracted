@@ -1,0 +1,11 @@
+Revision history for Perl extension QAccel.
+
+0.02  Sat Apr  5 11:46:34 1997
+	- added disconnectItem()
+
+0.02  Sat Apr  5 10:38:50 1997
+	- executed an s/reciever/receiver/ on the damned thing
+
+0.01  Mon Mar 17 08:42:03 1997
+	- original version; created by h2xs 1.18
+

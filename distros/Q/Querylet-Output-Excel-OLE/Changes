@@ -1,0 +1,17 @@
+Revision history for Querylet-Output-Excel-OLE
+
+0.143     2013-11-14 22:44:42 America/New_York
+          update bugtracker and repo
+
+0.0142  2006-11-16
+        packaging improvements
+
+0.13    2004-12-16
+        use the column headers from Querylet::Query
+
+0.12    2004-09-23
+        the excel_workbook and _worksheet options work
+
+0.10    2004-09-21
+        first release
+

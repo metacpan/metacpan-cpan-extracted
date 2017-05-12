@@ -1,0 +1,26 @@
+libqbit-cron-perl (0.004) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon, 05 Sep 2016 00:00:17 +0300
+
+libqbit-cron-perl (0.003) raring; urgency=low
+
+  * Add attribute 'SILENT': don't print that other cron is running now.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 10 Mar 2015 14:52:38 +0400
+
+libqbit-cron-perl (0.002) raring; urgency=low
+
+  * Don't block on lock check.
+
+  * Do not create undefined subs in symbol table.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 17 Oct 2014 11:12:51 +0400
+
+libqbit-cron-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Sep 2013 18:23:46 +0400
+

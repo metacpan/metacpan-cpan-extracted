@@ -1,0 +1,22 @@
+$Id: ToDo,v 1.4 1998/03/09 03:18:09 ken Exp $
+
+* General
+ ** subclassing specs
+ ** sroff
+ ** footnotes
+ ** images
+ ** processing options and PIs
+ ** numbering examples and figures
+ ** grove queries (in SGML-Grove)
+ ** error reporting
+  *** spec rules not compiled correctly
+  *** errors during transforms
+  *** line numbers in source docs
+ ** debugging
+  *** debug messages during visiting
+ ** generated_id is more of backend issue than a DO issue, how can we
+attach backend attributes to DOs?
+
+* HTML
+ ** split html files
+ ** squeeze whitespace

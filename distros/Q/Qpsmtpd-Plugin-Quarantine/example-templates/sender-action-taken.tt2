@@ -1,0 +1,12 @@
+[% INCLUDE header.inc title = "SPAM Quarantine Control Center" %]
+
+<h1>[% GET message %]</h1>
+
+[% INCLUDE message_form.inc %]
+
+[% INCLUDE sender_messages.inc %]
+
+[% INCLUDE sender_options.inc %]
+
+
+[% INCLUDE footer.inc %]

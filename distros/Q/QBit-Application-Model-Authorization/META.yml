@@ -1,0 +1,29 @@
+---
+abstract: 'Simple model for authorization in QBit application.'
+author:
+  - 'Igor Sverdlov <igor-sverdlov@mail.ru>'
+build_requires:
+  QBit::Application: 0
+  QBit::Class: 0
+  Test::Deep: 0
+  Test::More: 0
+  lib::abs: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: QBit-Application-Model-Authorization
+requires:
+  Crypt::Blowfish: 0
+  Crypt::CBC: 0
+  Digest::SHA: 0
+  Exception: 0
+  QBit::Application::Model: 0
+  QBit::Application::Model::DB: 0
+  base: 0
+  qbit: 0
+version: 0.007

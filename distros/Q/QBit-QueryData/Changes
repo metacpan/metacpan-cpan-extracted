@@ -1,0 +1,67 @@
+==================================================
+Changes from 2015-12-18 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2016-12-17 15:15:13 +0000
+------------------------------------------
+
+  Change: a63dd13c4b481c44e3d1c971e827c744b0578b4e
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:14:16 +0000
+
+    Merge pull request #2 from QBitFramework/check_fields
+
+    check fields 
+
+  Change: 6edf3267675701df3361ce372d5fefde2a2b62d9
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 18:11:14 +0000
+
+    check fields 
+
+  Change: 2076883d59827db995c10b9ca109884581afe1d5
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 15:03:39 +0000
+
+    Merge pull request #1 from QBitFramework/fix_security
+
+    fix security 
+
+  Change: 1301ff26c03728c43b1549cea71612828488df9b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-17 15:02:07 +0000
+
+    fix security 
+
+------------------------------------------
+version 0.001 at 2016-12-10 16:50:14 +0000
+------------------------------------------
+
+  Change: 7e31fd2ef0621036fa3c688ceb6fb73d52b00cda
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-10 19:50:14 +0000
+
+    Version 0.001 
+
+  Change: 57c96477ab200c4e755b3289e4e51cbe0df19c78
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-10 19:47:24 +0000
+
+    fix copyright year 
+
+  Change: b7bd88dfc5db4dfb3b8f7b6853ccb2b0fb55669c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-10 19:45:40 +0000
+
+    added documentation 
+
+  Change: 09e90e71b7b0af34bad8a3235b42ef05f513e11b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-10 18:32:51 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

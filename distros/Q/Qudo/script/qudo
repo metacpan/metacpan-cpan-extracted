@@ -1,0 +1,80 @@
+#! /usr/bin/env perl
+use strict;
+use Getopt::Long;
+use Qudo::Test;
+use DBI;
+use Pod::Usage;
+
+Getopt::Long::GetOptions(
+    '--dry_run'    => \my $dry_run,
+    '--help'       => \my $help,
+    '--db=s'       => \my $db,
+    '--user=s'     => \my $user,
+    '--pass=s'     => \my $pass,
+    '--host=s'     => \my $host,
+    '--rdbms=s'    => \my $rdbms,
+    '--use_innodb' => \my $use_innodb,
+) || usage();
+usage() if $help;
+usage() if !defined $rdbms;
+usage() if $rdbms eq 'SQLite' && !defined $db;
+usage() if $rdbms ne 'SQLite' && (!defined $db || !defined $user);
+
+my %attr = (
+    defined $host ? (
+        host => $host
+    ) : (),
+    RaiseError => 1,
+    PrintError => 0,
+);
+
+if (!$dry_run && $rdbms ne 'SQLite') {
+    my $dsn = 'dbi:'.$rdbms.':';
+    $dsn .= 'dbname=postgres' if $rdbms eq 'Pg';
+    my $dbh = DBI->connect($dsn, $user, $pass, \%attr);
+    $dbh->do('create database '.$db);
+}
+
+my $dbh;
+if (!$dry_run) {
+    $dbh = DBI->connect('dbi:'.$rdbms.':dbname='.$db, $user, $pass, \%attr);
+}
+
+my $schema = Qudo::Test::load_schema;
+for my $sql (@{$schema->{$rdbms}}) {
+    if ($rdbms eq 'mysql' && $use_innodb) {
+        $sql .= " ENGINE=INNODB\n";
+    }
+    if ($dry_run) {
+        print $sql,"\n";
+    } else {
+        $dbh->do($sql);
+    }
+}
+
+sub usage {
+    pod2usage(1);
+}
+
+=pod
+
+=head1 NAME
+
+qudo - command to create database scheme
+
+=head1 USAGE
+
+  qudo [opts]
+
+=head1 OPTIONS
+
+    --rdbms      database kind [required] ex) mysql SQLite Pg
+    --db         database name [required] ex) qudo_test
+    --user       db user                  ex) root
+    --pass       db password.
+    --host       db host.
+    --help       disp help.
+    --dry_run    disp schema only.
+    --use_innodb using innodb (optional)
+
+=cut

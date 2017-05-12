@@ -1,0 +1,15 @@
+Source: libqbit-timelog-perl
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), libqbit-perl, libqbit-class-perl
+Build-Depends-Indep: perl
+Standards-Version: 3.9.4
+Vcs-Git: git@github.com:QBitFramework/QBit-TimeLog.git
+Vcs-Browser: https://github.com/QBitFramework/QBit-TimeLog
+
+Package: libqbit-timelog-perl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, libqbit-perl, libqbit-class-perl
+Description: Class for hierarchical time logging.
+ Class for hierarchical time logging.

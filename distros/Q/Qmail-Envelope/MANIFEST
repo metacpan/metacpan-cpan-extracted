@@ -1,0 +1,13 @@
+Changes
+Envelope.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/as_string.t
+t/gen.t
+t/host_list.t
+t/new_args.t
+t/sender.t
+t/total_recips_for_host.t
+t/total_recips.t

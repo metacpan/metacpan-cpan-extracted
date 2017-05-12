@@ -1,0 +1,22 @@
+Revision history for Querylet-Output-Excel-XLS
+
+0.134     2014-02-04 22:37:22-05:00 America/New_York
+        - fix github links
+
+0.133     2013-11-14 22:50:34 America/New_York
+          update repo and bugtracker
+
+0.132   2006-11-18
+        packaging improvements
+
+0.131   2006-11-14
+        packaging improvements
+
+0.13    2004-12-16 11:00
+        use column headers
+
+0.12    2004-09-21 18:05
+        use open()'d scalar to avoid needing output closure
+
+0.10    2004-09-21 15:40
+        first release

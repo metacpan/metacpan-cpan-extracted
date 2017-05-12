@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use qbit;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my %args = ();
+GetOptions(\%args, 'help|?', 'port=i', 'lib-path=s@');
+
+pod2usage(1) if $args{'help'} || !exists($ARGV[0]);
+
+if ($args{'lib-path'}) {
+    require lib;
+    lib->import(@{$args{'lib-path'}});
+}
+
+my $class_fname = $ARGV[0];
+$class_fname =~ s/::/\//g;
+$class_fname .= '.pm';
+require $class_fname;
+
+my $web_interface = $ARGV[0]->new();
+$web_interface->run(port => $args{'port'});
+
+__END__
+
+=head1 NAME
+
+qbit_start
+
+=head1 SYNOPSIS
+
+qbit_start [options] class_name
+
+Class "class_name" must be QBit::WebInterface::OwnServer descendant.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-p, --port>
+
+WebServer port. Listen on 0.0.0.0.
+
+Default listen on 5000.
+
+=item B<--lib-path>
+
+Directories with perl modules. Use several times if need.
+
+=item B<-h, -?, --help>
+
+Show help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+Start simple HTTP server. Use it only for quick test of your application.

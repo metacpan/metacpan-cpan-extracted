@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 52a76ce692eb73535f149a48d0b6a30c1b57baed Changes
+SHA1 b6aa8594b2c8772fbf135d22e45edd0f9cbbb766 MANIFEST
+SHA1 b827789b187a7cacdd2e01b6a8b90c2db7924295 MANIFEST.SKIP
+SHA1 f5ae908f9bc1cf0e92df86c8dcefd39f16498dbd META.json
+SHA1 2ae8b644c17b5a4feac363f2f80fa5f819282b43 META.yml
+SHA1 796940889551edc409b21a81cb824924adbef9fa Makefile.PL
+SHA1 ee3853f28b9e0047ec2bf3199d370dcd1f4dd90e README
+SHA1 513b27dc5198b35b5ec49db1f238f3fe7ff7727d lib/QMake/Project.pm
+SHA1 dade84a22858705df32b2c92a0560131cb90bf8f t/00-load.t
+SHA1 4be789030c1673829b9cfc90bcc71a99e4d3ae43 t/01-QMake-Project.t
+SHA1 0e1c671134b9405b438dd6b1eae5097cb5ae233d t/manifest.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 e9ef83a94a1b5e1f783aaed52de58a0cee989391 t/test_projects/01-typical/01-typical.pro
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/01-typical/main.cpp
+SHA1 0aa991d62db7067be1fcc1d47a948f87e9fa6cd0 t/test_projects/02-default-target/02-default-target.pro
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/02-default-target/main.cpp
+SHA1 0925bf98c1e50747b29fe0c067c30f8672962faa t/test_projects/03-list/03-list.pro
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/03-list/main.cpp
+SHA1 9680007d5c529dbba902371410d4dbb42a9f140f t/test_projects/04-error/04-error.pro
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/04-error/main.cpp
+SHA1 fdd5732111d1c134ebed6185f154e0fb46671cac t/test_projects/05 space in path/05 space in path.pro
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/05 space in path/main.cpp
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/05 space in path/space in source.cpp
+SHA1 734440b709c04cc45888a60fc7f7d524ce7e9982 t/test_projects/06-ordering/06-ordering.pro
+SHA1 5d3aa587220707a2b6199d991019bac80bf97dd6 t/test_projects/06-ordering/main.cpp
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/test_projects/07-no-project-file/dummy
+SHA1 0995804027f5f40c00a7ff5ba24237bb539649b6 t/test_projects/08-different-named-project-file/somefile.pro
+SHA1 b962198c95206244d92867e2f370f89adfe76134 t/test_projects/09-multiple-project-files/09-multiple-project-files.pro
+SHA1 633fcfee8fd58e60f4fb32bd0ac070142547b6d8 t/test_projects/09-multiple-project-files/notloaded.pro
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTrQ3IAAoJEG3YuWOtEXouWvcH/2zUsq/jf9/3FgoUFKrC81eA
+VpgP1A1p4PJkvD1vockj4i8edoILmFgTlUgTJqgR1Cv/yqd54jAZpTK9OLxyKGDh
+EvFc5oKf+Nqx0fXias5AW5LU8U6nOy1ywFWnZU6/CMDNryycF/tXLYrmcPALdP+q
+XHLDn24UXTTW536agoyxdZ2cf8TPIdrURjMOq4FKNdG6B3ELuBo0whiN+OEK7cqL
+sMRJagU2rwT9VlHgzpyASpkdE3W8fQia9VkKvvQc0AJs25VmF5CEijQI4yB7Ge6P
+TABZNktLv9pQsYSzQKfoLZVOLQnuEdVAgQZUL8xrfVag/CxFuKtGWFXRjek5dM4=
+=V3lZ
+-----END PGP SIGNATURE-----

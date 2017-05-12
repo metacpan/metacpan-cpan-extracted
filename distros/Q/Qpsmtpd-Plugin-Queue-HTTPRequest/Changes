@@ -1,0 +1,7 @@
+Revision history for Perl extension Qpsmtpd::Plugin::Queue::HTTPRequest
+
+0.02  Thu Sep  4 12:07:03 JST 2008
+        - first CPAN release
+
+0.01  Thu Dec 20 13:18:11 JST 2007
+        - original version

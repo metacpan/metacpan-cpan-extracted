@@ -1,0 +1,12 @@
+libqbit-application-model-db-mysql-table-multistateactionlog-perl (0.002) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Sep 2016 23:29:25 +0300
+
+libqbit-application-model-db-mysql-table-multistateactionlog-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Sep 2013 09:56:52 +0400
+

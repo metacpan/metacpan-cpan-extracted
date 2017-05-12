@@ -1,0 +1,157 @@
+==================================================
+Changes from 2016-01-13 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.014 at 2017-01-12 05:39:57 +0000
+------------------------------------------
+
+  Change: 9d15655ed00260317050464d94b04d4935d3092d
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-01-12 09:39:10 +0000
+
+    Merge pull request #9 from Madskill/fix_current_rights
+
+    clear current user rights 
+
+  Change: f4282d58f86c184b14e4807ca59653f3120fc62f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-01-12 08:36:34 +0000
+
+    clear current user rights 
+
+------------------------------------------
+version 0.013 at 2016-12-01 18:32:55 +0000
+------------------------------------------
+
+  Change: b22267d7317b7a3ab6bd510bf4f672b89da669ae
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 21:32:55 +0000
+
+    Version 0.013 
+
+  Change: 5749d013b2689336017d6ddd7f1f1cc3a645e4f2
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 21:32:12 +0000
+
+    Merge pull request #8 from Madskill/speed_up
+
+    speed up check_rights 
+
+  Change: 7b53e0b824f3dde4671b0f6c81cac1bdcb37901d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-26 20:01:00 +0000
+
+    unique rights and added _fix_cur_user 
+
+  Change: e384a8b7bdfc05552b6436dd91d5bce81e47630a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-25 02:42:02 +0000
+
+    speed up check_rights 
+
+------------------------------------------
+version 0.012 at 2016-10-09 08:57:06 +0000
+------------------------------------------
+
+  Change: e832301f2c9e0ebcdab65d4b0c592770532fdbe5
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 11:57:06 +0000
+
+    Version 0.012 
+
+  Change: fd2ff1623aa5536d42283cbedcaa9ae2ca6beda9
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-10-09 12:56:14 +0000
+
+    Merge pull request #7 from Madskill/fix_dependency
+
+    added TestTimeLog 
+
+  Change: 5ca1076977a669332791e8aebe467a4003caced0
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-10-08 17:37:47 +0000
+
+    added TestTimeLog 
+
+------------------------------------------
+version 0.011 at 2016-07-03 15:28:31 +0000
+------------------------------------------
+
+  Change: 1fb220a02d63a2bb7de2ec27437db5c3ab2d97ec
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-07-03 18:28:31 +0000
+
+    Version 0.011 
+
+  Change: b767c4c8d4e09f36078cf63f7a4735a7ae8546c4
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-07-03 19:26:09 +0000
+
+    Merge pull request #6 from Madskill/fix_regexp
+
+    fix regexp 
+
+  Change: eb6a2339d7b90f925fdd9b52ea08ce43c85eb9ba
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-07-03 18:11:23 +0000
+
+    fix regexp 
+
+------------------------------------------
+version 0.010 at 2016-03-27 20:21:53 +0000
+------------------------------------------
+
+  Change: c8dd4888b288b8c1fd62d55d381a9a5a221fd39e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-03-27 23:21:53 +0000
+
+    Version 0.010 
+
+  Change: 079e9741eb665e98d6e1a1eb726e9e69ef191411
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-03-28 00:20:34 +0000
+
+    Merge pull request #5 from Madskill/upload_to_cpan
+
+    upload to cpan 
+
+  Change: bcba31fbb37b8471fa4bb3f997321ec5ff8b271e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-03-27 23:19:45 +0000
+
+    upload to cpan 
+
+------------------------------------------
+version 0.009 at 2016-01-24 16:08:08 +0000
+------------------------------------------
+
+  Change: 2877dfd7e7371bacb5784cdb172301fb215262f0
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-01-24 19:08:08 +0000
+
+    Version 0.009 
+
+  Change: bcc921a84c152dc3664e1bd7556a8095fe07b668
+  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
+  Date : 2016-01-24 15:51:27 +0000
+
+    Merge pull request #4 from Madskill/fix_path
+
+    fix ApplicationPath: '/t_lib/Application.pm' -> './' 
+
+  Change: dfe7f415d29f1da951a6ce03a67cf8d16290c3e5
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-01-24 09:54:58 +0000
+
+    perltidy 
+
+  Change: 58f5f16ed76d568384dba656477a4a372694b021
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-01-24 09:52:08 +0000
+
+    fix ApplicationPath: '/t_lib/Application.pm' -> './' 
+
+================================================
+Plus 8 releases after 2016-01-13 00:00:00 +0000.
+================================================

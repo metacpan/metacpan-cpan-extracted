@@ -1,0 +1,200 @@
+libqbit-webinterface-perl (0.029) raring; urgency=low
+
+  * fix dumper
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 23 Apr 2017 17:02:29 +0300
+
+libqbit-webinterface-perl (0.028) raring; urgency=low
+
+  * exceptions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 20 Dec 2016 07:53:44 +0300
+
+libqbit-webinterface-perl (0.027) raring; urgency=low
+
+  * added TestTimeLog
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 09 Oct 2016 23:14:01 +0300
+
+libqbit-webinterface-perl (0.026) raring; urgency=low
+
+  * t_lib -> lib
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 08 Oct 2016 22:39:00 +0300
+
+libqbit-webinterface-perl (0.025) raring; urgency=low
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 04 Sep 2016 23:40:44 +0300
+
+libqbit-webinterface-perl (0.024) raring; urgency=low
+
+  * shift -> $_[0]
+
+  * fix exception
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 03 Jul 2016 18:31:18 +0300
+
+libqbit-webinterface-perl (0.023) raring; urgency=low
+
+  * fix path and added libcgi-pm-perl in depends
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 10 Feb 2016 23:27:21 +0300
+
+libqbit-webinterface-perl (0.022) raring; urgency=low
+
+  * use t_lib
+
+  * fix typo
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 26 Jan 2016 23:07:07 +0300
+
+libqbit-webinterface-perl (0.021) raring; urgency=low
+
+  * Clearify that ajax message is 'Internal Server Error'.
+
+  * Allow children to redefine internal server error catcher.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 19 Mar 2015 16:07:20 +0400
+
+libqbit-webinterface-perl (0.020) raring; urgency=low
+
+  * Fixed "+" in multipart form data
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 17 Feb 2015 12:54:39 +0400
+
+libqbit-webinterface-perl (0.019) raring; urgency=low
+
+  * Don't redirect when 500 error on test happened.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 28 Aug 2014 13:45:49 +0400
+
+libqbit-webinterface-perl (0.018) raring; urgency=low
+
+  * Version 0.018
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 27 Apr 2014 18:07:37 +0400
+
+libqbit-webinterface-perl (0.017) raring; urgency=low
+
+  * Version 0.016
+
+  * Fixed tests
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 27 Apr 2014 11:28:36 +0400
+
+libqbit-webinterface-perl (0.016) raring; urgency=low
+
+  * Fixed tests
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 27 Apr 2014 11:28:22 +0400
+
+libqbit-webinterface-perl (0.015) raring; urgency=low
+
+  * Using page_title variable in template
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 20 Mar 2014 19:57:56 +0400
+
+libqbit-webinterface-perl (0.014) raring; urgency=low
+
+  * Add anchor into redirect
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 05 Mar 2014 19:54:56 +0400
+
+libqbit-webinterface-perl (0.013) raring; urgency=low
+
+  * Check whether the symbol is function before addressing it.
+  * When the import WebInterface::Controller code calls to UNIVERSAL::isa
+    as to code ref, it exploits it. UNIVERSAL::isa is GLOB, no CODE. When
+    calling it as code, undefined function is created, so all calls to it
+    will result in call to undefined function and won't rich the code in
+    GLOB.
+
+  * Added some tests for QBit::WebInterface::Request
+
+  * Revert "Add request store-retrive logic."
+  * This reverts commit 43b371b3f40969d112f089d8eab5a4cafadcfd3e.
+
+  * Add request store-retrive logic.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 26 Feb 2014 14:06:25 +0400
+
+libqbit-webinterface-perl (0.012) raring; urgency=low
+
+  * Added sub not_found
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 04 Feb 2014 17:53:21 +0400
+
+libqbit-webinterface-perl (0.011) raring; urgency=low
+
+  * Added enctype option in form
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 29 Jan 2014 20:30:18 +0400
+
+libqbit-webinterface-perl (0.010) raring; urgency=low
+
+  * Fixed depends
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 16 Jan 2014 19:05:14 +0400
+
+libqbit-webinterface-perl (0.009) raring; urgency=low
+
+  * Added basic tests
+
+  * header/footer -> page wrapper
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 16 Jan 2014 19:00:01 +0400
+
+libqbit-webinterface-perl (0.008) raring; urgency=low
+
+  * change locale to en_US for GMT
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 05 Dec 2013 18:01:53 +0400
+
+libqbit-webinterface-perl (0.007) raring; urgency=low
+
+  * add strftime from POSIX for build_response
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 05 Dec 2013 13:56:51 +0400
+
+libqbit-webinterface-perl (0.006) raring; urgency=low
+
+
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 04 Dec 2013 19:06:29 +0400
+
+libqbit-webinterface-perl (0.005) raring; urgency=low
+
+  * user agent take from hht_header, not from ENV
+
+  * add no-cache options for browser in build_response
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Wed, 04 Dec 2013 18:05:18 +0400
+
+libqbit-webinterface-perl (0.004) raring; urgency=low
+
+  * each() evil is drive off.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 27 Sep 2013 15:42:34 +0400
+
+libqbit-webinterface-perl (0.003) raring; urgency=low
+
+  * perltidy and evil expulsion.
+
+  * Method set_field_error is added.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 26 Sep 2013 19:51:53 +0400
+
+libqbit-webinterface-perl (0.002) raring; urgency=low
+
+  * Added default templates with JS/CSS/Images data
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 17 Sep 2013 13:14:03 +0400
+
+libqbit-webinterface-perl (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Sep 2013 10:44:03 +0400
+

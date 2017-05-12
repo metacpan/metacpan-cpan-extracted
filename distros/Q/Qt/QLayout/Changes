@@ -1,0 +1,9 @@
+Revision history for Perl extension QLayout.
+
+0.02  Mon Apr 14 17:00:57 1997
+	- added %Align $SingleLine $DontClip $ExpandTabs $ShowPrefix $WordBreak
+$GrayText and $DontPrint to @EXPORT
+
+0.01  Fri Apr  4 10:20:57 1997
+	- original version; created by h2xs 1.18
+

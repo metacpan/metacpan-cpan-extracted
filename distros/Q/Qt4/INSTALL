@@ -1,0 +1,50 @@
+PerlQt version 0.96
+===================
+
+For simple installation instructions, see the README file.
+
+This module uses cmake for its build system.  If you don't have it, you can
+download the most recent version at
+http://www.cmake.org/cmake/resources/software.html
+
+=== Makefile.PL ===
+The Makefile.PL is just a wrapper around calls to cmake.  Calling
+"Makefile.PL PREFIX=~/mycpan QMAKE=/opt/qt/bin/qmake"
+is the same thing as running
+"cmake . -DCMAKE_INSTALL_PREFIX=~/mycpan -DQT_QMAKE_EXECUTABLE=/opt/qt/bin/qmake"
+Makefile.PL builds an in-source-tree build.  It's a lot easier to get a clean
+source tree if you use an out-of-source build, as described below.
+
+=== CMake ===
+First, I recommend building the module in its own directory.  Type:
+    mkdir build
+    cd build
+
+cmake provides a nice 'GUI'ish interface to view compile time options.  To view
+this, type either:
+    cmake-gui ..
+
+Or if it's not available:
+    ccmake ..
+
+Once that finishes, exit with 'q', and type:
+    cmake ..
+
+If you just want to use all the default values and paths, you can skip the
+ccmake step.
+
+The standard options are:
+    CMAKE_BUILD_TYPE = The type of build ('Debug', 'Release', etc)
+    CMAKE_INSTALL_PREFIX = The location for any executables ( e.g. puic4 )
+    CUSTOM_PERL_SITE_ARCH_DIR = The location for the perl modules themselves.
+    QT_QMAKE_EXECUTABLE = The path to your system's qmake.
+
+cmake looks in your path for a qmake executable.  If it can't find it, it will
+complain and fail to configure properly.  If your qmake is not in your path,
+you can tell cmake where to find it by either setting it in ccmake, or on the
+commandline with:
+    cmake .. -DQT_QMAKE_EXECUTABLE=/path/to/my/qmake
+
+Once configured, compile and install with:
+    make
+    make install
