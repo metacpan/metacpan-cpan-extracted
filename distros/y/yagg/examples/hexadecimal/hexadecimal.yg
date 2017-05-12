@@ -1,0 +1,7 @@
+%%
+
+hexadecimal_number : digits ;
+
+digits : digit | digit digits ;
+
+digit : NUMBER | LETTER ;

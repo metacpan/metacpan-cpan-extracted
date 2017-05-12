@@ -1,0 +1,1524 @@
+%{
+#include <string>
+#include <set>
+
+using namespace std;
+
+#include "fault_tree_textual_parser/fault_tree_textual_parser_includes.h"
+
+#include "basic_types/bijection.h"
+
+extern int fault_tree_textual_parser_lineno;
+extern int fault_tree_textual_parser_lex();
+extern void fault_tree_textual_parser_error(string s);
+extern void fault_tree_textual_parser_scanner_initialize(FILE* in_input_file);
+
+
+const Event Event_By_Identifier(const string &in_identifier);
+const Input_Sequence Identifier_List_To_Input_Sequence(const list<string> &in_identifiers);
+const bool Cycle_Exists(searchable_list<Event>& in_path, set<Event> &in_events_to_visit);
+const bool Ensure_No_Cycles_In_Inputs();
+const bool Ensure_Corresponding_References_And_Definitions();
+const bool Ensure_Spare_Gate_Inputs_Are_Basic_Events();
+const bool Ensure_Spare_Gate_Inputs_Only_Input_To_Spare_Gates();
+const bool Ensure_FDEP_Trigger_Is_Not_Replicated();
+const bool Ensure_FDEP_Dependents_Are_Basic_Events();
+const string Get_Identifier_For_Event(const Event &in_event);
+
+Fault_Tree parsed_fault_tree;
+
+bijection<string, Event> identifiers_to_events;
+
+extern const bool Ensure_Valid_System_Event();
+
+// This is an additional check to avoid generating lots of unconstrained
+// trees. We would need to update the grammar to get this.
+const bool Ensure_Connectedness();
+const bool Compute_Reachable_Events(const Event& in_event,
+    const set<Event>& in_seen_events, set<Event>& in_local_seen_events);
+
+// Added for constrained fault tree output
+const bool Ensure_Input_Order(const list<string> &in_list);
+
+string NOT_FOUND("<NOT FOUND>");
+
+set<string> declarations;
+%}
+
+%union {
+  string*       text;
+  Natural*      natural;
+  Replication*  replication;
+  char*         character;
+  Event*        event;
+  int           token;
+  list<string>* text_list;
+  Threshold*    threshold;
+}
+
+%type  <text>        system_event
+%type  <text>        node_list
+
+%type  <text_list>   ands_list_opt
+%type  <text_list>   ors_list_opt
+%type  <text_list>   pands_list_opt
+%type  <text_list>   thresholds_list_opt
+%type  <text_list>   spares_list_opt
+%type  <text_list>   basic_events_list
+%type  <text_list>   fdeps_list_opt
+%type  <text_list>   seqs_list_opt
+
+%type  <text>        and_gate
+%type  <text>        or_gate
+%type  <text>        pand_gate
+%type  <text>        threshold_gate
+%type  <text>        spare_gate
+%type  <text>        basic_event
+%type  <text>        fdep_constraint
+%type  <text>        seq_constraint
+
+%type  <natural>     natural_nonterminal
+%type  <text_list>   identifier_list
+
+%token <text>        IDENTIFIER
+%token <natural>     NATURAL
+%token <natural>     ZERO
+%token               SYSTEM_EVENT
+%token               AND
+%token               OR
+%token               THRESHOLD
+%token               PAND
+%token               SPARE
+%token               SEQ
+%token               FDEP
+%token               BE
+%token               SEMICOLON
+%token               MAXIMUM
+%token               TRIGGER
+%token               EQUALS
+%token               REPLICATION
+%token               END_OF_FILE
+
+%% 
+
+fault_tree:
+  system_event node_list eof {
+    if (*$1 != *$2)
+      fault_tree_textual_parser_error("The first defined event " + *$2 + " is not the system event " + *$1);
+
+    delete $1;
+    delete $2;
+  };
+
+// ---------------------------------------------------------------------------
+
+system_event:
+  SYSTEM_EVENT EQUALS IDENTIFIER SEMICOLON {
+    Event system_event = Event_By_Identifier(*$3);
+    parsed_fault_tree.Set_Event_Description(system_event,*$3);
+    parsed_fault_tree.Set_System_Event(system_event);
+
+    $$ = new string(*$3);
+
+    delete $3;
+  }
+  {
+    Event system_event = Event_By_Identifier(*$3);
+    if (parsed_fault_tree.Event_Not_Referenced(system_event))
+      parsed_fault_tree.Remove_Event_Description(system_event);
+    parsed_fault_tree.Unset_System_Event();
+
+    delete $3;
+  };
+
+// ---------------------------------------------------------------------------
+
+eof:
+  END_OF_FILE {
+    // This is a check which is specific to the textual language.
+    if (!Ensure_Corresponding_References_And_Definitions())
+      return;
+
+    // Now do the various checks for consistency as specified in the formal
+    // definition of fault trees. Other checks (e.g. gates have replication
+    // of 1) are not necessary because they are handled during creation of
+    // the fault tree.
+    if (!Ensure_Valid_System_Event())
+      return;
+
+    if (!Ensure_Spare_Gate_Inputs_Only_Input_To_Spare_Gates())
+      return;
+
+    if (!Ensure_No_Cycles_In_Inputs())
+      return;
+
+    // This is an additional check to avoid generating lots of unconstrained
+    // trees. We would need to update the grammar to get this.
+    if (!Ensure_Connectedness())
+      return;
+
+    if (!Ensure_Spare_Gate_Inputs_Are_Basic_Events())
+      return;
+
+    if (!Ensure_FDEP_Dependents_Are_Basic_Events())
+      return;
+
+    if (!Ensure_FDEP_Trigger_Is_Not_Replicated())
+      return;
+  };
+
+// ---------------------------------------------------------------------------
+
+node_list:
+  ands_list_opt ors_list_opt pands_list_opt thresholds_list_opt
+  spares_list_opt basic_events_list fdeps_list_opt seqs_list_opt
+  {
+    list<string> merged_list;
+    merged_list.insert(merged_list.end(),$1->begin(),$1->end());
+    merged_list.insert(merged_list.end(),$2->begin(),$2->end());
+    merged_list.insert(merged_list.end(),$3->begin(),$3->end());
+    merged_list.insert(merged_list.end(),$4->begin(),$4->end());
+    merged_list.insert(merged_list.end(),$5->begin(),$5->end());
+    merged_list.insert(merged_list.end(),$6->begin(),$6->end());
+
+    if (merged_list.size() > 0)
+      *$$ = merged_list.front();
+    else
+      fault_tree_textual_parser_error(
+        "You must be at least one gate or basic event in the fault tree\n");
+
+    delete $1;
+    delete $2;
+    delete $3;
+    delete $4;
+    delete $5;
+    delete $6;
+    delete $7;
+    delete $8;
+  };
+
+// ---------------------------------------------------------------------------
+
+ands_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  ands_list_opt and_gate {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+and_gate :
+  IDENTIFIER AND identifier_list SEMICOLON {
+    if (!Ensure_Input_Order(*$3))
+      fault_tree_textual_parser_error("Inputs to " + *$1 + " must be sorted");
+    // Check for duplicate definition
+    else if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      parsed_fault_tree.Set_Event_Description(gate,*$1);
+      Input_Sequence inputs = Identifier_List_To_Input_Sequence(*$3);
+
+      Input_Sequence::const_iterator an_input_event;
+      list<string>::const_iterator an_input_identifier;
+      for (an_input_event = inputs.begin(), an_input_identifier = (*$3).begin();
+           an_input_event != inputs.end();
+           an_input_event++, an_input_identifier++)
+      {
+        parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+      }
+
+      parsed_fault_tree.Set_Gate_Inputs(gate,inputs);
+
+      parsed_fault_tree.Insert_And_Gate(gate);
+    }
+
+    $$ = $1;
+
+    delete $3;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      Input_Sequence inputs = parsed_fault_tree.Get_Gate_Inputs(gate);
+
+      parsed_fault_tree.Remove_Gate_Inputs(gate);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = inputs.begin(); an_input_event != inputs.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+
+      parsed_fault_tree.Remove_And_Gate(gate);
+
+      if (parsed_fault_tree.Event_Not_Referenced(gate))
+        parsed_fault_tree.Remove_Event_Description(gate);
+    }
+
+    delete $1;
+  };
+
+// ---------------------------------------------------------------------------
+
+ors_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  ors_list_opt or_gate {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+or_gate :
+  IDENTIFIER OR identifier_list SEMICOLON {
+    if (!Ensure_Input_Order(*$3))
+      fault_tree_textual_parser_error("Inputs to " + *$1 + " must be sorted");
+    // Check for duplicate definition
+    else if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      parsed_fault_tree.Set_Event_Description(gate,*$1);
+      Input_Sequence inputs = Identifier_List_To_Input_Sequence(*$3);
+
+      Input_Sequence::const_iterator an_input_event;
+      list<string>::const_iterator an_input_identifier;
+      for (an_input_event = inputs.begin(), an_input_identifier = (*$3).begin();
+           an_input_event != inputs.end();
+           an_input_event++, an_input_identifier++)
+      {
+        parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+      }
+
+      parsed_fault_tree.Set_Gate_Inputs(gate,inputs);
+
+      parsed_fault_tree.Insert_Or_Gate(gate);
+    }
+
+    $$ = $1;
+
+    delete $3;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      Input_Sequence inputs = parsed_fault_tree.Get_Gate_Inputs(gate);
+
+      parsed_fault_tree.Remove_Gate_Inputs(gate);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = inputs.begin(); an_input_event != inputs.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+
+      parsed_fault_tree.Remove_Or_Gate(gate);
+
+      if (parsed_fault_tree.Event_Not_Referenced(gate))
+        parsed_fault_tree.Remove_Event_Description(gate);
+    }
+
+    delete $1;
+  };
+
+// ---------------------------------------------------------------------------
+
+pands_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  pands_list_opt pand_gate {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+pand_gate :
+  IDENTIFIER PAND identifier_list SEMICOLON {
+    // Check for duplicate definition
+    if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      parsed_fault_tree.Set_Event_Description(gate,*$1);
+      Input_Sequence inputs = Identifier_List_To_Input_Sequence(*$3);
+
+      Input_Sequence::const_iterator an_input_event;
+      list<string>::const_iterator an_input_identifier;
+      for (an_input_event = inputs.begin(), an_input_identifier = (*$3).begin();
+           an_input_event != inputs.end();
+           an_input_event++, an_input_identifier++)
+      {
+        parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+      }
+
+      parsed_fault_tree.Set_Gate_Inputs(gate,inputs);
+
+      parsed_fault_tree.Insert_Pand_Gate(gate);
+    }
+
+    $$ = $1;
+
+    delete $3;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      Input_Sequence inputs = parsed_fault_tree.Get_Gate_Inputs(gate);
+
+      parsed_fault_tree.Remove_Gate_Inputs(gate);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = inputs.begin(); an_input_event != inputs.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+
+      parsed_fault_tree.Remove_Pand_Gate(gate);
+
+      if (parsed_fault_tree.Event_Not_Referenced(gate))
+        parsed_fault_tree.Remove_Event_Description(gate);
+    }
+
+    delete $1;
+  };
+
+// ---------------------------------------------------------------------------
+
+thresholds_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  thresholds_list_opt threshold_gate {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+threshold_gate :
+  IDENTIFIER THRESHOLD MAXIMUM EQUALS natural_nonterminal identifier_list SEMICOLON {
+    if (!Ensure_Input_Order(*$6))
+      fault_tree_textual_parser_error("Inputs to " + *$1 + " must be sorted");
+    // Check for duplicate definition
+    else if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      parsed_fault_tree.Set_Event_Description(gate,*$1);
+      Input_Sequence inputs = Identifier_List_To_Input_Sequence(*$6);
+
+      Input_Sequence::const_iterator an_input_event;
+      list<string>::const_iterator an_input_identifier;
+      for (an_input_event = inputs.begin(), an_input_identifier = (*$6).begin();
+           an_input_event != inputs.end();
+           an_input_event++, an_input_identifier++)
+      {
+        parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+      }
+
+      parsed_fault_tree.Set_Gate_Inputs(gate,inputs);
+
+      parsed_fault_tree.Insert_Threshold_Gate(gate,Threshold(*$5));
+    }
+
+    $$ = $1;
+
+    delete $5;
+    delete $6;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      Input_Sequence inputs = parsed_fault_tree.Get_Gate_Inputs(gate);
+
+      parsed_fault_tree.Remove_Gate_Inputs(gate);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = inputs.begin(); an_input_event != inputs.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+
+      parsed_fault_tree.Remove_Threshold_Gate(gate);
+
+      if (parsed_fault_tree.Event_Not_Referenced(gate))
+        parsed_fault_tree.Remove_Event_Description(gate);
+    }
+
+    delete $1;
+  };
+
+natural_nonterminal:
+  ZERO {
+    $$ = new Natural(*$1);
+
+    delete $1;
+  } |
+  NATURAL {
+    $$ = new Natural(*$1);
+
+    delete $1;
+  };
+
+// ---------------------------------------------------------------------------
+
+spares_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  spares_list_opt spare_gate {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+spare_gate :
+  IDENTIFIER SPARE identifier_list SEMICOLON {
+    // Check for duplicate definition
+    if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      parsed_fault_tree.Set_Event_Description(gate,*$1);
+      Input_Sequence inputs = Identifier_List_To_Input_Sequence(*$3);
+
+      Input_Sequence::const_iterator an_input_event;
+      list<string>::const_iterator an_input_identifier;
+      for (an_input_event = inputs.begin(), an_input_identifier = (*$3).begin();
+           an_input_event != inputs.end();
+           an_input_event++, an_input_identifier++)
+      {
+        parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+      }
+
+      parsed_fault_tree.Set_Gate_Inputs(gate,inputs);
+
+      parsed_fault_tree.Insert_Spare_Gate(gate);
+    }
+
+    $$ = $1;
+
+    delete $3;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event gate = Event_By_Identifier(*$1);
+
+      Input_Sequence inputs = parsed_fault_tree.Get_Gate_Inputs(gate);
+
+      parsed_fault_tree.Remove_Gate_Inputs(gate);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = inputs.begin(); an_input_event != inputs.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+
+      parsed_fault_tree.Remove_Spare_Gate(gate);
+
+      if (parsed_fault_tree.Event_Not_Referenced(gate))
+        parsed_fault_tree.Remove_Event_Description(gate);
+    }
+
+    delete $1;
+  };
+
+// ---------------------------------------------------------------------------
+
+fdeps_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  fdeps_list_opt fdep_constraint {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+fdep_constraint :
+  IDENTIFIER FDEP TRIGGER EQUALS IDENTIFIER identifier_list SEMICOLON {
+    // Check for duplicate definition
+    if (!Ensure_Input_Order(*$6))
+      fault_tree_textual_parser_error("Dependents for " + *$1 + " must be sorted");
+    else if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      // Using a global this way is really ugly, but I need to pass back
+      // the threshold value somehow.
+      Input_Sequence dependents = Identifier_List_To_Input_Sequence(*$6);
+      Event trigger = Event_By_Identifier(*$5);
+
+      Functional_Dependency an_fdep;
+      an_fdep.Set_Trigger(trigger);
+      an_fdep.Set_Dependents(dependents);
+
+      if (parsed_fault_tree.Get_FDEP_Constraints().find(an_fdep) !=
+          parsed_fault_tree.Get_FDEP_Constraints().end())
+      {
+        string error = "\"" + *$1 +
+          "\" has already been defined as \"" +
+          parsed_fault_tree.Get_FDEP_Description(an_fdep) + "\". This definition will be ignored.";
+        fault_tree_textual_parser_error(error);
+      }
+      else
+      {
+        declarations.insert(*$1);
+
+        Input_Sequence::const_iterator an_input_event;
+        list<string>::const_iterator an_input_identifier;
+        for (an_input_event = dependents.begin(), an_input_identifier = (*$6).begin();
+             an_input_event != dependents.end();
+             an_input_event++, an_input_identifier++)
+        {
+          parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+        }
+
+        parsed_fault_tree.Set_Event_Description(an_fdep.Get_Trigger(),*$5);
+
+        parsed_fault_tree.Insert_FDEP_Constraint(an_fdep);
+        parsed_fault_tree.Set_FDEP_Description(an_fdep,*$1);
+      }
+    }
+
+    delete $1;
+    delete $5;
+    delete $6;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Input_Sequence dependents = Identifier_List_To_Input_Sequence(*$6);
+
+      Functional_Dependency an_fdep;
+      an_fdep.Set_Trigger(Event_By_Identifier(*$5));
+      an_fdep.Set_Dependents(dependents);
+
+      parsed_fault_tree.Remove_FDEP_Constraint(an_fdep);
+      parsed_fault_tree.Remove_FDEP_Description(an_fdep);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = dependents.begin(); an_input_event != dependents.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+    }
+
+    if (parsed_fault_tree.Event_Not_Referenced(Event_By_Identifier(*$5)))
+      parsed_fault_tree.Remove_Event_Description(Event_By_Identifier(*$5));
+
+    delete $1;
+    delete $5;
+    delete $6;
+  };
+
+// ---------------------------------------------------------------------------
+
+seqs_list_opt :
+  /* NOTHING */ {
+    $$ = new list<string>;
+  } |
+  seqs_list_opt seq_constraint {
+    if ($1->size() > 0 && $1->back() > *$2)
+    {
+      fault_tree_textual_parser_error(
+        "Definitions of a given type must be in alphabetical order\n");
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+seq_constraint :
+  IDENTIFIER SEQ identifier_list SEMICOLON {
+    // Check for duplicate definition
+    if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      Input_Sequence seq = Identifier_List_To_Input_Sequence(*$3);
+
+      if (parsed_fault_tree.Get_SEQ_Constraints().find(seq) !=
+          parsed_fault_tree.Get_SEQ_Constraints().end())
+      {
+        string error = "\"" + *$1 +
+          "\" has already been defined as \"" +
+          parsed_fault_tree.Get_SEQ_Description(seq) + "\". This definition will be ignored.";
+        fault_tree_textual_parser_error(error);
+      }
+      else
+      {
+        declarations.insert(*$1);
+
+        Input_Sequence::const_iterator an_input_event;
+        list<string>::const_iterator an_input_identifier;
+        for (an_input_event = seq.begin(), an_input_identifier = (*$3).begin();
+             an_input_event != seq.end();
+             an_input_event++, an_input_identifier++)
+        {
+          parsed_fault_tree.Set_Event_Description(*an_input_event,*an_input_identifier);
+        }
+
+        parsed_fault_tree.Insert_SEQ_Constraint(seq);
+        parsed_fault_tree.Set_SEQ_Description(seq,*$1);
+      }
+    }
+
+    delete $1;
+    delete $3;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Input_Sequence seq = Identifier_List_To_Input_Sequence(*$3);
+      parsed_fault_tree.Remove_SEQ_Constraint(seq);
+      parsed_fault_tree.Remove_SEQ_Description(seq);
+
+      Input_Sequence::const_iterator an_input_event;
+      for (an_input_event = seq.begin(); an_input_event != seq.end(); an_input_event++)
+      {
+        if (parsed_fault_tree.Event_Not_Referenced(*an_input_event))
+          parsed_fault_tree.Remove_Event_Description(*an_input_event);
+      }
+    }
+
+    delete $1;
+    delete $3;
+  };
+
+// ---------------------------------------------------------------------------
+
+basic_events_list :
+  basic_event {
+    $$ = new list<string>;
+    $$->push_back(*$1);
+
+    delete $1;
+  } |
+  basic_events_list basic_event {
+    $$ = $1;
+
+    // Check for out-of-order definition.
+    if ($1->size() > 0 && *$2 < $1->back())
+    {
+      string error = "\"" + *$2 +
+        "\" is not sorted correctly. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+basic_event:
+  IDENTIFIER BE SEMICOLON {
+    // Check for duplicate definition
+    if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event basic_event = Event_By_Identifier(*$1);
+      parsed_fault_tree.Insert_Basic_Event(basic_event,1);
+      parsed_fault_tree.Set_Event_Description(basic_event,*$1);
+    }
+
+    $$ = $1;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event basic_event = Event_By_Identifier(*$1);
+      parsed_fault_tree.Remove_Basic_Event(basic_event);
+      if (parsed_fault_tree.Event_Not_Referenced(basic_event))
+        parsed_fault_tree.Remove_Event_Description(basic_event);
+    }
+
+    delete $1;
+  } |
+  IDENTIFIER BE REPLICATION EQUALS NATURAL SEMICOLON {
+    // Check for duplicate definition
+    if (declarations.find(*$1) != declarations.end())
+    {
+      string error = "\"" + *$1 +
+        "\" has already been defined. This definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+    }
+    else
+    {
+      declarations.insert(*$1);
+
+      Event basic_event = Event_By_Identifier(*$1);
+      parsed_fault_tree.Insert_Basic_Event(basic_event,Replication(*$5));
+      parsed_fault_tree.Set_Event_Description(basic_event,*$1);
+    }
+
+    $$ = $1;
+
+    delete $5;
+  }
+  {
+    if (!m_error_occurred)
+    {
+      declarations.erase(*$1);
+
+      Event basic_event = Event_By_Identifier(*$1);
+      parsed_fault_tree.Remove_Basic_Event(basic_event);
+      if (parsed_fault_tree.Event_Not_Referenced(basic_event))
+        parsed_fault_tree.Remove_Event_Description(basic_event);
+    }
+
+    delete $1;
+  };
+
+// ---------------------------------------------------------------------------
+
+identifier_list:
+  IDENTIFIER {
+    $$ = new list<string>;
+    $$->push_back(*$1);
+
+    delete $1;
+  } |
+  identifier_list IDENTIFIER {
+    if ( find($1->begin(),$1->end(),*$2) != $1->end() )
+    {
+      string error = '"' + *$2 +
+        "\" is listed twice in this identifier list." +
+        " The second definition will be ignored.";
+      fault_tree_textual_parser_error(error);
+
+      delete $1;
+    }
+    else
+    {
+      $$ = $1;
+      $$->push_back(*$2);
+    }
+
+    delete $2;
+  };
+
+// ---------------------------------------------------------------------------
+
+%% 
+
+void fault_tree_textual_parser_parser_initialize(FILE* in_input_file)
+{
+  fault_tree_textual_parser_scanner_initialize(in_input_file);
+
+  declarations.clear();
+  parsed_fault_tree.Clear();
+  identifiers_to_events.clear();
+
+  fault_tree_textual_parser_lineno = 1;
+}
+
+// ---------------------------------------------------------------------------
+
+/*
+ * Given a identifier, determines if the identifier has been associated with
+ * an event. If it has, a copy of the event is returned.  If it hasn't, then a
+ * new event is created.
+ */
+const Event Event_By_Identifier(const string &in_identifier)
+{
+  bijection<string, Event>::const_iterator the_event =
+    identifiers_to_events.find(in_identifier);
+
+  if (the_event != identifiers_to_events.end())
+  {
+    // Already encountered this identifier and created an event for it
+    return the_event->second;
+  }
+  else
+  {
+    // Add the new event and identifier
+    Event new_event;
+    identifiers_to_events[in_identifier] = new_event;
+    return new_event;
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/*
+ * Converts a list of identifiers into an input sequence by looking up the
+ * events associated with the identifiers
+ */
+const Input_Sequence Identifier_List_To_Input_Sequence(const list<string> &in_identifiers)
+{
+  Input_Sequence inputs;
+
+  for (list<string>::const_iterator it = in_identifiers.begin();
+       it != in_identifiers.end();it++)
+  {
+    Event event = Event_By_Identifier(*it);
+
+    inputs.push_back(event);
+  }
+
+  return inputs;
+}
+
+// ---------------------------------------------------------------------------
+
+// If a cycle is found, it is left in in_path 
+const bool Cycle_Exists(searchable_list<Event>& in_path, set<Event> &in_events_to_visit)
+{
+  in_events_to_visit.erase(in_path.back());
+
+  if (parsed_fault_tree.Get_Gates().find(in_path.back()) == parsed_fault_tree.Get_Gates().end())
+    return false;
+
+  Input_Sequence::const_iterator an_input;
+  for(an_input = parsed_fault_tree.Get_Gate_Inputs(in_path.back()).begin(); an_input != parsed_fault_tree.Get_Gate_Inputs(in_path.back()).end(); an_input++)
+  {
+    searchable_list<Event>::iterator location = in_path.find(*an_input);
+
+    if (location != in_path.end())
+    {
+      in_path.erase(in_path.begin(), location);
+
+      return true;
+    }
+    
+    in_path.push_back(*an_input);
+        
+    if (Cycle_Exists(in_path, in_events_to_visit))
+      return true;
+
+    in_path.pop_back();
+  }
+
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_Valid_System_Event()
+{
+  // Check the system level event
+  if (parsed_fault_tree.Get_Events().find(parsed_fault_tree.Get_System_Event()) ==
+    parsed_fault_tree.Get_Events().end())
+  {
+    string error = "The system level event named " +
+      parsed_fault_tree.Get_Event_Description(parsed_fault_tree.Get_System_Event()) +
+      " is not in the fault tree.";
+    fault_tree_textual_parser_error(error);
+
+    return false;
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_No_Cycles_In_Inputs()
+{
+  set<Event> parent_events;
+  set<Event> events_to_visit = parsed_fault_tree.Get_Events();
+
+  set<Event>::const_iterator an_event;
+  for(an_event = parsed_fault_tree.Get_Events().begin(); an_event != parsed_fault_tree.Get_Events().end(); an_event++)
+  {
+    if (parsed_fault_tree.Get_Gates_Event_Is_Input_To(*an_event).size() == 0)
+      parent_events.insert(*an_event);
+  }
+
+  // First we traverse starting with the parent events. This will hopefully
+  // visit all the events
+//  set<Event>::const_iterator an_event;
+  for(an_event = parent_events.begin(); an_event != parent_events.end(); an_event++)
+  {
+    searchable_list<Event> path;
+    path.push_back(*an_event);
+
+    if (Cycle_Exists(path, events_to_visit))
+    {
+      string error = "There is a cycle in the fault tree: ";
+
+      searchable_list<Event>::const_iterator a_cycle_event;
+      for(a_cycle_event = path.begin(); a_cycle_event != path.end(); a_cycle_event++)
+        error += parsed_fault_tree.Get_Event_Description(*a_cycle_event) + " -> ";
+
+      error += parsed_fault_tree.Get_Event_Description(path.front());
+
+      fault_tree_textual_parser_error(error);
+
+      return false;
+    }
+  }
+
+  // Now visit the remaining nodes
+  while (!events_to_visit.empty())
+  {
+    searchable_list<Event> path;
+    path.push_back(*(events_to_visit.begin()));
+
+    if (Cycle_Exists(path, events_to_visit))
+    {
+      string error = "There is a cycle in the fault tree: ";
+
+      searchable_list<Event>::const_iterator a_cycle_event;
+      for(a_cycle_event = path.begin(); a_cycle_event != path.end(); a_cycle_event++)
+        error += parsed_fault_tree.Get_Event_Description(*a_cycle_event) + " -> ";
+
+      error += parsed_fault_tree.Get_Event_Description(path.front());
+
+      fault_tree_textual_parser_error(error);
+
+      return false;
+    }
+  }
+
+  // We can get here if there are events that are not inputs to any gates,
+  // such as triggers for FDEPs or inputs to SEQs.
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_Corresponding_References_And_Definitions()
+{
+  const set<Event> events = parsed_fault_tree.Get_Events();
+  const set<Event> gates = parsed_fault_tree.Get_Gates();
+
+  set<Event>::const_iterator aGate;
+  for (aGate = gates.begin(); aGate != gates.end(); aGate++)
+  {
+    const Input_Sequence inputs = parsed_fault_tree.Get_Gate_Inputs(*aGate);
+
+    Input_Sequence::const_iterator anInput;
+    for (anInput = inputs.begin();anInput != inputs.end();anInput++)
+    {
+      if (events.find(*anInput) == events.end())
+      {
+        string error = '"' + Get_Identifier_For_Event(*anInput) +
+          "\" is an input to gate \"" +
+          parsed_fault_tree.Get_Event_Description(*aGate) +
+          "\" but is not defined.";
+        fault_tree_textual_parser_error(error);
+
+        return false;
+      }
+    }
+  }
+
+  const set<Input_Sequence> seqs = parsed_fault_tree.Get_SEQ_Constraints();
+
+  set<Input_Sequence>::const_iterator aSeq;
+  for (aSeq = seqs.begin(); aSeq != seqs.end(); aSeq++)
+  {
+    const Input_Sequence inputs = *aSeq;
+
+    Input_Sequence::const_iterator anInput;
+    for (anInput = inputs.begin();anInput != inputs.end();anInput++)
+    {
+      if (events.find(*anInput) == events.end())
+      {
+        string error = '"' + Get_Identifier_For_Event(*anInput) +
+          "\" is an input to sequence enforcer \"" +
+          parsed_fault_tree.Get_SEQ_Description(*aSeq) +
+          "\" but is not defined.";
+        fault_tree_textual_parser_error(error);
+
+        return false;
+      }
+    }
+  }
+
+  const set<Functional_Dependency> fdeps = parsed_fault_tree.Get_FDEP_Constraints();
+
+  set<Functional_Dependency>::const_iterator an_fdep;
+  for (an_fdep = fdeps.begin(); an_fdep != fdeps.end(); an_fdep++)
+  {
+    const Event trigger = (*an_fdep).Get_Trigger();
+    const Input_Sequence dependents = (*an_fdep).Get_Dependents();
+
+    if (events.find(trigger) == events.end())
+    {
+      string error = '"' + Get_Identifier_For_Event(trigger) +
+        "\" is a trigger for the functional dependency \"" +
+        parsed_fault_tree.Get_FDEP_Description(*an_fdep) +
+        "\" but is not defined.";
+      fault_tree_textual_parser_error(error);
+
+      return false;
+    }
+
+    Input_Sequence::const_iterator aDependent;
+    for (aDependent = dependents.begin();aDependent != dependents.end();aDependent++)
+    {
+      if (events.find(*aDependent) == events.end())
+      {
+        string error = '"' + Get_Identifier_For_Event(*aDependent) +
+          "\" is a dependent input to the functional dependency \"" +
+          parsed_fault_tree.Get_FDEP_Description(*an_fdep) +
+          "\" but is not defined.";
+        fault_tree_textual_parser_error(error);
+
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_Spare_Gate_Inputs_Are_Basic_Events()
+{
+  set<Event>::const_iterator a_spare_gate;
+  for(a_spare_gate = parsed_fault_tree.Get_Spare_Gates().begin(); a_spare_gate != parsed_fault_tree.Get_Spare_Gates().end(); a_spare_gate++)
+  {
+    Input_Sequence::const_iterator an_input;
+    for(an_input = parsed_fault_tree.Get_Gate_Inputs(*a_spare_gate).begin(); an_input != parsed_fault_tree.Get_Gate_Inputs(*a_spare_gate).end(); an_input++)
+    {
+      set<Event> gates_basic_event_is_input_to = parsed_fault_tree.Get_Gates_Event_Is_Input_To(*an_input);
+
+      set<Event>::const_iterator a_gate_input_to;
+      for(a_gate_input_to = gates_basic_event_is_input_to.begin(); a_gate_input_to != gates_basic_event_is_input_to.end(); a_gate_input_to++)
+      {
+        if(parsed_fault_tree.Get_Spare_Gates().find(*a_gate_input_to) == parsed_fault_tree.Get_Spare_Gates().end())
+        {
+          string error = "The input \"" + parsed_fault_tree.Get_Event_Description(*an_input) +
+            "\" for spare gate \"" + parsed_fault_tree.Get_Event_Description(*a_spare_gate) + 
+            "\" is also input to the gate \"" + parsed_fault_tree.Get_Event_Description(*a_gate_input_to) +
+            "\" which is not a spare gate.";
+          fault_tree_textual_parser_error(error);
+
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_Spare_Gate_Inputs_Only_Input_To_Spare_Gates()
+{
+  set<Event>::const_iterator a_spare_gate;
+  for(a_spare_gate = parsed_fault_tree.Get_Spare_Gates().begin(); a_spare_gate != parsed_fault_tree.Get_Spare_Gates().end(); a_spare_gate++)
+  {
+    Input_Sequence::const_iterator an_input;
+    for(an_input = parsed_fault_tree.Get_Gate_Inputs(*a_spare_gate).begin(); an_input != parsed_fault_tree.Get_Gate_Inputs(*a_spare_gate).end(); an_input++)
+    {
+      if(parsed_fault_tree.Get_Basic_Events().find(*an_input) == parsed_fault_tree.Get_Basic_Events().end())
+      {
+        string error = "The input \"" + parsed_fault_tree.Get_Event_Description(*an_input) +
+          "\" for spare gate \"" + parsed_fault_tree.Get_Event_Description(*a_spare_gate) + 
+          "\" is not a basic event.";
+        fault_tree_textual_parser_error(error);
+
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_FDEP_Trigger_Is_Not_Replicated()
+{
+  set<Functional_Dependency>::const_iterator an_fdep;
+  for(an_fdep = parsed_fault_tree.Get_FDEP_Constraints().begin(); an_fdep != parsed_fault_tree.Get_FDEP_Constraints().end(); an_fdep++)
+  {
+    if(parsed_fault_tree.Get_Replication((*an_fdep).Get_Trigger()) > (Natural)1)
+    {
+      string error = "The trigger input \"" + parsed_fault_tree.Get_Event_Description((*an_fdep).Get_Trigger()) +
+        "\" for the functional dependency \"" + parsed_fault_tree.Get_FDEP_Description(*an_fdep) + 
+        "\" has a replication greater than 1.";
+      fault_tree_textual_parser_error(error);
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_FDEP_Dependents_Are_Basic_Events()
+{
+  set<Functional_Dependency>::const_iterator an_fdep;
+  for(an_fdep = parsed_fault_tree.Get_FDEP_Constraints().begin(); an_fdep != parsed_fault_tree.Get_FDEP_Constraints().end(); an_fdep++)
+  {
+    Input_Sequence::const_iterator a_dependent;
+    for(a_dependent = (*an_fdep).Get_Dependents().begin(); a_dependent != (*an_fdep).Get_Dependents().end(); a_dependent++)
+    {
+      if(parsed_fault_tree.Get_Basic_Events().find(*a_dependent) == parsed_fault_tree.Get_Basic_Events().end())
+      {
+        string error = "The depedent input \"" + parsed_fault_tree.Get_Event_Description(*a_dependent) +
+          "\" for the functional dependency \"" + parsed_fault_tree.Get_FDEP_Description(*an_fdep) + 
+          "\" is not a basic event.";
+        fault_tree_textual_parser_error(error);
+
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+const string Get_Identifier_For_Event(const Event &in_event)
+{
+  if (identifiers_to_events.inverse_find(in_event) != identifiers_to_events.end())
+    return identifiers_to_events.inverse_apply(in_event);
+  else
+    return NOT_FOUND;
+}
+
+// ---------------------------------------------------------------------------
+
+// This algorithm works by tracking the set of seen events. We initialize the
+// seen events set, then we iterate over the remaining unseen events of the
+// fault tree. We construct a temporary set of seen events, and merge this set
+// with the main set if we encounter an event which is already in the main set.
+// If we can't do this, then we know that the temporary set is disjoint, and
+// we don't have a connected fault tree.
+const bool Ensure_Connectedness()
+{
+  set<Event> parent_events;
+
+  set<Event>::const_iterator an_event;
+  for(an_event = parsed_fault_tree.Get_Events().begin(); an_event != parsed_fault_tree.Get_Events().end(); an_event++)
+  {
+    if (parsed_fault_tree.Get_Gates_Event_Is_Input_To(*an_event).size() == 0)
+      parent_events.insert(*an_event);
+  }
+
+  set< Event > seen_events;
+  set< Event > local_seen_events;
+
+//  set<Event>::const_iterator an_event;
+  for(an_event = parent_events.begin(); an_event != parent_events.end(); an_event++)
+  {
+    if (!Compute_Reachable_Events(*an_event, seen_events, local_seen_events) && !seen_events.empty())
+    {
+      fault_tree_textual_parser_error("The fault tree is not fully connected");
+
+      return false;
+    }
+
+    set_union(seen_events.begin(), seen_events.end(),
+      local_seen_events.begin(), local_seen_events.end(),
+      inserter(seen_events,seen_events.begin()));
+
+    local_seen_events.clear();
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+// Returns true if the local search space connects to the seen events
+const bool Compute_Reachable_Events(const Event& in_event,
+    const set<Event>& in_seen_events, set<Event>& in_local_seen_events)
+{
+  // Avoid cycles
+  if (in_local_seen_events.find(in_event) != in_local_seen_events.end())
+    return false;
+
+  // Check for connected and avoid extra work
+  if (in_seen_events.find(in_event) != in_seen_events.end())
+    return true;
+
+  in_local_seen_events.insert(in_event);
+
+  bool connected = false;
+
+  // If it's a gate, recurse into the inputs
+  if(parsed_fault_tree.Get_Gates().find(in_event) != parsed_fault_tree.Get_Gates().end())
+  {
+    Input_Sequence::const_iterator an_input;
+    for(an_input = parsed_fault_tree.Get_Gate_Inputs(in_event).begin();
+        an_input != parsed_fault_tree.Get_Gate_Inputs(in_event).end();
+        an_input++)
+    {
+      if (Compute_Reachable_Events(*an_input, in_seen_events,
+          in_local_seen_events))
+        connected = true;
+    }
+  }
+
+  // Check to see if it's the input to a sequence enforcer
+  set<Input_Sequence>::const_iterator an_seq;
+  for(an_seq = parsed_fault_tree.Get_SEQ_Constraints().begin();
+      an_seq != parsed_fault_tree.Get_SEQ_Constraints().end();
+      an_seq++)
+  {
+    if (an_seq->find(in_event) != an_seq->end())
+    {
+      Input_Sequence::const_iterator an_input;
+      for(an_input = an_seq->begin(); an_input != an_seq->end(); an_input++)
+      {
+        if (Compute_Reachable_Events(*an_input,in_seen_events,
+            in_local_seen_events))
+          connected = true;
+      }
+    }
+  }
+
+  // Check to see if it's a dependent or trigger for a functional dependency
+  set<Functional_Dependency>::const_iterator a_functional_dependency;
+  for(a_functional_dependency = parsed_fault_tree.Get_FDEP_Constraints().begin();
+      a_functional_dependency != parsed_fault_tree.Get_FDEP_Constraints().end();
+      a_functional_dependency++)
+  {
+    if ((a_functional_dependency->Get_Trigger() == in_event) ||
+        (a_functional_dependency->Get_Dependents().find(in_event) !=
+           a_functional_dependency->Get_Dependents().end()))
+    {
+      if (Compute_Reachable_Events(a_functional_dependency->Get_Trigger(),
+          in_seen_events, in_local_seen_events))
+        connected = true;
+
+      Input_Sequence::const_iterator an_input;
+      for(an_input = a_functional_dependency->Get_Dependents().begin();
+          an_input != a_functional_dependency->Get_Dependents().end();
+          an_input++)
+      {
+        if (Compute_Reachable_Events(*an_input, in_seen_events,
+            in_local_seen_events))
+          connected = true;
+      }
+    }
+  }
+
+  return connected;
+}
+
+// ---------------------------------------------------------------------------
+
+const bool Ensure_Input_Order(const list<string> &in_list)
+{
+  list<string>::const_iterator an_input_identifier;
+  for(an_input_identifier = in_list.begin();
+      an_input_identifier != in_list.end();
+      an_input_identifier++)
+  {
+    list<string>::const_iterator next_input_identifier =
+      an_input_identifier;
+    next_input_identifier++;
+
+    if (next_input_identifier == in_list.end())
+      break;
+
+    if (*an_input_identifier > *next_input_identifier)
+    {
+#ifdef DEBUG_FAULT_TREE_CONSTRAINTS
+      cerr << "CNSTR: " << Utility::indent << "--> NOT VALID" << endl;
+#endif // DEBUG_FAULT_TREE_CONSTRAINTS
+
+      fault_tree_textual_parser_error("Inputs must be in order");
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+
+/*
+Sample main file
+
+#include <string>
+#include <cstdio>
+#include "fault_tree_textual_parser/fault_tree_textual_parser_includes.h"
+#include "y.tab.h"
+
+extern FILE *fault_tree_textual_parser_in;
+extern int fault_tree_textual_parser_parse();
+extern void fault_tree_textual_parser_parser_initialize(FILE *in_input_file);
+
+int main(int argc, char *argv[]) {
+  fault_tree_textual_parser_in = fopen(argv[1], "r");
+  fault_tree_textual_parser_parser_initialize(fault_tree_textual_parser_in);
+  fault_tree_textual_parser_parse();
+
+  // Not freed by yacc
+  free(fault_tree_textual_parser_ss);
+  fault_tree_textual_parser_ss = NULL;
+  free(fault_tree_textual_parser_vs);
+  fault_tree_textual_parser_vs = NULL;
+
+  fclose(fault_tree_textual_parser_in);
+
+  if (fault_tree_textual_parser_error_string != "")
+    printf("ERRORS!\n%s", fault_tree_textual_parser_error_string.c_str());
+
+  return 0;
+}
+*/
+

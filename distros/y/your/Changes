@@ -1,0 +1,12 @@
+1.00  Thu Aug 30 05:48:16 PDT 2007
+    Documentation
+    - Added a copyright and license notice.
+
+    Internal Changes
+    - Convert to Module::Build
+    
+    Test Changes
+    - Depend on Test::More rather than shipping a really old version.
+
+0.01  Tue May 22 15:27:53 BST 2001
+    - First working version

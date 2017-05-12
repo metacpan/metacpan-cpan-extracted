@@ -1,0 +1,100 @@
+%{
+#include "basic_event_model_textual_parser/basic_event_model_textual_parser_includes.h"
+
+#include <string>
+#include <iostream>
+
+using namespace std;
+
+void basic_event_model_textual_parser_error (string s);
+%}
+
+%option prefix="basic_event_model_textual_parser_"
+
+%%
+
+<<EOF>> {
+    return END_OF_FILE;
+}
+
+["id_#"] {
+  return IDENTIFIER;
+}
+
+"dormancy" {
+  return DORMANCY; 
+}
+
+"coverage" {
+  return COVERAGE; 
+}
+
+"restoration" {
+  return RESTORATION; 
+}
+
+"single_point_failure" {
+  return SINGLE_POINT_FAILURE; 
+}
+
+"mean" {
+  return MEAN; 
+}
+
+"rate" {
+  return RATE; 
+}
+
+"shape" {
+  return SHAPE; 
+}
+
+"standard_deviation" {
+  return STANDARD_DEVIATION; 
+}
+
+"probability" {
+  return PROBABILITY; 
+}
+
+"distribution" {
+  return DISTRIBUTION; 
+}
+
+"constant" {
+  return CONSTANT; 
+}
+
+"exponential" {
+  return EXPONENTIAL; 
+}
+
+"weibull" {
+  return WEIBULL; 
+}
+
+"lognormal" {
+  return LOGNORMAL; 
+}
+
+( 0 | 1 | 2 | 5 ) {
+  return NATURAL;
+}
+
+( 0 | 0.01 | 0.98 | 0.02 | 0.97 | 0.93 | 0.25 | 0.75 | 0.5 ) {
+  return REAL;
+}
+
+"=" {
+  return EQUALS; 
+}
+
+";\n" {
+  return SEMICOLON; 
+}
+
+%%
+
+void basic_event_model_textual_parser_error(string error_string)
+{
+}

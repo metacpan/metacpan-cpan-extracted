@@ -1,0 +1,6 @@
+This is a very simple example that generates logical expressions.
+
+Run it with:
+
+$ yagg -m logical_expressions.yg logical_expressions.lg
+$ ./output/progs/generate 4

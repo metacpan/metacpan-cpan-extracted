@@ -1,0 +1,683 @@
+%{
+#include "rbd_textual_parser/rbd_textual_parser_includes.h"
+#include <string>
+#include <sstream>
+#include <cstdio>
+#include <iostream>
+#include "basic_types/searchable_list"
+
+#include "basic_types/bijection.h"
+
+using namespace std;
+
+#ifdef RBD_PARSER_DEBUG
+extern string rbd_textual_parser_debug_string;
+#endif // RBD_PARSER_DEBUG
+
+
+extern int rbd_textual_parser_lineno;
+extern int rbd_textual_parser_lex();
+extern void rbd_textual_parser_error(string s);
+extern void rbd_textual_parser_scanner_initialize(FILE* in_input_file);
+
+
+const Block Block_By_Identifier(const string &in_identifier);
+const Block_Set Block_Identifier_List_To_Block_Set(const list<string> &in_identifiers);
+const bool Cycle_Exists(searchable_list<Block>& path);
+const bool Path_Exists(searchable_list<Block>& path, const Block& block);
+const bool Component_Blocks_Already_Declared(const Block_Set &in_block_set);
+void Ensure_No_Cycles_In_Inputs();
+void Ensure_Proper_Structure();
+const string Get_Identifier_For_Block(const Block &in_block);
+
+RBD parsed_rbd;
+
+bijection<string, Block> identifiers_to_blocks;
+bijection<string, Component> identifiers_to_components;
+
+const string Get_Identifier_For_Block(const Block &in_block);
+
+string NOT_FOUND("<NOT FOUND>");
+
+class Rule;
+extern string chosen_rule;
+extern map<string, Rule*> name_to_rule;
+extern void Print_Strings(ostream &in_stream, Rule* in_rule);
+%}
+
+%union {
+  string*        text;
+  Block*         block;
+  int            token;
+  list<string>*  text_list;
+  Block_Set*     block_set;
+}
+
+%token <text>        BLOCK_IDENTIFIER
+%token <text>        COMPONENT_IDENTIFIER
+%type  <text>        component_identifier_nonterminal
+%type  <text>        block_identifier_nonterminal
+%token               COMPONENT
+%token               BLOCK
+%token               CONTAINS
+%token               OUTPUTSTO
+%token               SEMICOLON
+%token               EQUALS
+%type  <text_list>   block_identifier_list
+%token               END_OF_FILE
+
+%% 
+
+rbd:
+  component_def_list block_output_def_list eof {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed component defs. and block outputs.\n";
+#endif // RBD_PARSER_DEBUG
+  };
+
+eof:
+  END_OF_FILE {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed the end of the file.\n";
+#endif // RBD_PARSER_DEBUG
+// Print_Strings(cout, name_to_rule["rbd"]);
+
+		// This check is stronger than that in the specification.
+		// Ensure_Proper_Structure checks that every block has a path to the
+		// source and sink nodes, rather than there being *some* path to the
+		// source and sink node.
+    Ensure_Proper_Structure();
+
+    Ensure_No_Cycles_In_Inputs();
+  };
+
+
+component_def_list:
+  component_def {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a component.\n";
+#endif // RBD_PARSER_DEBUG
+  } |
+  component_def_list component_def {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed multiple components.\n";
+#endif // RBD_PARSER_DEBUG
+  };
+
+
+component_def:
+  COMPONENT component_identifier_nonterminal CONTAINS block_identifier_list SEMICOLON {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a component, identifier: \"" + *$2 + "\"\n";
+#endif // RBD_PARSER_DEBUG
+    // Check for duplicate definition
+    if (identifiers_to_components.find(*$2) != identifiers_to_components.end())
+    {
+      string error = "Component \"" + *$2 +
+        "\" has already been defined. This definition will be ignored.";
+      rbd_textual_parser_error(error);
+    }
+    else
+    {
+      Block_Set block_set = Block_Identifier_List_To_Block_Set(*$4);
+
+      if (block_set.find(parsed_rbd.Get_Source_Block()) != block_set.end() ||
+          block_set.find(parsed_rbd.Get_Sink_Block()) != block_set.end())
+      {
+        string error = "Component \"" + *$2 +
+          "\" can not list the source or sink block as a reliability block." +
+          " This definition will be ignored.";
+        rbd_textual_parser_error(error);
+      }
+      else if (Component_Blocks_Already_Declared(block_set))
+      {
+        string error = "Component \"" + *$2 +
+          "\" uses one or more reliability blocks which " +
+          "have already been declared for another component. " + 
+          "This definition will be ignored.";
+        rbd_textual_parser_error(error);
+      }
+      else
+      {
+        Component component;
+
+				identifiers_to_components[*$2] = component;
+
+        parsed_rbd.Insert_Component(component);
+        parsed_rbd.Set_Component_Description(component,*$2);
+        parsed_rbd.Set_Phys_To_Log_Map(component,block_set);
+      }
+    }
+
+    delete $2;
+    delete $4;
+  }
+	{
+		if (!m_error_occurred)
+		{
+			Component component = identifiers_to_components[*$2];
+			identifiers_to_components.erase(*$2);
+
+			parsed_rbd.Remove_Component(component);
+			parsed_rbd.Remove_Component_Description(component);
+			parsed_rbd.Remove_Phys_To_Log_Map(component);
+
+			for (list<string>::const_iterator it = $4->begin(); it != $4->end(); it++)
+				if (!parsed_rbd.Block_Is_Referenced(Block_By_Identifier(*it)))
+					identifiers_to_blocks.erase(*it);
+		}
+
+    delete $2;
+    delete $4;
+	};
+
+block_output_def_list:
+  source_block_output_def nonsource_block_output_def_list;
+
+nonsource_block_output_def_list:
+  block_output_def {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a block's output.\n";
+#endif // RBD_PARSER_DEBUG
+  } |
+  block_output_def nonsource_block_output_def_list {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed multiple blocks' outputs.\n";
+#endif // RBD_PARSER_DEBUG
+  };
+
+source_block_output_def:
+  BLOCK "source" OUTPUTSTO block_identifier_list SEMICOLON {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed the  source block's output, identifier: \"source\"\n";
+#endif // RBD_PARSER_DEBUG
+		Block_Set output_blocks = Block_Identifier_List_To_Block_Set(*$4);
+		parsed_rbd.Set_Block_Outputs(parsed_rbd.Get_Source_Block(),output_blocks);
+
+		parsed_rbd.Set_Block_Description(parsed_rbd.Get_Source_Block(),"source");
+
+    delete $4;
+  }
+	{
+		parsed_rbd.Remove_Block_Outputs(parsed_rbd.Get_Source_Block());
+		parsed_rbd.Remove_Block_Description(parsed_rbd.Get_Source_Block());
+
+		for (list<string>::const_iterator it = $4->begin(); it != $4->end(); it++)
+			if (!parsed_rbd.Block_Is_Referenced(Block_By_Identifier(*it)))
+				identifiers_to_blocks.erase(*it);
+
+		delete $4;
+	};
+
+block_output_def:
+  BLOCK block_identifier_nonterminal OUTPUTSTO block_identifier_list SEMICOLON {
+#ifdef RBD_PARSER_DEBUG
+    if ($2 != NULL)
+      rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a block's output, identifier: \"" + Get_Identifier_For_Block(*$2) + "\"\n";
+    else
+      rbd_textual_parser_debug_string += "RBD_PARSER: Parsed an invalid block's output.\n";
+#endif // RBD_PARSER_DEBUG
+		Block block = Block_By_Identifier(*$2);
+
+		// For symmetry breaking during RBD generation. We have to be careful here
+		// because the generator will generate b9 before b10, but b9 > b10. This
+		// code assumes "b#" block identifiers
+		bool out_of_order = false;
+
+		for (Block_Set::iterator it = parsed_rbd.Get_Reliability_Blocks().begin();
+				it != parsed_rbd.Get_Reliability_Blocks().end(); it++) {
+			if (!parsed_rbd.Block_Has_Outputs(*it))
+				continue;
+
+			string block_name = Get_Identifier_For_Block(*it);
+			istringstream last_number_string(block_name.substr(1,block_name.size()) +
+				" " + $2->substr(1,$2->size()));
+			int block_number, new_block_number;
+			last_number_string >> block_number >> new_block_number;
+
+			if (block_number > new_block_number) {
+				out_of_order = true;
+				break;
+			}
+		}
+
+		if (out_of_order) {
+			string error = "Block output definition \"" + *$2 +
+				"\" is not in order. This definition will be ignored.";
+			rbd_textual_parser_error(error);
+		}
+		else if (*$2 == "sink")
+		{
+			string error = (string)"A sink block can not have output blocks. " +
+				"This definition will be ignored.";
+			rbd_textual_parser_error(error);
+		}
+    else if (parsed_rbd.Block_Has_Outputs(block))
+    {
+      string error = "Outputs for block \"" + *$2 +
+        "\" have already been defined. This definition will be ignored.";
+      rbd_textual_parser_error(error);
+    }
+    else if (*$2 != "source" && *$2 != "sink" &&
+				!parsed_rbd.Containing_Component_Exists(block))
+    {
+      string error = "There is no component for block \"" + *$2 +
+        "\". This output block will be ignored.";
+      rbd_textual_parser_error(error);
+    }
+    else
+    {
+			if (*$2 != "source" && *$2 != "sink")
+				parsed_rbd.Insert_Reliability_Block(block);
+
+			Block_Set output_blocks = Block_Identifier_List_To_Block_Set(*$4);
+      parsed_rbd.Set_Block_Outputs(block,output_blocks);
+
+      parsed_rbd.Set_Block_Description(block,*$2);
+    }
+
+    delete $2;
+    delete $4;
+  }
+	{
+    Block block = Block_By_Identifier(*$2);
+
+    if (!m_error_occurred)
+    {
+			if (*$2 != "source" && *$2 != "sink")
+				parsed_rbd.Remove_Reliability_Block(block);
+			parsed_rbd.Remove_Block_Outputs(block);
+      parsed_rbd.Remove_Block_Description(block);
+		}
+
+		if (!parsed_rbd.Block_Is_Referenced(block))
+			identifiers_to_blocks.erase(*$2);
+
+		for (list<string>::const_iterator it = $4->begin(); it != $4->end(); it++)
+			if (!parsed_rbd.Block_Is_Referenced(Block_By_Identifier(*it)))
+				identifiers_to_blocks.erase(*it);
+
+		delete $2;
+		delete $4;
+	};
+
+component_identifier_nonterminal:
+  COMPONENT_IDENTIFIER {
+#ifdef RBD_PARSER_DEBUG
+    ostringstream temp_string;
+    temp_string << *$1;
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a component identifier: \"" + temp_string.str() + "\"\n";
+#endif // RBD_PARSER_DEBUG
+    $$ = new string(*$1);
+    delete $1;
+  };
+
+block_identifier_list:
+  block_identifier_nonterminal {
+#ifdef RBD_PARSER_DEBUG
+    ostringstream temp_string;
+    temp_string << *$1;
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a block identifier\n";
+#endif // RBD_PARSER_DEBUG
+    $$ = new list<string>;
+    $$->push_back(*$1);
+    delete $1;
+  } |
+  block_identifier_list block_identifier_nonterminal {
+#ifdef RBD_PARSER_DEBUG
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed multiple block identifiers\n";
+#endif // RBD_PARSER_DEBUG
+    $$ = $1;
+
+		// For symmetry breaking during RBD generation. We have to be careful here
+		// because the generator will generate b9 before b10, but b9 > b10. This
+		// code assumes "b#" block identifiers
+		if ($$->size() > 0) {
+			istringstream last_number_string($$->back().substr(1,$$->back().size()) +
+				" " + $2->substr(1,$2->size()));
+			int last_number, new_number;
+			last_number_string >> last_number >> new_number;
+
+			if (last_number > new_number) {
+				string error = "Block \"" + *$2 + "\" is not in order.";
+				rbd_textual_parser_error(error);
+			}
+		}
+
+		bool already_listed = false;
+
+		for (list<string>::const_iterator it = $$->begin(); it != $$->end(); it++)
+			if (*it == *$2) {
+				already_listed = true;
+				break;
+			}
+
+		if (already_listed) {
+      string error = "Block \"" + *$2 + "\" has already been listed. This reference will be ignored.";
+      rbd_textual_parser_error(error);
+		} else
+			$$->push_back(*$2);
+
+    delete $2;
+  };
+
+block_identifier_nonterminal:
+  BLOCK_IDENTIFIER {
+#ifdef RBD_PARSER_DEBUG
+    ostringstream temp_string;
+    temp_string << *$1;
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a block identifier: \"" + temp_string.str() + "\"\n";
+#endif // RBD_PARSER_DEBUG
+    $$ = new string(*$1);
+    delete $1;
+  } |
+  "source" {
+#ifdef RBD_PARSER_DEBUG
+    ostringstream temp_string;
+    temp_string << "source";
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a block identifier: \"" + temp_string.str() + "\"\n";
+#endif // RBD_PARSER_DEBUG
+    $$ = new string("source");
+  } |
+  "sink" {
+#ifdef RBD_PARSER_DEBUG
+    ostringstream temp_string;
+    temp_string << "sink";
+    rbd_textual_parser_debug_string += "RBD_PARSER: Parsed a block identifier: \"" + temp_string.str() + "\"\n";
+#endif // RBD_PARSER_DEBUG
+    $$ = new string("sink");
+  };
+
+/* ----------------------------------------------------------------- */
+
+%% 
+
+void rbd_textual_parser_parser_initialize(FILE *in_input_file)
+{
+  rbd_textual_parser_scanner_initialize(in_input_file);
+
+  parsed_rbd.Clear();
+  identifiers_to_blocks.clear();
+
+  rbd_textual_parser_lineno = 1;
+}
+
+/*
+ * Given a identifier, determines if the identifier has been associated with
+ * an block. If it has, a copy of the block is returned.  If it hasn't, then a
+ * new block is created.
+ */
+const Block Block_By_Identifier(const string &in_identifier)
+{
+  // So at this point in_identifier is not a source or sink
+  Block block;
+
+  if (identifiers_to_blocks.find(in_identifier) != identifiers_to_blocks.end())
+  {
+    // Already encountered this identifier and created a block for it
+    block = (identifiers_to_blocks.find(in_identifier))->second;
+  }
+  else
+  {
+    if (in_identifier == "source")
+      block = parsed_rbd.Get_Source_Block();
+
+    if (in_identifier == "sink")
+      block = parsed_rbd.Get_Sink_Block();
+
+    identifiers_to_blocks[in_identifier] = block;
+  }
+
+  return block;
+}
+
+
+/*
+ * Converts a list of identifiers into a set of blocks by looking up the
+ * events associated with the identifiers
+ */
+const Block_Set Block_Identifier_List_To_Block_Set(const list<string> &in_identifiers)
+{
+  Block_Set block_set;
+
+  for (list<string>::const_iterator it = in_identifiers.begin();
+       it != in_identifiers.end();it++)
+  {
+    Block block = Block_By_Identifier(*it);
+    block_set.insert(block);
+  }
+
+  return block_set;
+}
+
+const bool Component_Blocks_Already_Declared(const Block_Set &in_block_set)
+{
+	for (set<Component>::const_iterator cit =
+			parsed_rbd.Get_Components().begin();
+			cit != parsed_rbd.Get_Components().end(); cit++)
+		for (Block_Set::const_iterator bit = in_block_set.begin();
+				bit != in_block_set.end(); bit++)
+			if (parsed_rbd.Get_Phys_To_Log_Map(*cit).find(*bit) !=
+					parsed_rbd.Get_Phys_To_Log_Map(*cit).end())
+				return true;
+
+  return false;
+}
+
+// in_path should contain the starting block at the beginning of the search.
+// At the end of the search it will contain a path containing a cycle,
+// excluding the last repeated block of the cycle
+const bool Cycle_Exists(searchable_list<Block>& in_path)
+{
+	Block last_block = in_path.back();
+
+	Dests_Map dests = parsed_rbd.Get_Dests_Map();
+
+	if (dests.find(last_block) == dests.end())
+		return false;
+
+	Block_Set outputs = parsed_rbd.Get_Dests_Map()(last_block);
+
+	for (Block_Set::const_iterator it = outputs.begin(); it != outputs.end();
+		it++)
+	{
+    if (in_path.find(*it) != in_path.end())
+      return true;
+
+    in_path.push_back(*it);
+
+    if (Cycle_Exists(in_path))
+      return true;
+
+    in_path.pop_back();
+	}
+
+  return false;
+}
+
+void Ensure_No_Cycles_In_Inputs()
+{
+	// Check source
+	{
+		searchable_list<Block> path;
+		path.push_back(parsed_rbd.Get_Source_Block());
+
+    if (Cycle_Exists(path))
+		{
+			string error = "\"source\" is input to itself.";
+			rbd_textual_parser_error(error);
+    }
+  }
+
+	for (Block_Set::iterator it = parsed_rbd.Get_Reliability_Blocks().begin();
+			it != parsed_rbd.Get_Reliability_Blocks().end(); it++)
+	{
+		searchable_list<Block> path;
+		path.push_back(*it);
+
+    if (Cycle_Exists(path))
+		{
+			string error = '"' + Get_Identifier_For_Block(*it) +
+				"\" is input to itself.";
+			rbd_textual_parser_error(error);
+    }
+  }
+}
+
+// in_path should contain the starting block at the beginning of the search.
+// At the end of the search it will contain the path to the block, excluding
+// the block itself.
+const bool Path_Exists(searchable_list<Block>& in_path, const Block &block)
+{
+	Block last_block = in_path.back();
+
+	Dests_Map dests = parsed_rbd.Get_Dests_Map();
+
+	if (dests.find(last_block) == dests.end())
+		return false;
+
+	Block_Set outputs = parsed_rbd.Get_Dests_Map()(last_block);
+
+	for (Block_Set::const_iterator it = outputs.begin(); it != outputs.end();
+		it++)
+	{
+		// Don't let cycles crash us
+    if (in_path.find(*it) != in_path.end())
+			continue;
+
+    if (*it == block)
+      return true;
+
+    in_path.push_back(*it);
+
+    if (Path_Exists(in_path, block))
+      return true;
+
+    in_path.pop_back();
+	}
+
+  return false;
+}
+
+void Ensure_Proper_Structure()
+{
+	// Check that blocks referenced in component definitions are defined
+	for (set<Component>::const_iterator cit =
+			parsed_rbd.Get_Components().begin();
+			cit != parsed_rbd.Get_Components().end(); cit++)
+		for (Block_Set::const_iterator bit =
+				parsed_rbd.Get_Phys_To_Log_Map(*cit).begin();
+				bit != parsed_rbd.Get_Phys_To_Log_Map(*cit).end(); bit++)
+  		if (parsed_rbd.Get_Reliability_Blocks().find(*bit) ==
+					parsed_rbd.Get_Reliability_Blocks().end())
+			{
+				string error = "The block \"" + Get_Identifier_For_Block(*bit) +
+					"\" is referenced by a component definition but is not defined.";
+				rbd_textual_parser_error(error);
+			}
+
+	// Check that blocks referenced in block definitions are defined
+	{
+		for (Block_Set::const_iterator it2 =
+				parsed_rbd.Get_Block_Outputs(parsed_rbd.Get_Source_Block()).begin();
+				it2 != parsed_rbd.Get_Block_Outputs(parsed_rbd.Get_Source_Block()).end(); it2++)
+  		if (*it2 != parsed_rbd.Get_Sink_Block() &&
+					parsed_rbd.Get_Reliability_Blocks().find(*it2) ==
+					parsed_rbd.Get_Reliability_Blocks().end())
+			{
+				string error = "The block \"" + Get_Identifier_For_Block(*it2) +
+					"\" is referenced by a block definition but is not defined.";
+				rbd_textual_parser_error(error);
+			}
+	}
+
+	for (Block_Set::const_iterator it1 =
+			parsed_rbd.Get_Reliability_Blocks().begin();
+			it1 != parsed_rbd.Get_Reliability_Blocks().end(); it1++)
+		for (Block_Set::const_iterator it2 =
+				parsed_rbd.Get_Block_Outputs(*it1).begin();
+				it2 != parsed_rbd.Get_Block_Outputs(*it1).end(); it2++)
+  		if (*it2 != parsed_rbd.Get_Sink_Block() &&
+					parsed_rbd.Get_Reliability_Blocks().find(*it2) ==
+					parsed_rbd.Get_Reliability_Blocks().end())
+			{
+				string error = "The block \"" + Get_Identifier_For_Block(*it2) +
+					"\" is referenced by a block definition but is not defined.";
+				rbd_textual_parser_error(error);
+			}
+
+	for (Block_Set::iterator it = parsed_rbd.Get_Reliability_Blocks().begin();
+			it != parsed_rbd.Get_Reliability_Blocks().end(); it++)
+	{
+		// Check source to block
+		{
+			searchable_list<Block> path;
+			path.push_back(parsed_rbd.Get_Source_Block());
+
+			if (!Path_Exists(path, *it))
+			{
+				string error = "There is no path from the source block to \"" +
+					Get_Identifier_For_Block(*it) + "\".";
+				rbd_textual_parser_error(error);
+			}
+		}
+
+		// Check block to sink
+		{
+			searchable_list<Block> path;
+			path.push_back(*it);
+
+			if (!Path_Exists(path, parsed_rbd.Get_Sink_Block()))
+			{
+				string error = "There is no path \"" +
+					Get_Identifier_For_Block(*it) + "\" to the sink block.";
+				rbd_textual_parser_error(error);
+			}
+		}
+  }
+}
+
+
+const string Get_Identifier_For_Block(const Block &in_block)
+{
+  if (identifiers_to_blocks.inverse_find(in_block) != identifiers_to_blocks.end())
+  {
+    return identifiers_to_blocks.inverse_apply(in_block);
+  }
+  else
+  {
+    return NOT_FOUND;
+  }
+}
+
+/*
+Sample main file
+
+#include <string>
+#include <cstdio>
+#include "rbd_textual_parser/rbd_textual_parser_includes.h"
+#include "y.tab.h"
+
+extern FILE *rbd_textual_parser_in;
+extern int rbd_textual_parser_parse();
+extern void rbd_textual_parser_parser_initialize(FILE* in_input_file);
+
+int main(int argc, char *argv[]) {
+  rbd_textual_parser_in = fopen(argv[1], "r");
+  rbd_textual_parser_parser_initialize(rbd_textual_parser_in);
+  rbd_textual_parser_parse();
+
+  // Not freed by yacc
+  free(rbd_textual_parser_ss);
+  rbd_textual_parser_ss = NULL;
+  free(rbd_textual_parser_vs);
+  rbd_textual_parser_vs = NULL;
+
+  fclose(rbd_textual_parser_in);
+
+  if (rbd_textual_parser_error_string != "")
+    printf("ERRORS!\n%s", rbd_textual_parser_error_string.c_str());
+
+  return 0;
+}
+*/

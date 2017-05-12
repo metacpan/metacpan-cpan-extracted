@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+# Extracts just the base directory of a full path. e.g. /tmp/mydir becomes
+# /tmp, tmp/mydir becomes tmp
+
+die <<EOF unless $#ARGV == 0 && $ARGV[0] ne '--help';
+usage: $0 <directory path>
+EOF
+
+my $dir = $ARGV[0];
+
+my $leading_slash = "";
+
+if ($dir =~ /^\//)
+{
+  $leading_slash = "/";
+  $dir =~ s/^.//;
+}
+
+$dir =~ s/^(.*?)\/.*/$1/;
+
+print $leading_slash.$dir;

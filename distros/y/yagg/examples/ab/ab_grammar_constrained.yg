@@ -1,0 +1,5 @@
+%% 
+
+node_list : a_list b_list | a_list | b_list ;
+a_list : a_list "a" | "a" ;
+b_list : b_list "b" | "b" ;

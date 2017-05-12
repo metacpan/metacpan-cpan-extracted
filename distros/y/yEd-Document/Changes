@@ -1,0 +1,12 @@
+Revision history for yEd-Document
+
+1.01    2014-10-04
+
+    - tested and fixed compliance with perl 5.010 (set the correct modules perl version)
+    - review of documentation
+    - found better place for Node loop-detection
+
+1.00    2014-10-02
+        
+    - First version, released
+

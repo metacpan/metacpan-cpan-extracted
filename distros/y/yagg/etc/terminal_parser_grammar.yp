@@ -1,0 +1,446 @@
+%{
+# (c) Copyright David Coppit 2004, all rights reserved.
+# (see COPYRIGHT in yagg documentation for use and
+# distribution# rights)
+#
+# Written by David Coppit <david@coppit.org>
+#
+# This grammar is based on that of Flex 2.54.
+#
+# Use: yapp -m 'yagg::TerminalParser' -o lib/yagg/TerminalParser.pm etc/terminal_parser_grammar.yp
+#
+# to generate the Parser module.
+# 
+%}
+
+%{
+require 5.004;
+
+use Carp;
+
+my($input,$lexlevel,$lineno,$old_lineno,$number_of_errors,$context);
+
+my($token);
+
+my(%TERMINALS,%OPTIONS,@PROLOGUES,$EPILOGUE);
+%}
+
+%token GENERATOR_STRING STRING CHAR EOF_OP RETURN
+%token OPTION_OP OPT_PREFIX
+
+%%
+
+goal		:  declarations '%%' rules epilogue_opt
+		;
+
+declarations	:  declarations declaration
+		|  /* nothing */
+		;
+
+declaration	:  options
+		|  PROLOGUE { push @PROLOGUES,$_[1]; undef }
+		;
+
+options		:  OPTION_OP optionlist
+		;
+
+optionlist	:  optionlist option
+		|
+		;
+
+option		:  OPT_PREFIX '=' STRING
+			{
+                          $_[3][0] =~ /^"(.*)"$/;
+                          $OPTIONS{'prefix'} = $1;
+                        }
+		;
+
+rules    	:  
+		   rules rule
+		|  rule
+		;
+
+rule		:  
+		   pattern '{' RETURN IDENTIFIER ';' '}'
+			{
+                          if (exists $TERMINALS{$_[4][0]})
+                          {
+                             _SyntaxError(0, "Terminal $_[4][0] multiply defined. Ignoring this definition.",
+                                $_[4][1]);
+                             return;
+                          }
+
+                          $TERMINALS{$_[4][0]} = $_[1];
+			}
+
+		|  pattern RETURN IDENTIFIER ';'
+			{
+                          if (exists $TERMINALS{$_[3][0]})
+                          {
+                             _SyntaxError(0, "Terminal $_[3][0] multiply defined. Ignoring this definition.",
+                                $_[3][1]);
+                             return;
+                          }
+
+                          $TERMINALS{$_[3][0]} = $_[1];
+			}
+		;
+
+pattern		:
+		   EOF_OP
+			{
+                          {data => '""',type => 'simple'};
+			}
+
+                |  value
+			{
+                          {data => $_[1][0],type => 'simple'};
+			}
+
+		|  simple_alternation
+                        {
+                          $_[1];
+			}
+
+		|  equivalence_alternation
+                        {
+                          $_[1];
+			}
+
+		|  equivalence_generator
+                        {
+                          $_[1];
+			}
+		;
+
+alternation	:
+                   value '|' value
+			{
+                          { data => [$_[1][0],$_[3][0]],type => 'alternation'};
+			}
+
+		|  alternation '|' value
+                        {
+                          {data => [@{$_[1]->{'data'}},$_[3][0]],type => 'alternation'};
+			}
+		;
+
+simple_alternation	:
+                   '(' alternation ')'
+			{
+                          {data => $_[2]->{'data'},type => 'alternation'};
+			}
+		;
+
+equivalence_alternation	:
+                   '[' alternation ']'
+			{
+                          {data => $_[2]->{'data'},type => 'equivalence alternation'};
+			}
+		;
+
+equivalence_generator	:
+                   '[' GENERATOR_STRING ']'
+			{
+                          {data => $_[2][0],type => 'equivalence generator'};
+			}
+		;
+
+value	:
+                   STRING
+		|  CHAR
+		|  NUMBER
+		;
+
+epilogue_opt:       
+  /* Nothing.  */
+| '%%' EPILOGUE                    
+    {
+      $EPILOGUE=$_[2]
+    }       
+;
+
+%%
+
+sub _Error {
+    my($value)=$_[0]->YYCurval;
+  
+    my($what)= $$value[0] ? "input: '$$value[0]'" : "end of input";
+        
+    _SyntaxError(1,"Unexpected $what",$$value[1]);
+}             
+          
+sub _Lexer {  
+              
+    #At EOF
+        pos($$input) >= length($$input)
+    and return('',[ undef, -1 ]);
+
+    #In Epilogue section
+        $lexlevel eq 'epilogue'
+    and do {
+        my($pos)=pos($$input);
+
+        $old_lineno=$lineno;
+        $lineno=-1;
+        pos($$input)=length($$input);
+        return('EPILOGUE',[ substr($$input,$pos), $old_lineno ]);
+    };
+
+    #Skip blanks
+        $$input=~m{\G((?:
+                            \s+           # any white space char
+                        |   \#[^\n]*\n    # Perl like comments
+                        |   /\*.*?\*/     # C like comments
+                        |   //[^\n]*\n    # C++ like comments
+                        )+)}xsgc
+    and do {
+        my($blanks)=$1;
+
+        #Maybe At EOF
+            pos($$input) >= length($$input)
+        and return('',[ undef, -1 ]);
+
+        $lineno+= $blanks=~tr/\n//;
+    };
+
+    $old_lineno=$lineno;
+
+        $$input=~/\G(%%)/gc
+    and do {
+        if ($lexlevel eq 'declarations')
+        {
+          $lexlevel = 'rules';
+        }
+        elsif ($lexlevel eq 'rules')
+        {
+          $lexlevel = 'epilogue';
+        }
+        return($1, [ $1, $old_lineno ]);
+    };
+
+    if ($context ne 'options')
+    {
+          $$input=~/\Greturn\b/gc
+      and return('RETURN',[ undef, $old_lineno ]);
+
+          $$input=~/\G([A-Za-z_.][A-Za-z0-9_.]*)/gc
+      and return('IDENTIFIER',[ $1, $old_lineno ]);
+
+          $$input=~/\G("(?:[^"\\]|\\\\|\\"|\\)+?")/gc
+      and do {
+          my $string = $1;
+          if ($string =~ /[^\\]#/)
+          {
+            return('GENERATOR_STRING',[ $string, $old_lineno ]);
+          }
+          else
+          {
+            return('STRING',[ $string, $old_lineno ]);
+          }
+      };
+
+          ($$input=~/\G('(?:[^'\\]|\\.)')/gc)
+      and do {
+          return('CHAR',[ $1, $old_lineno ]);
+      };
+
+          ($$input=~/\G('(?:[^'\\]|\\.)')/gc)
+      and do {
+          return('CHAR',[ $1, $old_lineno ]);
+      };
+
+          ($$input=~/\G(([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?)/gc)
+      and do {
+          return('NUMBER',[ $1, $old_lineno ]);
+      };
+    }
+
+        $$input=~/\G(%%)/gc
+    and do {
+        $lexlevel = 'rules';
+        return($1, [ $1, $old_lineno ]);
+    };
+
+=for comment
+        $$input=~/\G\{/gc
+    and do {
+        my $code;
+
+        my $level = 1;
+        my $from=pos($$input);
+        my $to;
+
+
+        while($$input =~ /\G(.*?
+                               (?:
+                                   \#[^\n]*\n    # Perl like comments
+                                 | \/\*.*?\*\/     # C like comments
+                                 | \/\/[^\n]*\n    # C++ like comments
+                                 | (?<!\\)'.*?(?<!\\)'  # Single-quoted strings
+                                 | (?<!\\)".*?(?<!\\)"  # Double-quoted strings
+                                 | ([{}]|$)         # Our match or EOF
+                               )
+                            )/xsgc)
+        {
+          if (defined $2)
+          {
+            if ($2 eq '}')
+            {
+              $level--;
+
+              unless($level)
+              {
+                $to = pos($$input) - 1;
+                last;
+              }
+            }
+            elsif ($2 eq '{')
+            {
+              $level++;
+            }
+            else
+            {
+              $to = length $$input;
+              print(2,"Unmatched { opened line $old_lineno",-1);
+              last;
+            }
+          }
+        }
+
+        $code = substr($$input,$from,$to-$from);
+
+        $lineno+= $code=~tr/\n//;
+        return('BRACED_CODE',[ $code, $old_lineno ]);
+    };
+=cut
+
+    if($lexlevel eq 'declarations') {# In declarations section
+            $$input=~/\G%option/gc
+        and do {
+          $context = 'options';
+          return('OPTION_OP',[ undef, $old_lineno ]);
+        };
+        if ($context eq 'options')
+        {
+              $$input=~/\Gprefix/gc
+          and do {
+            $context = '';
+            return('OPT_PREFIX',[ undef, $old_lineno ]);
+          };
+        }
+
+            $$input=~/\G%\{/gc
+        and do {
+            my($code);
+
+            my $from=pos($$input);
+            my $to;
+
+            while($$input =~ m{\G(.*?
+                                         (?:
+                                             \#[^\n]*\n    # Perl like comments
+                                           | /\*.*?\*/     # C like comments
+                                           | //[^\n]*\n    # C++ like comments
+                                           | (%\}|$)         # Our match or EOF
+                                         )
+                                     )}xsgc)
+            {
+              if (defined $2)
+              {
+                if ($2 eq '%}')
+                {
+                  $to = pos($$input) - 2;
+                }
+                else
+                {
+                  $to = length $$input;
+                  _SyntaxError(2,"Unmatched \%{ opened line $old_lineno",-1)
+                }
+
+                last;
+              }
+            }
+
+            $code = substr($$input,$from,$to-$from);
+
+            $lineno+= $code=~tr/\n//;
+            return('PROLOGUE',[ $code, $old_lineno ]);
+        };
+
+    }
+    else {# In rule section
+    }
+
+        $$input=~/\G<<EOF>>/gc
+    and return('EOF_OP',[ undef, $old_lineno ]);
+
+    #Always return something
+        $$input=~/\G(.)/sg
+    or  die "Parse::Yapp::Grammar::Parse: Match (.) failed: report as a BUG";
+
+        $1 eq "\n"
+    and ++$lineno;
+
+    ( $1 ,[ $1, $old_lineno ]);
+
+}
+
+sub _SyntaxError {
+    my($level,$message,$error_lineno)=@_;
+
+    $message= "*".
+              [ 'Warning', 'Error', 'Fatal' ]->[$level].
+              "* $message, at ".
+              ($error_lineno < 0 ? "eof" : "line $error_lineno").
+              ".\n";
+
+        $level > 1
+    and die $message;
+
+    warn $message;
+
+        $level > 0
+    and ++$number_of_errors;
+
+        $number_of_errors == 20
+    and die "*Fatal* Too many errors detected.\n"
+}
+
+sub Parse {
+    my($self)=shift;
+
+        @_ > 0
+    or  croak("No input grammar\n");
+
+    $input=\$_[0];
+
+    $lexlevel='declarations';
+    $lineno=1;
+    $old_lineno=1;
+    $number_of_errors=0;
+
+    $token={};
+    $context = '';
+    %OPTIONS = ();
+    %TERMINALS = ();
+    @PROLOGUES = ();
+    $EPILOGUE = undef;
+
+    pos($$input)=0;
+
+    $self->YYParse(yylex => \&_Lexer, yyerror => \&_Error);
+
+        $number_of_errors
+    and _SyntaxError(2,"Errors detected: No output",-1);
+
+    my %parsed;
+
+    $parsed{ 'OPTIONS' } = \%OPTIONS;
+    $parsed{ 'TERMINALS' } = \%TERMINALS;
+    $parsed{ 'HEAD' } = \@PROLOGUES;
+    $parsed{ 'TAIL' } = $EPILOGUE;
+
+    return \%parsed;
+}
+

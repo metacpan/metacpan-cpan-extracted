@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/yesssSMS.t
+lib/yesssSMS.pm

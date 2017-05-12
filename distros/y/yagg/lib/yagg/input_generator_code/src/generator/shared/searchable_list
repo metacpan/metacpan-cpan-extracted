@@ -1,0 +1,35 @@
+#ifndef SEARCHABLE_LIST_H
+#define SEARCHABLE_LIST_H
+
+#include <list>
+
+template <class _Tp>
+class searchable_list : public std::list<_Tp>
+{
+public:
+  typename searchable_list<_Tp>::const_iterator find(const _Tp& in_value) const
+  {
+    typename searchable_list<_Tp>::const_iterator a_value;
+    for (a_value = this->begin(); a_value != this->end(); a_value++)
+    {
+      if (*a_value == in_value)
+      break;
+    }
+
+    return a_value;
+  }
+
+  typename searchable_list<_Tp>::iterator find(const _Tp& in_value)
+  {
+    typename searchable_list<_Tp>::iterator a_value;
+    for (a_value = this->begin(); a_value != this->end(); a_value++)
+    {
+      if (*a_value == in_value)
+      break;
+    }
+
+    return a_value;
+  }
+};
+
+#endif // SEARCHABLE_LIST_H

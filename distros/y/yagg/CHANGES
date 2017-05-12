@@ -1,0 +1,165 @@
+Version 1.4007: May 2 2015
+- Prevent CPAN from indexing private-lib
+
+Version 1.4006: Mon Apr 20 2015
+- Fix perl 5.21.10 warning about unescaped {. Thanks to Slaven Rezic
+  <srezic@cpan.org> for the report.
+  https://rt.cpan.org/Ticket/Display.html?id=103514
+- Allow for generic "c++" instead of requiring g++. Thanks to Slaven Rezic
+  <srezic@cpan.org> for the report.
+  https://rt.cpan.org/Ticket/Display.html?id=103515
+- Default make binary to "gmake" for freebsd. Thanks to Slaven Rezic
+  <srezic@cpan.org> for the patch.
+  https://rt.cpan.org/Ticket/Display.html?id=103515
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+- Require File::Slurp instead of including it, to avoid potential problems 
+  like this: 
+  http://www.cpantesters.org/cpan/report/86a0145a-e52b-11e4-a1d1-8536eb4f9f07 
+- Dump stdout and stderr in case of test failure, to help debug CPAN testers
+  failures such as this:
+  http://www.cpantesters.org/cpan/report/c8809414-e60f-11e4-8481-e1dcdfbfc7aa
+
+Version 1.4005: Sun Apr 12 2015
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+
+Version 1.4004: Mon Mar 23 2015
+- Moved code to github
+- Updated code avoid use of deprecated foreach $x qw() syntax
+  https://rt.cpan.org/Ticket/Display.html?id=99170
+  Thanks to srezic@cpan.org for the bug report.
+- Fix code to avoid recursing into "old" subdir during makefile generation
+
+Version 1.4003: Sun Jul 11 2010
+- Added some missing #include to allow code to be compiled by gcc 4.3. (Thanks
+	to Sebastien Fricker <sebastien.fricker@gmail.com> for the patch.)
+- Updated t/logical_expressions_simple to match code that would be generated
+	with the latest version.
+
+Version 1.4002: Sun Aug 16 2009
+- Updated to the latest version of Module::Install
+- Fixed missing File::HomeDir files
+- Cleaned up spurious spaces added to makefiles during installation
+- Moved hosting to Google Code
+- Implemented an optimization where the generator will skip over variables
+	that were not accessed during constraint checking
+
+Version 1.4001: Sun Apr 1 2007
+- Added a section to the tutorial on controlling output formatting. (Thanks to
+	Casiano Rodriguez Leon <casiano@ull.es> for the question.)
+- Fixed a misspelling in the hexadecimal example's README.
+- Updated the makefile version
+- Fixed an assert failure that would occur if (1) a rule list has more than
+	one nonterminal, (2) some nonterminal in the list except the last one had no
+	strings for a given allocation, and (3) the last nonterminal had strings for
+	the given allocation.
+- Updated the Makefiles
+- Updated the test cases for the pass-by-reference updates in 1.3000.
+- Make it possible to call Print_Strings from anywhere in the program for
+	debugging. Maybe I'll add a flag for it later.
+- Added RBD example
+
+Version 1.4000: Tue Aug 22 2006
+- Added a program to generate random strings
+- Fixed a bug where yagg would be unable to generate a double quote character.
+	(Thanks to Brad Hill <brad@isecpartners.com> for finding and fixing the bug.)
+- Fixed a bug where use equivalence alternation would result in an assertion
+	failing. (Thanks to Brad Hill <brad@isecpartners.com> for finding the bug.)
+
+Version 1.3001: Mon Jun 6 2005
+- Fixed a bug generating code for nonpointer rule types
+- Fixed an rsync bug involving paths with spaces in them
+
+Version 1.3000: Mon Mar 21 2005
+- Removed unnecessary copy constructors, operator= functions, Clone functions
+- Optimization for 2X speedup
+  - $1 values are now only copied when needed
+  - Rule lists in nonterminals are now not deleted and recreated
+  - More values are passed by reference
+- Added -M option to allow the user to provide additional make arguments
+- Changed the syntax for alternation in the terminal file from "a|b" to
+  "(a|b)"
+- Paths are removed from the makefile when compiling remotely
+- Generator program can now generate any rule in the grammar
+- Modified setup to automatically use g++ for LD, since the LD given by Perl
+  is the C compiler, not the C++ compiler
+
+Version 1.2100: Sun Feb 6 2005
+- 2-3X faster. Figured out how to do equivalence classes without computing the
+  terminal rules. So I got rid of Get_Terminals().
+- Added missing -DDISABLE_GENERATED_STRING_CACHING_OPTIMIZATION to generated
+  makefile
+- Fixed build failure and runtime failure when using
+  -DDISABLE_ALLOCATION_CACHING_OPTIMIZATION
+- Fixed an infinite loop for some grammars which was related to a string
+  caching optimization. (Thanks to Ted Turocy <arbiter@econmail.tamu.edu> for
+  the bug report.)
+- Fixed a bug that would cause left recursion to reproduce some strings.
+  (Thanks to Ted Turocy <arbiter@econmail.tamu.edu> for the bug report.)
+- Enhanced test cases
+- Improved interactions with "find" that would cause running make on the
+  generated code to not build anything, on some systems.
+
+Version 1.20:
+- Over 30X faster. Added an allocations cache for rule lists
+- Changed the name to "yagg" and moved development to SourceForge
+
+Version 1.11:
+- Added support for empty productions
+- Fixed chmod to do the right thing on remote machines
+- Fixed a bug where a remote command would be executed even if "cd" failed
+- Fixed a missing unindent and a typo for SHORT_RULE_TRACE debug output
+- Enhanced debugging information for length computations.
+
+Version 1.10:
+- Updated all the examples, tutorial, and documentation
+- Polished off everything for public distribution
+
+Version 1.02:
+- Switch from File::Find to rsync, which is *much* faster
+- This version works completely for the logical expressions and fault trees
+  examples.
+  - Added a tutorial
+  - Changed the terminals input file into a lex-like format
+  - Nonterminal input file is now basically yacc+undo actions.
+- Added -c flag to rsync to avoid copying identical files, which prevents
+  recompilation unless it is needed. Also added --delete to remove previously
+  generated files.
+- Fixed some bugs in generator_generator when input files don't have head or
+  tail blocks
+- Moved example input files into separate directories in new examples/
+  directory
+- Added support for constant strings like "x" 'x' 23 to the nonterminal .yg
+  file.
+- Added #line directives in the generated code
+- Added string length optimization for disabling infeasible productions
+- Added test cases.
+- Prepared everything for installation and distribution
+- Wrote a tutorial and finished the documentation
+- Added -L and -C flags
+- Restructured the file layout
+
+Version 1.01:
+- Added TODO file
+- Restructured parsing of the grammars. Grammar now returns info on the union,
+  and parses the union name declarations. (See the comments for the Post_Parse
+  function)
+- Moved template files into the input_generator_code directory, renaming them
+  to foo.template.cc, foo.template.h, etc.
+- Added code to remove any rule lists containing the special "error" token
+- Changed syntax for 'atomic_#' to ['atomic_#']
+- Updated the grammar to bless rules as 'SIMPLE' or 'ALTERNATION'. Renamed
+  'GENERATOR' to 'GENERATOR_EQUIVALENCE' and 'EQUIVALENCE' to
+  'ALTERNATION_EQUIVALENCE'.
+- Implemented action code blocks, with a few rough parts. See TODO file
+- Fixed terminal generation for alternation
+- Updated the generator with the changes from generate-dfts-oo
+  (yacc_compatible branch). This makes it easier to generate the code blocks.
+  I can see that the terminal generation isn't quite right... Need to fix
+  that.
+- Renamed template files.
+
+Version 1.0:
+- Initial version

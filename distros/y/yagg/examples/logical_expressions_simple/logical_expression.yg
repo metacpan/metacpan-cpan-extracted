@@ -1,0 +1,11 @@
+%% 
+
+wfe :
+  wfe BINARY_OPERATOR wfe
+  |
+  LEFT_PAREN wfe RIGHT_PAREN
+  |
+  UNARY_OPERATOR wfe
+  |
+  ATOMIC
+  ;

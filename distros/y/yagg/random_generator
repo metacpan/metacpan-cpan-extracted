@@ -1,0 +1,1179 @@
+#!/usr/bin/perl -w
+
+# Modules to use
+use strict;
+use warnings;
+
+use yagg::Grammar;
+use yagg::TerminalParser;
+use yagg::Config;
+use Text::Template;
+use IPC::Open3;
+use FileHandle;
+use URI;
+use Cwd;
+use Getopt::Std;
+use File::Temp;
+use File::Path;
+
+use vars qw( $VERSION );
+
+$VERSION = sprintf "%d.%02d%02d", q/1.30.1/ =~ /(\d+)/g;
+
+# Make unbuffered
+$| = 1;
+
+use vars qw( %opts );
+
+my $VIRTUAL_TERMINAL_NUMBER = 1;
+my $CONTINUE_GENERATING = 1;
+
+############################################################################
+
+sub dprint;
+sub report_and_exit;
+
+{
+  Check_Help_Or_Usage();
+
+  my ($grammar_filename, $terminal_filename) = Get_Options_And_Arguments();
+
+  Print_Debug_Information($grammar_filename,$terminal_filename);
+
+  Initialize();
+
+  print "Parsing grammars...\n";
+
+  my $grammar =
+    Build_Nonterminal_Grammar($grammar_filename);
+  my $terminal_data =
+    Build_Terminal_Grammar($terminal_filename,$grammar);
+
+  $grammar = Add_Rule_Weights($grammar);
+
+  dprint "Post-processed nonterminal grammar:\n";
+  dprint grep { s/^/  /; $_ .= "\n" } split /\n/, Dumper($grammar)
+    if $opts{'d'};
+  dprint "Terminal information:\n";
+  dprint grep { s/^/  /; $_ .= "\n" } split /\n/, Dumper($terminal_data)
+    if $opts{'d'};
+
+  Generate_Strings($grammar, $terminal_data);
+
+  exit 0;
+}
+
+# --------------------------------------------------------------------------
+
+# Print a nice error message before exiting
+
+sub report_and_exit
+{
+  my $message = shift;
+
+  $message .= "\n" unless $message =~ /\n$/;
+  warn "random_generator: $message";
+  exit 1;
+}
+
+# --------------------------------------------------------------------------
+
+# Outputs debug messages with the -D flag. Be sure to return 1 so code like
+# 'dprint "blah\n" and exit' works.
+
+sub dprint
+{
+  return 1 unless $opts{'d'};
+
+  my $message = join '',@_;
+
+  foreach my $line (split /\n/, $message)
+  {
+    warn "DEBUG: $line\n";
+  }
+
+  return 1;
+}
+
+# --------------------------------------------------------------------------
+
+sub Print_Debug_Information
+{
+  my $grammar_filename = shift;
+  my $terminal_filename = shift;
+
+  return unless $opts{'d'};
+
+  my $command_line;
+
+  # Need to quote arguments with spaces
+  my @args = @ARGV;
+  @args = map { $_ = index($_, ' ') != -1 ? "'$_'" : $_ } @ARGV;
+
+  $command_line = "$0 @args";
+
+  dprint "Version: $VERSION";
+
+  dprint "Command line was (special characters not escaped):";
+  dprint "  $command_line";
+
+  dprint "Text::Template VERSION: $Text::Template::VERSION"
+    if defined $Date::Parse::VERSION;
+  dprint "Parse::Yapp VERSION: $Parse::Yapp::VERSION"
+    if defined $Parse::Yapp::VERSION;
+
+  dprint "Options are:";
+  foreach my $i (sort keys %opts)
+  {
+    if (defined $opts{$i})
+    {
+      dprint "  $i: $opts{$i}";
+    }
+    else
+    {
+      dprint "  $i: undef";
+    }
+  }
+
+  dprint "INC is:";
+  foreach my $i (@INC)
+  {
+    dprint "  $i";
+  }
+
+  dprint "Language grammar file:";
+  dprint "  $grammar_filename";
+
+  $terminal_filename = '<NONE>' unless defined $terminal_filename;
+  dprint "Terminal specification file:";
+  dprint "  $terminal_filename";
+}
+
+# --------------------------------------------------------------------------
+
+sub Check_Help_Or_Usage
+{
+  print usage() and exit if $#ARGV >= 0 && $ARGV[0] eq '--help';
+  print "$VERSION\n" and exit if $#ARGV >= 0 && $ARGV[0] eq '--version';
+}
+
+# --------------------------------------------------------------------------
+
+sub usage
+{
+<<EOF;
+usage: $0 [--help|--version] [-d] [-n <number>]
+  [-l <length specification>] <nonterminal .yg file> [terminal .lg file]
+
+-d Enable debug output to STDERR
+-l Only generate strings whose length matches the length specification
+-n Generate a number of random strings and then stop
+EOF
+
+}
+
+# --------------------------------------------------------------------------
+
+sub Get_Options_And_Arguments
+{
+  local @ARGV = @ARGV;
+
+  # Print usage error if no arguments given
+  report_and_exit("No arguments given.\n\n" . usage()) unless @ARGV;
+
+  # Check for --help, the standard usage command, or --version.
+  print usage() and exit(0) if grep { /^--help$/ } @ARGV;
+  print "$VERSION\n" and exit(0) if grep { /^--version$/ } @ARGV;
+
+  my @valid_options = qw( d l n );
+
+  # Initialize all options to zero.
+  map { $opts{$_} = 0; } @valid_options;
+
+  # And some to non-zero
+  $opts{'l'} = '=-1';
+  $opts{'n'} = -1;
+
+  getopt('ln', \%opts);
+
+  # Make sure no unknown flags were given
+  foreach my $option (keys %opts)
+  {
+    unless (grep {/^$option$/} @valid_options)
+    {
+      report_and_exit("Invalid option \"$option\".\n\n" . usage());
+    }
+  }
+
+  report_and_exit("Invalid length specification.\n")
+    unless $opts{'l'} =~ /^(=|<|<=|>|>=)\d+$/;
+
+  report_and_exit("Invalid arguments.\n\n" . usage())
+    unless $#ARGV == 0 && $ARGV[0] =~ /\.yg$/i ||
+           $#ARGV == 1 && $ARGV[0] =~ /\.yg$/i && $ARGV[1] =~ /\.lg$/i;
+
+  return ($ARGV[0],$ARGV[1]);
+}
+
+# --------------------------------------------------------------------------
+
+sub Initialize
+{
+  if ($opts{'d'})
+  {
+    eval 'require Data::Dumper'
+      or report_and_exit "Couldn't load Data::Dumper: $@";
+    import Data::Dumper;
+    $Data::Dumper::Sortkeys = 1;
+    # To prevent warning about variable being used only once
+    my $dummy = $Data::Dumper::Sortkeys;
+  }
+
+  $SIG{INT} = sub { $CONTINUE_GENERATING = 0 };
+}
+
+# --------------------------------------------------------------------------
+
+sub Parse_Output_Flag
+{
+  my $unparsed_path = shift;
+
+  my %parsed = (
+    'scheme' => undef,
+    'user' => undef,
+    'host' => undef,
+    'port' => undef,
+    'path' => undef,
+    'unparsed' => $unparsed_path,
+  );
+
+  my $unparsed_path_with_protocol = $unparsed_path;
+  my $need_to_drop_slash = ($unparsed_path =~ /:[^\/]/);
+
+  if ($unparsed_path =~ /^\w+:\/\//)
+  {
+    $need_to_drop_slash = 1 unless $unparsed_path =~ /^\w+:.*:/;
+  }
+  elsif ($unparsed_path =~ /::/)
+  {
+    if($unparsed_path_with_protocol =~ /::\//)
+    {
+      $need_to_drop_slash = 0;
+      $unparsed_path_with_protocol =~ s!::!!;
+    }
+    else
+    {
+      $unparsed_path_with_protocol =~ s!::!\/!;
+    }
+
+    $unparsed_path_with_protocol = "rsync://$unparsed_path_with_protocol";
+  }
+  elsif ($unparsed_path =~ /:/)
+  {
+    if($unparsed_path_with_protocol =~ /:\//)
+    {
+      $need_to_drop_slash = 0;
+      $unparsed_path_with_protocol =~ s!:!!;
+    }
+    else
+    {
+      $unparsed_path_with_protocol =~ s!:!\/!;
+    }
+
+    $unparsed_path_with_protocol = "rsync://$unparsed_path_with_protocol";
+  }
+  else
+  {
+    $unparsed_path_with_protocol = "file:$unparsed_path_with_protocol";
+  }
+
+  my $uri = new URI $unparsed_path_with_protocol;
+
+  $parsed{'scheme'} = $uri->scheme;
+  $parsed{'path'} = $uri->path;
+  $parsed{'user'} = $uri->user if $uri->can('user');
+  $parsed{'host'} = $uri->host
+    if $uri->can('host') && defined $uri->host && $uri->host ne '';
+  $parsed{'port'} = $uri->port if $uri->can('port');
+
+  $parsed{'path'} =~ s/^\/// if $need_to_drop_slash;
+
+  return \%parsed;
+}
+
+# --------------------------------------------------------------------------
+
+# Reads grammars from one or more files, creating a grammar data structure
+# which is then returned.
+
+sub Build_Nonterminal_Grammar
+{
+  my $filename = shift;
+
+  my $grammar_text;
+
+  {
+    local $/ = undef;
+    open GRAMMAR, $filename or report_and_exit $!;
+    $grammar_text = <GRAMMAR>;
+    close GRAMMAR;
+  }
+  
+  # Parse the grammar
+  my $raw_grammar = new yagg::Grammar(input => $grammar_text);
+
+  # Do some post-processing
+  my $grammar = Post_Process_Grammar($raw_grammar);
+
+  return $grammar;
+}
+
+# --------------------------------------------------------------------------
+
+# Returns a hash containing:
+# - TERMINALS: the terminals of the grammar, as a list
+# - NONTERMINALS: the nonterminals of the grammar, as a list
+# - DECLARATIONS: The %{ ... }% code from the declarations section
+# - PROGRAMS: The code at the end of the YACC file
+# - RULES: The grammar rules, in a list containing:
+#   - the name of the nonterminal
+#   - a list reference with the names of the body of the rule
+#   - the precedence (or undef)
+#   - a list reference with the code for the action block, followed by the
+#     line number. This list will contain two more elements if an unaction block
+#     was specified (undo code, line number)
+# - RETURN_TYPES: A mapping from nonterminal names to return types, or
+#   undef if there isn't one in the union
+
+sub Post_Process_Grammar
+{
+  my $yapp_grammar = shift;
+
+  my $grammar = $yapp_grammar->{GRAMMAR};
+
+  # Compute the starting nonterminal, storing it in the hash as
+  # STARTING_RULE. Then delete all references to it in the $grammar
+  # object.
+  {
+    my $starting_rule;
+
+    # Delete the $start grammar rule
+    for (my $i=0; $i <= $#{$grammar->{'RULES'}}; $i++)
+    {
+      if ($grammar->{'RULES'}[$i][0] eq '$start')
+      {
+        $starting_rule = $grammar->{'RULES'}[$i][1][0];
+        splice(@{$grammar->{'RULES'}}, $i, 1);
+        last;
+      }
+    }
+
+    # Delete the "$start" in NTERM
+    delete $grammar->{'NTERM'}{'$start'};
+
+    # Subtract 1 from the NTERM list
+    foreach my $nonterminal (keys %{$grammar->{'NTERM'}})
+    {
+      foreach my $i (0..$#{$grammar->{'NTERM'}{$nonterminal}})
+      {
+        $grammar->{'NTERM'}{$nonterminal}[$i]--;
+      }
+    }
+
+    $grammar->{'STARTING_RULE'} = $starting_rule;
+  }
+
+  # Compute the terminals and nonterminals
+  $grammar->{'TERMINALS'} = [grep { !/(^\0|^error$)/ } keys %{$grammar->{'TERM'}}];
+  $grammar->{'NONTERMINALS'} = [sort keys %{$grammar->{'NTERM'}}];
+
+  # Remove any error rules, and any rules with empty productions that result
+  # from them
+  for (my $i=0; $i <= $#{ $grammar->{'RULES'} }; $i++)
+  {
+    if (scalar (grep { $_ eq 'error' } @{ $grammar->{'RULES'}[$i][1] }) > 0)
+    {
+      splice(@{$grammar->{'RULES'}}, $i, 1);
+      $i--;
+    }
+  }
+
+  # Delete old stuff we don't need
+  delete $grammar->{'TERM'};
+  delete $grammar->{'NTERM'};
+  delete $grammar->{'EXPECT'};
+  delete $grammar->{'NULLABLE'};
+  delete $grammar->{'UUTERM'};
+
+  # Get the union
+  my ($union) = $yapp_grammar->{'OPTIONS'}{'input'} =~ /%union\s*{(.*?)}/s;
+
+  my %unions;
+  if (defined $union)
+  {
+    while ($union =~ /\s*(.*?)\s+(.*?);\s*$/mg)
+    {
+      $unions{$2} = $1;
+    }
+  }
+
+  # Parse the union member names
+  {
+    my %return_types;
+
+    while ($yapp_grammar->{'OPTIONS'}{'input'} =~
+      /\%(?:left|right|nonassoc|type|token)\s*<(.*?)>\s*(.*?)\s*$/mg)
+    {
+      if (exists $unions{$1})
+      {
+        $return_types{$2} = $unions{$1};
+      }
+      elsif ($1 eq 'token')
+      {
+        $return_types{$2} = 'int';
+      }
+      else
+      {
+        warn "Couldn't compute return type for $2. Setting to undef...\n";
+        $return_types{$2} = $1;
+      }
+    }
+
+    $grammar->{'RETURN_TYPES'} = \%return_types;
+  }
+
+  foreach my $nonterminal (@{$grammar->{'NONTERMINALS'}})
+  {
+    ${$grammar->{'RETURN_TYPES'}}{$nonterminal} = undef
+      unless exists ${$grammar->{'RETURN_TYPES'}}{$nonterminal};
+  }
+
+  dprint "Computing lengths of nodes\n";
+
+  foreach my $nonterminal (@{$grammar->{'NONTERMINALS'}})
+  {
+    $grammar->{'PRODUCTION_LENGTHS'}{$nonterminal} =
+      [ Compute_Lengths_For_Node($nonterminal,$grammar) ];
+  }
+
+  # Sort everything so that it's easier to compare the grammars during
+  # debugging
+  {
+    @{$grammar->{'NONTERMINALS'}} = sort @{$grammar->{'NONTERMINALS'}};
+    @{$grammar->{'TERMINALS'}} = sort @{$grammar->{'TERMINALS'}};
+  }
+
+  return $grammar;
+}
+
+# --------------------------------------------------------------------------
+
+my %lengths;
+
+# TODO: This function computes weak expressions for the different productions
+# when they are recursive in nature. For example: A -> xAx | y should have an
+# expression such as "(length-1)%2==0 && length >= 1", but this function
+# computes the weaker statement "length>=1". See the TODO file for more info.
+
+sub Compute_Lengths_For_Node
+{
+  my $node = shift;
+  my $grammar = shift;
+
+  local $" = ", " if $opts{'d'};
+  dprint "  $node: Computing length";
+
+  if(exists $lengths{$node})
+  {
+    dprint "  $node: FINISHED: Using cached value of \"@{ $lengths{$node} }\"";
+    return @{ $lengths{$node} };
+  }
+
+  $lengths{$node} = [ '>=0' ];
+
+  if(grep { $node eq $_ } @{ $grammar->{'TERMINALS'} })
+  {
+    $lengths{$node} = [ '=1' ];
+    dprint "  $node: FINISHED: Using terminal value \"=1\"";
+    return ( '=1' );
+  }
+
+  my @lengths;
+
+  foreach my $rule (grep { $_->[0] eq $node } @{ $grammar->{'RULES'} })
+  {
+    my $rule_length = undef;
+
+    dprint "  $node: Adding up lengths for productions \"@{$rule->[1]}\"";
+
+    foreach my $product (@{$rule->[1]})
+    {
+      my $most_permissive_product_length = undef;
+
+      foreach my $product_length (Compute_Lengths_For_Node($product,$grammar))
+      {
+        $most_permissive_product_length = $product_length, next
+          unless defined $most_permissive_product_length;
+
+        my ($product_modifier) = $product_length =~ /^(=|>=)/;
+        my ($most_permissive_product_modifier) =
+          $most_permissive_product_length =~ /^(=|>=)/;
+
+        $most_permissive_product_length =~ s/^(=|>=)//;
+        $product_length =~ s/^(=|>=)//;
+
+        if ($most_permissive_product_modifier eq '=' &&
+            $product_modifier eq '=' &&
+            $most_permissive_product_length == $product_length)
+        {
+          $most_permissive_product_length = "=$product_length";
+        }
+        else
+        {
+          if ($most_permissive_product_length < $product_length)
+          {
+            $most_permissive_product_length =
+              ">=$most_permissive_product_length";
+          }
+          else
+          {
+            $most_permissive_product_length = ">=$product_length";
+          }
+        }
+      }
+
+      $rule_length = $most_permissive_product_length, next
+        unless defined $rule_length;
+
+      my ($rule_modifier) = $rule_length =~ /^(=|>=)/;
+      my ($most_permissive_product_modifier) =
+        $most_permissive_product_length =~ /^(=|>=)/;
+
+      $rule_length =~ s/^(=|>=)//;
+      $most_permissive_product_length =~ s/^(=|>=)//;
+
+      if ($rule_modifier eq '=')
+      {
+        $rule_length = $most_permissive_product_modifier .
+          ($rule_length + $most_permissive_product_length);
+      }
+      else
+      {
+        $rule_length = '>=' .
+          ($rule_length + $most_permissive_product_length);
+      }
+    }
+
+    $rule_length = '=0' unless @{$rule->[1]};
+
+    dprint "  $node: Productions sum is \"$rule_length\"";
+
+    push @lengths, $rule_length;
+  }
+
+  $lengths{$node} = \@lengths;
+
+  dprint "  $node: FINISHED: Lengths are \"@lengths\"";
+
+  return @lengths;
+}
+
+# --------------------------------------------------------------------------
+
+# Reads terminal grammar, creating a data structure which is then returned.
+
+sub Build_Terminal_Grammar
+{
+  my $terminal_filename = shift;
+  my $grammar = shift;
+
+  my $raw_terminal_data;
+
+  if (defined $terminal_filename)
+  {
+    my $file_text;
+
+    {
+      local $/ = undef;
+      open GRAMMAR, $terminal_filename or report_and_exit $!;
+      $file_text = <GRAMMAR>;
+      close GRAMMAR;
+    }
+
+    my $parser = new yagg::TerminalParser;
+    $raw_terminal_data = $parser->Parse($file_text);
+  }
+  else
+  {
+    $raw_terminal_data = {
+      'TERMINALS' => {},
+      'OPTIONS' => {},
+      'TAIL' => undef,
+      'HEAD' => []
+    };
+  }
+
+  # Do some post-processing
+  my $terminal_data;
+  ($terminal_data,$grammar) =
+    Post_Process_Terminals($raw_terminal_data,$grammar);
+
+  return $terminal_data;
+}
+
+# --------------------------------------------------------------------------
+
+sub Post_Process_Terminals
+{
+  my $terminal_data = shift;
+  my $grammar = shift;
+
+  $terminal_data->{'OPTIONS'}{'prefix'} = "yy"
+    unless defined $terminal_data->{'OPTIONS'}{'prefix'};
+
+  ($grammar,$terminal_data) =
+    Create_Virtual_Terminals($grammar, $terminal_data);
+
+
+  # Check that all the terminals have been properly defined in the terminal
+  # file
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    report_and_exit "Terminal $terminal is not defined in the .lg file\n"
+      unless exists $terminal_data->{'TERMINALS'}{$terminal};
+  }
+
+
+  # Make all the terminal strings arrays
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    $terminal_data->{'TERMINALS'}{$terminal}{'data'} =
+      [ $terminal_data->{'TERMINALS'}{$terminal}{'data'} ]
+      unless ref $terminal_data->{'TERMINALS'}{$terminal}{'data'};
+  }
+
+
+  ($grammar,$terminal_data) =
+    Infer_Terminal_Return_Types($grammar, $terminal_data);
+
+  return ($terminal_data,$grammar);
+}
+
+# --------------------------------------------------------------------------
+
+sub Infer_Terminal_Return_Types
+{
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  dprint "Computing return types for terminals...";
+
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    my @strings = @{ $terminal_data->{'TERMINALS'}{$terminal}{'data'} };
+
+    if (exists ${$grammar->{'RETURN_TYPES'}}{$terminal})
+    {
+      dprint "  $terminal => ${$grammar->{'RETURN_TYPES'}}{$terminal}";
+      next;
+    }
+
+    # Try to infer the return type from the strings given by the user. See
+    # the Perl FAQ
+    if (scalar(grep { /^'([^'\\]|\\.)'$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'char';
+    }
+    elsif (scalar(grep { /^".*"$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'string';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^\d+$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'unsigned long int';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^[+-]?\d+$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'long int';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'unsigned double';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'double';
+    }
+    else
+    {
+      report_and_exit "Could not infer type of \"@strings\" for terminal $terminal";
+    }
+
+    local $" = ', ';
+    dprint "  $terminal => ${$grammar->{'RETURN_TYPES'}}{$terminal} (inferred from @strings)\n";
+  }
+
+  return ($grammar,$terminal_data);
+}
+
+# --------------------------------------------------------------------------
+
+sub Create_Virtual_Terminals
+{
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  my %virtual_terminal_map;
+
+  dprint "Creating virtual terminals for constant strings in the grammar file";
+
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    # Create a virtual terminal if the user provided a constant string or
+    # number in the .yg file.
+    if ($terminal =~ /^'([^'\\]|\\.)+'$/ ||
+        $terminal =~ /^"[^"]*"$/)
+    {
+      dprint "  Creating virtual terminal for $terminal";
+
+      $virtual_terminal_map{$terminal} =
+        "VIRTUAL_TERMINAL_$VIRTUAL_TERMINAL_NUMBER";
+
+      $terminal_data->{'TERMINALS'}{"VIRTUAL_TERMINAL_$VIRTUAL_TERMINAL_NUMBER"} =
+        {
+          'type' => 'simple',
+          'data' => $terminal,
+        };
+
+      $VIRTUAL_TERMINAL_NUMBER++;
+    }
+  }
+
+  for (my $i=0; $i <= $#{ $grammar->{'TERMINALS'} }; $i++)
+  {
+    if (exists $virtual_terminal_map{$grammar->{'TERMINALS'}[$i]})
+    {
+      $grammar->{'TERMINALS'}[$i] =
+        $virtual_terminal_map{$grammar->{'TERMINALS'}[$i]};
+    }
+  }
+
+  foreach my $constant_terminal (keys %virtual_terminal_map)
+  {
+    for (my $i=0; $i <= $#{ $grammar->{'RULES'} }; $i++)
+    {
+      for (my $j=0; $j <= $#{ $grammar->{'RULES'}[$i][1] }; $j++)
+      {
+        next unless $grammar->{'RULES'}[$i][1][$j] eq $constant_terminal;
+
+        $grammar->{'RULES'}[$i][1][$j] =
+          $virtual_terminal_map{$constant_terminal};
+      }
+    }
+  }
+
+  return ($grammar,$terminal_data);
+}
+
+############################################################################
+
+sub Add_Rule_Weights
+{
+  my $grammar = shift;
+
+  foreach my $nonterminal (@{$grammar->{'NONTERMINALS'}})
+  {
+    # Just assign equal weights for now...
+    my $number_of_productions = 0;
+
+    foreach my $rule (@{$grammar->{'RULES'}})
+    {
+      next unless $nonterminal eq $rule->[0];
+
+      $number_of_productions++;
+    }
+
+    foreach my $rule (@{$grammar->{'RULES'}})
+    {
+      next unless $nonterminal eq $rule->[0];
+
+      push(@$rule, 1/$number_of_productions);
+    }
+  }
+
+  return $grammar;
+}
+
+############################################################################
+
+# Could make this more efficient by computing the lengths for the production
+# rules.
+sub Generate_Strings
+{
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  print "Generating strings... Press CTRL-c to stop\n";
+
+  $CONTINUE_GENERATING = 1;
+
+  my $number_generated = 0;
+
+  while ($CONTINUE_GENERATING &&
+    ($opts{'n'} == -1 || $number_generated < $opts{'n'}))
+  {
+    my @terminals = Generate_String_Recursive($grammar->{'STARTING_RULE'},
+      $grammar, $terminal_data);
+
+    next unless
+      $opts{'l'} =~ /^=(\d+)$/ && scalar @terminals == $1 ||
+      $opts{'l'} =~ /^<(\d+)$/ && scalar @terminals < $1 ||
+      $opts{'l'} =~ /^<=(\d+)$/ && scalar @terminals <= $1 ||
+      $opts{'l'} =~ /^>(\d+)$/ && scalar @terminals > $1 ||
+      $opts{'l'} =~ /^>=(\d+)$/ && scalar @terminals >= $1;
+
+    @terminals = map { s/\\n/\n/g ; $_ } @terminals;
+
+    Print_String(@terminals);
+
+    $number_generated++;
+  }
+
+  if ($CONTINUE_GENERATING)
+  {
+    print "Generation finished\n";
+  }
+  else
+  {
+    print "Generation interrupted\n";
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_String_Recursive
+{
+  my $start_rule = shift;
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  if ( grep { $_ eq $start_rule } @{$grammar->{'TERMINALS'}} )
+  {
+    return ( Generate_Terminal($start_rule, $terminal_data) );
+  }
+
+  my $choice = rand();
+
+  my $running_total = 0;
+  foreach my $rule (@{$grammar->{'RULES'}})
+  {
+    next unless $start_rule eq $rule->[0];
+
+    $running_total += $rule->[4];
+
+    # Be careful of floating point inaccuracies!
+    next if $choice > $running_total;
+
+    my @generated_terminals = ();
+
+    foreach my $production (@{$rule->[1]})
+    {
+      push @generated_terminals,
+        Generate_String_Recursive($production, $grammar, $terminal_data);
+    }
+
+    return @generated_terminals;
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_Terminal
+{
+  my $terminal = shift;
+  my $terminal_data = shift;
+
+  # For now we'll treat every terminal as an alternation type with an equal
+  # probability for each alternative.
+  my $string = $terminal_data->{'TERMINALS'}{$terminal}{'data'}[
+    int(rand($#{$terminal_data->{'TERMINALS'}{$terminal}{'data'}} + 1)) ];
+
+  $string =~ s/^"(.*)"$/$1/;
+  $string =~ s/\\n/\n/g;
+
+  return $string;
+}
+
+# --------------------------------------------------------------------------
+
+sub Print_String
+{
+  my @terminals = @_;
+
+  my $need_space = 0;
+
+  print "--\n";
+
+  foreach my $terminal (@terminals)
+  {
+    if ($need_space)
+    {
+      print " ";
+    }
+    else
+    {
+      $need_space = 1;
+    }
+
+    print $terminal;
+
+    $need_space = 0 if $terminal =~ /\n$/;
+  }
+
+  print "\n" unless $terminals[-1] =~ /\n$/;
+}
+
+############################################################################
+
+=head1 NAME
+
+random_generator - randomly generate strings from a grammar
+
+=head1 SYNOPSIS
+
+  random_generator -u user_files_dir grammar.yg
+
+=head1 DESCRIPTION
+
+Given YACC-like and LEX-like input files, B<random_generator> generates random
+strings of a user-specified length. If the grammar file has any action blocks,
+they are ignored. This means that some strings may be generated that would
+have been invalidated by context-sensitive checks implemented in the action
+blocks.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item B<.yg grammar file>
+
+This is the main grammar file, which is very similar (if not identical) to the
+YACC file that a programmer might write to parse an input file. There are one
+or two differences--see the section L<"INPUT FILE SYNTAX"> below for details.
+
+=item B<.lg terminal generator file>
+
+A terminal specification file that defines productions for nonterminals which
+represent tokens in the language grammar. This is analogous to, and replaces,
+the LEX file that a programmer might write to parse an input file. See the
+section L<"INPUT FILE SYNTAX"> below for details.
+
+This input file is not necessary if you use constant strings exclusively in
+your grammar (i.e. if the grammar has no terminals).
+
+=item B<-d>
+
+Output debugging information to STDERR.
+
+=item B<-l <length specification>>
+
+Generate strings of the specified length. The length specification is an
+operator followed by a number. For example, "=10", ">10", "<=10". Be sure to
+quote the specification to protect it from your shell.
+
+=item B<-n <number>>
+
+Generate the specified number of strings and then stop. The value "-1" is
+interpreted as generating an infinite number of strings. This is the behavior
+of the program if B<-n> is not specified.
+
+=item B<--help>
+
+Print the usage message and exit.
+
+=item B<--version>
+
+Print the version and exit.
+
+=back
+
+
+=head1 INPUT FILE SYNTAX
+
+This section provides a brief overview of the input file syntax. See the
+L<yagg::Tutorial> for more discussion.
+
+=head2 Language Grammar File
+
+The language grammar file syntax is based on that of YACC.
+B<yagg> should be able to process your F<.y> file unchanged.
+(Please report a bug if it can not.) Then for any actions that have
+side-effects, you will need to add "unaction" blocks to reverse those side
+effects (described in more detail shortly). Otherwise, you should not have to
+make any other changes to the file.
+
+A couple of things must be kept in mind. First, make very sure that your code
+does not contain memory leaks. While you may not notice them for a single
+execution of a parser, the generator will run your action code many times, in
+which case memory leaks will accrue. (Valgrind on Linux is a good leak
+checker.)
+
+If your grammar actions have side effects, you B<must> provide an unaction
+block that will reverse the side effects. This is because the generator needs
+to be able to backtrack in its search, and can't figure out how to undo your
+changes automatically. An example rule with an unaction block follows:
+
+  // nonterminal and rule_1 have a return type of string*
+  nonterminal : rule_1 "constant string"
+  {
+    // Normal action block
+    global_count += $2;
+    $$ = new string(*$1);
+    delete $1;
+  }
+  {
+    // New unaction block
+    global_count -= $2; // <--- To restore global state
+  };
+
+First, notice that I am careful to delete the C<$1> positional parameter in
+the action block. Failing to do so would cause a memory leak. In the unaction
+block, I decrement the C<global_count> variable. Note that you do not have to
+worry about deallocating or otherwise restoring the state of C<$$>--that is
+handled automatically.  Any positional parameters such as C<$2> that are used
+in the unaction block are automatically initialized with copies.  (This means
+that any pointers to user-defined types must have a copy constructor defined.)
+Copies will not be made in the unaction block if you do not use a positional
+parameter, so you only need to delete C<$1> if you use it.
+
+In an action block, any call to C<yyerror()> is interpreted by the generator
+as a string that is invalid, and should not be generated. In the unaction
+block, C<m_error_occurred> will be true if the action block resulted in an
+invalid string. Here's how you might use this to add a constraint on the
+generated strings:
+
+  // nonterminal and rule_1 have a return type of string*
+  nonterminal : rule_1 "constant string"
+  {
+    if (*$1 == "foo")
+      yyerror("foo is not allowed!");
+    else
+    {
+      global_count += $2;  // <--- Only increment for valid strings
+      $$ = new string(*$1);
+    }
+
+    delete $1;
+  }
+  {
+    if (!m_error_occurred) // <--- Only decrement for valid strings
+      global_count -= $2;
+  };
+
+=head2 Terminal Generator File
+
+The terminal generator file specifies the productions for terminals (which
+would be tokens in LEX). The generator supports a number of features for
+limiting the generation, as described below. The format is loosely based on
+that of LEX. The major change is that the only code that can be in the
+C<{...}> blocks is a return statement for the token.
+
+For obvious reasons, generating an unbounded number of possible strings for a
+regular expression is infeasible. Therefore, the programmer must provide one
+of several specifications for each terminal that tell the generator how to
+generate its strings.
+
+=head3 Simple
+
+The most simple specification is a constant string, which will replace the
+terminal wherever it appears in the generated string. For example:
+
+  "=" return EQUAL;
+
+You may also use constant strings in the language grammar file. They will be
+automatically replaced with "virtual terminals" having a simple string
+specification.
+
+=head3 Alternation
+
+If there are several possibilities for a terminal, you can use the syntax
+"C<(alt1|alt2)>" to specify them. for example:
+
+  ( "+" | "-" | "*" | "/" ) {
+    return OPERATOR;
+  }
+
+This example also demonstrates an alternative form for the return statement.
+During generation, the C<OPERATOR> terminal will be replaced with each of the
+alternatives, creating four times as many output strings.
+
+=head3 Equivalence Classes
+
+If an alternation is enclosed in square brackets, then the alternatives are
+considered to be interchangeable. This means that strings which differ only in
+terms of which alternative was chosen will not be printed. However, strings
+which utilize multiple alternatives will still be generated.
+
+This is useful when generating terminals such as variable names:
+
+  [ "x" | "y" ] return VARIABLE;
+
+Consider a language grammar containing the following:
+
+  SUM : VARIABLE "+" VARIABLE ;
+
+Without the equivalence class, the following strings would be generated:
+
+  x+x
+  x+y
+  y+x
+  y+y
+
+With the equivalence class, the following strings will be generated:
+
+  x+x
+  x+y
+
+Since x and y are part of the same equivalence class, x+x is the same as y+y.
+Similarly, x+y is the same as y+x.
+
+=head3 Equivalence Generators
+
+If the terminal specification is an equivalence containing one literal string
+containing one "#" character, then the generator will create strings as
+needed, replacing the "#" character with 1, 2, 3, etc. Use "\#" if you want a
+literal "#" character in the produced string.
+
+This is useful when generating an unlimited number of terminals such as
+variable names:
+
+  [ "var_#" ] return VARIABLE;
+
+Consider a language grammar containing the following:
+
+  SUM : VARIABLE "+" VARIABLE ;
+
+With the equivalence generator, the following strings will be generated:
+
+  var_1+var_1
+  var_1+var_2
+
+You can think of this feature as an "infinite equivalence class".
+
+=head1 AUTHOR
+
+David Coppit, <david@coppit.org>, http://coppit.org/
+
+=head1 SEE ALSO
+
+Parse::Yapp, YACC, Bison, LEX, FLEX
+
+=cut

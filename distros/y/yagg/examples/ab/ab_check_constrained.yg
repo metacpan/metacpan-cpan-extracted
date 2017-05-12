@@ -1,0 +1,38 @@
+// Include some declarations that we need
+%{
+#include <list>
+#include <string>
+
+using namespace std;
+%}
+
+// Define the return types
+%union {
+  list<string> text_list;
+  string       text;
+}
+
+// Define the grammar production return types
+%type <text_list> node_list
+%type <text>      node
+
+%%
+
+node_list :
+  node_list node
+  {
+    if ($$.size() > 0 && $$.back() == "b" && $2 == "a")
+      yyerror("\"a\" can't follow \"b\"!");
+    else
+    {
+      $$.push_back($2);
+    }
+  } |
+  node
+  {
+    $$.push_back($1);
+  };
+
+node :
+  "a" { $$ = $1; } |
+  "b" { $$ = $1; } ;

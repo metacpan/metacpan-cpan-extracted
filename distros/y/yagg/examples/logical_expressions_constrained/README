@@ -1,0 +1,26 @@
+This example generates logical expressions. It is similar to the
+logical_expressions_simple example, with the following differences:
+
+- The logical_expression.yg file is based on a Bison input file.  As such,
+  there is code in the action block to store the parsed expression along with
+  the line number in parsed_expressions. The user_code directory contains the
+  include file normally used by bison and flex.
+- The atomic propositions to the left and right of a binary operator are
+  constrained so that they can't be the same.
+- The main generator program is provided by the user, instead of using the
+  default generated one. This version prints "-p" instead of "- p"
+
+Run it with:
+
+$ yagg -m -u user_code logical_expression.yg logical_expression.lg
+$ ./output/progs/generate 4
+
+If you want to make the parser source code, it's in
+logical_expression_parser/. If you want to feed generated expressions to the
+parser, try the following:
+
+$ perl ./test_generator_and_parser.pl
+
+This will test whether the generator is indeed producing strings that can be
+parsed by a program created by bison using the same grammar. (It's battle of
+the generators!)

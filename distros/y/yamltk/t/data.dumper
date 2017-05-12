@@ -1,0 +1,17 @@
+$VAR1 = [
+          {
+            'name' => 'leo',
+            'age' => 35
+          },
+          {
+            'name' => 'jim',
+            'age' => 25
+          },
+          {
+            'name' => 'paul'
+          },
+          {
+            'name' => 'marge',
+            'state' => 'md'
+          }
+        ];

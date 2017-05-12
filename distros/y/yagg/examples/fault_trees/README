@@ -1,0 +1,28 @@
+This example generates fault trees. Fault trees are a reliability modeling
+language in which models capture the relationships between low-level failures
+in a system. (They're actually directed acyclic graphs.) For example:
+
+  system_event = id_1 ;
+  id_1 or id_2 id_3 ;
+  id_2 be ;
+  id_3 be ;
+
+states that the overall system (id_1) will fail if id_2 or id_3 fails.
+Normally the basic event failures would be modeled with probability
+distributions, so that the overall probability of failure could be computed.
+
+This example demonstrates:
+
+- An input .yg that is exactly the same as the Bison input file, except for
+  the addition of unaction blocks.
+- Sophisticated unaction blocks that remove elements from the global data
+  structure.
+- The use of sophisticated constraint checks during generation, such as
+  disallowing fault trees containing cycles.
+- The use of a lot of user-defined code. (The Fault_Tree data structure and
+  supporting types.)
+
+Run it with:
+
+$ yagg -m -u user_code fault_tree.yg fault_tree.lg
+$ ./output/progs/generate 12

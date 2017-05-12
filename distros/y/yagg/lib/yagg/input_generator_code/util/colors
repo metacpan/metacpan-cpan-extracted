@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+%code_map = ('black' => 0, 'red' => 1, 'green' => 2, 'yellow' => 3,
+              'blue' => 4, 'magenta' => 5, 'cyan' => 6, 'white' => 7);
+
+die <<EOF unless $#ARGV == 1;
+usage: $0 <foreground color> <background color>
+  where colors are:
+    black, red, green, yellow, blue, magenta, cyan, white
+EOF
+
+my $foreground_color = shift @ARGV;
+my $background_color = shift @ARGV;
+
+die "unknown foreground color: $foreground_color\n"
+  unless exists $code_map{$foreground_color};
+die "unknown background color: $background_color\n"
+  unless exists $code_map{$background_color};
+
+my $foreground_code = $code_map{lc($foreground_color)} + 30;
+my $background_code = $code_map{lc($background_color)} + 40;
+
+print "[$foreground_code;${background_code}m";

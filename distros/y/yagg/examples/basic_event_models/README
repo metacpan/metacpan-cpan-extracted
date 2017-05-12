@@ -1,0 +1,20 @@
+This example generates a list of basic event models. Basic event models are
+used with fault trees to model the reliability of systems. Basic event models
+use probability distributions to model the failure characteristics of the
+components of the system. For example:
+
+  id_1 distribution = constant probability = 0.5
+    coverage = 0.99 restoration = 0 single_point_failure = 0.01 dormancy = 0 ;
+
+states that component id_1 fails at a constant probability of 0.5. Its
+coverage model states that when it fails, it has a 1% chance of causing the
+entire system to fail through a single point failure. When used as a dormant
+spare, it does not fail.
+
+In this example, note how we have to carefully choose values for reals, since
+there is a constraint that the three coverage values must sum to 1.
+
+Run it with:
+
+$ yagg -m -u user_code basic_event_model.yg basic_event_model.lg
+$ ./output/progs/generate 41

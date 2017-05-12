@@ -1,0 +1,163 @@
+%{
+#include <string>
+#include <set>
+#include "basic_event_model_textual_parser/basic_event_model_textual_parser_includes.h"
+
+using namespace std;
+
+extern void basic_event_model_textual_parser_error(string s);
+%}
+
+%union {
+  string*            text;
+  string*            text;
+  Natural*           natural;
+  Real*              real;
+  int                token;
+  set<string>*       set;
+}
+
+%token <text>                    IDENTIFIER
+%token <natural>                 NATURAL
+%token <real>                    REAL
+
+%token                           DORMANCY
+%token                           COVERAGE
+%token                           RESTORATION
+%token                           SINGLE_POINT_FAILURE
+%token                           MEAN
+%token                           RATE
+%token                           SHAPE
+%token                           STANDARD_DEVIATION
+%token                           PROBABILITY
+%token                           DISTRIBUTION
+%token                           CONSTANT
+%token                           EXPONENTIAL
+%token                           WEIBULL
+%token                           LOGNORMAL
+
+%token                           EQUALS
+%token                           SEMICOLON
+
+%type  <set>                     basic_event_model_mapping_list
+%type  <text>                    basic_event_model_mapping
+%type  <text>                    basic_event_identifier
+%type  <natural>                 positive_integer_nonterminal
+%type  <real>                    positive_real_nonterminal
+%token                           END_OF_FILE
+
+%% 
+
+basic_event_model_file :
+  basic_event_model_mapping_list eof
+  {
+    delete $1;
+  };
+
+basic_event_model_mapping_list :
+  basic_event_model_mapping
+  {
+    $$ = new set<string>();
+    $$->insert(*$1);
+    delete $1;
+  } |
+  basic_event_model_mapping basic_event_model_mapping_list
+  {
+    $$ = $2;
+
+    if ($2->find(*$1) != $2->end())
+      basic_event_model_textual_parser_error("");
+    else
+      $$->insert(*$1);
+
+    delete $1;
+  };
+
+eof:
+  END_OF_FILE ;
+
+
+basic_event_model_mapping:
+  basic_event_identifier basic_event_model SEMICOLON
+  {
+    $$ = $1;
+  };
+
+basic_event_identifier:
+  IDENTIFIER
+  {
+    $$ = $1;
+  };
+
+basic_event_model:
+  distribution_specifier coverage_model_specifier dormancy_specifier ;
+
+distribution_specifier:
+  DISTRIBUTION EQUALS CONSTANT constant_distribution_specifier |
+  DISTRIBUTION EQUALS EXPONENTIAL exponential_distribution_specifier |
+  DISTRIBUTION EQUALS WEIBULL weibull_distribution_specifier |
+  DISTRIBUTION EQUALS LOGNORMAL lognormal_distribution_specifier  ;
+
+constant_distribution_specifier:
+  PROBABILITY EQUALS positive_real_nonterminal {
+    if (*$3 > (Real)1)
+      basic_event_model_textual_parser_error("");
+
+    delete $3;
+  };
+
+exponential_distribution_specifier:
+  RATE EQUALS positive_real_nonterminal {
+    delete $3;
+  };
+
+weibull_distribution_specifier:
+  RATE EQUALS positive_real_nonterminal SHAPE EQUALS positive_real_nonterminal {
+    delete $3;
+    delete $6;
+  };
+
+lognormal_distribution_specifier:
+  MEAN EQUALS positive_real_nonterminal STANDARD_DEVIATION EQUALS positive_real_nonterminal {
+    delete $3;
+    delete $6;
+  };
+
+coverage_model_specifier:
+  COVERAGE EQUALS positive_real_nonterminal RESTORATION EQUALS positive_real_nonterminal SINGLE_POINT_FAILURE EQUALS positive_real_nonterminal {
+    if ((Real)(*$3 + *$6 + *$9) != (Real)1)
+      basic_event_model_textual_parser_error("");
+    if (*$3 > (Real)1)
+      basic_event_model_textual_parser_error("");
+    if (*$6 > (Real)1)
+      basic_event_model_textual_parser_error("");
+    if (*$9 > (Real)1)
+      basic_event_model_textual_parser_error("");
+
+    delete $3;
+    delete $6;
+    delete $9;
+  };
+
+dormancy_specifier:
+  DORMANCY EQUALS positive_real_nonterminal {
+    if (*$3 > (Real)1)
+      basic_event_model_textual_parser_error("");
+
+    delete $3;
+  };
+
+positive_real_nonterminal:
+  REAL {
+    $$ = $1;
+  } |
+  positive_integer_nonterminal {
+    $$ = new Real(*$1);
+    delete $1;
+  };
+
+positive_integer_nonterminal:
+  NATURAL {
+    $$ = new Natural(*$1);
+    delete $1;
+  };

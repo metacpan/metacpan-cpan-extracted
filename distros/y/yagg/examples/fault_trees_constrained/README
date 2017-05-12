@@ -1,0 +1,30 @@
+This example generates fault trees similar to the fault_trees example. The
+only difference is that the grammar has been modified in order to constrain
+the generated fault trees in certain ways. For example, instead of generating
+both of these:
+
+  system_event = id_1 ;
+  id_1 or id_2 id_3 ;
+  id_2 be ;
+  id_3 be ;
+
+  system_event = id_1 ;
+  id_1 or id_2 id_3 ;
+  id_3 be ;
+  id_2 be ;
+
+Only the first will be generated. The constraints are:
+
+- The first node (gate or basic event) defined must be for the system event.
+- The definitions must be in order according to type (AND, then OR, then PAND,
+  etc.)
+- Within the definitions for a type, the identifiers for the nodes must be in
+  alphabetical order.
+
+Run it with:
+
+$ yagg -m -u user_code fault_tree.yg fault_tree.lg
+$ ./output/progs/generate 12
+
+You may also want to tweak the compile flags:
+   -fdynamic-no-pic -falign-loops=16

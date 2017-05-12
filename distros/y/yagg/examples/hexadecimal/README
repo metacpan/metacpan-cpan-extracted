@@ -1,0 +1,12 @@
+This is an example that generates hexadecimal numbers. String generation is a
+lot like counting. Note that this example takes advantage of the caching of
+generated strings optimization. Unfortunately this optimization can't be used
+for any nonterminal whose strings are context sensitive. i.e.: has an
+"equivalence" terminal, or has a production with an action block. (Equivalence
+terminals depend on previous strings in the currently generated string, and
+action blocks may check context-sensitive conditions before calling yyerror.)
+
+Run it with:
+
+$ yagg -m hexadecimal.yg hexadecimal.lg
+$ ./output/progs/generate 4

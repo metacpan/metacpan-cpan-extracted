@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+use strict;
+# ABSTRACT = 'Filter yaml to csv.'
+use Carp;
+use Getopt::Std::Strict 'hvd:';
+use lib './lib';
+use LEOCHARRE::DataConverter ':all';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+
+$opt_h and print STDERR usage() and exit;
+$opt_v and print $VERSION and exit;
+$opt_d ||=',';
+
+sub usage {q{yaml2csv [OPTION]..
+Filter yaml to csv.
+
+   -h             help
+   -d string      delimiter
+   -v             version
+
+yamltk - parent package.
+}}
+
+
+
+
+
+my $stdin;
+while (<>){ $stdin.=$_ }
+
+#print data2csv( yaml2data( $stdin ) ) ;
+my $data = yaml2data( $stdin );
+### $data
+#
+#
+
+my $csv = data2csv($data);
+
+print $csv;
+
+
+
+__END__
+
+
+
+
+my @records = YAML::Load($stdin);
+
+# we need to know all keys possible
+my %keys_possible;
+map { 
+   map{ $keys_possible{$_}++ } keys %$_ 
+} @records;
+my @keys = sort keys %keys_possible;
+
+# first column..
+printf "#Fields: %s\n",join($opt_d,@keys);
+
+# each  record..
+for my $record (@records){
+   my @values;
+   for my $key (@keys){
+      my $val = $record->{$key};
+      if (defined $val){
+         $val=~s/\Q$opt_d\E/\\$opt_d/g; # escape delimiters
+      }
+      else {
+         $val = undef;
+      }
+      push @values, $val;
+   }
+   printf "%s\n", join($opt_d, @values);
+}
+
+
+
+
+
+
+
+
+sub usage {q{yaml2csv [OPTION]..
+   -h           help
+   -d char        delimiter, default is ','
+   -e char        escape char, default is '\\'
+   -f string      fields, delimited by delimiter
+
+Try 'man yaml2csv' for more info.
+}}
+
+
+
+
+
+

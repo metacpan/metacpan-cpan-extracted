@@ -1,0 +1,17 @@
+Revision history for ylib
+
+0.003     2014-02-04 15:16:33-05:00 America/New_York
+
+    [CHANGED]
+
+    - All paths added to @INC now use Unix slashes
+
+    - Switched from Path::Class to Path::Tiny
+
+    - Distribution now managed with Dist::Zilla
+
+0.002 Thu Apr  2 14:27:05 EDT 2009
+    - added documentation note about Makefile.PL
+
+0.001 Thu Apr  2 08:53:15 2009
+    - inital release

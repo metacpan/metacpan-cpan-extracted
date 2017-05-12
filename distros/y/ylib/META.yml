@@ -1,0 +1,47 @@
+---
+abstract: 'Add paths to @INC from a config file'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Spec::Functions: 0
+  File::pushd: 1.00
+  List::Util: 0
+  Test::More: 0
+  version: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: ylib
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  ylib:
+    file: lib/ylib.pm
+    version: 0.003
+requires:
+  File::HomeDir: 0.86
+  Path::Tiny: 0.052
+  lib: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/ylib/issues
+  homepage: https://github.com/dagolden/ylib
+  repository: https://github.com/dagolden/ylib.git
+version: 0.003
+x_authority: cpan:DAGOLDEN

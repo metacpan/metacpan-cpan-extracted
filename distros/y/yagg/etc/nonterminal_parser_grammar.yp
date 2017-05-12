@@ -1,0 +1,939 @@
+%{
+# (c) Copyright David Coppit 2004, all rights reserved.
+# (see COPYRIGHT in yagg documentation for use and distribution
+# rights)
+#
+# Written by David Coppit <david@coppit.org>
+#
+# This grammar is based on that of Bison 1.05. I've left out undocumented
+# features, and definitions that are unused. A version of this file was
+# submitted to Francois Desarmenien, the author of Parse::Yapp. Hopefully he
+# will decide to use it to update his grammar parser.
+#
+# Use: yapp -m 'yagg::NonterminalParser' -o lib/yagg/NonterminalParser.pm etc/nonterminal_parser_grammar.yp
+#
+# to generate the Parser module.
+# 
+%}
+
+%{
+require 5.004;
+
+use Carp;
+
+my($input,$lexlevel,@lineno,$nberr,$prec,$precedences,$labelno);
+my($syms,$declarations,$epilogue,$token,$term,$nterm,$rules,$precterm,$start,$nullable,$aliases);
+my($expect);
+
+%}
+
+/* Define the tokens together with their human representation.  */
+
+%token PERCENT_TOKEN
+
+%token PERCENT_TYPE
+
+%token PERCENT_UNION
+
+%token PERCENT_LEFT
+%token PERCENT_RIGHT
+%token PERCENT_NONASSOC
+
+%token PERCENT_PREC
+
+
+/*----------------------.
+| Global Declarations.  |
+`----------------------*/
+
+%token PERCENT_DEBUG
+%token PERCENT_DEFINES
+%token PERCENT_EXPECT
+%token PERCENT_FILE_PREFIX
+%token PERCENT_LOCATIONS
+%token PERCENT_NAME_PREFIX
+%token PERCENT_NO_LINES
+%token PERCENT_OUTPUT
+%token PERCENT_PARSE_PARAM
+%token PERCENT_PURE_PARSER
+%token PERCENT_START
+%token PERCENT_TOKEN_TABLE
+%token PERCENT_VERBOSE
+%token PERCENT_YACC
+
+
+%token EQUAL
+%token ERROR
+%token SEMICOLON
+%token PIPE
+
+%%
+
+input:
+  declarations '%%' grammar epilogue_opt
+            {
+                    $start
+                or  $start=$$rules[1][0];
+
+                    ref($$nterm{$start})
+                or  _SyntaxError(2,"Start symbol $start not found ".
+                                   "in rules section",$_[4][1]);
+
+                $$rules[0]=[ '$start', [ $start, chr(0) ], undef, undef ];
+            }
+# A Parse::Yapp check that is not in the Bison grammar
+| declarations '%%' { _SyntaxError(2,"No rules in input grammar",$_[2][1]); }
+;
+
+
+	/*------------------------------------.
+	| Declarations: before the first %%.  |
+	`------------------------------------*/
+
+declarations:
+  /* Nothing */
+| declarations declaration
+;
+
+declaration:
+  grammar_declaration
+| PROLOGUE                                 { push(@$declarations,$_[1]); undef }
+| PERCENT_DEBUG                            {
+      _SyntaxError(0,"Parser option \"\%debug\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_DEFINES                          {
+      _SyntaxError(0,"Parser option \"\%defines\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_EXPECT INT                       { $expect=$_[2][0]; undef }
+| PERCENT_FILE_PREFIX EQUAL string_content {
+      _SyntaxError(0,"Parser option \"\%file-prefix\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_LOCATIONS                      {
+      _SyntaxError(0,"Parser option \"\%locations\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_NAME_PREFIX EQUAL string_content {
+      _SyntaxError(0,"Parser option \"\%name-prefix\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_NO_LINES                       {
+      _SyntaxError(0,"Parser option \"\%no-lines\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_OUTPUT                         {
+      _SyntaxError(0,"Parser option \"\%output\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_PARSE_PARAM                    {
+      _SyntaxError(0,"Parser option \"\%parse-param\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_PURE_PARSER                    {
+      _SyntaxError(0,"Parser option \"\%pure-parser\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_TOKEN_TABLE                    {
+      _SyntaxError(0,"Parser option \"\%token-table\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_VERBOSE                        {
+      _SyntaxError(0,"Parser option \"\%verbose\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| PERCENT_YACC                           {
+      _SyntaxError(0,"Parser option \"\%yacc\" is not supported. ".
+                     "It will be ignored",$_[1][1]);
+                                           }
+| SEMICOLON
+;
+
+grammar_declaration:
+  precedence_declaration
+| symbol_declaration
+| PERCENT_START symbol
+    {
+      $start=$_[2][0]; undef
+    }
+| PERCENT_UNION BRACED_CODE
+    {
+      undef
+    } #ignore
+;    
+
+symbol_declaration:
+  PERCENT_TOKEN symbol_defs_1
+            {
+                for (@{$_[2]}) {
+                    my($symbol,$lineno)=@$_;
+
+                        exists($$token{$symbol})
+                    and do {
+                        _SyntaxError(0,
+                                "Token $symbol redefined: ".
+                                "Previously defined line $$token{$symbol}",
+                                $lineno);
+                        next;
+                    };
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ ];
+                }
+                undef
+            }
+| PERCENT_TOKEN TYPE symbol_defs_1
+            {
+                for (@{$_[3]}) {
+                    my($symbol,$lineno)=@$_;
+
+                        exists($$token{$symbol})
+                    and do {
+                        _SyntaxError(0,
+                                "Token $symbol redefined: ".
+                                "Previously defined line $$token{$symbol}",
+                                $lineno);
+                        next;
+                    };
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ ];
+                }
+                undef
+            }
+| PERCENT_TYPE TYPE symbols_1
+            {
+                for ( @{$_[3]} ) {
+                    my($symbol,$lineno)=@$_;
+
+                        exists($$nterm{$symbol})
+                    and do {
+                        _SyntaxError(0,
+                                "Non-terminal $symbol redefined: ".
+                                "Previously defined line $$nterm{$symbol}",
+                                $lineno);
+                        next;
+                    };
+                    delete($$term{$symbol});   #not a terminal
+                    $$nterm{$symbol}=undef;    #is a non-terminal
+                }
+            }
+;
+
+precedence_declaration:
+  precedence_declarator type_opt symbols_1
+    {
+      for (@{$_[3]}) {
+          my($symbol,$lineno)=@$_;
+
+              defined($$precedences{$symbol})
+          and do {
+              _SyntaxError(1,
+                  "Precedence for symbol $symbol redefined: ".
+                  "Previously defined line $$precedences{$symbol}",
+                  $lineno);
+              next;
+          };
+          $$token{$symbol}=$lineno;
+          $$term{$symbol} = [ $_[1][0], $prec ];
+          $$precedences{$symbol} = $prec;
+      }
+      ++$prec;
+      undef
+    }
+;
+
+precedence_declarator:
+  PERCENT_LEFT
+| PERCENT_RIGHT
+| PERCENT_NONASSOC
+;
+
+type_opt:
+  /* Nothing. */
+| TYPE
+;
+
+/* One or more nonterminals to be %typed. */
+
+symbols_1:
+  symbol            { [ $_[1] ] }
+| symbols_1 symbol  { push(@{$_[1]},$_[2]); $_[1] }
+;
+
+/* One token definition.  */
+symbol_def:
+  ID
+| ID INT
+    {
+      _SyntaxError(0,"User-defined numeric token codes are not supported. ".
+                     "The value \"$_[2][0]\" will be ignored",$_[2][1]);
+      $_[1];
+    }
+| ID string_as_id
+    {
+      $$aliases{$_[2][0]} = $_[1][0];
+      delete $$term{$_[2][0]};
+      $_[1];
+    }
+| ID INT string_as_id
+    {
+      $$aliases{$_[3][0]} = $_[1][0];
+      delete $$term{$_[3][0]};
+      _SyntaxError(0,"User-defined numeric token codes are not supported. ".
+                     "The value \"$_[2][0]\" will be ignored",$_[2][1]);
+      $_[1];
+    }
+;
+
+/* One or more symbol definitions. */
+symbol_defs_1:
+  symbol_def
+    { [ $_[1] ] }
+| symbol_defs_1 symbol_def
+    { push(@{$_[1]},$_[2]); $_[1]; }
+;
+
+
+	/*------------------------------------------.
+	| The grammar section: between the two %%.  |
+	`------------------------------------------*/
+
+grammar:
+  rules_or_grammar_declaration
+| grammar rules_or_grammar_declaration
+;
+
+rules_or_grammar_declaration:
+  rules
+# Yapp::Parse doesn't support the Bison extension which allows use of
+# the grammar declarations in the body of the grammar. Should we enable this?
+#| grammar_declaration
+#    {
+#      if (yacc_flag)
+#      {
+#        _SyntaxError(2, "POSIX forbids declarations in the grammar", $_[0][1]);
+#      }
+#    }
+| ERROR symbol SEMICOLON
+    {
+      $_[0]->YYErrok
+    }
+| ERROR SEMICOLON
+    {
+      $_[0]->YYErrok
+    }
+| SEMICOLON
+;
+
+rules:
+  ID_COLON rhses_1
+    {
+      # For some reason Parse::Yapp treats the last code array as a
+      # non-reference. i.e. instead of
+      # [ ['SYMB',...], ['BRACED_CODE',...], ['SYMB',...], ['BRACED_CODE',['x',4]] ]
+      # it has
+      # [ ['SYMB',...], ['BRACED_CODE',...], ['SYMB',...], 'x',4 ]
+
+      my $code;
+
+      for(my $i=0;$i<=$#{$_[2]};$i++)
+      {
+        unless (defined $_[2][$i])
+        {
+          splice(@{$_[2]},$i,1,[undef,undef]);
+          next;
+        }
+
+        # Get the precedence, if any
+        my $precedence = undef;
+
+        for(my $j=0;$j<=$#{$_[2][$i]};$j++)
+        {
+          if ($_[2][$i][$j][0] eq 'PERCENT_PREC')
+          {
+            if(defined $precedence)
+            {
+              _SyntaxError(2,"\%prec can only appear once in a rule", $_[1][1]);
+            }
+            else
+            {
+              $precedence = $_[2][$i][$j][1];
+              splice(@{$_[2][$i]},$j,1),
+            }
+          }
+        }
+
+        # Dereference last code block
+        my $code_block_found = 0;
+
+        if(@{$_[2][$i]} >= 1)
+        {
+          if ($_[2][$i][-1][0] eq 'BRACED_CODE')
+          {
+            $code_block_found = 1;
+            # Merge the lists if there was an unaction block too. (We
+            # need to make sure we do this in a way that doesn't freak
+            # Parse::Yapp out.)
+            my @code_and_line_numbers = @{ $_[2][$i][-1][1] };
+            push @code_and_line_numbers, @{ $_[2][$i][-1][2] }
+              if defined $_[2][$i][-1][2];
+            splice(@{$_[2][$i]},-1,1,($precedence,\@code_and_line_numbers));
+          }
+        }
+
+        # Append undef, undef if no code block was found
+        push @{$_[2][$i]}, $precedence, undef unless $code_block_found;
+
+        for(my $j=0;$j<=$#{$_[2][$i]}-2;$j++)
+        {
+          $_[2][$i][$j][0] = 'CODE' if $_[2][$i][$j][0] eq 'BRACED_CODE';
+        }
+      }
+
+      _AddRules($_[1],$_[2]);
+      undef;
+    }
+;
+
+rhses_1:
+  rhs               { [ $_[1] ] }
+| rhses_1 PIPE rhs   { push(@{$_[1]},$_[3]); $_[1] }
+;
+
+rhs:
+  /* Nothing.  */
+    { }
+| rhs symbol
+    {
+      push(@{$_[1]},[ 'SYMB', $_[2] ]);
+      $_[1];
+    }
+| rhs action_opt action
+    {
+      if (defined $_[2])
+      {
+        push(@{$_[1]}, [ 'BRACED_CODE', $_[2], $_[3] ] );
+      }
+      else
+      {
+        push(@{$_[1]}, [ 'BRACED_CODE', $_[3] ] );
+      }
+      $_[1];
+    }
+| rhs PERCENT_PREC symbol
+    {
+                       	defined($$precedences{$_[3][0]})
+                    or  do {
+                        _SyntaxError(1,"No precedence for symbol $_[3][0]",
+                                         $_[3][1]);
+                        return undef;
+                    };
+
+                    ++$$precterm{$_[3][0]};
+                    my $temp = $$precedences{$_[3][0]};
+
+                    push(@{$_[1]}, [ 'PERCENT_PREC', $temp ] );
+                    $_[1];
+    }
+;
+
+symbol:
+  ID
+| string_as_id
+  {
+    if (exists $$aliases{$_[1][0]})
+    {
+      $_[1][0] = $$aliases{$_[1][0]};
+    }
+    else
+    {
+      # Must be a literal, in which case we don't touch it.
+    }
+    $_[1];
+  }
+;
+
+action_opt:
+  /* Nothing.  */
+| BRACED_CODE_WITH_BRACED_CODE_FOLLOWING
+;
+
+action:
+  BRACED_CODE
+;
+
+/* A string used as an ID: we have to keep the quotes. */
+string_as_id:
+  STRING
+    {
+        if (exists $$aliases{$_[1][0]})
+        {
+              exists($$syms{$$aliases{$_[1][0]}})
+          or  do {
+              $$syms{$$aliases{$_[1][0]}} = $_[1][1];
+              $$term{$$aliases{$_[1][0]}} = undef;
+          };
+        }
+        else
+        {
+              exists($$syms{$_[1][0]})
+          or  do {
+              $$syms{$_[1][0]} = $_[1][1];
+              $$term{$_[1][0]} = undef;
+          };
+        }
+        $_[1]
+    }
+;
+
+/* A string used for its contents.  Strip the quotes. */
+string_content:
+  STRING
+    {
+      $_[1][0] =~ s/.(.*)./$1/;
+      $_[1]
+    };
+
+
+epilogue_opt:
+  /* Nothing.  */
+| '%%' EPILOGUE
+    {
+      $epilogue=$_[2]
+    }
+;
+
+ID:  IDENT   {
+                        exists($$syms{$_[1][0]})
+                    or  do {
+                        $$syms{$_[1][0]} = $_[1][1];
+                        $$term{$_[1][0]} = undef;
+                    };
+                    $_[1]
+             }
+;
+
+%%
+sub _Error {
+    my($value)=$_[0]->YYCurval;
+
+    my($what)= $token ? "input: '$$value[0]'" : "end of input";
+
+    _SyntaxError(1,"Unexpected $what",$$value[1]);
+}
+
+sub _Lexer {
+ 
+    #At EOF
+        pos($$input) >= length($$input)
+    and return('',[ undef, -1 ]);
+
+    #In Epilogue section
+        $lexlevel > 1
+    and do {
+        my($pos)=pos($$input);
+
+        $lineno[0]=$lineno[1];
+        $lineno[1]=-1;
+        pos($$input)=length($$input);
+        return('EPILOGUE',[ substr($$input,$pos), $lineno[0] ]);
+    };
+
+    #Skip blanks
+        $$input=~m{\G((?:
+                            \s+           # any white space char
+                        |   \#[^\n]*\n    # Perl like comments
+                        |   /\*.*?\*/     # C like comments
+                        |   //[^\n]*\n    # C++ like comments
+                        )+)}xsgc
+    and do {
+        my($blanks)=$1;
+
+        #Maybe At EOF
+            pos($$input) >= length($$input)
+        and return('',[ undef, -1 ]);
+
+        $lineno[1]+= $blanks=~tr/\n//;
+    };
+
+    $lineno[0]=$lineno[1];
+
+        $$input=~/\G<([A-Za-z_.][A-Za-z0-9_.]*)>/gc
+    and return('TYPE',[ $1, $lineno[0] ]);
+
+        $$input=~m{\G
+                     ([A-Za-z_.][A-Za-z0-9_.]*) #identifier
+                     ((?:
+                            \s+           # any white space char
+                        |   \#[^\n]*\n    # Perl like comments
+                        |   /\*.*?\*/     # C like comments
+                        |   //[^\n]*\n    # C++ like comments
+                        )*)
+                     :        # colon
+                 }xsgc
+    and do {
+        my($blanks)=$2;
+
+        $lineno[1]+= $blanks=~tr/\n//;
+
+        return('ID_COLON',[ $1, $lineno[0] ]);
+    };
+
+        $$input=~/\G([A-Za-z_.][A-Za-z0-9_.]*)/gc
+    and do {
+            $1 eq 'error'
+        and do {
+            return('ERROR',[ 'error', $lineno[0] ]);
+        };
+        return('IDENT',[ $1, $lineno[0] ]);
+    };
+
+        $$input=~/\G('(?:[^'\\]|\\\\|\\'|\\)+?')/gc
+    and do {
+            $1 eq "'error'"
+        and do {
+            _SyntaxError(0,"Literal 'error' ".
+                           "will be treated as error token",$lineno[0]);
+            return('ERROR',[ 'error', $lineno[0] ]);
+        };
+        return('STRING',[ $1, $lineno[0] ]);
+    };
+
+        $$input=~/\G("(?:[^"\\]|\\\\|\\"|\\)+?")/gc
+    and do {
+            $1 eq '"error"'
+        and do {
+            _SyntaxError(0,'Literal "error" '.
+                           "will be treated as error token",$lineno[0]);
+            return('ERROR',[ 'error', $lineno[0] ]);
+        };
+        return('STRING',[ $1, $lineno[0] ]);
+    };
+
+        $$input=~/\G(%%)/gc
+    and do {
+        ++$lexlevel;
+        return($1, [ $1, $lineno[0] ]);
+    };
+
+        $$input=~/\G\{/gc
+    and do {
+        my $code;
+
+        my $level = 1;
+        my $from=pos($$input);
+        my $to;
+
+
+        while($$input =~ /\G(.*?
+                               (?:
+                                   \#[^\n]*\n    # Perl like comments
+                                 | \/\*.*?\*\/     # C like comments
+                                 | \/\/[^\n]*\n    # C++ like comments
+                                 | (?<!\\)'.*?(?<!\\)'  # Single-quoted strings
+                                 | (?<!\\)".*?(?<!\\)"  # Double-quoted strings
+                                 | ([{}]|$)         # Our match or EOF
+                               )
+                            )/xsgc)
+        {
+          if (defined $2)
+          {
+            if ($2 eq '}')
+            {
+              $level--;
+
+              unless($level)
+              {
+                $to = pos($$input) - 1;
+                last;
+              }
+            }
+            elsif ($2 eq '{')
+            {
+              $level++;
+            }
+            else
+            {
+              $to = length $$input;
+              print(2,"Unmatched { opened line $lineno[0]",-1);
+              last;
+            }
+          }
+        }
+
+        $code = substr($$input,$from,$to-$from);
+
+        $lineno[1]+= $code=~tr/\n//;
+
+        # Lookahead to resolve shift/reduce error
+        {
+          my $old_pos = pos $$input;
+          if ($$input =~ /\G\s*\{/)
+          {
+            pos $$input = $old_pos;
+            return('BRACED_CODE_WITH_BRACED_CODE_FOLLOWING',[ $code, $lineno[0] ]);
+          }
+          else
+          {
+            pos $$input = $old_pos;
+            return('BRACED_CODE',[ $code, $lineno[0] ]);
+          }
+        }
+    };
+
+    if($lexlevel == 0) {# In declarations section
+            $$input=~/\G%left/gc
+        and return('PERCENT_LEFT',[ 'LEFT', $lineno[0] ]);
+            $$input=~/\G%right/gc
+        and return('PERCENT_RIGHT',[ 'RIGHT', $lineno[0] ]);
+            $$input=~/\G%nonassoc/gc
+        and return('PERCENT_NONASSOC',[ 'NONASSOC', $lineno[0] ]);
+            $$input=~/\G%(start)/gc
+        and return('PERCENT_START',[ undef, $lineno[0] ]);
+            $$input=~/\G%(expect)/gc
+        and return('PERCENT_EXPECT',[ undef, $lineno[0] ]);
+            $$input=~/\G%\{/gc
+        and do {
+            my($code);
+
+            my $from=pos($$input);
+            my $to;
+
+            while($$input =~ m{\G(.*?
+                                         (?:
+                                             \#[^\n]*\n    # Perl like comments
+                                           | /\*.*?\*/     # C like comments
+                                           | //[^\n]*\n    # C++ like comments
+                                           | (%\}|$)         # Our match or EOF
+                                         )
+                                     )}xsgc)
+            {
+              if (defined $2)
+              {
+                if ($2 eq '%}')
+                {
+                  $to = pos($$input) - 2;
+                }
+                else
+                {
+                  $to = length $$input;
+                  _SyntaxError(2,"Unmatched \%{ opened line $lineno[0]",-1)
+                }
+
+                last;
+              }
+            }
+
+            $code = substr($$input,$from,$to-$from);
+
+            $lineno[1]+= $code=~tr/\n//;
+            return('PROLOGUE',[ $code, $lineno[0] ]);
+        };
+
+            $$input=~/\G%(token)/gc
+        and return('PERCENT_TOKEN',[ undef, $lineno[0] ]);
+            $$input=~/\G%(type)/gc
+        and return('PERCENT_TYPE',[ undef, $lineno[0] ]);
+            $$input=~/\G%(union)/gc
+        and return('PERCENT_UNION',[ undef, $lineno[0] ]);
+            $$input=~/\G%(debug)/gc
+        and return('PERCENT_DEBUG',[ undef, $lineno[0] ]);
+            $$input=~/\G%(defines)/gc
+        and return('PERCENT_DEFINES',[ undef, $lineno[0] ]);
+            $$input=~/\G%(file-prefix)/gc
+        and return('PERCENT_FILE_PREFIX',[ undef, $lineno[0] ]);
+            $$input=~/\G%(locations)/gc
+        and return('PERCENT_LOCATIONS',[ undef, $lineno[0] ]);
+            $$input=~/\G%(name-prefix)/gc
+        and return('PERCENT_NAME_PREFIX',[ undef, $lineno[0] ]);
+            $$input=~/\G%(no-lines)/gc
+        and return('PERCENT_NO_LINES',[ undef, $lineno[0] ]);
+            $$input=~/\G%(output)/gc
+        and return('PERCENT_OUTPUT',[ undef, $lineno[0] ]);
+            $$input=~/\G%(parse-param)/gc
+        and return('PERCENT_PARSE_PARAM',[ undef, $lineno[0] ]);
+            $$input=~/\G%(pure[-_]parser)/gc
+        and return('PERCENT_PURE_PARSER',[ undef, $lineno[0] ]);
+            $$input=~/\G%(token-table)/gc
+        and return('PERCENT_TOKEN_TABLE',[ undef, $lineno[0] ]);
+            $$input=~/\G%(verbose)/gc
+        and return('PERCENT_VERBOSE',[ undef, $lineno[0] ]);
+            $$input=~/\G%(yacc)/gc
+        and return('PERCENT_YACC',[ undef, $lineno[0] ]);
+
+            $$input=~/\G([0-9]+)/gc
+        and return('INT',[ $1, $lineno[0] ]);
+
+    }
+    else {# In rule section
+            $$input=~/\G%(prec)/gc
+        and return('PERCENT_PREC',[ undef, $lineno[0] ]);
+    }
+
+        $$input=~/\G=/gc
+    and return('EQUAL',[ undef, $lineno[0] ]);
+        $$input=~/\G;/gc
+    and return('SEMICOLON',[ undef, $lineno[0] ]);
+        $$input=~/\G\|/gc
+    and return('PIPE',[ undef, $lineno[0] ]);
+
+    #Always return something
+        $$input=~/\G(.)/sg
+    or  die "Parse::Yapp::Grammar::Parse: Match (.) failed: report as a BUG";
+
+        $1 eq "\n"
+    and ++$lineno[1];
+
+    ( $1 ,[ $1, $lineno[0] ]);
+
+}
+
+sub _SyntaxError {
+    my($level,$message,$lineno)=@_;
+
+    $message= "*".
+              [ 'Warning', 'Error', 'Fatal' ]->[$level].
+              "* $message, at ".
+              ($lineno < 0 ? "eof" : "line $lineno").
+              ".\n";
+
+        $level > 1
+    and die $message;
+
+    warn $message;
+
+        $level > 0
+    and ++$nberr;
+
+        $nberr == 20 
+    and die "*Fatal* Too many errors detected.\n"
+}
+
+sub _AddRules {
+    my($lhs,$lineno)=@{$_[0]};
+    my($rhss)=$_[1];
+
+        ref($$nterm{$lhs})
+    and do {
+        _SyntaxError(1,"Non-terminal $lhs redefined: ".
+                       "Previously declared line $$syms{$lhs}",$lineno);
+        return;
+    };
+
+        ref($$term{$lhs})
+    and do {
+        my($where) = exists($$token{$lhs}) ? $$token{$lhs} : $$syms{$lhs};
+        _SyntaxError(1,"Non-terminal $lhs previously ".
+                       "declared as token line $where",$lineno);
+        return;
+    };
+
+        ref($$nterm{$lhs})      #declared through %type
+    or  do {
+            $$syms{$lhs}=$lineno;   #Say it's declared here
+            delete($$term{$lhs});   #No more a terminal
+    };
+    $$nterm{$lhs}=[];       #It's a non-terminal now
+
+    my($epsrules)=0;        #To issue a warning if more than one epsilon rule
+
+    for my $rhs (@$rhss) {
+        my($tmprule)=[ $lhs, [ ], splice(@$rhs,-2) ]; #Init rule
+
+            @$rhs
+        or  do {
+            ++$$nullable{$lhs};
+            ++$epsrules;
+        };
+
+        for (0..$#$rhs) {
+            my($what,$value)=@{$$rhs[$_]};
+
+                $what eq 'CODE'
+            and do {
+                my($name)='@'.++$labelno."-$_";
+                push(@$rules,[ $name, [], undef, $value ]);
+                push(@{$$tmprule[1]},$name);
+                next;
+            };
+            push(@{$$tmprule[1]},$$value[0]);
+        }
+        push(@$rules,$tmprule);
+        push(@{$$nterm{$lhs}},$#$rules);
+    }
+
+        $epsrules > 1
+    and _SyntaxError(0,"More than one empty rule for symbol $lhs",$lineno);
+}
+
+sub Parse {
+    my($self)=shift;
+
+        @_ > 0
+    or  croak("No input grammar\n");
+
+    my($parsed)={};
+
+    $input=\$_[0];
+
+    $lexlevel=0;
+    @lineno=(1,1);
+    $nberr=0;
+    $prec=0;
+    $labelno=0;
+
+    $declarations=();
+    $epilogue="";
+
+    $syms={};
+    $token={};
+    $term={};
+    $precedences={};
+    $nterm={};
+    $rules=[ undef ];   #reserve slot 0 for start rule
+    $precterm={};
+
+    $start="";
+    $nullable={};
+    $aliases={};
+    $expect=0;
+
+    pos($$input)=0;
+
+
+    $self->YYParse(yylex => \&_Lexer, yyerror => \&_Error);
+
+        $nberr
+    and _SyntaxError(2,"Errors detected: No output",-1);
+
+    @$parsed{ 'HEAD', 'TAIL', 'RULES', 'NTERM', 'TERM',
+              'NULL', 'PREC', 'SYMS',  'START', 'EXPECT' }
+    =       (  $declarations,  $epilogue,  $rules,  $nterm,  $term,
+               $nullable, $precterm, $syms, $start, $expect);
+
+    undef($input);
+    undef($lexlevel);
+    undef(@lineno);
+    undef($nberr);
+    undef($prec);
+    undef($labelno);
+
+    undef($declarations);
+    undef($epilogue);
+
+    undef($syms);
+    undef($token);
+    undef($term);
+    undef($precedences);
+    undef($nterm);
+    undef($rules);
+    undef($precterm);
+
+    undef($start);
+    undef($nullable);
+    undef($aliases);
+    undef($expect);
+
+    $parsed
+}
+

@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+# Exits with error codes:
+# - 1: timeout
+# - 2: byte overflow
+
+use strict;
+
+unless (@ARGV)
+{
+  print "usage: $0 <progress timeout> <max bytes> <command> [arguments]\n\n";
+  print "Use 0 timeout for no timeout, and 0 for no max bytes\n";
+  exit 1;
+}
+
+my ($progress_timeout, $max_bytes, @command_and_args) = @ARGV;
+
+
+my $process_pid = open COMMAND, "@command_and_args |";
+die "Can't run command: $!" unless $process_pid;
+
+$SIG{KILL} = sub { kill 9, $process_pid; exit 1 };
+$SIG{PIPE} = sub { kill 9, $process_pid; exit 1 };
+$SIG{HUP}  = sub { kill 9, $process_pid; exit 1 };
+$SIG{INT}  = sub { kill 9, $process_pid; exit 1 };
+$SIG{QUIT} = sub { kill 9, $process_pid; exit 1 };
+$SIG{SEGV} = sub { kill 9, $process_pid; exit 1 };
+$SIG{TERM} = sub { kill 9, $process_pid; exit 1 };
+
+my $stop = 'no';
+my $num_bytes = 0;
+
+# Keep reading and printing as long as the process is still alive
+# and outputting in a timely manner.
+do
+{
+  my $buffer = undef;
+  my $bytes_read = 0;
+
+  eval
+  {
+    local $SIG{ALRM} = sub { die "alarm" };
+    alarm $progress_timeout;
+    $bytes_read = sysread(COMMAND, $buffer, 100000);
+    alarm 0;
+  };
+
+  die if $@ and $@ !~ /alarm/;
+
+  $num_bytes += $bytes_read if defined $buffer;
+
+  $stop = 'alarm' if $@ =~ /alarm/;
+  $stop = 'size' if $max_bytes != 0 && $num_bytes > $max_bytes;
+  $stop = 'done' if $bytes_read == 0 && $@ !~ /alarm/;
+  $stop = 'child gone' unless kill(0, $process_pid) ;
+  
+  print $buffer if defined $buffer;
+}
+while ($stop eq 'no');
+
+my $command_succeeded = close COMMAND;
+
+# Kill it if it timed out.
+if ($stop eq 'alarm')
+{
+  print STDERR "timeout: Progress timeout of $progress_timeout second(s) has expired. Killing process $process_pid\n";
+  kill 15, $process_pid;
+  exit(1);
+}
+# Kill it if exceeded output
+elsif ($stop eq 'size')
+{
+  print STDERR "timeout: Maximum of $max_bytes bytes exceeded. Killing process $process_pid\n";
+  kill 15, $process_pid;
+  exit(2);
+}
+elsif ($stop eq 'child gone' && $stop eq 'done')
+{
+  if ($command_succeeded)
+  {
+    exit(0);
+  }
+  else
+  {
+    exit(1);
+  }
+}

@@ -1,0 +1,133 @@
+General TODOs:
+- After Module::Install support CPAN::Meta 2.0, specify gpl_2 as the license.
+  Suggested by Paul Howarth <paul@city-fan.org>
+- After Module::Install support CPAN::Meta 2.0, add info for repository URL
+  and bug tracker. Suggested by Paul Howarth <paul@city-fan.org>
+- In t/compile.t, copy t/logical_expressions_simple to a tempdir, chdir there,
+  then compile.
+
+-----------------------------------------------------------------------------
+
+Generator TODOs:
+
+- Implement the optimization used by Khorat: When doing the incrementing
+	following a failed action block, increment until one of the values accessed
+	by the action block is incremented.
+- Mark Morgan suggested using fork() to checkpoint state, so that unaction
+  blocks are not necessary. Performance penalty?
+- Detect ambiguous grammars, either during generation or at runtime. This is
+  important in order to avoid generating the same string twice.
+- Handle precedence
+  %union {
+    double number;
+  }
+
+  %type  <number> exp
+  %type  <number> number
+  %left           "+" "-"
+  %left           "*" "/"
+
+  %%
+
+  exp :
+    exp "+" exp { $$ = $1 + $3; } |
+    exp "-" exp { $$ = $1 - $3; } |
+    exp "*" exp { $$ = $1 * $3; } |
+    exp "/" exp {
+      if ( $3 == 0 ) {
+        yyerror("Can't divide by zero");
+        $$ = $1;
+      } else
+        $$ = $1 / $3;
+    } |
+    number ;
+
+  number :
+    "3" { $$ = 3; } |
+    "1" { $$ = 1; } ;
+- Update the language grammar so that it supports equivalences, so that the
+  terminal input file is not necessary in this case either.
+- Change the directory mirroring so that it removes additional files from
+  output/src, but not others. Need to update the GNUmakefile to remove .o and
+  .d files if the corresponding source file is missing. This will make -f
+  largely unnecessary, and will allow reuse of already compiled generator
+  files.
+- Add support for non-rsync copying solutions.
+- Actually parse the C/C++ in the HEAD and TAIL, moving implementation stuff
+  out of the head and replacing it with extern declarations. Right now we have
+  a Perl hack.
+  - I could try Inline::C::ParseRegExp or Inline::C::ParseRecDescent for C,
+    and Inline::CPP::grammar for C++.
+  - Parse::RecDescent has a pretty functional demo_Cgrammar.pl, but the
+    demo_cpp.pl seems a bit limited.
+  - PERCEPS (http://starship.python.net/crew/tbryan/PERCEPS/) is a Perl header
+    file parser. Not sure how well it would work for the head section of a
+    YACC or LEX input file.
+- Test it on more grammars
+- Once Parse::Yapp progresses past 1.05, see if we can update our code to
+  remove any workarounds and such.
+- Add a simple non-equivalence "FOO_#" which just generates strings.
+  - OOPS!  This is hard because we don't know how many to generate! We would
+    need to know the total number of terminals of the given type that are in
+    the string, but all we have is a pointer to the previous rule.
+  - It might be possible to do this if we deferred creation of the match_#
+    rule lists so that there is only one active rule list with its allocated
+    rules. That way we could just count how many total terminals have been
+    created of a given type. (If more than one match_# has allocated its
+    rules, this count will be more than it should be.)
+- Doesn't process grammar here: http://pltplp.net/lex-yacc/example.html.en
+  correctly
+- Modify the terminal parser grammar so that it accepts unquoted strings in
+  alternations and equivalences. e.g. (a|b) and [a|b] instead of ("a"|"b") and
+  ["a"|"b"]
+- .lg files aren't parsed correctly if a definition follows right after
+  another:
+  "+"             return PLUS;
+  "-"             return MINUS;
+- YYLVAL isn't supported instead of %union. See
+  http://pltplp.net/lex-yacc/example.html.en
+- Make sure the default rule $$ = $1 is implemented, and that it doesn't
+  prevent the caching nonterminal rule template from being used.
+- During installation, ask for default make arguments like "-j4"
+- Add support for yyerror in the grammar file
+- Add support for yyerror(char*) or yyerror(string)
+- Construct a call graph to determine if an action block can actually call
+  yyerror. If not, we can do caching for that nonterminal, instead of just
+  assuming that it will, as we do now.
+- Check into the feasibility of creating subclasses of Terminal_Rule for each
+  of the 4 kinds of terminals, and simplify the generation code.
+- Add support for random generation of outputs, but with a true uniform
+	distribution across the grammar:
+	http://citeseer.ist.psu.edu/568471.html
+	http://portal.acm.org/citation.cfm?id=313651.313803
+	http://scitation.aip.org/getabs/servlet/GetabsServlet?prog=normal&id=SMJCAT000012000004000645000001&idtype=cvips&gifs=yes
+	http://www.lri.fr/~genrgens/manual/GRGs-manual-html/node5.html#SECTION00520000000000000000
+- Add support for random generation of integer/floating point values in a
+	range. (Casiano Rodriguez Leon <casiano@ull.es> asked for it.)
+- Do structure-coverage testing, where you generate only one random instance
+	of any given structure.
+
+-----------------------------------------------------------------------------
+
+Fault tree TODOs:
+
+- Check/fix type order vs. system event order. Maybe some FTs are not being
+  generated...
+
+-----------------------------------------------------------------------------
+
+Generated code TODOs:
+
+- make dist fails for generated code (todo.txt, etc). Need to update the
+  makefile
+- Speed up the generation, hopefully by reducing the amount of recursion. (1)
+  I've noticed that the generator calls reset a lot, then calls reset again
+  while checking for strings. Sometimes this is necessary, but always? (2) Can
+  we modify the code so that you don't have to call reset before calling check
+  for strings?
+- Copy const for pointer return values
+- Improve the length computation for the grammar productions as an
+  optimization on when rules are active. Right now we just use the minimum,
+  but we could compute the modulus for recursive grammars. NOTE: It's not
+  clear that this will actually save us a lot of work, given that I've
+  implemented an optimization to cache previously generated allocations.

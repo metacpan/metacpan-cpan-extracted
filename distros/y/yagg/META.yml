@@ -1,0 +1,51 @@
+---
+abstract: 'generate a string generator from a grammar'
+author:
+  - 'David Coppit <david@coppit.org>'
+build_requires:
+  Cwd: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Find: 0
+  File::Slurp: 0
+  File::Spec::Functions: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::Slurp: 0
+  URI::Escape: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: yagg
+no_index:
+  directory:
+    - examples
+    - inc
+    - private-lib
+    - t
+provides:
+  yagg:
+    file: yagg
+    version: '1.4007'
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  File::Path: 0
+  File::Temp: 0
+  FileHandle: 0
+  Getopt::Std: 0
+  IPC::Open3: 0
+  Parse::Yapp::Driver: 1.05
+  Text::Template: 0
+  URI: 0
+  perl: '5.005'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=yagg
+  homepage: https://github.com/coppit/yagg
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: https://github.com/coppit/yagg
+version: '1.4007'

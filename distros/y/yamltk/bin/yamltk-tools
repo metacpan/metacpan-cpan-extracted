@@ -1,0 +1,11 @@
+#!/bin/sh
+# yamltk-tools
+
+echo "
+   csv2yaml             Filter csv to yaml.
+   yaml2csv             Filter yaml to csv.
+   yamltk               yaml toolkit merges yaml and transforms bash variables to yaml.
+
+Try 'man yamltk' for more info.
+"
+

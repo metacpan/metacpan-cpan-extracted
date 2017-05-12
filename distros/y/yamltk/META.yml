@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               yamltk
+version:            1.08
+abstract:           yaml toolkit merges yaml and transforms bash variables to yaml
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 1
+    Cwd:                  3
+    Data::Dumper:         2.121_08
+    Exporter:             5
+    Getopt::Std::Strict:  1.01
+    Smart::Comments:      1
+    Test::Simple:         0
+    Text::CSV:            0
+    Text::CSV::Slurp:     0
+    XML::Dumper:          0.81
+    YAML:                 0.66
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

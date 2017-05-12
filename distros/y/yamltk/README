@@ -1,0 +1,113 @@
+
+================================================================================
+
+yamltk - yaml toolkit merges yaml and transforms bash variables to yaml
+
+USAGE
+    yamltk [OPTION].. PATH..
+
+       -c       check source
+       -h       help
+       -v       version
+       -x       use filename extensions as special
+       -m       output is xml
+
+  USAGE EXAMPLES
+    Merge ..
+           yamltk ./*yml > merged.yml
+
+    Check that these files have proper syntax
+           yamltk -c ./*yml
+
+    Merge in a special kind of way:
+           # cat houses.var
+           These are all houses.
+           They are really cool houses.
+           # cat notes.yml
+           ---
+           NAME: A great place to start
+           DESCRIPTION: I am without a doubt, descriptive.
+
+           # yamltk -x houses.var notes.yml
+           ---
+           DESCRIPTION: 'I am without a doubt, descriptive.'
+           NAME: A great place to start
+           houses: |-
+             These are all houses.
+             They are really cool houses.
+
+   SPECIAL EXTENSIONS
+    If you want to treat extensions as special, use the -x option flag.
+
+    If you use these, the filenames dictate how the data is merged.
+
+    The data is merged into a master hash. If the filename to merge from has
+    the string 'var', the file data is inserted into the master hash with
+    the key 'houses' for a filename of 'houses.var'
+
+       yamltk houses.var
+
+    If the data is yaml, it will be inserted- if it is not yaml, it is
+    inserted as scalar.
+
+    This is primarily being used to create data for use with tmpltk
+
+SEE ALSO
+    Also in this distribution:
+
+       csv2yaml - filter csv to yaml 
+       yaml2cvs - filter yaml to csv   
+       yamltk - parent package
+       yamltk-tools - lists info
+
+CAVEATS
+    Being used in production- but still in alpha. Please contact the AUTHOR
+    for any suggestions, etc.
+
+TODO
+    This should take in bash variables and be able to turn into YAML. For
+    example, if the input is 'set' putput, should be able to make that into
+    yaml output.
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+LICENSE
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e., under the terms of the
+    "Artistic License" or the "GNU General Public License".
+
+DISCLAIMER
+    This package is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the "GNU General Public License" for more details.
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Carp: 1
+Cwd: 3
+Data::Dumper: 2.121_08
+Exporter: 5
+Getopt::Std::Strict: 1.01
+Smart::Comments: 1
+Test::Simple: 0
+Text::CSV: 0
+Text::CSV::Slurp: 0
+XML::Dumper: 0.81
+YAML: 0.66
+
+
+INSTALL
+
+   perl Makefile.PL
+   make install
+
+
+

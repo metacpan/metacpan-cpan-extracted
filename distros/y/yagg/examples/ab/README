@@ -1,0 +1,13 @@
+This is an example that demonstrates methods for restricting the number of
+generated strings. See the tutorial for more information.
+
+Run it with:
+
+$ yagg -m ab.yg
+$ ./output/progs/generate 4
+
+$ yagg -m ab_1.yg
+$ ./output/progs/generate 4
+
+$ yagg -m ab_2.yg
+$ ./output/progs/generate 4

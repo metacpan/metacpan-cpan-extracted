@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+
+# This program is like "makedepend", except that it uses gcc/g++ to
+# generate the dependencies. The benefit is C++ support, which
+# makedepend doesn't have, and the ability to handle bugs in different
+# versions of gcc/g++. Call it like:
+# makedependgcc g++ -M -Idir1 -Idir2 input.cc -o input.o
+
+my $VERSION = 0.20;
+
+use strict;
+use Getopt::Std;
+
+die usage() if !@ARGV || $ARGV[0] =~ /--help/;
+
+my %opts = Get_Options();
+
+die usage() if $opts{'h'};
+
+my $dependencies = Get_Dependencies(@ARGV);
+
+unless ($opts{'f'})
+{
+  print $dependencies;
+  exit;
+}
+
+my $makefile_name = Get_Makefile_Name();
+
+my $makefile_text = Get_Makefile_Text($makefile_name);
+
+$makefile_text = Remove_Old_Dependencies($makefile_text)
+  unless $opts{'a'};
+
+if ($opts{'r'})
+{
+  Write_Makefile_Text($makefile_name, $makefile_text);
+  exit;
+}
+
+Back_Up_Makefile($makefile_name) unless $opts{'B'};
+
+$makefile_text = Add_Dependencies($makefile_text, $dependencies);
+
+Write_Makefile_Text($makefile_name, $makefile_text);
+
+exit;
+
+# ----------------------------------------------------------------------------
+
+sub usage
+{
+  <<"  EOF";
+usage: $0 [FLAGS] -- <g++ compile line with -M flag, but no -o flag>
+-a Append dependencies to makefile
+-r Just remove dependencies from makefile and exit
+-f Specify makefile name
+-B Suppress backup file
+
+If -f is not specified, output is printed to standard output.
+  EOF
+}
+
+# ----------------------------------------------------------------------------
+
+sub Get_Dependencies
+{
+  my @commands = @_;
+
+  my $dependencies = `@commands`;
+
+  exit 1 if $?;
+
+  # New versions of g++ are buggy. They write the output to the file
+  # specified by the -o flag instead of dumping to the screen. Plus the -o
+  # target does not have directories--i.e. -o build/foo.o ends up as "foo.o:"
+  # instead of "build/foo.o:"
+  if ($dependencies !~ /^.*:/)
+  {
+    my ($output_filename) = "@commands" =~ /-o (\S+)/;
+
+    open OUTPUT, $output_filename
+      or die "Can't read dependencies from $output_filename: $!";
+    local $/ = undef;
+    $dependencies = <OUTPUT>;
+    close OUTPUT;
+
+    unlink $output_filename;
+
+    $dependencies =~ s/(.*?)(\s*:)/$output_filename$2/;
+  }
+
+  return $dependencies;
+}
+
+# ----------------------------------------------------------------------------
+
+sub Get_Options
+{
+  my %opts;
+
+  $opts{'a'} = $opts{'r'} = $opts{'B'} = 0;
+
+  getopt('f',\%opts);
+
+  return %opts;
+}
+
+# ----------------------------------------------------------------------------
+
+sub Get_Makefile_Name
+{
+  my $makefile_name;
+
+  if (defined $opts{'f'})
+  {
+    $makefile_name = $opts{'f'};
+  }
+  else
+  {
+    $makefile_name =
+      -e 'GNUMakefile' ? 'GNUMakefile' : -e 'makefile' ? 'makefile' : -e 'Makefile' ? 'Makefile' : undef;
+  }
+
+  die "Couldn't find makefile named \"$makefile_name\"!\n"
+    unless -e $makefile_name;
+
+  return $makefile_name
+}
+
+# ----------------------------------------------------------------------------
+
+sub Back_Up_Makefile
+{
+  my $makefile_name = shift;
+
+  if (-e "$makefile_name.bak")
+  {
+    unlink "$makefile_name.bak"
+      or die "Couldn't remove $makefile_name.bak: $!\n";
+  }
+
+  system("cp $makefile_name $makefile_name.bak") == 0
+    or die "Couldn't copy $makefile_name to $makefile_name.bak: $!\n";
+}
+
+# ----------------------------------------------------------------------------
+
+sub Get_Makefile_Text
+{
+  my $makefile_name = shift;
+
+  open MAKEFILE, "$makefile_name"
+    or die "Couldn't open $makefile_name: $!\n";
+  local $/ = undef;
+  my $makefile_text = <MAKEFILE>;
+  close MAKEFILE;
+
+  return $makefile_text;
+}
+
+# ----------------------------------------------------------------------------
+
+sub Remove_Old_Dependencies
+{
+  my $makefile_text = shift;
+
+  $makefile_text =~ s/\s*\n# DO NOT DELETE\s*\n.*$/\n/s;
+
+  return $makefile_text;
+}
+
+# ----------------------------------------------------------------------------
+
+sub Add_Dependencies
+{
+  my $makefile_text = shift;
+  my $dependencies = shift;
+
+  $makefile_text .= "\n# DO NOT DELETE\n"
+    unless $makefile_text =~ /\n# DO NOT DELETE\n/;
+  $makefile_text .= "\n$dependencies";
+
+  return $makefile_text;
+}
+
+# ----------------------------------------------------------------------------
+
+sub Write_Makefile_Text
+{
+  my $makefile_name = shift;
+  my $makefile_text = shift;
+
+  open MAKEFILE, ">$makefile_name"
+    or die "Couldn't open $makefile_name for writing: $!\n";
+  print MAKEFILE $makefile_text;
+  close MAKEFILE;
+}
+

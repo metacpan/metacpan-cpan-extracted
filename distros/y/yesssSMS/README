@@ -1,0 +1,38 @@
+yesssSMS version 1.00
+=====================
+
+Objects of the yesssSMS class are only able to send text messages to
+mobile phones through the website of yesss!. To be able to use this
+service, you need to have an account at yesss! (a mobile phone). The
+target phone number must be provided with the international code starting
+with 00 (e.g. 0043 for Austria). The text messages are limited to 160 
+characters.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ * strict
+ * warnings
+ * HTML::Parser
+ * LWP::UserAgent
+ * HTTML::Cookies
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Armin Fuerst
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

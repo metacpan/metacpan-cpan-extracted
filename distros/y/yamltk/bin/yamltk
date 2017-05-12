@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+use strict;
+# ABSTRACT = 'yaml toolkit merges yaml and transforms bash variables to yaml.'
+use Getopt::Std::Strict 'chvxm';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.8 $ =~ /(\d+)/g; 
+use YAML;
+use XML::Dumper;
+
+$opt_v and print $VERSION and exit;
+$opt_h and print STDERR usage() and exit;
+
+
+
+
+sub check_yaml {
+   my $abs = shift;
+   -f $abs or warn("Not on disk: $abs\n") and return;
+   unless( eval { YAML::LoadFile($abs) }){
+         print STDERR "$abs, error: ";
+         YAML::LoadFile($abs);
+         die;
+   }
+   1;
+}
+  
+
+
+# default.. merge
+do {
+
+   my %data;
+  
+
+   SOURCE: for my $path (@ARGV){
+      -f $path or die("Not on disk: $path\n");
+
+
+      # are we using file extensions?
+      if ( $opt_x and $path=~/\bvar\W|\Wvar\b/i){
+         ### is .var file
+         
+         my $varname = $path;
+         $varname=~s/.+\/+//;
+         $varname=~s/\Wvar\W|\Wvar$|^var\W//i or die;
+         $varname=~s/^\W+|\W+$//g;
+         ### $varname
+         my $varval;
+
+         # is it yaml or text
+         if ( eval { YAML::LoadFile($path) } ){
+            ### is yaml, ok..
+            my @dats = YAML::LoadFile($path);
+            if (scalar @dats == 1){
+               $varval = $dats[0];
+            }
+            else {
+               $varval = [@dats];
+            }
+         }
+         else {
+            ### will treat as scalar content, not yaml
+            open(FILE,'<',$path) or die("cant open for reading, $!");
+            local $/;
+            $varval = <FILE>;
+            close FILE;
+            chomp $varval;
+            $varval=~s/\s+$|^\s+//sg;
+         }
+         
+         $data{$varname} = $varval;
+
+         next SOURCE;
+      }
+
+
+      else {
+         ### no exts... or not .var file..
+
+         
+
+      
+      
+         check_yaml($path);
+
+         my @data = YAML::LoadFile($path);
+
+         if (scalar @data > 1 ){
+            ### array
+            warn("array refs not accepted struct, $path\n");
+         }         
+
+      
+         ### hash
+         map { $data{$_} = $data[0]->{$_} } keys %{$data[0]};
+      
+
+         ### $path
+      }
+
+   }
+
+   if( !$opt_c ){# if just checking, don't say anything
+
+      print $opt_m ? XML::Dumper::pl2xml(\%data) : YAML::Dump(\%data);
+   }
+
+
+};
+
+
+
+
+sub usage {q{yamltk [OPTION].. PATH..
+yaml toolkit merges yaml and transforms bash variables to yaml.
+
+   -c       check source
+   -h       help
+   -v       version
+   -x       use filename extensions as special
+   -m       output is xml
+
+Try 'man yamltk' for more info.
+}}
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+yamltk - yaml toolkit merges yaml and transforms bash variables to yaml
+
+=head1 USAGE
+
+yamltk [OPTION].. PATH..
+
+   -c       check source
+   -h       help
+   -v       version
+   -x       use filename extensions as special
+   -m       output is xml
+
+=head2 USAGE EXAMPLES
+
+=over 4
+
+=item Merge ..
+
+   yamltk ./*yml > merged.yml
+
+=item Check that these files have proper syntax
+
+   yamltk -c ./*yml
+
+=item Merge in a special kind of way:
+
+   # cat houses.var
+   These are all houses.
+   They are really cool houses.
+   # cat notes.yml
+   ---
+   NAME: A great place to start
+   DESCRIPTION: I am without a doubt, descriptive.
+
+   # yamltk -x houses.var notes.yml
+   ---
+   DESCRIPTION: 'I am without a doubt, descriptive.'
+   NAME: A great place to start
+   houses: |-
+     These are all houses.
+     They are really cool houses.
+
+=back
+
+=head3 SPECIAL EXTENSIONS
+
+If you want to treat extensions as special, use the -x option flag.
+
+If you use these, the filenames dictate how the data is merged.
+
+The data is merged into a master hash.
+If the filename to merge from has the string 'var', the file data
+is inserted into the master hash with the key 'houses' for a filename of
+'houses.var'
+
+   yamltk houses.var
+
+If the data is yaml, it will be inserted- if it is not yaml, it is inserted
+as scalar.
+
+This is primarily being used to create data for use with tmpltk
+
+=head1 SEE ALSO
+
+Also in this distribution:
+
+   csv2yaml - filter csv to yaml 
+   yaml2cvs - filter yaml to csv   
+   yamltk - parent package
+   yamltk-tools - lists info
+
+=head1 CAVEATS
+
+Being used in production- but still in alpha.
+Please contact the AUTHOR for any suggestions, etc.
+
+=head1 TODO
+
+This should take in bash variables and be able to turn into YAML.
+For example, if the input is 'set' putput, should be able to make that into yaml output.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+
+
+

@@ -1,0 +1,5 @@
+This is the source code for a simple logical expression parser. The
+distribution is based on the easy-to-use makefile framework I have developed.
+The interesting bits for this sample code are in src/
+
+David Coppit <david@coppit.org>

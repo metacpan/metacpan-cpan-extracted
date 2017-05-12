@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+use strict;
+# ABSTRACT = 'Filter csv to yaml.'
+use Carp;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+#use Smart::Comments '###';
+use Getopt::Std::Strict 'hvd:e:f:';
+use YAML;
+
+$opt_h and print STDERR usage() and exit;
+$opt_v and print $VERSION and exit;
+$opt_d ||= ',';
+$opt_e ||= '\\';
+
+sub usage {q{csv2yaml [OPTION]..
+Filter csv to yaml.
+
+   -h             help
+   -v             version
+   -d char        delimiter, default is ','
+   -e char        escape char, default is '\\'
+   -f string      fields, delimited by delimiter
+
+yamltk - parent package
+}}
+
+
+my $stdin;
+while(<>){ $stdin.=$_ }
+
+#use Text::CSV; my $o = Text::CSV->new(    sep_char => $opt_d,    escape_char => $opt_e 
+# figure out fields..
+#my @fields;
+#if( $stdin=~/#\s*Fields:\s*(.+)\n/i ){
+#   @fields = split(/\Q$opt_d\E/, $1);
+#}
+#else{
+#   warn("no fields");
+#}
+
+
+use Text::CSV::Slurp;
+# fields are either provided or first rown is deemed to be the field names
+# see Text::CSV::Slurp
+
+my %arg;
+$opt_d and $arg{sep_char} = $opt_d;
+#$opt_e and $arg{escape_char} = $opt_e;
+$opt_f and $arg{field_order} = [split(/\Q$opt_d\E/, $opt_f)];
+
+
+### %arg
+
+my $csv = Text::CSV::Slurp->new(%arg);
+$csv or die;
+
+### ok made csv
+#my @fields  = $csv->{field_order};
+## @fields
+
+$arg{string} = $stdin;
+my $data = $csv->load( %arg );
+
+ref $data eq 'ARRAY' or die;
+
+print YAML::Dump(@$data);
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,4 @@
+%% 
+
+node_list : node_list node | node ;
+node : "a" | "b" ;

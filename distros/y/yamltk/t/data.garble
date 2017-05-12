@@ -1,0 +1,6 @@
+
+open( OUT, '>','t/data.garble') or die;
+pirint OUT "garble garblefageight 842y 42\n";
+print OUT "more agaggarble garblefageight 842y 42\n";
+print OUT "sgag43 more agaggarble garblefageight 842y 42\n";
+close OUT;

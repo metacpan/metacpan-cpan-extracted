@@ -1,0 +1,138 @@
+%{
+#include "fault_tree_textual_parser/fault_tree_textual_parser_includes.h"
+//TODO: Can we remove this automatically?
+//#include "fault_tree_textual_parser/fault_tree_textual_parser.h"
+
+#include <string>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
+
+// -----------------------------------------------------------------
+
+void fault_tree_textual_parser_error (string s);
+string fault_tree_textual_parser_error_string;
+
+bool fault_tree_textual_parser_reached_end_of_file;
+%}
+
+/* Set the name prefix so we can have multiple lexers in the same program. */
+%option prefix="fault_tree_textual_parser_"
+
+%%
+
+<<EOF>> return END_OF_FILE;
+
+// This style works too
+"system_event" {
+  return SYSTEM_EVENT;
+}
+
+"and" return AND; 
+
+"or" return OR; 
+
+"thr" return THRESHOLD; 
+
+"pand" return PAND; 
+
+"spare" return SPARE; 
+
+"maximum" return MAXIMUM; 
+
+"trigger" return TRIGGER; 
+
+"seq" return SEQ; 
+
+"fdep" return FDEP; 
+
+"be" return BE; 
+
+"replication" return REPLICATION; 
+
+// "id_1" return IDENTIFIER;
+// ( "id_1" | "id_2" | "id_3" ) return IDENTIFIER;
+// ["id_1" | "id_2" | "id_3"] return IDENTIFIER;
+["id_#"] return IDENTIFIER;
+
+( 0 | 1 | 2 | 10 ) return NATURAL;
+
+0 return ZERO;
+
+"=" return EQUALS; 
+
+";\n" return SEMICOLON; 
+
+%%
+
+void fault_tree_textual_parser_error(string error_string)
+{
+  ostringstream temp_string;
+  temp_string << fault_tree_textual_parser_lineno;
+
+  // Generic yacc "syntax error" message isn't very useful
+  if (error_string != "syntax error")
+    fault_tree_textual_parser_error_string += "SYNTAX ERROR (line " + temp_string.str() +
+      "): " + error_string + "\n";
+  else
+    fault_tree_textual_parser_error_string += "SYNTAX ERROR (line " + temp_string.str() +
+      ")\n";
+}
+
+void fault_tree_textual_parser_scanner_initialize(FILE* in_input_file)
+{
+  yyrestart(in_input_file);
+  fault_tree_textual_parser_reached_end_of_file = false;
+  fault_tree_textual_parser_error_string = "";
+}
+
+/*
+Sample main file
+
+#include <string>
+#include <cstdio>
+
+extern FILE *fault_tree_textual_parser_in;
+extern int fault_tree_textual_parser_lex();
+extern void fault_tree_textual_parser_scanner_initialize(FILE *in_input_file);
+
+int main(int argc, char *argv[]) {
+  fault_tree_textual_parser_in = fopen(argv[1], "r");
+  fault_tree_textual_parser_scanner_initialize(fault_tree_textual_parser_in);
+
+  int token;
+
+  while ((token = fault_tree_textual_parser_lex()))
+  {
+    if (fault_tree_textual_parser_error_string != "")
+      break;
+
+    if (token == IDENTIFIER)
+      delete fault_tree_textual_parser_lval.text;
+
+    if (token == NATURAL)
+      delete fault_tree_textual_parser_lval.natural;
+
+    if (token == ZERO)
+      delete fault_tree_textual_parser_lval.zero;
+
+    if (token == INTEGER)
+      delete fault_tree_textual_parser_lval.integer;
+
+    if (token == REAL)
+      delete fault_tree_textual_parser_lval.real;
+  }
+
+  fclose(fault_tree_textual_parser_in);
+
+  if (fault_tree_textual_parser_error_string != "")
+  {
+    printf("ERRORS!\n%s", fault_tree_textual_parser_error_string.c_str());
+    return 1;
+  }
+
+  printf("Scanning succeeded\n");
+  return 0;
+}
+*/

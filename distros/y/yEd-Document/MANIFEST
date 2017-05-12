@@ -1,0 +1,28 @@
+Changes
+lib/yEd/Document.pm
+lib/yEd/Edge.pm
+lib/yEd/Node.pm
+lib/yEd/Label.pm
+lib/yEd/PropertyBasedObject.pm
+lib/yEd/Edge/QuadCurveEdge.pm
+lib/yEd/Edge/PolyLineEdge.pm
+lib/yEd/Edge/ArcEdge.pm
+lib/yEd/Edge/BezierEdge.pm
+lib/yEd/Edge/GenericEdge.pm
+lib/yEd/Edge/SplineEdge.pm
+lib/yEd/Label/EdgeLabel.pm
+lib/yEd/Label/NodeLabel.pm
+lib/yEd/Node/GenericNode.pm
+lib/yEd/Node/ShapeNode.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basiccode.t
+t/02-deepercode.t
+t/manifest.t
+t/pod.t
+t/boilerplate.t
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

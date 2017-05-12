@@ -1,0 +1,8 @@
+---
+- age: 35
+  name: leo
+- age: 25
+  name: jim
+- name: paul
+- name: marge
+  state: md

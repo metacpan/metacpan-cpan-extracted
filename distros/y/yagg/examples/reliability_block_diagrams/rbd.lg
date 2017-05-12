@@ -1,0 +1,61 @@
+%{
+#include "rbd_textual_parser/rbd_textual_parser_includes.h"
+//#include "rbd_textual_parser/rbd_textual_parser.h"
+
+#include <string>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
+
+// -----------------------------------------------------------------
+
+void rbd_textual_parser_error (string s);
+string rbd_textual_parser_error_string;
+
+bool rbd_textual_parser_reached_end_of_file;
+%}
+
+/* Set the name prefix so we can have multiple lexers in the same program. */
+%option prefix="rbd_textual_parser_"
+
+%%
+
+"component" return COMPONENT; 
+
+"block" return BLOCK; 
+
+"contains" return CONTAINS; 
+
+"outputsto" return OUTPUTSTO; 
+
+["c#"] return COMPONENT_IDENTIFIER;
+
+["b#"] return BLOCK_IDENTIFIER;
+
+";\n" return SEMICOLON; 
+
+<<EOF>> return END_OF_FILE;
+
+%%
+
+void rbd_textual_parser_error(string error_string)
+{
+  ostringstream temp_string;
+  temp_string << rbd_textual_parser_lineno;
+
+  // Generic yacc "syntax error" message isn't very useful
+  if (error_string != "syntax error")
+    rbd_textual_parser_error_string += "SYNTAX ERROR (line " + temp_string.str() +
+      "): " + error_string + "\n";
+  else
+    rbd_textual_parser_error_string += "SYNTAX ERROR (line " + temp_string.str() +
+      ")\n";
+}
+
+void rbd_textual_parser_scanner_initialize(FILE *in_input_file)
+{
+  yyrestart(in_input_file);
+  rbd_textual_parser_reached_end_of_file = false;
+  rbd_textual_parser_error_string = "";
+}

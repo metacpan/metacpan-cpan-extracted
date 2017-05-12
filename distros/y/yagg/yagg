@@ -1,0 +1,2358 @@
+#!/usr/bin/perl -w
+
+# Modules to use
+use strict;
+use warnings;
+
+use 5.005;
+
+use yagg::Grammar;
+use yagg::TerminalParser;
+use yagg::Config;
+use Text::Template;
+use IPC::Open3;
+use FileHandle;
+use URI;
+use Cwd;
+use Getopt::Std;
+use File::Temp;
+use File::Path;
+
+use vars qw( $VERSION );
+
+$VERSION = sprintf "%d.%02d%02d", q/1.40.7/ =~ /(\d+)/g;
+
+# Make unbuffered
+$| = 1;
+
+use vars qw( %opts );
+
+my $AUTO_GENERATED_ENUM_VALUE = 257;
+my $VIRTUAL_TERMINAL_NUMBER = 1;
+
+############################################################################
+
+sub dprint;
+sub report_and_exit;
+
+{
+  Check_Help_Or_Usage();
+
+  my ($grammar_filename, $terminal_filename) = Get_Options_And_Arguments();
+
+  Print_Debug_Information($grammar_filename,$terminal_filename);
+
+  Initialize();
+
+  print "Parsing grammars...\n";
+
+  my $grammar =
+    Build_Nonterminal_Grammar($grammar_filename);
+  my $terminal_data =
+    Build_Terminal_Grammar($terminal_filename,$grammar);
+
+  dprint "Post-processed nonterminal grammar:\n";
+  dprint grep { s/^/  /; $_ .= "\n" } split /\n/, Dumper($grammar)
+    if $opts{'d'};
+  dprint "Terminal information:\n";
+  dprint grep { s/^/  /; $_ .= "\n" } split /\n/, Dumper($terminal_data)
+    if $opts{'d'};
+
+  Write_Cpp_Generator_code($grammar,$terminal_data,$grammar_filename,
+    $terminal_filename);
+
+  Build_Code() if $opts{'m'};
+
+  if (defined $opts{'r'})
+  {
+    Run_Generator();
+  }
+  else
+  {
+    if ($opts{'m'})
+    {
+      print "==> Finished. You may now run \"$opts{'o'}{'path'}/progs/generate <number>\"";
+      print " on $opts{'o'}{'host'}" if $opts{'o'}{'scheme'} ne 'file';
+      print ".\n";
+    }
+    else
+    {
+      print "==> Finished. You may now run \"make\" in the $opts{'o'}{'path'} directory";
+      print " on $opts{'o'}{'host'}" if $opts{'o'}{'scheme'} ne 'file';
+      print ".\n";
+    }
+  }
+
+  exit 0;
+}
+
+# --------------------------------------------------------------------------
+
+# Print a nice error message before exiting
+
+sub report_and_exit
+{
+  my $message = shift;
+
+  $message .= "\n" unless $message =~ /\n$/;
+  warn "yagg: $message";
+  exit 1;
+}
+
+# --------------------------------------------------------------------------
+
+# Outputs debug messages with the -D flag. Be sure to return 1 so code like
+# 'dprint "blah\n" and exit' works.
+
+sub dprint
+{
+  return 1 unless $opts{'d'};
+
+  my $message = join '',@_;
+
+  foreach my $line (split /\n/, $message)
+  {
+    warn "DEBUG: $line\n";
+  }
+
+  return 1;
+}
+
+# --------------------------------------------------------------------------
+
+sub Print_Debug_Information
+{
+  my $grammar_filename = shift;
+  my $terminal_filename = shift;
+
+  return unless $opts{'d'};
+
+  my $command_line;
+
+  # Need to quote arguments with spaces
+  my @args = @ARGV;
+  @args = map { $_ = index($_, ' ') != -1 ? "'$_'" : $_ } @ARGV;
+
+  $command_line = "$0 @args";
+
+  dprint "Version: $VERSION";
+
+  dprint "Command line was (special characters not escaped):";
+  dprint "  $command_line";
+
+  dprint "Text::Template VERSION: $Text::Template::VERSION"
+    if defined $Date::Parse::VERSION;
+  dprint "Parse::Yapp VERSION: $Parse::Yapp::VERSION"
+    if defined $Parse::Yapp::VERSION;
+
+  dprint "Options are:";
+  foreach my $i (sort keys %opts)
+  {
+    if (defined $opts{$i})
+    {
+      dprint "  $i: $opts{$i}";
+    }
+    else
+    {
+      dprint "  $i: undef";
+    }
+  }
+
+  dprint "INC is:";
+  foreach my $i (@INC)
+  {
+    dprint "  $i";
+  }
+
+  dprint "Language grammar file:";
+  dprint "  $grammar_filename";
+
+  $terminal_filename = '<NONE>' unless defined $terminal_filename;
+  dprint "Terminal specification file:";
+  dprint "  $terminal_filename";
+}
+
+# --------------------------------------------------------------------------
+
+sub Check_Help_Or_Usage
+{
+  print usage() and exit if $#ARGV >= 0 && $ARGV[0] eq '--help';
+  print "$VERSION\n" and exit if $#ARGV >= 0 && $ARGV[0] eq '--version';
+}
+
+# --------------------------------------------------------------------------
+
+sub usage
+{
+<<EOF;
+usage: $0 [--help|--version] [-X] [-dfm]
+  [-o <output directory>] [-u <input user code directory>]
+  [-C "<compiler flags>"] [-L "<linker flags>"]
+  [-M "<make arguments>"] [-r <length>]
+  <nonterminal .yg file> [terminal .lg file]
+
+-C Set compiler flags (default is "-Wall -pedantic -O3")
+-d Enable debug output to STDERR
+-f Overwrite existing files in the output directory
+-L Set linker flags (default is "")
+-m Run "make" in the output directory after code generation
+-M Provide extra arguments to "make"
+-o Specify the output directory (default is "output")
+-r Automatically run the generator for the given length (implies -m)
+-u Specify the input user code directory
+-X Suppress output of #line directives in generated code
+EOF
+
+}
+
+# --------------------------------------------------------------------------
+
+sub Get_Options_And_Arguments
+{
+  local @ARGV = @ARGV;
+
+  # Print usage error if no arguments given
+  report_and_exit("No arguments given.\n\n" . usage()) unless @ARGV;
+
+  # Check for --help, the standard usage command, or --version.
+  print usage() and exit(0) if grep { /^--help$/ } @ARGV;
+  print "$VERSION\n" and exit(0) if grep { /^--version$/ } @ARGV;
+
+  my @valid_options = qw( C d f L m M o r u X );
+
+  # Initialize all options to zero.
+  map { $opts{$_} = 0; } @valid_options;
+
+  # And some to non-zero.
+  $opts{'o'} = 'output';
+  $opts{'C'} = '-Wall -pedantic -O3';
+  $opts{'L'} = '';
+  $opts{'M'} = '';
+  $opts{'r'} = undef;
+  $opts{'u'} = undef;
+
+  getopt('CLMuor', \%opts);
+
+  # Make sure no unknown flags were given
+  foreach my $option (keys %opts)
+  {
+    unless (grep {/^$option$/} @valid_options)
+    {
+      report_and_exit("Invalid option \"$option\".\n\n" . usage());
+    }
+  }
+
+  report_and_exit("Invalid arguments.\n\n" . usage())
+    unless $#ARGV == 0 && $ARGV[0] =~ /\.yg$/i ||
+           $#ARGV == 1 && $ARGV[0] =~ /\.yg$/i && $ARGV[1] =~ /\.lg$/i;
+
+  return ($ARGV[0],$ARGV[1]);
+}
+
+# --------------------------------------------------------------------------
+
+sub Initialize
+{
+  # Check the user directory
+  $opts{'u'} = undef unless exists $opts{'u'};
+  if (defined $opts{'u'})
+  {
+    if (-e $opts{'u'})
+    {
+      report_and_exit "Input $opts{'u'} exists but is not a directory\n"
+        unless -d $opts{'u'};
+    }
+    else
+    {
+      report_and_exit "Input directory $opts{'u'} does not exist\n"
+        unless -d $opts{'u'};
+    }
+  }
+
+  if ($opts{'d'})
+  {
+    eval 'require Data::Dumper'
+      or report_and_exit "Couldn't load Data::Dumper: $@";
+    import Data::Dumper;
+    $Data::Dumper::Sortkeys = 1;
+    # To prevent warning about variable being used only once
+    my $dummy = $Data::Dumper::Sortkeys;
+  }
+
+  $opts{'m'} = 1 if defined $opts{'r'};
+
+  $opts{'o'} = Parse_Output_Flag($opts{'o'});
+}
+
+# --------------------------------------------------------------------------
+
+sub Parse_Output_Flag
+{
+  my $unparsed_path = shift;
+
+  my %parsed = (
+    'scheme' => undef,
+    'user' => undef,
+    'host' => undef,
+    'port' => undef,
+    'path' => undef,
+    'unparsed' => $unparsed_path,
+  );
+
+  my $unparsed_path_with_protocol = $unparsed_path;
+  my $need_to_drop_slash = ($unparsed_path =~ /:[^\/]/);
+
+  if ($unparsed_path =~ /^\w+:\/\//)
+  {
+    $need_to_drop_slash = 1 unless $unparsed_path =~ /^\w+:.*:/;
+  }
+  elsif ($unparsed_path =~ /::/)
+  {
+    if($unparsed_path_with_protocol =~ /::\//)
+    {
+      $need_to_drop_slash = 0;
+      $unparsed_path_with_protocol =~ s!::!!;
+    }
+    else
+    {
+      $unparsed_path_with_protocol =~ s!::!\/!;
+    }
+
+    $unparsed_path_with_protocol = "rsync://$unparsed_path_with_protocol";
+  }
+  elsif ($unparsed_path =~ /:/)
+  {
+    if($unparsed_path_with_protocol =~ /:\//)
+    {
+      $need_to_drop_slash = 0;
+      $unparsed_path_with_protocol =~ s!:!!;
+    }
+    else
+    {
+      $unparsed_path_with_protocol =~ s!:!\/!;
+    }
+
+    $unparsed_path_with_protocol = "rsync://$unparsed_path_with_protocol";
+  }
+  else
+  {
+    $unparsed_path_with_protocol = "file:$unparsed_path_with_protocol";
+  }
+
+  my $uri = new URI $unparsed_path_with_protocol;
+
+  $parsed{'scheme'} = $uri->scheme;
+  $parsed{'path'} = $uri->path;
+  $parsed{'user'} = $uri->user if $uri->can('user');
+  $parsed{'host'} = $uri->host
+    if $uri->can('host') && defined $uri->host && $uri->host ne '';
+  $parsed{'port'} = $uri->port if $uri->can('port');
+
+  $parsed{'path'} =~ s/^\/// if $need_to_drop_slash;
+
+  return \%parsed;
+}
+
+# --------------------------------------------------------------------------
+
+# Reads grammars from one or more files, creating a grammar data structure
+# which is then returned.
+
+sub Build_Nonterminal_Grammar
+{
+  my $filename = shift;
+
+  my $grammar_text;
+
+  {
+    local $/ = undef;
+    open GRAMMAR, $filename or report_and_exit $!;
+    $grammar_text = <GRAMMAR>;
+    close GRAMMAR;
+  }
+  
+  # Parse the grammar
+  my $raw_grammar = new yagg::Grammar(input => $grammar_text);
+
+  # Do some post-processing
+  my $grammar = Post_Process_Grammar($raw_grammar);
+
+  return $grammar;
+}
+
+# --------------------------------------------------------------------------
+
+# Returns a hash containing:
+# - TERMINALS: the terminals of the grammar, as a list
+# - NONTERMINALS: the nonterminals of the grammar, as a list
+# - DECLARATIONS: The %{ ... }% code from the declarations section
+# - PROGRAMS: The code at the end of the YACC file
+# - RULES: The grammar rules, in a list containing:
+#   - the name of the nonterminal
+#   - a list reference with the names of the body of the rule
+#   - the precedence (or undef)
+#   - a list reference with the code for the action block, followed by the
+#     line number. This list will contain two more elements if an unaction block
+#     was specified (undo code, line number)
+# - RETURN_TYPES: A mapping from nonterminal names to return types, or
+#   undef if there isn't one in the union
+
+sub Post_Process_Grammar
+{
+  my $yapp_grammar = shift;
+
+  my $grammar = $yapp_grammar->{GRAMMAR};
+
+  # Compute the starting nonterminal, storing it in the hash as
+  # STARTING_RULE. Then delete all references to it in the $grammar
+  # object.
+  {
+    my $starting_rule;
+
+    # Delete the $start grammar rule
+    for (my $i=0; $i <= $#{$grammar->{'RULES'}}; $i++)
+    {
+      if ($grammar->{'RULES'}[$i][0] eq '$start')
+      {
+        $starting_rule = $grammar->{'RULES'}[$i][1][0];
+        splice(@{$grammar->{'RULES'}}, $i, 1);
+        last;
+      }
+    }
+
+    # Delete the "$start" in NTERM
+    delete $grammar->{'NTERM'}{'$start'};
+
+    # Subtract 1 from the NTERM list
+    foreach my $nonterminal (keys %{$grammar->{'NTERM'}})
+    {
+      foreach my $i (0..$#{$grammar->{'NTERM'}{$nonterminal}})
+      {
+        $grammar->{'NTERM'}{$nonterminal}[$i]--;
+      }
+    }
+
+    $grammar->{'STARTING_RULE'} = $starting_rule;
+  }
+
+  # Compute the terminals and nonterminals
+  $grammar->{'TERMINALS'} = [grep { !/(^\0|^error$)/ } keys %{$grammar->{'TERM'}}];
+  $grammar->{'NONTERMINALS'} = [sort keys %{$grammar->{'NTERM'}}];
+
+  # Remove any error rules, and any rules with empty productions that result
+  # from them
+  for (my $i=0; $i <= $#{ $grammar->{'RULES'} }; $i++)
+  {
+    if (scalar (grep { $_ eq 'error' } @{ $grammar->{'RULES'}[$i][1] }) > 0)
+    {
+      splice(@{$grammar->{'RULES'}}, $i, 1);
+      $i--;
+    }
+  }
+
+  # Delete old stuff we don't need
+  delete $grammar->{'TERM'};
+  delete $grammar->{'NTERM'};
+  delete $grammar->{'EXPECT'};
+  delete $grammar->{'NULLABLE'};
+  delete $grammar->{'UUTERM'};
+
+  # Get the union
+  my ($union) = $yapp_grammar->{'OPTIONS'}{'input'} =~ /%union\s*{(.*?)}/s;
+
+  my %unions;
+  if (defined $union)
+  {
+    while ($union =~ /\s*(.*?)\s+(.*?);\s*$/mg)
+    {
+      $unions{$2} = $1;
+    }
+  }
+
+  # Parse the union member names
+  {
+    my %return_types;
+
+    while ($yapp_grammar->{'OPTIONS'}{'input'} =~
+      /\%(?:left|right|nonassoc|type|token)\s*<(.*?)>\s*(.*?)\s*$/mg)
+    {
+      if (exists $unions{$1})
+      {
+        $return_types{$2} = $unions{$1};
+      }
+      elsif ($1 eq 'token')
+      {
+        $return_types{$2} = 'int';
+      }
+      else
+      {
+        warn "Couldn't compute return type for $2. Setting to undef...\n";
+        $return_types{$2} = $1;
+      }
+    }
+
+    $grammar->{'RETURN_TYPES'} = \%return_types;
+  }
+
+  foreach my $nonterminal (@{$grammar->{'NONTERMINALS'}})
+  {
+    ${$grammar->{'RETURN_TYPES'}}{$nonterminal} = undef
+      unless exists ${$grammar->{'RETURN_TYPES'}}{$nonterminal};
+  }
+
+  dprint "Computing lengths of nodes\n";
+
+  foreach my $nonterminal (@{$grammar->{'NONTERMINALS'}})
+  {
+    $grammar->{'PRODUCTION_LENGTHS'}{$nonterminal} =
+      [ Compute_Lengths_For_Node($nonterminal,$grammar) ];
+  }
+
+  # Sort everything so that it's easier to compare the grammars during
+  # debugging
+  {
+    @{$grammar->{'NONTERMINALS'}} = sort @{$grammar->{'NONTERMINALS'}};
+    @{$grammar->{'TERMINALS'}} = sort @{$grammar->{'TERMINALS'}};
+  }
+
+  return $grammar;
+}
+
+# --------------------------------------------------------------------------
+
+my %lengths;
+
+# TODO: This function computes weak expressions for the different productions
+# when they are recursive in nature. For example: A -> xAx | y should have an
+# expression such as "(length-1)%2==0 && length >= 1", but this function
+# computes the weaker statement "length>=1". See the TODO file for more info.
+
+sub Compute_Lengths_For_Node
+{
+  my $node = shift;
+  my $grammar = shift;
+
+  local $" = ", " if $opts{'d'};
+  dprint "  $node: Computing length";
+
+  if(exists $lengths{$node})
+  {
+    dprint "  $node: FINISHED: Using cached value of \"@{ $lengths{$node} }\"";
+    return @{ $lengths{$node} };
+  }
+
+  $lengths{$node} = [ '>=0' ];
+
+  if(grep { $node eq $_ } @{ $grammar->{'TERMINALS'} })
+  {
+    $lengths{$node} = [ '=1' ];
+    dprint "  $node: FINISHED: Using terminal value \"=1\"";
+    return ( '=1' );
+  }
+
+  my @lengths;
+
+  foreach my $rule (grep { $_->[0] eq $node } @{ $grammar->{'RULES'} })
+  {
+    my $rule_length = undef;
+
+    dprint "  $node: Adding up lengths for productions \"@{$rule->[1]}\"";
+
+    foreach my $product (@{$rule->[1]})
+    {
+      my $most_permissive_product_length = undef;
+
+      foreach my $product_length (Compute_Lengths_For_Node($product,$grammar))
+      {
+        $most_permissive_product_length = $product_length, next
+          unless defined $most_permissive_product_length;
+
+        my ($product_modifier) = $product_length =~ /^(=|>=)/;
+        my ($most_permissive_product_modifier) =
+          $most_permissive_product_length =~ /^(=|>=)/;
+
+        $most_permissive_product_length =~ s/^(=|>=)//;
+        $product_length =~ s/^(=|>=)//;
+
+        if ($most_permissive_product_modifier eq '=' &&
+            $product_modifier eq '=' &&
+            $most_permissive_product_length == $product_length)
+        {
+          $most_permissive_product_length = "=$product_length";
+        }
+        else
+        {
+          if ($most_permissive_product_length < $product_length)
+          {
+            $most_permissive_product_length =
+              ">=$most_permissive_product_length";
+          }
+          else
+          {
+            $most_permissive_product_length = ">=$product_length";
+          }
+        }
+      }
+
+      $rule_length = $most_permissive_product_length, next
+        unless defined $rule_length;
+
+      my ($rule_modifier) = $rule_length =~ /^(=|>=)/;
+      my ($most_permissive_product_modifier) =
+        $most_permissive_product_length =~ /^(=|>=)/;
+
+      $rule_length =~ s/^(=|>=)//;
+      $most_permissive_product_length =~ s/^(=|>=)//;
+
+      if ($rule_modifier eq '=')
+      {
+        $rule_length = $most_permissive_product_modifier .
+          ($rule_length + $most_permissive_product_length);
+      }
+      else
+      {
+        $rule_length = '>=' .
+          ($rule_length + $most_permissive_product_length);
+      }
+    }
+
+    $rule_length = '=0' unless @{$rule->[1]};
+
+    dprint "  $node: Productions sum is \"$rule_length\"";
+
+    push @lengths, $rule_length;
+  }
+
+  $lengths{$node} = \@lengths;
+
+  dprint "  $node: FINISHED: Lengths are \"@lengths\"";
+
+  return @lengths;
+}
+
+# --------------------------------------------------------------------------
+
+# Reads terminal grammar, creating a data structure which is then returned.
+
+sub Build_Terminal_Grammar
+{
+  my $terminal_filename = shift;
+  my $grammar = shift;
+
+  my $raw_terminal_data;
+
+  if (defined $terminal_filename)
+  {
+    my $file_text;
+
+    {
+      local $/ = undef;
+      open GRAMMAR, $terminal_filename or report_and_exit $!;
+      $file_text = <GRAMMAR>;
+      close GRAMMAR;
+    }
+
+    my $parser = new yagg::TerminalParser;
+    $raw_terminal_data = $parser->Parse($file_text);
+  }
+  else
+  {
+    $raw_terminal_data = {
+      'TERMINALS' => {},
+      'OPTIONS' => {},
+      'TAIL' => undef,
+      'HEAD' => []
+    };
+  }
+
+  # Do some post-processing
+  my $terminal_data;
+  ($terminal_data,$grammar) =
+    Post_Process_Terminals($raw_terminal_data,$grammar);
+
+  return $terminal_data;
+}
+
+# --------------------------------------------------------------------------
+
+sub Post_Process_Terminals
+{
+  my $terminal_data = shift;
+  my $grammar = shift;
+
+  $terminal_data->{'OPTIONS'}{'prefix'} = "yy"
+    unless defined $terminal_data->{'OPTIONS'}{'prefix'};
+
+  ($grammar,$terminal_data) =
+    Create_Virtual_Terminals($grammar, $terminal_data);
+
+
+  # Check that all the terminals have been properly defined in the terminal
+  # file
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    report_and_exit "Terminal $terminal is not defined in the .lg file\n"
+      unless exists $terminal_data->{'TERMINALS'}{$terminal};
+  }
+
+
+  # Make all the terminal strings arrays
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    $terminal_data->{'TERMINALS'}{$terminal}{'data'} =
+      [ $terminal_data->{'TERMINALS'}{$terminal}{'data'} ]
+      unless ref $terminal_data->{'TERMINALS'}{$terminal}{'data'};
+  }
+
+
+  ($grammar,$terminal_data) =
+    Infer_Terminal_Return_Types($grammar, $terminal_data);
+
+  return ($terminal_data,$grammar);
+}
+
+# --------------------------------------------------------------------------
+
+sub Infer_Terminal_Return_Types
+{
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  dprint "Computing return types for terminals...";
+
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    my @strings = @{ $terminal_data->{'TERMINALS'}{$terminal}{'data'} };
+
+    if (exists ${$grammar->{'RETURN_TYPES'}}{$terminal})
+    {
+      dprint "  $terminal => ${$grammar->{'RETURN_TYPES'}}{$terminal}";
+      next;
+    }
+
+    # Try to infer the return type from the strings given by the user. See
+    # the Perl FAQ
+    if (scalar(grep { /^'([^'\\]|\\.)'$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'char';
+    }
+    elsif (scalar(grep { /^".*"$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'string';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^\d+$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'unsigned long int';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^[+-]?\d+$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'long int';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'unsigned double';
+    }
+    # We could check the length and assign a smaller data type, but memory
+    # is cheap
+    elsif (scalar(grep { /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ } @strings) == scalar(@strings))
+    {
+      ${$grammar->{'RETURN_TYPES'}}{$terminal} = 'double';
+    }
+    else
+    {
+      report_and_exit "Could not infer type of \"@strings\" for terminal $terminal";
+    }
+
+    local $" = ', ';
+    dprint "  $terminal => ${$grammar->{'RETURN_TYPES'}}{$terminal} (inferred from @strings)\n";
+  }
+
+  return ($grammar,$terminal_data);
+}
+
+# --------------------------------------------------------------------------
+
+sub Create_Virtual_Terminals
+{
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  my %virtual_terminal_map;
+
+  dprint "Creating virtual terminals for constant strings in the grammar file";
+
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    # Create a virtual terminal if the user provided a constant string or
+    # number in the .yg file.
+    if ($terminal =~ /^'([^'\\]|\\.)+'$/ ||
+        $terminal =~ /^"[^"]*"$/)
+    {
+      dprint "  Creating virtual terminal for $terminal";
+
+      $virtual_terminal_map{$terminal} =
+        "VIRTUAL_TERMINAL_$VIRTUAL_TERMINAL_NUMBER";
+
+      $terminal_data->{'TERMINALS'}{"VIRTUAL_TERMINAL_$VIRTUAL_TERMINAL_NUMBER"} =
+        {
+          'type' => 'simple',
+          'data' => $terminal,
+        };
+
+      $VIRTUAL_TERMINAL_NUMBER++;
+    }
+  }
+
+  for (my $i=0; $i <= $#{ $grammar->{'TERMINALS'} }; $i++)
+  {
+    if (exists $virtual_terminal_map{$grammar->{'TERMINALS'}[$i]})
+    {
+      $grammar->{'TERMINALS'}[$i] =
+        $virtual_terminal_map{$grammar->{'TERMINALS'}[$i]};
+    }
+  }
+
+  foreach my $constant_terminal (keys %virtual_terminal_map)
+  {
+    for (my $i=0; $i <= $#{ $grammar->{'RULES'} }; $i++)
+    {
+      for (my $j=0; $j <= $#{ $grammar->{'RULES'}[$i][1] }; $j++)
+      {
+        next unless $grammar->{'RULES'}[$i][1][$j] eq $constant_terminal;
+
+        $grammar->{'RULES'}[$i][1][$j] =
+          $virtual_terminal_map{$constant_terminal};
+      }
+    }
+  }
+
+  return ($grammar,$terminal_data);
+}
+
+############################################################################
+
+sub Write_Cpp_Generator_code
+{
+  my $grammar = shift;
+  my $terminal_data = shift;
+  my $grammar_filename = shift;
+  my $terminal_filename = shift;
+
+  my $tempdir = File::Temp::tempdir( 'tempdir-XXXXX', CLEANUP => 1,
+    DIR => getcwd);
+
+  print "Copying generator files...\n";
+
+  Mirror_Directory($yagg::Config{'template_path'},
+    $tempdir, ['*.template.*']);
+
+  print "Updating generator makefile...\n";
+
+  Update_Makefile($tempdir);
+
+  print "Generating code for terminals...\n";
+
+  Generate_Terminals($tempdir,$grammar,$terminal_data);
+
+  print "Generating code for nonterminals...\n";
+
+  Generate_Nonterminals($tempdir,$grammar,$grammar_filename, $terminal_data);
+
+  print "Generating global utility code...\n";
+
+  Generate_Utilities($tempdir,$grammar,$terminal_data,$grammar_filename,
+    $terminal_filename);
+
+  print "Generating main program...\n";
+
+  Generate_Main_Program($tempdir,$grammar);
+
+  if (defined $opts{'u'})
+  {
+    print "Copying user-supplied files...\n";
+    Mirror_Directory($opts{'u'}, $tempdir);
+  }
+
+  print "Copying modified or new files to $opts{'o'}{'path'}";
+  print " on $opts{'o'}{'host'}" if $opts{'o'}{'scheme'} ne 'file';
+  print "...\n";
+
+
+  Mirror_Directory($tempdir, $opts{'o'}{'unparsed'}, [], $opts{'f'});
+
+  rmtree $tempdir;
+}
+
+# --------------------------------------------------------------------------
+
+sub Mirror_Directory
+{
+  my $in_dir = shift;
+  my $out_dir = shift;
+
+  $in_dir =~ s/ /\\ /g;
+  $out_dir =~ s/ /\\ /g;
+
+  my @exclusions;
+  @exclusions = @{ shift @_ } if defined $_[0];
+
+  my $delete_destination = shift;
+  $delete_destination = 0 unless defined $delete_destination;
+
+  my $exclusions = '';
+  map { $exclusions .= " --exclude '$_'" } @exclusions;
+  $exclusions .= " --exclude '.*swp'";
+
+  my $deletions = '';
+  $deletions = ' --delete' if $delete_destination;
+
+  system("$yagg::Config{'programs'}{'rsync'} --checksum --cvs-exclude --recursive$exclusions$deletions $in_dir/. $out_dir") == 0
+    or report_and_exit "rsync failed\n";
+
+  # We chmod immediately in case the script exits early and File::Find tries
+  # to clean up the temporary directory. If there are read-only files,
+  Run_Chmod($out_dir);
+}
+
+# --------------------------------------------------------------------------
+
+sub Run_Chmod
+{
+  my $directory = shift;
+
+  my $rsh = $yagg::Config{'programs'}{'ssh'};
+  $rsh = $ENV{'RSYNC_RSH'} if defined $ENV{'RSYNC_RSH'};
+
+  if ($directory eq $opts{'o'}{'unparsed'} && $opts{'o'}{'scheme'} ne 'file')
+  {
+    dprint "Remote chmod command:";
+    dprint "  $rsh $opts{'o'}{'host'} 'cd $opts{'o'}{'path'} && chmod -R u+rw *'";
+
+    system("$rsh $opts{'o'}{'host'} 'cd $opts{'o'}{'path'} && chmod -R u+rw *'") == 0
+      or report_and_exit "chmod failed\n";
+  }
+  else
+  {
+    my $cwd = getcwd;
+    chdir $directory;
+    system("$yagg::Config{'programs'}{'chmod'} -R u+rw *") == 0
+      or report_and_exit "chmod failed\n";
+    chdir $cwd;
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Update_Makefile
+{
+  my $tempdir = shift;
+
+  Update_Makefile_Programs($tempdir);
+  Update_Makefile_Flags($tempdir);
+}
+
+# --------------------------------------------------------------------------
+
+sub Update_Makefile_Programs
+{
+  my $tempdir = shift;
+
+  my $filename = "$tempdir/GNUmakefile";
+  my %locations = %{ $yagg::Config{'programs'} };
+
+  my $code = Read_File($filename);
+
+  foreach my $program (keys %locations)
+  {
+    $locations{$program} = "NONE" unless defined $locations{$program};
+  }
+
+  my %symbol_lookup = (
+    'LN' => 'ln',
+    'CP' => 'cp',
+    'RM' => 'rm',
+    'MV' => 'mv',
+    'GREP' => 'grep',
+    'CHMOD' => 'chmod',
+    'CXX' => 'c++',
+    'LD' => 'c++',
+    'AR' => 'ar',
+    'MKDIR' => 'mkdir',
+    'DATE' => 'date',
+    'PERL' => 'perl',
+    'DIRNAME' => 'dirname',
+    'EXPR' => 'expr',
+    'FIND' => 'find',
+  );
+
+  while ($code =~ /^([A-Z]+)(\s*=\s*)(.*)$/mg)
+  {
+    my $symbol = $1;
+    my $middle = $2;
+    my $value = $3;
+
+    next unless exists $symbol_lookup{$symbol};
+
+    if ($opts{'o'}{'scheme'} eq 'file' &&
+        exists $locations{ $symbol_lookup{$symbol} })
+    {
+      my $old_pos = pos $code;
+      substr($code,pos($code) - length($value), length($value)) =
+        $locations{ $symbol_lookup{$symbol} };
+      pos($code) = $old_pos - length($value) +
+        length($locations{ $symbol_lookup{$symbol} });
+    }
+    else
+    {
+      my $old_pos = pos $code;
+      substr($code,pos($code) - length($value), length($value)) =
+        $symbol_lookup{$symbol};
+      pos($code) = $old_pos - length($value) +
+        length( $symbol_lookup{$symbol} );
+    }
+  }
+
+  Write_File($filename, $code);
+}
+
+# --------------------------------------------------------------------------
+
+sub Update_Makefile_Flags
+{
+  my $tempdir = shift;
+
+  my $filename = "$tempdir/GNUmakefile";
+
+  my $code = Read_File($filename);
+
+  while ($code =~ /^([A-Z]+)([\t ]*=[\t ]*)(.*)$/mg)
+  {
+    my $symbol = $1;
+    my $middle = $2;
+    my $value = $3;
+
+    if ($symbol eq 'CFLAGS')
+    {
+      my $old_pos = pos $code;
+
+      my $new_value = $opts{'C'};
+      $new_value = " $new_value" unless $middle =~ / $/;
+
+      substr($code,pos($code) - length($value), length($value)) = $new_value;
+      pos($code) = $old_pos - length($value) + length($new_value);
+    }
+
+    if ($symbol eq 'LDFLAGS')
+    {
+      my $old_pos = pos $code;
+
+      my $new_value = $opts{'L'};
+      $new_value = " $new_value" unless $middle =~ / $/;
+
+      substr($code,pos($code) - length($value), length($value)) = $new_value;
+      pos($code) = $old_pos - length($value) + length($new_value);
+    }
+  }
+
+  Write_File($filename, $code);
+}
+
+# --------------------------------------------------------------------------
+
+sub Read_File
+{
+  my $filename = shift;
+
+  local $/ = undef;
+
+  open SOURCE, $filename
+    or report_and_exit "Couldn't open file \"$filename\": $!";
+  my $code = <SOURCE>;
+  close SOURCE;
+
+  return $code;
+}
+
+# --------------------------------------------------------------------------
+
+sub Write_File
+{
+  my $filename = shift;
+  my $code = shift;
+
+  open SOURCE, ">$filename"
+    or report_and_exit "Couldn't open file \"$filename\": $!";
+  print SOURCE $code;
+  close SOURCE;
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_Terminals
+{
+  my $tempdir = shift @_;
+  my $grammar = shift @_;
+  my $terminal_data = shift @_;
+
+  mkpath "$tempdir/src/model/terminal_rules";
+
+  dprint "Generating terminals";
+
+  foreach my $terminal (@{$grammar->{'TERMINALS'}})
+  {
+    my $terminal_type = $terminal_data->{'TERMINALS'}{$terminal}{'type'};
+    my $return_type = ${$grammar->{'RETURN_TYPES'}}{$terminal};
+    my @strings = @{ $terminal_data->{'TERMINALS'}{$terminal}{'data'} };
+
+    local $" = ', ';
+    dprint "  $terminal => @strings";
+
+    Write_Terminal_Header_File($tempdir,$terminal,$terminal_type,$return_type);
+    Write_Terminal_Implementation_File($tempdir,$terminal,\@strings,$grammar,$terminal_type,$return_type);
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Write_Terminal_Header_File
+{
+  my $tempdir = shift @_;
+  my $terminal = shift @_;
+  my $terminal_type = shift @_;
+  my $return_type = shift @_;
+
+  my %templates = (
+    'simple' => "$yagg::Config{'template_path'}/src/model/terminal_rules/simple_terminal.template.h",
+    'alternation' => "$yagg::Config{'template_path'}/src/model/terminal_rules/alternation_terminal.template.h",
+    'equivalence alternation' => "$yagg::Config{'template_path'}/src/model/terminal_rules/equivalence_alternation_terminal.template.h",
+    'equivalence generator' => "$yagg::Config{'template_path'}/src/model/terminal_rules/equivalence_generator_terminal.template.h",
+  );
+
+  report_and_exit "Unknown terminal type \"$terminal_type\" for template."
+    unless exists $templates{$terminal_type};
+
+  open (OUT,">$tempdir/src/model/terminal_rules/$terminal.h")
+    or report_and_exit $!;
+
+  my $template =
+    Text::Template->new(SOURCE => $templates{$terminal_type},
+    DELIMITERS => ['[[[',']]]'])
+    or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+  print OUT $template->fill_in(HASH => {
+    terminal => $terminal,
+    return_type => $return_type,
+    nonpointer_return_type => Get_Nonpointer_Type($return_type),
+  });
+
+  close OUT;
+}
+
+# --------------------------------------------------------------------------
+
+sub Write_Terminal_Implementation_File
+{
+  my $tempdir = shift @_;
+  my $terminal = shift @_;
+  my @strings = @{ shift @_ };
+  my $grammar = shift @_;
+  my $terminal_type = shift @_;
+  my $return_type = shift @_;
+
+  my $size = scalar @strings;
+
+  my %templates = (
+    'simple' => "$yagg::Config{'template_path'}/src/model/terminal_rules/simple_terminal.template.cc",
+    'alternation' => "$yagg::Config{'template_path'}/src/model/terminal_rules/alternation_terminal.template.cc",
+    'equivalence alternation' => "$yagg::Config{'template_path'}/src/model/terminal_rules/equivalence_alternation_terminal.template.cc",
+    'equivalence generator' => "$yagg::Config{'template_path'}/src/model/terminal_rules/equivalence_generator_terminal.template.cc",
+  );
+
+  report_and_exit "Unknown terminal type \"$terminal_type\" for template."
+    unless exists $templates{$terminal_type};
+
+  open (OUT,">$tempdir/src/model/terminal_rules/$terminal.cc")
+    or report_and_exit $!;
+
+  my $template =
+    Text::Template->new(SOURCE => $templates{$terminal_type},
+    DELIMITERS => ['[[[',']]]'])
+    or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+  print OUT $template->fill_in(HASH => {
+    terminal => $terminal,
+    strings => \@strings,
+    size => $size,
+    return_type => $return_type,
+    nonpointer_return_type => Get_Nonpointer_Type($return_type),
+  });
+
+  close(OUT);
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_Nonterminals
+{
+  my $tempdir = shift @_;
+  my $grammar = shift @_;
+  my $grammar_filename = shift @_;
+  my $terminal_data = shift @_;
+
+  mkpath "$tempdir/src/model/nonterminal_rules";
+
+  dprint "Generating nonterminals";
+
+  foreach my $nonterminal (@{$grammar->{'NONTERMINALS'}})
+  {
+    my @productions = ();
+    my @length_constraints = @{$grammar->{'PRODUCTION_LENGTHS'}{$nonterminal}};
+
+    foreach my $rule (@{$grammar->{RULES}})
+    {
+      if ($rule->[0] eq $nonterminal)
+      {
+        push @productions,
+          { 'rules'       => $rule->[1],
+            'action code' => Generate_Action_Code($nonterminal, $rule->[3][0],
+              $rule->[3][1], $rule->[1], $grammar->{'RETURN_TYPES'},
+              $grammar->{'TERMINALS'}, $grammar_filename, $terminal_data),
+            'action line' => $rule->[3][1],
+            'unaction code' => Generate_Action_Code($nonterminal, $rule->[3][2],
+              $rule->[3][1], $rule->[1], $grammar->{'RETURN_TYPES'},
+              $grammar->{'TERMINALS'}, $grammar_filename, $terminal_data),
+            'unaction line' => $rule->[3][3],
+            'length constraint' => shift @length_constraints,
+          };
+      }
+    }
+
+    dprint "  $nonterminal (" . scalar(@productions) . " productions):";
+    foreach my $production (@productions)
+    {
+      local $" = ", ";
+      dprint "    $nonterminal => @{$production->{'rules'}}";
+    }
+
+    my $return_type = ${$grammar->{'RETURN_TYPES'}}{$nonterminal};
+
+    my $nonterminal_type;
+    # Equivalence terminals are context-sensitive in that their value depends
+    # on the previous rules. Similarly, if any sub-rule of the nonterminal has
+    # an action block, that action block may test some context-sensitive
+    # condition and call yyerror. In these cases, we can't cache the generated
+    # strings. :(
+    if (Has_Equivalence_Terminal($nonterminal,$grammar,$terminal_data) ||
+        Has_Action_Block($nonterminal,$grammar,$terminal_data) ||
+        $nonterminal eq $grammar->{'STARTING_RULE'})
+    {
+       $nonterminal_type = 'noncaching';
+    }
+    else
+    {
+       $nonterminal_type = 'caching';
+    }
+
+    Write_Nonterminal_Header_File($tempdir,$nonterminal,\@productions,
+      $nonterminal_type,$return_type);
+    Write_Nonterminal_Implementation_File($tempdir,$nonterminal,\@productions,
+      $grammar,$nonterminal_type,$return_type);
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_Action_Code
+{
+  my $nonterminal = shift;
+  my $code = shift;
+  my $line_number = shift;
+  my @rules = @{ shift @_ };
+  my %return_types = %{ shift @_ };
+  my @terminals = @{ shift @_ };
+  my $grammar_filename = shift;
+  my $terminal_data = shift;
+
+  return undef unless defined $code;
+
+  unless ($opts{'X'})
+  {
+    $grammar_filename = getcwd . "/$grammar_filename"
+      unless $grammar_filename =~ m!^/!;
+
+    $code =<<"EOF";
+#line $line_number "$grammar_filename"
+$code
+EOF
+  }
+
+  $code =
+    Escape_Macros($code, \@terminals, $terminal_data->{'OPTIONS'}{'prefix'});
+
+  $code =~ s/\$\$/dollar_dollar/g;
+  $code =~ s/^\n+//s;
+  $code =~ s/\s+$//s;
+
+  for(my $i = scalar @rules; $i != 0; $i--)
+  {
+    my $return_type;
+    $return_type = 'int'
+      if grep { $_ eq $rules[$i-1] } @terminals;
+    $return_type = $return_types{$rules[$i-1]}
+      if exists $return_types{$rules[$i-1]};
+
+    if ($code =~ /\$$i\b/)
+    {
+      report_and_exit "Don't know return type for nonterminal $nonterminal, rule \$$i\n" .
+        "($rules[$i-1])\n"
+        unless defined $return_type;
+
+      my $nonpointer_return_type = Get_Nonpointer_Type($return_type);
+
+      # Delete any deletes
+      $code =~ s/(^|\n)[ \t]*\bdelete\b\s*\$$i\b\s*;[ \t]*//g;
+
+      next unless $code =~ /\$$i\b/;
+
+      # Make a copy for any code that needs the raw pointer
+      $code =~ s/\*\s+\$$i\b/\*\$$i/g;
+      $code =~ s/\$$i\s+->/\$$i->/g;
+      $code =~ s/(?<!\*)\$$i\b(?!->)/new $nonpointer_return_type(*\$$i)/g
+        if defined $nonpointer_return_type;
+
+      my $i_minus_1 = $i - 1;
+
+      $code =~ s/\$$i\b/(($rules[$i-1]*)(*this)[$i_minus_1])->Get_Value()/g;
+    }
+  }
+
+  return undef if $code eq '';
+
+  return $code;
+}
+
+# --------------------------------------------------------------------------
+
+sub Get_Nonpointer_Type
+{
+  my $type = shift;
+
+  return undef unless defined $type;
+
+  my $nonpointer_type = $type;
+  $nonpointer_type =~ s/\s*\*\s*$//;
+
+  return undef if $type eq $nonpointer_type;
+  return $nonpointer_type;
+}
+
+# --------------------------------------------------------------------------
+
+sub Escape_Macros
+{
+  my $code = shift;
+  my @terminals = @{ shift @_ };
+  my $prefix = shift;
+
+  my $terminal_pattern;
+  {
+    local $" = '|';
+    $terminal_pattern = "(@terminals)";
+  }
+
+  return $code unless $code =~ /$terminal_pattern/;
+
+
+  my $flags = '';
+  foreach my $terminal (@terminals)
+  {
+    $flags .= " -D$terminal=$prefix$terminal";
+  }
+
+  # Ignore SIGPIPE; we'll catch errors on exit.
+  local $SIG{PIPE} =
+    sub
+    {
+      report_and_exit "Could not execute " .
+        "$yagg::Config{'programs'}{'cpp'}\n";
+    };
+
+
+  my $input = new FileHandle;
+  my $output = new FileHandle;
+  my $error = new FileHandle;
+
+  eval { open3($input, $output, $error, 
+    "$yagg::Config{'programs'}{'cpp'} -P -C -CC -w -undef$flags") };
+
+  report_and_exit "Could not execute " .
+    "$yagg::Config{'programs'}{'cpp'}: $@\n" if $@;
+
+  report_and_exit "Could not execute " .
+    "$yagg::Config{'programs'}{'cpp'}\n" if $?;
+
+  my $escaped_code = $code;
+  $escaped_code =~ s/#/awoeifunawefiwkmed/g;
+
+  print $input $escaped_code;
+  close $input;
+
+  local $/ = undef;
+  my $resulting_escaped_code = <$output>;
+  close $output;
+
+  my $errors = <$error>;
+  close $error;
+
+  $code = $resulting_escaped_code;
+  $code =~ s/#.*\n//g;
+  $code =~ s/awoeifunawefiwkmed/#/g;
+
+  return $code;
+}
+
+# --------------------------------------------------------------------------
+
+my %equivalences;
+
+sub Has_Equivalence_Terminal
+{
+  my $node = shift;
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  if (exists $equivalences{$node})
+  {
+    return $equivalences{$node} if defined $equivalences{$node};
+    return 0;
+  }
+
+  if (exists $terminal_data->{'TERMINALS'}{$node})
+  {
+    $equivalences{$node} = 0;
+
+    $equivalences{$node} = 1
+      if $terminal_data->{'TERMINALS'}{$node}{'type'} eq
+          'equivalence alternation' ||
+         $terminal_data->{'TERMINALS'}{$node}{'type'} eq
+          'equivalence generator';
+
+    return $equivalences{$node};
+  }
+  
+  $equivalences{$node} = undef;
+
+  foreach my $rule (grep { $_->[0] eq $node } @{ $grammar->{'RULES'} })
+  {
+    foreach my $product (@{$rule->[1]})
+    {
+      if (Has_Equivalence_Terminal($product, $grammar, $terminal_data))
+      {
+        $equivalences{$node} = 1;
+        return $equivalences{$node};
+      }
+    }
+  }
+
+  $equivalences{$node} = 0;
+  return $equivalences{$node};
+}
+
+# --------------------------------------------------------------------------
+
+my %action_blocks;
+
+sub Has_Action_Block
+{
+  my $node = shift;
+  my $grammar = shift;
+  my $terminal_data = shift;
+
+  if (exists $action_blocks{$node})
+  {
+    return $action_blocks{$node} if defined $action_blocks{$node};
+    return 0;
+  }
+
+  if (exists $terminal_data->{'TERMINALS'}{$node})
+  {
+    $action_blocks{$node} = 0;
+    return $action_blocks{$node};
+  }
+  
+  $action_blocks{$node} = undef;
+  
+  $action_blocks{$node} = undef;
+
+  foreach my $rule (grep { $_->[0] eq $node } @{ $grammar->{'RULES'} })
+  {
+    if (defined $rule->[3][0] && $rule->[3][0] !~ /^\s*$/)
+    {
+      $action_blocks{$node} = 1;
+      return $action_blocks{$node};
+    }
+
+    foreach my $product (@{$rule->[1]})
+    {
+      if (!exists $terminal_data->{'TERMINALS'}{$node} &&
+        Has_Action_Block($product, $grammar, $terminal_data))
+      {
+        $action_blocks{$node} = 1;
+        return $action_blocks{$node};
+      }
+    }
+  }
+
+  $action_blocks{$node} = 0;
+  return $action_blocks{$node};
+}
+
+# --------------------------------------------------------------------------
+
+sub Write_Nonterminal_Header_File
+{
+  my $tempdir = shift @_;
+  my $nonterminal = shift @_;
+  my @productions = @{ shift @_ };
+  my $nonterminal_type = shift @_;
+  my $return_type = shift @_;
+
+  my %templates = (
+    'noncaching' => "$yagg::Config{'template_path'}/src/model/nonterminal_rules/noncaching_nonterminal.template.h",
+    'caching' => "$yagg::Config{'template_path'}/src/model/nonterminal_rules/caching_nonterminal.template.h",
+  );
+
+  report_and_exit "Unknown nonterminal type \"$nonterminal_type\" for template."
+    unless exists $templates{$nonterminal_type};
+
+  open (OUT,">$tempdir/src/model/nonterminal_rules/$nonterminal.h")
+    or report_and_exit $!;
+
+  my $template =
+    Text::Template->new(SOURCE => $templates{$nonterminal_type},
+    DELIMITERS => ['[[[',']]]'])
+    or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+  print OUT $template->fill_in(HASH => {
+    nonterminal => $nonterminal,
+    productions => \@productions,
+    return_type => $return_type,
+  });
+
+  close(OUT);
+}
+
+# --------------------------------------------------------------------------
+
+sub Write_Nonterminal_Implementation_File
+{
+  my $tempdir = shift @_;
+  my $nonterminal = shift @_;
+  my @productions = @{ shift @_};
+  my $grammar = shift @_;
+  my $nonterminal_type = shift @_;
+  my $return_type = shift @_;
+
+  my %templates = (
+    'noncaching' => "$yagg::Config{'template_path'}/src/model/nonterminal_rules/noncaching_nonterminal.template.cc",
+    'caching' => "$yagg::Config{'template_path'}/src/model/nonterminal_rules/caching_nonterminal.template.cc",
+  );
+
+  report_and_exit "Unknown nonterminal type \"$nonterminal_type\" for template."
+    unless exists $templates{$nonterminal_type};
+
+  open (OUT,">$tempdir/src/model/nonterminal_rules/$nonterminal.cc")
+    or report_and_exit $!;
+
+  my $template =
+    Text::Template->new(SOURCE => $templates{$nonterminal_type},
+    DELIMITERS => ['[[[',']]]'])
+    or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+  print OUT $template->fill_in(HASH => {
+    nonterminal => $nonterminal,
+    productions => \@productions,
+    grammar => \$grammar,
+    return_type => $return_type,
+    nonpointer_return_type => Get_Nonpointer_Type($return_type),
+  });
+
+  close(OUT);
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_Utilities
+{
+  my $tempdir = shift @_;
+  my $grammar = shift @_;
+  my $terminal_data = shift @_;
+  my $grammar_filename = shift @_;
+  my $terminal_filename = shift @_;
+
+  my @terminals = @{ $grammar->{'TERMINALS'} };
+
+  Generate_Utility_Files($tempdir,$grammar,$terminal_data,'nonterminal',
+    \@terminals,$grammar_filename);
+  Generate_Utility_Files($tempdir,$grammar,$terminal_data,'terminal',
+    \@terminals,$terminal_filename);
+}
+
+# --------------------------------------------------------------------------
+
+# This function processes the tail block, creating extern declarations in the
+# head for any function definitions it finds. It then processes the head
+# block, making any declarations into "extern" declarations, and moving the
+# real declaration to the tail. The head is then put into a header file, and
+# the tail into an implementation file.
+
+# TODO: We really should parse the C/C++. For now we just try to figure it out
+# in Perl.
+
+sub Generate_Utility_Files
+{
+  my $tempdir = shift @_;
+  my $grammar = shift @_;
+  my $terminal_data = shift @_;
+  my $file_type = shift @_;
+  my @terminals = @{ shift @_ };
+  my $filename = shift @_;
+
+  my ($head,$tail);
+
+  if ($file_type eq 'nonterminal')
+  {
+    $head = $grammar->{'HEAD'}[0][0] ;
+  }
+  else
+  {
+    $head = $terminal_data->{'HEAD'}[0][0] ;
+  }
+
+  if(defined $head)
+  {
+    unless ($opts{'X'})
+    {
+      $filename = getcwd . "/$filename" unless $filename =~ m!^/!;
+      my $line_number = $grammar->{'HEAD'}[0][1];
+
+      $head =<<"EOF";
+#line $line_number "$filename"
+$head
+EOF
+    }
+  }
+  else
+  {
+    $head = '';
+  }
+
+  my $tail_line_number;
+
+  if ($file_type eq 'nonterminal')
+  {
+    if (ref $grammar->{'TAIL'})
+    {
+      $tail = $grammar->{'TAIL'}[0];
+
+      unless ($opts{'X'})
+      {
+        $filename = getcwd . "/$filename" unless $filename =~ m!^/!;
+        $tail_line_number = $grammar->{'TAIL'}[1];
+
+        $tail =<<"EOF";
+#line $tail_line_number "$filename"
+$tail
+EOF
+      }
+    }
+    else
+    {
+      $tail = '';
+    }
+  }
+  else
+  {
+    if (ref $terminal_data->{'TAIL'})
+    {
+      $tail = $terminal_data->{'TAIL'}[0];
+
+      unless ($opts{'X'})
+      {
+        $filename = getcwd . "/$filename" unless $filename =~ m!^/!;
+        $tail_line_number = $terminal_data->{'TAIL'}[1];
+
+        $tail =<<"EOF";
+#line $tail_line_number "$filename"
+$tail
+EOF
+      }
+    }
+    else
+    {
+      $tail = '';
+    }
+  }
+
+  # Prepend macros using cpp
+  $tail = Escape_Macros($tail, $grammar->{'TERMINALS'},
+    $terminal_data->{'OPTIONS'}{'prefix'})
+    if $file_type eq 'nonterminal';
+
+  my $append_to_head = '';
+  my $prepend_to_tail = '';
+
+  # Make any declarations extern
+  {
+    while($head =~ /\G(\s+|#.*?\n|[^;]+;\n?)/mgsc)
+    {
+      my $definition = $1;
+
+      next if $definition =~ /^#/ || $definition =~ /^\s+$/s;
+      next if $definition =~ /^\s*(extern|using\s+namespace|class|struct)\b/s;
+      next if $definition =~ /^\s*(\/\/|\/\*)/s;
+
+      # Try to catch initializations, but not function declarations
+      if ($definition =~ /^(.*?)(\s*=.*)$/ || $definition =~ /^(.*?)(\s*\(\s*['"\d].*\).*)$/)
+      {
+        my $variable = $1;
+        my $initializer = $1;
+
+        my $old_pos = pos $head;
+
+        substr($head,$old_pos - length $definition,length $definition) =
+          "extern $variable;";
+
+        pos($head) =
+          $old_pos - length($definition) + length("extern $variable;");
+
+        $prepend_to_tail .= "$definition";
+      }
+      else
+      {
+        my $old_pos = pos $head;
+
+        substr($head,$old_pos - length $definition,0) = 'extern ';
+
+        pos($head) = $old_pos + length 'extern ';
+
+        $prepend_to_tail .= "$definition" unless $definition =~ /\(/;
+      }
+    }
+  }
+
+  # For yyrestart and yyerror below
+  $append_to_head .=<<EOF;
+
+#include <string>
+#include <cstdio>
+
+using namespace std;
+EOF
+
+  # Make any function definitions extern
+  {
+    while($tail =~ /^((\w+ )+\w+\(.*\))\s*{/mg)
+    {
+      $append_to_head .= "extern $1;\n";
+    }
+  }
+
+  $append_to_head .= "\n";
+  if ($file_type eq 'nonterminal')
+  {
+    $prepend_to_tail .= "\n";
+    foreach my $terminal (@terminals)
+    {
+      $append_to_head .= "const int $terminal_data->{'OPTIONS'}{'prefix'}$terminal = $AUTO_GENERATED_ENUM_VALUE;\n";
+      $AUTO_GENERATED_ENUM_VALUE++;
+    }
+  }
+
+  $append_to_head .=<<EOF;
+
+extern int $terminal_data->{'OPTIONS'}{'prefix'}lineno;
+extern void yyrestart(FILE* in_input_file);
+extern void $terminal_data->{'OPTIONS'}{'prefix'}error(string error_string);
+EOF
+
+  if ($file_type eq 'terminal')
+  {
+    $prepend_to_tail =<<"EOF";
+#include "generator/utility/utility.h"
+
+int $terminal_data->{'OPTIONS'}{'prefix'}lineno = 0;
+
+void yyrestart(FILE* in_input_file)
+{
+}
+
+$prepend_to_tail
+EOF
+    chomp $prepend_to_tail;
+
+    if ($tail =~ /$terminal_data->{'OPTIONS'}{'prefix'}error[^;{]*?{[^\n]*\n?/g)
+    {
+      if ($opts{'X'})
+      {
+        substr($tail,pos $tail,0) =<<"EOF";
+  Utility::yyerror();
+  return;
+
+EOF
+      }
+      else
+      {
+        my $number_of_lines = 1 + substr($tail,0,pos $tail) =~ y/\n//;
+        my $line_number = $tail_line_number + $number_of_lines - 2;
+
+        substr($tail,pos $tail,0) =<<"EOF";
+  Utility::yyerror();
+  return;
+
+#line $line_number "$filename"
+EOF
+      }
+    }
+    else
+    {
+      $prepend_to_tail .=<<"EOF";
+void $terminal_data->{'OPTIONS'}{'prefix'}error(string error_string)
+{
+  Utility::yyerror();
+}
+
+EOF
+    }
+  }
+    
+  $tail = "$prepend_to_tail\n$tail";
+  $head .= "\n$append_to_head";
+
+  Write_Utility_Files($tempdir,$head,$tail,$file_type);
+}
+
+# --------------------------------------------------------------------------
+
+sub Write_Utility_Files
+{
+  my $tempdir = shift @_;
+  my $head = shift @_;
+  my $tail = shift @_;
+  my $file_type = shift @_;
+
+  my $utility_dir = "$tempdir/src/model/utility";
+  mkpath $utility_dir;
+
+  my %header_templates = (
+    'terminal' => "$yagg::Config{'template_path'}/src/model/utility/terminal_utility.template.h",
+    'nonterminal' => "$yagg::Config{'template_path'}/src/model/utility/nonterminal_utility.template.h",
+  );
+
+  my %implementation_templates = (
+    'terminal' => "$yagg::Config{'template_path'}/src/model/utility/terminal_utility.template.cc",
+    'nonterminal' => "$yagg::Config{'template_path'}/src/model/utility/nonterminal_utility.template.cc",
+  );
+
+  report_and_exit "Unknown file type \"$file_type\" for template."
+    unless exists $header_templates{$file_type} && exists
+    $implementation_templates{$file_type};
+
+  {
+    open (OUT,">$tempdir/src/model/utility/${file_type}_utility.h")
+      or report_and_exit $!;
+
+    my $template =
+      Text::Template->new(SOURCE => $header_templates{$file_type},
+      DELIMITERS => ['[[[',']]]'])
+      or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+    print OUT $template->fill_in(HASH => {
+      head => $head,
+      file_type => $file_type,
+    });
+
+    close OUT;
+  }
+
+  {
+    open (OUT,">$tempdir/src/model/utility/${file_type}_utility.cc")
+      or report_and_exit $!;
+
+    my $template =
+      Text::Template->new(SOURCE => $implementation_templates{$file_type},
+      DELIMITERS => ['[[[',']]]'])
+      or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+    print OUT $template->fill_in(HASH => {
+      tail => $tail,
+      file_type => $file_type,
+    });
+
+    close OUT;
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Generate_Main_Program
+{
+  my $tempdir = shift @_;
+  my $grammar = shift @_;
+
+  mkpath "$tempdir/src/progs";
+
+  my $starting_rule = $grammar->{'STARTING_RULE'};
+
+  my %minimum_lengths;
+
+  foreach my $rule ( @{$grammar->{'NONTERMINALS'}} )
+  {
+    my $minimum_length;
+    foreach my $length (@{$grammar->{'PRODUCTION_LENGTHS'}{$rule}})
+    {
+      $length =~ s/(=|>=)//;
+      unless (defined $minimum_length)
+      {
+        $minimum_length = $length;
+        next;
+      }
+
+      $minimum_length = $length if $length < $minimum_length;
+    }
+
+    $minimum_lengths{$rule} = $minimum_length;
+  }
+
+  open (OUT,">$tempdir/src/progs/generate.cc")
+    or report_and_exit $!;
+
+  my $template =
+    Text::Template->new( SOURCE =>
+    "$yagg::Config{'template_path'}/src/progs/generate.template.cc",
+    DELIMITERS => ['[[[',']]]'])
+    or report_and_exit "Couldn't construct template: $Text::Template::ERROR";
+
+  print OUT $template->fill_in(HASH => {
+    grammar => \$grammar,
+    starting_rule => $starting_rule,
+    minimum_lengths => \%minimum_lengths,
+  });
+
+  close(OUT);
+}
+
+############################################################################
+
+sub Build_Code
+{
+  my $rsh = $yagg::Config{'programs'}{'ssh'};
+  $rsh = $ENV{'RSYNC_RSH'} if defined $ENV{'RSYNC_RSH'};
+
+  print "Running \"make 1>make.stdout\" in $opts{'o'}{'path'}";
+  print " on $opts{'o'}{'host'}" if $opts{'o'}{'scheme'} ne 'file';
+  print "...\n";
+
+  if ($opts{'o'}{'scheme'} ne 'file')
+  {
+    dprint "Remote build command:";
+    dprint "  $rsh $opts{'o'}{'host'} 'cd $opts{'o'}{'path'} && make $opts{'M'} 1>make.stdout'";
+
+    system("$rsh $opts{'o'}{'host'} 'cd $opts{'o'}{'path'} && make $opts{'M'} 1>make.stdout'") == 0
+      or report_and_exit "Compilation failed\n";
+  }
+  else
+  {
+    my $cwd = getcwd;
+    chdir $opts{'o'}{'path'};
+    system("$yagg::Config{'programs'}{'make'} $opts{'M'} 1>make.stdout") == 0
+      or report_and_exit "Compilation failed\n";
+    chdir $cwd;
+  }
+}
+
+# --------------------------------------------------------------------------
+
+sub Run_Generator
+{
+  my $rsh = 'ssh';
+  $rsh = $ENV{'RSYNC_RSH'} if defined $ENV{'RSYNC_RSH'};
+
+  print "Running \"$opts{'o'}{'path'}/progs/generate $opts{'r'}\"";
+  print " on $opts{'o'}{'host'}" if $opts{'o'}{'scheme'} ne 'file';
+  print "...\n";
+
+  if ($opts{'o'}{'scheme'} ne 'file')
+  {
+    dprint "Remote build command:";
+    dprint "  $rsh $opts{'o'}{'host'} 'cd $opts{'o'}{'path'} && ./progs/generate $opts{'r'}'";
+
+    system("$rsh $opts{'o'}{'host'} 'cd $opts{'o'}{'path'} && ./progs/generate $opts{'r'}'") == 0
+      or report_and_exit "Execution failed\n";
+  }
+  else
+  {
+    system("$opts{'o'}{'path'}/progs/generate $opts{'r'}") == 0
+      or report_and_exit "Generation failed\n";
+  }
+}
+
+# --------------------------------------------------------------------------
+
+=head1 NAME
+
+yagg - generate a string generator from a grammar
+
+=head1 SYNOPSIS
+
+  yagg -u user_files_dir grammar.yg
+
+=head1 DESCRIPTION
+
+Given YACC-like and LEX-like input files, B<yagg> generates a
+C++ program that generates all strings of a user-specified length.  The
+YACC-like I<language grammar> file provides the grammar productions for string
+generation, along with optional action blocks that can perform
+context-sensitive checks in order to limit the generated strings. The LEX-like
+I<terminal generator> file provides specifications that instruct the
+program how to generate strings for terminals in the grammar.
+
+If the programmer already has a YACC or Bison parser file, he or she only
+needs to add "unaction" blocks to allow the recursive generator to undo the
+side effects of the action blocks. If the programmer already has a LEX or FLEX
+lexer input file, he or she only needs to remove extraneous code and replace
+any regular expressions with one of the terminal generator specifications.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item B<.yg grammar file>
+
+This is the main grammar file, which is very similar (if not identical) to the
+YACC file that a programmer might write to parse an input file. There are one
+or two differences--see the section L<"INPUT FILE SYNTAX"> below for details.
+
+=item B<.lg terminal generator file>
+
+A terminal specification file that defines productions for nonterminals which
+represent tokens in the language grammar. This is analogous to, and replaces,
+the LEX file that a programmer might write to parse an input file. See the
+section L<"INPUT FILE SYNTAX"> below for details.
+
+This input file is not necessary if you use constant strings exclusively in
+your grammar (i.e. if the grammar has no terminals).
+
+=item B<-C "compiler flags">
+
+Set the compiler flags in the GNUmakefile for the generated code. This is
+"-Wall -pedantic -O3" by default. Be sure to quote the argument to B<-C> if
+you have multiple compiler flags. e.g.:
+
+  yagg -C "-g -Wall" foo.yg foo.lg
+
+There are a number of flags for printing debug information during generation.
+See the generated GNUmakefile for a list. (-DSHORT_RULE_TRACE is especially
+useful if you want to trace the recursive generation of strings from the
+grammar.)
+
+Remember to force a rebuild if you change the compiler flags. You can do this
+with the B<-f> flag, or by running C<make clean> in the output directory.
+
+=item B<-d>
+
+Output debugging information to STDERR.
+
+=item B<-f>
+
+Delete the contents of the output directory before generating. By default, new
+files overwrite old files if they are different. (Non-generated files that
+exist in the output directory are not removed, so that any compiler
+intermediate files can be reuse.)
+
+=item B<-L "linker flags">
+
+Set the linker flags in the GNUmakefile for the generated code. This is empty
+by default.
+
+=item B<-m>
+
+Run "make" in the output directory after completing the generation.
+
+If -o specifies a remote directory, this command will be run remotely using
+B<ssh>, or whatever the I<RSYNC_RSH> environment variable is set to.
+
+=item B<-M>
+
+Pass these additional arguments to "make". This is useful if you want to set a
+control what is built on the remote machine. For example, you can send
+"LD=g++" to set g++ as the linker, or send "test" to run the tests.
+
+=item B<-r <length>>
+
+Automatically run the generator program using the specified length. Implies
+-m.
+
+If -o specifies a remote directory, this command will be run remotely using
+B<ssh>, or whatever the I<RSYNC_RSH> environment variable is set to. If you
+set up your public and private keys correctly, you should be able to run the
+generator without having to type in any passwords. That way you can
+transparently leverage the greater computational resources of a remote
+computer.
+
+WARNING: The makefile uses a set of programs such as ln, g++, etc. The remote
+build will use whatever program paths happen to be in your default path.
+
+=item B<-o directory>
+
+Specify the output directory. This is passed directly to rsync, so you can
+specify a remote directory using any of the formats it supports (assuming your
+remote maching has rsync).
+
+  yagg -o userid@example.com:output foo.yg foo.lg
+
+=item B<-u directory>
+
+Specify a directory with user-supplied files for the generator. Any files and
+subdirectories are copied into the output directory, overriding any generated
+files. You can use this to provide custom versions of any file, such as the
+F<src/progs/generate.cc> file for the main program.
+
+=item B<-X>
+
+Don't put any #line preprocessor commands in the generated files. Ordinarily
+B<yagg> puts them in the files so that the C++ compiler and
+debuggers will associate errors with your source file, the grammar file. This
+option causes them to associate errors with the generated code, treating it as
+an independent source file in its own right.
+
+NOTE: This flag can save you some compile time, because changing the input
+grammar file changes the line numbers, which changes the #line directives,
+which forces a recompile of the generated code.
+
+=item B<--help>
+
+Print the usage message and exit.
+
+=item B<--version>
+
+Print the version and exit.
+
+=back
+
+
+=head1 INPUT FILE SYNTAX
+
+This section provides a brief overview of the input file syntax. See the
+L<yagg::Tutorial> for more discussion.
+
+=head2 Language Grammar File
+
+The language grammar file syntax is based on that of YACC.
+B<yagg> should be able to process your F<.y> file unchanged.
+(Please report a bug if it can not.) Then for any actions that have
+side-effects, you will need to add "unaction" blocks to reverse those side
+effects (described in more detail shortly). Otherwise, you should not have to
+make any other changes to the file.
+
+A couple of things must be kept in mind. First, make very sure that your code
+does not contain memory leaks. While you may not notice them for a single
+execution of a parser, the generator will run your action code many times, in
+which case memory leaks will accrue. (Valgrind on Linux is a good leak
+checker.)
+
+If your grammar actions have side effects, you B<must> provide an unaction
+block that will reverse the side effects. This is because the generator needs
+to be able to backtrack in its search, and can't figure out how to undo your
+changes automatically. An example rule with an unaction block follows:
+
+  // nonterminal and rule_1 have a return type of string*
+  nonterminal : rule_1 "constant string"
+  {
+    // Normal action block
+    global_count += $2;
+    $$ = new string(*$1);
+    delete $1;
+  }
+  {
+    // New unaction block
+    global_count -= $2; // <--- To restore global state
+  };
+
+First, notice that I am careful to delete the C<$1> positional parameter in
+the action block. Failing to do so would cause a memory leak. In the unaction
+block, I decrement the C<global_count> variable. Note that you do not have to
+worry about deallocating or otherwise restoring the state of C<$$>--that is
+handled automatically.  Any positional parameters such as C<$2> that are used
+in the unaction block are automatically initialized with copies.  (This means
+that any pointers to user-defined types must have a copy constructor defined.)
+Copies will not be made in the unaction block if you do not use a positional
+parameter, so you only need to delete C<$1> if you use it.
+
+In an action block, any call to C<yyerror()> is interpreted by the generator
+as a string that is invalid, and should not be generated. In the unaction
+block, C<m_error_occurred> will be true if the action block resulted in an
+invalid string. Here's how you might use this to add a constraint on the
+generated strings:
+
+  // nonterminal and rule_1 have a return type of string*
+  nonterminal : rule_1 "constant string"
+  {
+    if (*$1 == "foo")
+      yyerror("foo is not allowed!");
+    else
+    {
+      global_count += $2;  // <--- Only increment for valid strings
+      $$ = new string(*$1);
+    }
+
+    delete $1;
+  }
+  {
+    if (!m_error_occurred) // <--- Only decrement for valid strings
+      global_count -= $2;
+  };
+
+=head2 Terminal Generator File
+
+The terminal generator file specifies the productions for terminals (which
+would be tokens in LEX). The generator supports a number of features for
+limiting the generation, as described below. The format is loosely based on
+that of LEX. The major change is that the only code that can be in the
+C<{...}> blocks is a return statement for the token.
+
+For obvious reasons, generating an unbounded number of possible strings for a
+regular expression is infeasible. Therefore, the programmer must provide one
+of several specifications for each terminal that tell the generator how to
+generate its strings.
+
+=head3 Simple
+
+The most simple specification is a constant string, which will replace the
+terminal wherever it appears in the generated string. For example:
+
+  "=" return EQUAL;
+
+You may also use constant strings in the language grammar file. They will be
+automatically replaced with "virtual terminals" having a simple string
+specification.
+
+=head3 Alternation
+
+If there are several possibilities for a terminal, you can use the syntax
+"C<(alt1|alt2)>" to specify them. for example:
+
+  ( "+" | "-" | "*" | "/" ) {
+    return OPERATOR;
+  }
+
+This example also demonstrates an alternative form for the return statement.
+During generation, the C<OPERATOR> terminal will be replaced with each of the
+alternatives, creating four times as many output strings.
+
+=head3 Equivalence Classes
+
+If an alternation is enclosed in square brackets, then the alternatives are
+considered to be interchangeable. This means that strings which differ only in
+terms of which alternative was chosen will not be printed. However, strings
+which utilize multiple alternatives will still be generated.
+
+This is useful when generating terminals such as variable names:
+
+  [ "x" | "y" ] return VARIABLE;
+
+Consider a language grammar containing the following:
+
+  SUM : VARIABLE "+" VARIABLE ;
+
+Without the equivalence class, the following strings would be generated:
+
+  x+x
+  x+y
+  y+x
+  y+y
+
+With the equivalence class, the following strings will be generated:
+
+  x+x
+  x+y
+
+Since x and y are part of the same equivalence class, x+x is the same as y+y.
+Similarly, x+y is the same as y+x.
+
+=head3 Equivalence Generators
+
+If the terminal specification is an equivalence containing one literal string
+containing one "#" character, then the generator will create strings as
+needed, replacing the "#" character with 1, 2, 3, etc. Use "\#" if you want a
+literal "#" character in the produced string.
+
+This is useful when generating an unlimited number of terminals such as
+variable names:
+
+  [ "var_#" ] return VARIABLE;
+
+Consider a language grammar containing the following:
+
+  SUM : VARIABLE "+" VARIABLE ;
+
+With the equivalence generator, the following strings will be generated:
+
+  var_1+var_1
+  var_1+var_2
+
+You can think of this feature as an "infinite equivalence class".
+
+=head1 BUGS, LIMITATIONS, POSSIBLE IMPROVEMENTS
+
+=over
+
+=item Not fully tested
+
+I still need to test it for grammars found "in the wild." I also need to
+validate the steps in the second example of the tutorial. I have not tested it
+on many different platforms.
+
+=item Not optimized for speed or memory
+
+It's very recursive, so we can use memoization or other techniques to speed
+things up. There's probably plenty of opportunity to make the generated C++
+code faster. I'm hoping someone with optimization experience can help out.
+
+=item C<%{ ... %}> and code block parsing is error-prone
+
+Instead of doing real parsing of the user-provided C/C++ code, I try to parse
+it in Perl. We need to do this in order to identify declarations to extern,
+and to move definitions in order to avoid multiply defined symbols. Some real
+code may confuse the simple Perl parser, causing the utility files to fail to
+compile.
+
+=item Other bugs and planned changes
+
+See the TODO file.
+
+=back
+
+=head1 LICENSE
+
+This code is distributed under the GNU General Public License (GPL) Version 2.
+See the file LICENSE in the distribution for details.
+
+=head1 AUTHOR
+
+David Coppit E<lt>david@coppit.orgE<gt>
+
+=head1 SEE ALSO
+
+Run C<perldoc yagg::Tutorial> for a tutorial. Also see the
+F<examples/> directory in the distribution.
+
+Parse::Yapp, YACC, Bison, LEX, FLEX
+
+=cut
