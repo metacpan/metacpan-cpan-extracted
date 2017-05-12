@@ -1,0 +1,31 @@
+README for VMS::Mail
+
+Copyright (c) 2000 David G. North, CCP <rold5@tditx.com>
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module supplies a complete interface to callable the VMSMail routines
+for client-side access.
+
+Build and test the extension:
+
+  $ perl Makefile.pl
+  $ mms
+  $ mms test
+
+If it tests OK, then install it:
+
+  $ mms install
+
+This is the initial CPAN release. This module is brand new and certainly
+has bugs. I will be testing it further and will release updates as I repair
+problems. The purpose of this release is to provide external access to it
+for peer review. I am very new to the module development process and would
+welcome any constructive criticism.
+
+WHAT'S CHANGED IN THIS RELEASE:
+
+0.05: More bugfixes - first CPAN release, works with Perl 5.6
+      (0.04 was released with the zipfile containing VMS file attribs - this
+      version repairs that).

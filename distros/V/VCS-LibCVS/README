@@ -1,0 +1,106 @@
+                        LibCVS Perl Version 1.00.02 (1.0002_0)
+
+This is alpha software.  Use at your own risk. 
+
+Copyright (c) 2003,2004,2005 Alexander Taler (dissent@0--0.org)
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+
+DESCRIPTION
+
+LibCVS Perl provides access to CVS working directories and repositories.  See
+http://www.nongnu.org/libcvs-perl/.  If you are using LibCVS please let us
+know, we are keen to help.
+
+It also ships with three useful scripts: lcvs-logsummary which transforms CVS
+commit logs into ChangeLog format, grouping multiple file commits into a single
+entry; lcvs-tagbase which tags the base revision of a branch for specified
+files; lcvs-st which prints out an exhaustive status of files in a working
+directory.
+
+To learn how to write scripts with LibCVS, you can start with the documentation
+or the example script examples/lcvs-example.  A lot of effort has been put into
+the pod documentation, so please use it.  If something isn't clear in the docs,
+please report it, so it can be fixed.
+
+
+MAJOR LIMITATIONS
+
+The current version provides almost no write access, it won't modify your
+working directory, nor your repository, except that it can apply tags.
+Subsequent releases will include functionality for modifying both the
+repository and the working directory.
+
+The tests are not yet thorough, they only cover the lcvs-st script.
+
+Performance is poor.
+
+The interface _will_ change, but changes will be detailed in this README and
+the ChangeLog.  I will add and remove objects, change their names, change
+function names and function signatures.
+
+
+PREREQUISITES
+
+* You will need Perl installed.  I've developed with Perl 5.6.1 and 5.8.*, but
+  it will probably work with others too.
+
+* For remote repository access, CVS is not required.  For local access it is.
+  I've developed with CVS 1.10.8, 1.11.1p1, 1.11.11+ and 1.12.9+, but it will
+  probably work with others too.  (http://www.cvshome.org/)
+
+
+INSTALLATION
+
+    $ ./Makefile.PL
+
+    $ make test
+
+    # make install
+
+Or, possibly, use the CPAN shell:
+
+  # perl -MCPAN -e shell
+  cpan> install VCS::LibCVS
+
+
+CHANGES
+
+This section includes changes that may affect users since the last release,
+both to the library interface, and internal changes.  For a complete list of
+changes since the previous release, look in the ChangeLog-* file.  Also see the
+bug tracker at https://savannah.nongnu.org/projects/libcvs-perl/.
+
+API changes:
+
+  * Added VCS::LibCVS::Slice, which can be used to apply tags.
+
+  * Remove Sticky* classes which were useless and just cluttered the code.
+
+  * Indicate internal routies using an _ prefix.
+
+  * Added get_branch().
+
+Non-API changes:
+
+  * Added new script lcvs-tagbase, which is used to apply tags to the base of
+    existing branches.
+
+  * Better parsing of CVSROOTs.
+
+  * Better parsing for confusing log files.
+
+  * More flexibility when testing repositories for multiple command support.
+
+  * Fix a broken case in get_file_branch() if the branch had no revisions.
+
+  * WorkingUnmanagedFile->is_in_the_way() supports being in the way of 
+    directory now.
+
+TODO
+
+Lots!  For the next release I want to deal with all of the major limitations
+listed above.  Also check the bug tracker at Savannah.
+

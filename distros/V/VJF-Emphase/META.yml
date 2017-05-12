@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         VJF-Emphase
+version:      0.11
+version_from: lib/VJF/Emphase.pm
+installdirs:  site
+requires:
+    Getopt::Lucid:                 0.16
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

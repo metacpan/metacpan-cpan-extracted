@@ -1,0 +1,21 @@
+#VRML V2.0 utf8
+Group {
+    children [
+	DEF VIDEO TouchSensor {}
+	Shape {
+		appearance Appearance {
+			material Material {
+				name	MPG
+				diffuseColor	1 0 0
+			}
+			texture MovieTexture {
+				url	"your.mpg"
+			}
+		}
+		geometry Box {
+			size	4 4 4
+		}
+	}
+    ]
+}
+ROUTE VIDEO.touchTime TO MPG.startTime

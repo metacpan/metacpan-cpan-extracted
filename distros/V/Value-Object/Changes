@@ -1,0 +1,28 @@
+Revision history for Value-Object
+
+0.15  2016-01-20
+  - Remove accidental testing dependency on Path::Tiny
+0.14  2016-01-18
+  - Correct handling of value in new.
+0.13  2015-10-03
+  - Correct environment variable skip test.
+0.12  2015-09-28
+  - Fix the untainting test for old versions of Scalar::Util.
+0.11  2015-09-14
+  - Untainting code failed if there was a newline in the value. All of my test
+    objects were short strings.
+0.10  2015-07-28
+  - Remove dependency on Moo.
+  - Change internal representation of value object to be more space efficient.
+  - Correct RT bug report email message. It was still based on the old module
+    name
+  - New value object types:
+     - HexString
+     - W3CDate - The date portion of an ISO 8601 date
+     - W3CDateTime - Full date/time in W3C version of ISO 8601
+     - W3CDateTimeZ - Full date/time of ISO 8601 in UTC only
+0.07  2015-03-28
+  - Update README and Makefile.PL for new name and repo.
+0.06  2015-03-28
+  - Change namespace from MooX::Value to Value::Object.
+  - Renamed distribution from MooX::Value to Value::Object

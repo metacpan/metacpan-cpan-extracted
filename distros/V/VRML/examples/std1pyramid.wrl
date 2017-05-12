@@ -1,0 +1,50 @@
+#VRML V1.0 ascii
+DEF Title
+Info {
+	string	"Pyramid"
+}
+Info {
+	string	"Created with VRML::VRML1::Standard by H. Palm"
+}
+PerspectiveCamera {
+	position	0 0 5
+}
+Separator {
+	Material {
+		diffuseColor [
+			1 0 0,
+			0 1 0,
+			0 0 1,
+			1 1 0,
+			0 1 1
+		]
+	}
+	MaterialBinding {
+		value	PER_FACE_INDEXED
+	}
+	Coordinate3 {
+		point [
+			-1 -1 1,
+			1 -1 1,
+			1 -1 -1,
+			-1 -1 -1,
+			0 1 0
+		]
+	}
+	IndexedFaceSet {
+		coordIndex [
+			0, 3, 2, 1, -1,
+			0, 1, 4, -1,
+			1, 2, 4, -1,
+			2, 3, 4, -1,
+			3, 0, 4, -1
+		]
+		materialIndex [
+			0,
+			1,
+			2,
+			3,
+			4
+		]
+	}
+}

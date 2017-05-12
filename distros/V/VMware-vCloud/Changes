@@ -1,0 +1,303 @@
+Revision history for VMware::vCloud
+
+2.404     2016-12-20 16:48:32+00:00 Europe/London
+  - Tests better structured and split - still minimal :-(
+
+2.403     2016-12-01 15:23:14+00:00 Europe/London (TRIAL RELEASE)
+  - integrated bug fixes from https://github.com/ksyz/perl-VMware-vCloud
+  - fixed various PBP warnings
+  - spacing/line end/tidy clean up
+  - Dist::Zilla conversion
+  - Added travis builds
+  - Added badge decoration to the README with current status
+
+Unreleased 2014/04/25
+
+  Added:
+    POD test
+
+  Improved:
+    'use warnings' on all modules
+
+2.401 2014/03/06
+
+  Added:
+    LICENSE is part of the distribution now
+
+  Improved:
+    Better handling of connection timeouts
+    examples/compose-vapp.pl - Now uses Term::Prompt fully.
+    examples/create-vapp-from-template.pl - Now uses Term::Prompt fully.
+    examples/poweron-vapp.pl - Now uses Term::Prompt fully.
+    RCS 'Revisison' based version info removed from examples
+    Directly declared VERSION variables
+    Autogenerating META data for the modules
+
+2.400 2013-05-03
+
+  Improved:
+    All examples are now actually bundled with distribution.
+
+v2.390 2013-05-03
+
+  Added:
+    examples/list-datastores.pl
+    VMware::vCloud - list_datastores(), progress_of_task()
+    VMware::API::vCloud - datastore_list()
+
+2.380 2013-04-17
+
+  Added:
+    examples/get-template.pl
+
+  Improved:
+    examples/list-templates.pl - Better variable names for the example.
+    Added 'Which "name" is which' to POD on VMware::API::vCloud
+    Using Term::Prompt to ask for auth on example scripts.
+
+  Fixed:
+    VMware::API::vCloud - template_get(), vdc_get() - Missing match target on ternary.*
+ 
+  * Problem found by David Gress
+
+2.370 2013-04-15
+
+  Added:
+    VMware::API::vCloud - vapp_recompose_add_vm()
+
+  Improved:
+    VMware::vCloud - get_template() - now returns hash or hashref in context
+    VMware::API::vCloud - admin(), admin_extension_get(),
+      admin_extension_vimServer_get(), catalog_get(), catalog_get_access(),
+      org_get(), org_list(), pvdc_get(), task_get(), template_get(), 
+      template_get_metadata(), vdc_get(), vdc_list(), vapp_get(), 
+      vapp_get_metadata() - now use the core get() method
+
+2.360 2013-04-09
+
+  Added:
+    VMware::vCloud - delete_vapp(), create_vapp_from_sources()
+    VMware::API::vCloud - vapp_create_from_sources(), vapp_create_from_template()
+
+  Improved:
+    Error's now die() with the returned "message" as well as the HTTP code.
+    VMware::vCloud - Cache is automatically purged on delete actions.
+    VMware::API::vCloud - org_get(), org_list(), vapp_get(), vdc_get() - now use the core get() method
+    VMware::API::vCloud - get() now has level-3 debug of the request header
+  
+2.32 2013-03-29
+
+  Added:
+    VMware::vCloud - get_task(), list_pvdcs(), wait_on_task()
+    VMware::API::vCloud - org_vdc_update(), put(), task_get()
+
+  Improved:
+    examples/list-pvds.pl - Now using VMware::vCloud
+    VMware::vCloud - get_vdc() now retruns hash or hashref.
+    VMware::API::vCloud - added debug levels 2 and 3
+    Date format in documentation is now in ISO 8601 format.
+
+2.29 2013-03-25
+
+  Added:
+    Acknowledgement of David Gress as a contributor.
+    VMware::vCloud - create_catalog(), delete_catalog()
+    VMware::API::vCloud - catalog_create(), catalog_get_access(),
+      catalog_set_access(), logout()*
+	VMware::API::vCloud - POD noting the LoginUrl error.
+
+  Improved:
+    Automatic call of logout() on DESTROY if needed.
+
+  * Provided by David Gress
+    
+2.26 2013-03-19
+
+  Added:
+    VMware::API::vCloud - template_get_metadata(), vapp_get_metadata()
+    VMware::API::vCloud - Started adding API documentation URLs as comments in 
+                          front of each method.
+
+  Improved:
+    VMware::vCloud - list_vapps() & list_templates() - Now uses the current login 
+      org a a parameter to list_vapps() to avoid pemission errors when logged in 
+      as an Org Admin.
+    VMware::vCloud - org_create() improved POD, added ldap_mode as a parameter.
+
+2.22 2013-03-14
+
+  Added:
+    VMware::vCloud - admin_urls(), debug(), delete_org(), delete_org_network(), 
+      delete_vdc(), disable_org(), disable_vdc(), enable_org(), enable_vdc(), 
+      extensions(), get_pvdc(), list_external_networks(), list_portgroups(), 
+      purge(), vimserver(), webclienturl()
+
+  Improved:
+    VMware::vCloud - get_org() - now returns hash or hashref depending on context.
+    VMware::vCloud - Improved and reorganized POD.
+    POD cleanup and formatting.
+
+2.19 2013-03-13
+
+  Added:
+    VMware::vCloud - create_external_network()
+    VMware::API::vCloud - admin(), admin_extension_get(), 
+      admin_extension_vimServer_get(), delete(), get_raw(), org_create(), 
+      org_list(), org_network_create(), org_vdc_create(), pvdc_get(), vdc_list()
+    API version information is now read directly from offered versions.
+    Learned variables and Raw responses now attached to $VMware::API::vCloud::self
+    When Debug is on, learned variables are displayed on exit.
+    
+  Improved:
+    Now working with API version v5.1
+    Removed the 1.0 and 1.5 schema from the MANIFEST until necessary.
+    Most recent version is used.
+    Login URL is now directed by Version response.
+    VMware::API::vCloud - org_list() now generated with caching.
+
+  Fixed:
+    Version now included in accept header for authentication.
+  
+2.12 2011-10-27
+
+  Added:
+    XML schema descriptors for 1.0 and 1.5 included in distribution.
+    VMware::API::vCloud - "Template name validation" to "BUGS and LIMITATIONS" POD.
+    VMware::vCloud - create_vapp_from_template(), get_template(), 
+      list_networks(), list_vdcs()
+    VMware::API::vCloud - template_get()
+    examples/list-templates.pl - Example of how to list templates.
+    examples/create-vapp-from-template.pl - Instantiate a template with defaults.
+
+  Improved:
+    examples/poweron-vapp.pl - Corrected documentation.
+    VMware::vCloud & VMware::vCloud::vApp - now used bless() with two arguments.
+    VMware::API::vCloud
+      _fault() now pushes a Dumper() of the HTTP object on error. That gives 
+         more detail on a fault when debug is enabled.
+      post() now has optional parameters for content and content type.
+      
+  Fixed:
+    examples/poweron-vappl.pl - Now actually included in the distribution
+      
+2.07 2011-10-06
+
+  Improved:
+    VMware::API::vCloud: Error handling now recognizes an HTTP::Response object.
+    Synopsis documentation on VMware::vCloud.
+
+  Fixed:
+    Included VMware::vCloud::vApp in MANIFEST
+
+2.06 2011-10-05
+
+  Added:
+    VMware::vCloud::vApp - An object representation of a vApp.
+    examples/poweron-vapp.pl - Powering a vApp on.
+
+  Improved:
+    Documentation now matches all methods.
+
+2.04 2011-10-03
+
+  Added:
+    Caching of data with Cache::Bounded.
+    list_templates() & examples/list-vms.pl - List templates
+  
+  Improved:
+    examples/list-vms.pl - Removed commented-out code from 1.x version.
+
+
+2.01 2011-09-30
+
+  This is a major change in philosophy. Previously this module emulated the API
+  in the name of method and returned data structures.
+
+  This does not match most conceptual and desired usage for automation. People
+  do not "think" in a collection of REST API calls. They think in actions like
+  "deploy a VM."
+
+  Consequently I have moved the direct API implementation to 
+  VMware::API::vCloud. It offers an unadulterated pure-perl based view of the
+  API and its transactions.
+
+  In VMware::vCloud, I am going to try and present a more human friendly view.
+
+  Added:
+    lib/VMware/API/vCloud.pm - Raw API calls and returns.
+
+  Fixed:
+    Session ID is now handled via HTTP header, not cookies. This matches the published API docs.
+
+
+1.600.08 2011-08-02
+
+  Added:
+	examples/list-vms.pl - List all vApps and their VMs
+
+  Improved:
+    Added POD to the examples: get_org.pl, login.pl
+    Fixed double "v" on new Version in POD
+
+1.600.07 2011-07-29
+
+  Added:    
+    vdc_get() - List the contents of a Virtual Datacenter
+    vapp_get() - List the contents of a vApp
+
+  Fixed:
+    Moved to multidigit CPAN-compatible version to work around single-digit subversion numbers.
+
+1.6 2011-07-14
+
+  Added:
+    catalog_get() - List a catalogs contents
+
+  NB: Release created and submitted from the air on cross-country flight. :)
+
+1.5 2011-07-01
+
+  Improved:
+    Tests now skip() and don't report fail when connection info is not
+    provided. The first test reports visual details of this.
+
+1.4 2011-06-25
+
+  Added:
+    org_get() - List an organizations contents
+	examples/org_get.pl - Usage of the org_get() method
+  
+  Improved:
+    login() - Returned data structure is now only the Org branch of the content.
+	t/02-header.t - Added a dummy "ok" to avoid "dubious" warnings until test is expanded.
+
+  Corrected:
+    Removed POD references to VMware::API::LabManager
+
+1.3 2011-06-25
+
+  Corrected:
+    Error calling Data::Dumper on _fault()
+    Syntax error in META.yml
+
+1.2 2011-06-23
+
+  The server is now properly queried for the API version.
+  XML to data structure translation of server responses is now in place.  
+
+  Added:
+    api_versions() - Method to check API version supported by server
+	
+  Improved:
+    login() - Now returns a data structure of accessible organizations upon successful login.
+  
+1.1  2011-06-16
+
+  Initial connection seed from sample code from hosting.com with comments from
+  the VMware communities.
+
+   - http://mylhat.com/blog/2009/09/hosting-com-vcloud-express-api-example-in-perl/
+   - http://communities.vmware.com/thread/284659
+
+   Added:
+     login() - Basic method to get a login token from the server.

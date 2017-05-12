@@ -1,0 +1,46 @@
+VUser-Google-ProvisioningAPI version 0.20
+===================================
+
+VUser::Google::ProvisioningAPI - module that implements the Google Apps for Your Domain Provisioning API
+
+For a complete description of the Google API, see
+http://code.google.com/apis/apps-for-your-domain/google_apps_provisioning_api_v1.0_reference.html
+
+or 
+
+http://code.google.com/apis/apps/gdata_provisioning_api_v2.0_reference.html
+
+VERSION
+   v0.21 Fix bug in RetrieveAllUsers() and some i18n fixes.
+   v0.20 Add support for Google Provisioning API 2.0. Moved into VUser:: to
+         prevent conflicts with upstream releases.
+
+   v0.11 is a small bug-fix and Google API changes release, see Changes for more
+   v0.1 is the initial release
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent
+  HTTP::Request
+  Encode
+  XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Johan Reinalda
+Copyright (C) 2007 by Randy Smith
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

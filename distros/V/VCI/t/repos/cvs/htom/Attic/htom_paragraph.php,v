@@ -1,0 +1,87 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.42.02;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \brief The HTOM_Paragraph represents a paragraph element. 
+ *
+ * The paragraph is similar to the the HTOM_Static, but it is allways displayed starting from teh new line
+ */
+class HTOM_Paragraph extends HTOM_Element
+{
+  //! Create a paragraph object
+  /*! The $content parameter may be either HTOM_Evaluable or the oridary string containg a HTML data.
+   */
+  public function __construct($content,$attributes="")
+  {
+    if ($content instanceof HTOM_Element) {
+      $this->text = $content;
+    } else {
+      $this->text = new HTOM_Static("".$content);
+    }
+    $this->SetAttributes($attributes);
+    $this->Init();
+  }
+
+
+  //! Get the paragraph html formated data.
+  public function Evaluate()
+  {
+    return $this->text = "<p ".$this->Attributes().">".$this->text->Evaluate()."</p>";
+  }
+  
+  private $text="";
+  private $style="";
+  private $ID;
+}
+
+?>@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d27 1
+a27 1
+    return $this->text = "<p ".$this->ID()->Evaluate().$this->Attributes().">".$this->text->Evaluate()."</p>";
+@
+

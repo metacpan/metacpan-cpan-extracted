@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vcdiff-Xdelta3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Vcdiff: 0.505
+resources:
+  bugtracker: https://github.com/hoytech/Vcdiff-Xdelta3/issues
+  repository: git://github.com/hoytech/Vcdiff-Xdelta3.git
+version: 0.104

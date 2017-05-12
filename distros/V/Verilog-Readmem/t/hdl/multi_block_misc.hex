@@ -1,0 +1,19 @@
+// multiple data blocks, with starting addresses in miscellaneous
+// order; 2 blocks have the same starting address. 
+
+@2
+5
+a
+4
+b
+
+@8 f e d  c
+
+@4 ff
+
+@0
+0
+
+// another at address 4
+@4
+dd

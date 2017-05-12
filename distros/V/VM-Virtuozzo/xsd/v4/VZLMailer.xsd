@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/mailer" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/mailer" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="mailer" type="mailerType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Mail templates Configuration management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="mailerType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="mail_template_list" minOccurs="0"/>
+						<xs:element ref="get_mail_template" minOccurs="0"/>
+						<xs:element ref="set_mail_template" minOccurs="0"/>
+						<xs:element ref="remove_mail_template" minOccurs="0"/>
+						<xs:element ref="set_relay" minOccurs="0"/>
+						<xs:element ref="get_relay" minOccurs="0"/>
+						<xs:element ref="get_config" minOccurs="0"/>
+						<xs:element ref="set_config" minOccurs="0"/>
+						<xs:element ref="post" minOccurs="0"/>
+					</xs:choice>
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="relay" minOccurs="0"/>
+						<xs:element ref="mail_tempate_list" minOccurs="0"/>
+						<xs:element ref="mail_template" minOccurs="0"/>
+						<xs:element ref="config" minOccurs="0"/>
+					</xs:sequence>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="mail_template_list">
+		<xs:annotation>
+			<xs:documentation>List all of the avaliable mail templates. Returns "mail_template_list" or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_mail_template">
+		<xs:annotation>
+			<xs:documentation>Gets mail template, specified by its name. Returns "mail_template" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Mail template name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_mail_template">
+		<xs:annotation>
+			<xs:documentation>Sets mail template. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Mail template name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="body" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Body of template. Next reserved words are alowed. They will be replaced with actual values. $VEID - Container id where alert is occured. $TIME - time when alert is occured in rfc822 format. $ID - name of quota, ubc parameter or service name. $TYPE - type of alert "green", "red", "yellow", "black" for ubc or quota or "running", "stopped" for service alert. $CUR, $SOFT, $HARD - current value, soft limit and hard limit, only for ubc or quota alert.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove_mail_template">
+		<xs:annotation>
+			<xs:documentation>Removes mail template. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Mail template name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_relay">
+		<xs:annotation>
+			<xs:documentation>Sets smart relay for mail delivering. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="relay" type="vzlt:ip_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_relay">
+		<xs:annotation>
+			<xs:documentation>Gets smart relay. Returns "relay" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="get_config">
+		<xs:annotation>
+			<xs:documentation>Gets mailer configuration. Returns "config" or "error".</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="set_config">
+		<xs:annotation>
+			<xs:documentation>Sets mailer configuration. Returns "ok" or "error".</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="config">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="notify">
+					<xs:annotation>
+						<xs:documentation>Determines if mail messaging is enabled. If this tag is present then messaging is enabled.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="accounts" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If absent, mail accounts are not changed</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence minOccurs="0">
+							<xs:element name="admin" type="mailAccountInfo" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>If absent admin mail is not changed</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="system" type="mailAccountInfo" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>If absent, system mail is not changed</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="mailAccountInfo">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="email" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="post">
+		<xs:annotation>
+			<xs:documentation>Posts a new message. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="message" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>The message, including header and body.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="relay" type="vzlt:ip_type">
+		<xs:annotation>
+			<xs:documentation>Smart relay.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="mail_tempate_list">
+		<xs:annotation>
+			<xs:documentation>List of mail templates.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Mail template name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mail_template">
+		<xs:annotation>
+			<xs:documentation>Mail template.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Mail template name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="body" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>See above in "set_mail_template"</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="read_only">
+					<xs:annotation>
+						<xs:documentation>This flag states that this partucular template is read-only.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mail_template_listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="mail_tempate_list"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_mail_templateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="mail_template" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_mail_templateResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove_mail_templateResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_relayResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_relayResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="relay"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_configResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_configResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="postResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

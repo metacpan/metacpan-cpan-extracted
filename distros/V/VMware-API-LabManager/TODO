@@ -1,0 +1,14 @@
+TODO!
+
+These items are goals and plans for the future for this module. They recognize
+deficiencies and inefficiencies in the current module:
+
+- Add all internal methods
+- Improve documentation on return values on all methods
+- Verify that all methods are complete
+- Better handling of method handles
+- Better handling of errors
+- Handle all "singleton" return conditions to force arrays when appropriate
+
+Sadly, since Lab Manager is scheduled to be End-Of-Life in 2014, these may 
+never get done.

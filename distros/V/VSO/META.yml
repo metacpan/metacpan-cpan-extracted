@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               VSO
+version:            0.025
+abstract:           Very Simple Objects
+author:
+    - John Drago <jdrago_999@yahoo.com>
+license:            perl
+distribution_type:  module
+test_requires:
+    Test::More:       0
+requires:
+    Carp:             0
+    Scalar::Util:     0
+recommends:
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       Hand
+resources:
+  repository: git://github.com/jdrago999/VSO.git
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

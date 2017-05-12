@@ -1,0 +1,22 @@
+TYPEMAP
+Video_FFmpeg_AVFormat *			T_PTROBJ_SPECIAL
+Video_FFmpeg_AVStream *	T_PTROBJ_SPECIAL
+Video_FFmpeg_AVStream_Audio *		T_PTROBJ_SPECIAL
+Video_FFmpeg_AVStream_Video *		T_PTROBJ_SPECIAL
+Video_FFmpeg_AVStream_Subtitle *		T_PTROBJ_SPECIAL
+Video_FFmpeg_Data *		T_PTROBJ_SPECIAL
+Video_FFmpeg_Attachment *	T_PTROBJ_SPECIAL
+
+INPUT
+T_PTROBJ_SPECIAL
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/Ptr$//;\$ntt}\")) {
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = ($type) tmp;
+	} else {
+		croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/Ptr$//;\$ntt}\");
+	};
+
+OUTPUT
+T_PTROBJ_SPECIAL
+		sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s/Ptr$//;\$ntt}\",
+		(void*)$var);  

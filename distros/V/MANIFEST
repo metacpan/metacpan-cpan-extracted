@@ -1,0 +1,9 @@
+MANIFEST	# $Id: MANIFEST 1126 2007-11-07 00:10:02Z abeltje $
+Changes
+Makefile.PL
+README
+V.pm
+t/01basic.t
+t/02useit.t
+t/03bug.t
+META.yml                                 Module meta-data (added by MakeMaker)

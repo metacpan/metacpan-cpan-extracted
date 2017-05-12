@@ -1,0 +1,23 @@
+Revision history for VKontakte-API
+
+0.01    00:14/02.03.2011
+		First version. Sends requests to vkontakte.ru
+
+0.02    13:52/11.04.2011
+		Parameters mid and sid added. Can be used:
+		my $vk = VKontakte::API->new(
+		        $api_id,
+		        $cgi_query->param('session[secret]'),
+		        $cgi_query->param('session[mid]'),
+		        $cgi_query->param('session[sid]')
+		);
+0.03	05:18/12.04.2011
+                 OAuth 2.0 authentification
+                 use VKontakte::API::OAuth;
+		     
+		 my $vk = VKontakte::API::OAuth->new( $opt->{api_id}, $opt->{api_secret} );
+		 my $h = $vk->sendRequest( "getProfiles", { uid => 66748 } );
+		 print Dumper($h);
+
+0.04    12:57/12.04.2011
+		 Documentation fixed

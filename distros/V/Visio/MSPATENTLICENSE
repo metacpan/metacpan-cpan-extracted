@@ -1,0 +1,82 @@
+from:
+http://www.microsoft.com/mscorp/ip/format/xmlpatentlicense.asp
+
+Office 2003 XML Reference Schema Patent License
+Published: December 3, 2003 | Updated: January 27, 2005
+ 
+This document is intended to expand upon the rights that Microsoft grants to certain Microsoft® Office 2003 XML schemas. As 
+described in this document, the technical specifications for the schemas include rights under copyright to make reproductions 
+and to display and distribute those reproductions, subject to certain terms and conditions. The purpose of this document is to 
+provide a patent license to individuals and organizations interested in implementing software programs that can read and write 
+files that conform to such specifications.
+
+Please read this entire document carefully to understand your rights.
+
+Office Schemas
+Microsoft Office 2003 includes support for certain XML "schemas" known as Wordprocessing ML, Spreadsheet ML, and FormTemplate 
+Schemas. For purposes of this document, these schemas will be referred to as the "Office Schemas." In general terms, schemas are 
+document structures used for presentation and layout of XML data.
+
+Copies of the technical specifications for the Office Schemas, which include an associated copyright notice and license, can be 
+found at http://msdn.microsoft.com/office/understanding/xmloffice/default.aspx.
+
+Patent License
+Microsoft may have patents and/or patent applications that are necessary for you to license in order to make, sell, or 
+distribute software programs that read or write files that comply with the Microsoft specifications for the Office Schemas.
+
+Except as provided below, Microsoft hereby grants you a royalty-free license under Microsoft's Necessary Claims to make, use, 
+sell, offer to sell, import, and otherwise distribute Licensed Implementations solely for the purpose of reading and writing 
+files that comply with the Microsoft specifications for the Office Schemas. A "Licensed Implementation" means only those 
+specific portions of a software product that read and write files that are fully compliant with the specifications for the 
+Office Schemas. The term "Necessary Claims" means claims of a patent or patent application (including continuations, 
+continuations-in-part, or reissues) that are owned or controlled by Microsoft and that are necessarily infringed by reading or 
+writing files pursuant to the requirements of the Office Schemas. A claim is necessarily infringed only when it is not possible 
+to avoid infringing when conforming to the specification. Notwithstanding the foregoing, "Necessary Claims" do not include any 
+claims: (i) that would require a payment of royalties by Microsoft to unaffiliated third parties; (ii) covering any Enabling 
+Technologies that may be necessary to make or use any product incorporating a Licensed Implementation, or (iii) covering the 
+reading or writing of files other than those complying with the requirements of the specifications for the Office Schemas. 
+"Enabling Technologies" means technologies that may be necessary to make or use any product or portion of a product that 
+complies with the Microsoft specifications for the Office Schemas, but are not expressly set forth or required in those 
+specifications, such as general word processing, spreadsheet or presentation features or functionality, operating system 
+technology, programming interfaces, protocols, and the like.
+
+If you distribute, license or sell a Licensed Implementation, this license is conditioned upon you requiring that the following 
+notice be prominently displayed in all copies and derivative works of your source code and in copies of the documentation and 
+licenses associated with your Licensed Implementation:
+
+"This product may incorporate intellectual property owned by Microsoft Corporation. The terms and conditions upon which 
+Microsoft is licensing such intellectual property may be found at 
+http://msdn.microsoft.com/library/en-us/odcXMLRef/html/odcXMLRefLegalNotice.asp."
+
+By including the above notice in a Licensed Implementation, you will be deemed to have accepted the terms and conditions of this 
+license. You are not licensed to distribute a Licensed Implementation under license terms and conditions that prohibit the terms 
+and conditions of this license.
+
+You are not licensed to sublicense or transfer your rights.
+
+By way of clarification of the foregoing, given the unique role of government institutions, end users will not violate this 
+license by merely reading government documents that constitute files that comply with the Microsoft specifications for the 
+Office Schemas, or by using (solely for the purpose of reading such files) any software that enables them to do so. The term 
+"government documents" includes public records.
+
+Microsoft reserves the right to terminate this license grant if you sue Microsoft or any of Microsoft's affiliates for patent 
+infringement over claims relating to reading or writing of files that comply with the Office Schemas. This license is perpetual 
+subject to this reservation.
+
+You should consult applicable export control laws and regulations to determine whether they apply to your Licensed 
+Implementation.
+
+Legal Disclaimers
+THE PATENT LICENSE GRANTED HEREIN IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. ALL WARRANTIES, DUTIES AND CONDITIONS, 
+EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+PURPOSE, TITLE AND NON-INFRINGEMENT ARE HEREBY DISCLAIMED.
+
+MICROSOFT AND ITS AFFILIATES SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM OR RELATED TO THIS LICENSE, INCLUDING INDIRECT, 
+INCIDENTAL, CONSEQUENTIAL, PUNITIVE OR SPECIAL DAMAGES EVEN IF MICROSOFT OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY 
+OF SUCH DAMAGES IN ADVANCE.
+
+Reservation of Rights
+All rights not expressly granted in this license are reserved by Microsoft. No additional rights are granted by implication or 
+estoppel or otherwise. Nothing herein grants any rights to use or display any Microsoft trademarks or logos.
+ 
+

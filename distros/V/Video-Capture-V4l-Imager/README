@@ -1,0 +1,129 @@
+######################################################################
+    Video::Capture::V4l::Imager 0.01
+######################################################################
+
+NAME
+    Video::Capture::V4l::Imager - Capture images from a video webcam
+
+SYNOPSIS
+        use Video::Capture::V4l::Imager;
+
+        my $vcap = Video::Capture::V4l::Imager->new(
+            width  => 320,
+            height => 240,
+        );
+
+          # Adjust camera brightness if necessary
+        $vcap->brightness(32_000);
+       
+          # Capture an image, back comes an Imager object
+        my $img = $vcap->capture();
+
+          # Save it as JPEG
+        $img->write(file => 'mycapture.jpg')
+          or die "Can't write: $!";
+
+DESCRIPTION
+    Video::Capture::V4l::Imager captures still images from a USB video cam
+    connected to your Linux box. The pictures come back as Imager objects
+    (see the Imager module on CPAN for details) and can be easily
+    manipulated and saved to disk.
+
+    Video::Capture::V4l::Imager is a convenience wrapper around Marc
+    Lehmann's Video::Capture::V4l module. It uses the following procedure to
+    obtain the still images from the video stream:
+
+        http://www.perlmonks.org/?node=474047
+
+  Capturing Images
+    To initialize V4l with your connected video camera, call the constructor
+    with the width and height setting according to what's supported by the
+    video camera:
+
+        my $vcap = Video::Capture::V4l::Imager->new(
+            width   => 320,
+            height  => 240,
+        );
+
+    Note that this call will fail if your video camera doesn't support the
+    specified width and height setting.
+
+    To capture a picture from the video stream, call
+
+        $vcap->capture();
+
+    which will return an Imager object on success or "undef" otherwise.
+
+  Adjusting the Camera
+    To adjust the brightness setting of the camera, use
+
+        $vcap->brightness(32_000);
+
+    and pass the integer value of the desired brightness setting.
+
+    To calibrate the camera to obtain an image that has a given average
+    brightness, use "calibrate":
+
+        my $vcap = Video::Capture::V4l::Imager->new(
+            width             => 320,
+            height            => 240,
+            avg_optimal       => 128,
+            avg_tolerance     => 20,
+            brightness_min    => 0,
+            brightness_max    => 65535,
+            calibration_tries => 5,
+        );
+
+        $vcap->calibrate();
+
+    This will start a simple binary search by taking a picture, checking its
+    average brightness via "img_avg()" (see below) and adjusting the camera
+    brightness to get to a desired optimal brightness "avg_optimal". within
+    a selectable tolerance "avg_tolerance".
+
+    "calibrate()" returns the best camera brightness setting found.
+
+    The minimum and maximum settings for camera brightness (which depend on
+    the camera used) are set in "brightness_min" and "brightness_max".
+
+    The maximum number of test exposures is set in "calibration_tries",
+    after this number is reached, the camera brightness that worked best so
+    far gets returned.
+
+  Utility functions
+    The following utility methods for Imager objects have been included in
+    this module:
+
+    "$i->img_avg()"
+        Calculates the average brightness of an image by adding up all
+        channels of every pixel and then dividing it by 3 times the number
+        of pixels. Handy to get a feel if an image is over- or underexposed,
+        by a very crude measure.
+
+    "$i-">img_changed($other_img, $diff)>
+        Checks if two images are significantly different, used to tell if
+        two consecutive still images taken from a video stream show that
+        something's going on in the scene.
+
+        Calculates the difference in channel values of all pixels and
+        compares it to the number passed in $diff. If the sum of all channel
+        differences is greater than $diff, "img_changed" returns true and
+        false otherwise.
+
+        Note that the counter will be increased by up to 3 points per pixel
+        (red, green, blue channels), so factor that into $diff.
+
+  NOTES
+    Note that this module contains inline C code and will take significantly
+    longer to start up on the first run. It will speed up significantly on
+    consecutive runs, because the object code will be preserved once it has
+    been compiled.
+
+LEGALESE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <cpan@perlmeister.com>
+

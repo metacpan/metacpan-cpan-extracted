@@ -1,0 +1,105 @@
+#!/usr/bin/perl -w
+
+# This sample script shows how to build up a project tree structure
+# using VC::CMSynergy::traverse_project. 
+
+# We use stevan little's excellent Tree::Simple module 
+# to describe the tree structure.
+# Kudos go to Anne Feldmeier for the simple tree building algorithm.
+
+=head1 NAME
+
+project_tree - build a project tree
+
+=head1 SYNOPSIS
+
+project_tree [options] project
+
+  project     project spec, either in the form "proj_vers"
+              or as four part objectname
+
+  Common options:
+
+  -D PATH | --database PATH       database path
+  -H HOST | --host HOST           engine host
+  -U NAME | --user NAME           user name
+  -P STRING | --password STRING   user's password
+  --ui_database_dir PATH          path to copy database information to
+
+  Options:
+
+  -r          recurse into sub projects
+
+=cut
+
+use Getopt::Long qw(:config bundling);
+use Pod::Usage;
+use VCS::CMSynergy 1.29 qw(:cached_attributes :tied_objects);
+use VCS::CMSynergy::Helper; 
+use Tree::Simple;
+use strict;
+
+my $ccm_opts = VCS::CMSynergy::Helper::GetOptions;
+my $recursive;
+(GetOptions(
+    'r|recursive'	=> \$recursive,		# include subprojects
+) && @ARGV == 1) or pod2usage(2);
+
+my @attributes = qw(owner modify_time);		# just an example
+
+my $ccm = VCS::CMSynergy->new(
+    %$ccm_opts,
+    RaiseError	=> 1,
+    PrintError	=> 0);
+
+my $project = $ccm->project_object($ARGV[0]);
+
+my Tree::Simple $root;	# the root of the project tree
+my Tree::Simple $top;	# node corresponding to top of Traversal::dirs stack
+
+$project->traverse(
+    {
+	subprojects	=> $recursive,
+	attributes	=> \@attributes,
+	wanted		=> sub
+	{
+	    return if $_->cvtype eq "project";	# skip subprojects
+
+	    unless ($root)
+	    {
+		$root = $top = Tree::Simple->new($_);
+		return;
+	    }
+
+	    # traversal may have moved up in the project tree,
+	    # so $top may not correspond to the top of
+	    # the directory stack anymore
+	    my $topdir = $VCS::CMSynergy::Traversal::dirs[-1];
+	    $top = $top->getParent while $top->getNodeValue ne $topdir;
+
+	    # create a Node with $top as the parent
+	    my $node = Tree::Simple->new($_, $top);
+	    
+	    # move $top when we're on a directory,
+	    # because traversal will immediately descent into it
+	    $top = $node if $_->cvtype eq "dir";
+	},
+    });
+
+
+{
+    # print root (because Tree::Simple::Traverse doesn't walk the node it's called on)
+    my $object = $root->getNodeValue;
+    print join(" ", $object->name, $object->cvtype, @$object{@attributes}), "\n";
+}
+$root->traverse(
+    sub 
+    {
+	my ($node) = @_;
+
+	my $object = $node->getNodeValue;
+	print "  " x ($node->getDepth + 1), 
+	      join(" ", $object->name, $object->cvtype, @$object{@attributes}), "\n";
+    });
+
+exit(0);

@@ -1,0 +1,21 @@
+h12345
+s 00001/00000/00001
+d D 1.2 07/12/01 02:02:02 merijn 2 1
+m 01.0.0.02
+c Added SID
+e
+s 00001/00000/00000
+d D 1.1 07/12/01 01:01:01 merijn 1 0
+m 01.0.0.01
+c Added what
+e
+f q main_app
+f v 
+t test
+T
+I 1
+my $what = "%W%\t[%E%]";
+I 2
+my $id = "%I%";
+E 2
+E 1

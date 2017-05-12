@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<Org xmlns="http://www.vmware.com/vcloud/v1.5" name="Example" id="urn:vcloud:org:342506a6-e7c8-11e6-9cfe-df67eba3672f" href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f" type="application/vnd.vmware.vcloud.org+xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vmware.com/vcloud/v1.5 http://vcloud.example.com/api/v1.5/schema/master.xsd">
+    <Link rel="down" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd" name="Example Working VDC" type="application/vnd.vmware.vcloud.vdc+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/tasksList/342506a6-e7c8-11e6-9cfe-df67eba3672f" type="application/vnd.vmware.vcloud.tasksList+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/catalog/3425497d-e7c8-11e6-9cfe-92012b1b9c41" name="Example Catalog" type="application/vnd.vmware.vcloud.catalog+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f/catalog/3425497d-e7c8-11e6-9cfe-92012b1b9c41/controlAccess/" type="application/vnd.vmware.vcloud.controlAccess+xml"/>
+    <Link rel="controlAccess" href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f/catalog/3425497d-e7c8-11e6-9cfe-92012b1b9c41/action/controlAccess" type="application/vnd.vmware.vcloud.controlAccess+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/admin/org/342506a6-e7c8-11e6-9cfe-df67eba3672f/catalogs" type="application/vnd.vmware.admin.catalog+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/network/34254a1d-e7c8-11e6-9cfe-b36a4e644096" name="org net" type="application/vnd.vmware.vcloud.orgNetwork+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/supportedSystemsInfo/" type="application/vnd.vmware.vcloud.supportedSystemsInfo+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f/metadata" type="application/vnd.vmware.vcloud.metadata+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f/hybrid" type="application/vnd.vmware.vcloud.hybridOrg+xml"/>
+    <Description/>
+    <FullName>Example</FullName>
+</Org>

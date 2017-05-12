@@ -1,0 +1,30 @@
+;jfx
+use JiftyX::ModelHelpers;
+<<Object>> = M('<<Model>>')-><<Action>>( <<Arguments>> );
+<<>>
+;end
+
+;disp
+<<Dispatch>> <<Ruels>> => sub {
+    <<>>
+};
+;end
+
+
+;tplp
+template '<<Name>>' => page { <<MetaData>> } 
+content {
+    <<>>
+};
+
+;tpl
+template '<<Template>>' => sub {
+    <<>>
+};
+;end
+
+;script
+script { attr { type is 'text/javascript' }
+    outs_raw( qq|<<CODE>>|);
+}; 
+;end

@@ -1,0 +1,11 @@
+Revision history for Version-Util
+
+0.72    2016-03-02 (PERLANCAR)
+
+	- Add functions: add_version(), subtract_version().
+
+
+0.71    2014-04-17 (SHARYANTO)
+
+        - First release. Extracted from SHARYANTO-Utils (renamed module from
+          SHARYANTO::Version::Util).

@@ -1,0 +1,151 @@
+#!/usr/bin/perl -w
+# Teletext collector, part of Video::TeletextDB
+# Don't expect any of this to work except on linux
+# Corresponding code for other systems is welcome.
+
+my $VERSION = "0.02";
+
+use strict;
+use List::Util qw(first);
+
+BEGIN {$^W = 0}	# Sigh...
+use Video::XawTV;
+use Video::Capture::V4l;
+BEGIN {$^W = 1}
+use Video::Capture::VBI;
+use Video::Frequencies;
+
+use Video::TeletextDB;
+
+# Hardcoded ioctl constants for i386 linux
+use constant VIDIOCGFREQ => 0x8004760e;
+# use constant VIDIOC_S_FREQUENCY => 0x402c5639;
+use constant VIDIOC_G_FREQUENCY => 0xc02c5638;
+
+my $tuner = 0;
+my $new_style_ioctl = 1;
+my $page_versions = shift || 5;
+# max. 2 second backlog (~2M)
+my $backlog = 2 * 25;
+
+my $vbi_dev = shift || (first {-c} qw(/dev/v4l/vbi0 /dev/vbi0
+                             /dev/v4l/vbi1 /dev/vbi1)) || 
+    die "Could not determine VBI device\n";
+my $try = $vbi_dev;
+my $v4l_dev = (first {-c} $try =~ s/vbi/video/ ? $try : (), 
+               qw(/dev/v4l/video0 /dev/video0
+                  /dev/v4l/video1 /dev/video1)) ||
+    die "Could not determine VIDEO device\n";
+# print STDERR "vbi dev=$vbi_dev, vid dev=$v4l_dev\n";
+
+my $exit = 0;
+
+# Teletext collecting tends to dump core if surprised at the wrong moment. 
+# Set up some handlers so signals get deleyed until we are in perl again.
+$SIG{HUP}  = sub { $exit = 1 };
+$SIG{INT}  = sub { $exit = 1 };
+$SIG{TERM} = sub { $exit = 1 };
+
+my $xaw_tv = eval { Video::XawTV->new("$ENV{HOME}/.xawtv") };
+
+# Map a region to the frequency table they use
+my %freqtable_map = 
+    ("europe-west" => "pal-europe");
+sub frequency_table {
+    my $ftab;
+    if ($xaw_tv) {
+        $ftab = $xaw_tv->opt("freqtab");
+        if (!$ftab) {
+            # So much for the documented interface.
+            # Now go find the info where it really is.
+            for ($xaw_tv->channels) {
+                if ($_->{name} eq "global") {
+                    $ftab= $_->{"freqtab"};
+                    last;
+                }
+            }
+        }
+    }
+    $ftab ||= "europe-west";
+    # Map xawtv's frequency table name to the one used by Video::Frequencies
+    $ftab = $freqtable_map{$ftab} || $ftab;
+    return $CHANLIST{$ftab} || die "no such frequency table: $ftab\n";
+}
+my $freq_table = frequency_table;
+
+open(my $vid, "<", $v4l_dev) || die "Could not open $v4l_dev: $!\n";
+my ($old_channel, $raw_f);
+my $old_raw_f = -1;
+sub get_channel {
+    if ($new_style_ioctl) {
+        ioctl($vid, VIDIOC_G_FREQUENCY, my $val=pack("I", $tuner)) || 
+            die "Could not ioctl $v4l_dev VIDIOC_G_FREQUENCY: $!\n";
+        $raw_f = unpack("x8I", $val);
+    } else {
+        ioctl($vid, VIDIOCGFREQ, my $val="") || 
+            die "Could not ioctl $v4l_dev VIDIOCGFREQ: $!\n";
+        $raw_f = unpack("I", $val);
+    }
+    return $old_channel if $raw_f == $old_raw_f;
+
+    # Calculate frequency in Khz
+    my $f = $raw_f * 1000+7 >> 4;
+    my $dist = 1e50;
+    my $channel = "";
+    for (keys %$freq_table) {
+        next unless abs($freq_table->{$_}-$f) < $dist;
+        $dist = abs($freq_table->{$_}-$f);
+        $channel = $_;
+    }
+    die "Unknown channel for $f Khz\n" if $dist > 5000;
+    # print STDERR "$f Khz is closest to $channel ($freq_table->{$channel} Khz)\n";
+    $old_raw_f = $raw_f;
+    return $old_channel = $channel;
+}
+
+sub capture {
+    my $vbi = Video::Capture::V4l::VBI->new($vbi_dev) ||
+        die "Could not open $vbi_dev: $!\n";
+
+    $vbi->backlog($backlog);
+
+    my $read_mask = "";
+    vec($read_mask, $vbi->fileno, 1) = 1;
+
+    my $tele = Video::TeletextDB->new(page_versions => $page_versions);
+    my ($access, $before_channel);
+    my $after_channel = "none";
+    until ($exit) {
+        $before_channel = get_channel;
+        print STDERR "Switched from channel $after_channel to $before_channel\n" if $before_channel ne $after_channel;
+        # Select seems to block :-(
+        select(my $r = $read_mask, undef, undef, undef);
+        my $now = time;
+        last if $exit;
+
+        my @decoded;
+        push @decoded, decode_field($vbi->field, VBI_VT) while $vbi->queued;
+        next unless @decoded;
+
+        $after_channel = get_channel;
+        if ($before_channel ne $after_channel) {
+            print STDERR "Switched from channel $before_channel to $after_channel\n";
+            $before_channel = $after_channel;
+            $access = undef;
+            next;
+        }
+
+        $tele->channel($before_channel);
+        if ($access) {
+            $access->acquire;
+        } else {
+            $access = $tele->access(channel => $before_channel,
+                                    RW => 1, 
+                                    creat => 1);
+        }
+        $access->write_feed(time => $now, decoded_fields => \@decoded);
+        $access->release;
+    }
+}
+
+capture;

@@ -1,0 +1,6 @@
+Revision history for Perl extension Vector::Object3D.
+
+0.01  2012-12-24
+    - initial version (provides miscellaneous procedures to handle vector
+      object calculations in the 3D space, including basic transformations
+      as well as 2D casting)

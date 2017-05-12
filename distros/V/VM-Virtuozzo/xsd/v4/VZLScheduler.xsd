@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/scheduler" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/scheduler" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="scheduler" type="schedulerType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Schedule Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="schedulerType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="add">
+							<xs:annotation>
+								<xs:documentation>Add task to sheduler. Returns "id"/Error</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="remove">
+							<xs:annotation>
+								<xs:documentation>Remove given task. Returns Ok/Error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="list">
+							<xs:annotation>
+								<xs:documentation>List existed tasks. Returns "task"s/Error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="update"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="task"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="taskType">
+		<xs:sequence>
+			<xs:element name="id" type="vzlt:guid_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Task ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="title" type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>The titile of task.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The description of task.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="category" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Task category (vz.backup.ves, vz.restart.ves).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="triggers">
+				<xs:annotation>
+					<xs:documentation>Schedule triggers.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="trigger"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="next_start" type="vzlt:datetime_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Next start time. Read-Only property.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="packet" type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>Agent packet.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="disabled" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Disabled flag.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="add">
+		<xs:annotation>
+			<xs:documentation>Add task to scheduler. Returns "task"(with specified "id")/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="task"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove">
+		<xs:annotation>
+			<xs:documentation>Remove given task by Id. Returns Ok/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="vzlt:guid_type">
+					<xs:annotation>
+						<xs:documentation>Task ID.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list">
+		<xs:annotation>
+			<xs:documentation>List all tasks or concrete task if ID specified. Returns "task_info"s/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="vzlt:guid_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Task ID.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="addResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="vzlt:guid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="removeResponse">
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="task" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="task" type="taskType">
+		<xs:annotation>
+			<xs:documentation>Task definition</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="trigger" type="triggerType"/>
+	<xs:complexType name="triggerType">
+		<xs:sequence>
+			<xs:element name="start_time" type="vzlt:datetime_type">
+				<xs:annotation>
+					<xs:documentation>The date and time when the trigger is activated.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="end_time" type="vzlt:datetime_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The date and time when the trigger is deactivated.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="once_triggerType">
+		<xs:annotation>
+			<xs:documentation>Represents a trigger that starts a task once. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="triggerType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="daily_triggerType">
+		<xs:annotation>
+			<xs:documentation>Represents a trigger that starts a task based on a daily schedule. For example, the task starts at a specific time every day, every other day, every third day, and so on.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="triggerType">
+				<xs:choice>
+					<xs:element name="days_interval" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Repeat schedule every N days. Range [1-365].</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="workdays">
+						<xs:annotation>
+							<xs:documentation>Repeat schedule on workdays.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="weekends">
+						<xs:annotation>
+							<xs:documentation>Repeat schedule on weekends.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="weekly_triggerType">
+		<xs:annotation>
+			<xs:documentation>Represents a trigger that starts a task based on a weekly schedule. For example, the task starts at 8:00 A.M. on a specific day of the week every week or every other week.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="triggerType">
+				<xs:sequence>
+					<xs:element name="weeks_interval" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Repeat schedule every N weeks. Range [1-52].</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="day_of_week" maxOccurs="7">
+						<xs:annotation>
+							<xs:documentation>The day of week when the trigger is activated (Sunday-0, Monday-1, Tuesday-2, Wednesday-3, Thursday-4, Friday-5, Saturday-6).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="monthly_triggerType">
+		<xs:annotation>
+			<xs:documentation>Represents a trigger that starts a job based on a monthly schedule. For example, the task starts on specific days of specific months.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="triggerType">
+				<xs:sequence>
+					<xs:element name="day_of_month" maxOccurs="32">
+						<xs:annotation>
+							<xs:documentation>The day of month when trigger is activated(1-31, Last-32).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="month_of_year" maxOccurs="12">
+						<xs:annotation>
+							<xs:documentation>The month of the year when trigger is activated(January, February, March, April, May, June, July, August, September, October, November, December).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="monthly_day_of_week_triggerType">
+		<xs:annotation>
+			<xs:documentation>Represents a trigger that starts a task on a monthly day-of-week schedule. For example, the task starts on every first Thursday, May through October.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="triggerType">
+				<xs:sequence>
+					<xs:element name="day_of_week" maxOccurs="7">
+						<xs:annotation>
+							<xs:documentation>The day of week when the trigger is activated (Sunday-0, Monday-1, Tuesday-2, Wednesday-3, Thursday-4, Friday-5, Saturday-6).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="weekday_of_month" maxOccurs="6">
+						<xs:annotation>
+							<xs:documentation>The N(First, Second, Third, Fourth, Fifth, Last) weekday of month when the trigger is activated.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="month_of_year" maxOccurs="12">
+						<xs:annotation>
+							<xs:documentation>The month of the year when trigger is activated(January, February, March, April, May, June, July, August, September, October, November, December).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="update">
+		<xs:annotation>
+			<xs:documentation>Updates scheduled task with specified ID. Returns Ok/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="task"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updateResponse"/>
+	<xs:complexType name="scheduler_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="max_tasks_count" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Maximal count of simultaneously running tasks. If 0 - no limited.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

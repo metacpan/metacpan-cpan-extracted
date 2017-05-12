@@ -1,0 +1,25 @@
+Revision history for Perl extension Vim-Tag
+
+1.110690  2011-03-10 18:10:16 Europe/Vienna
+    - follow symlinks
+    - added --first to only make tags the first time each package is seen
+    - better POD for bin/*
+    - less verbose
+    - removed support for PTAGS.SKIP; this also made it a lot faster
+    - added documentation
+
+1.100880  2010-03-29 23:01:12 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Sun 2010.02.07 17:27:29 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - complete rewriting into clean OO-style
+
+0.03  Mon 2009.12.07 01:03:29 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - reduced dependencies using author tests
+    - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+0.02  Sat Nov  1 22:21:12 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - forgot to inherit from Exporter...
+
+0.01  Sat Nov  1 22:05:00 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

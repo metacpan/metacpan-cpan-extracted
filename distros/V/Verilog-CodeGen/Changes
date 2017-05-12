@@ -1,0 +1,23 @@
+Revision history for Perl extension Verilog::CodeGen.
+
+0.9.4  Fri May  9 15:52:10 BST 2003
+
+	-Forgot to change $VERSION to 0.9.3  
+
+0.9.3  Fri May  9 15:36:31 BST 2003
+
+	-The addidtions to handle multiple designs were broken. Fixed that.
+	-Added a "Set design" Entry to the GUI. Documented this change.
+	-Removed the ugly "for testing" stuff from the device object code template. It is now added before parsing.
+
+
+0.9.2  Mon Mar 31 10:58:28 BST 2003
+
+	- Added documentation for the GUI
+	- added support for multiple designs
+	- added script to create new designs and modified GUI to support it
+
+0.9.1  Wed Nov  6 14:07:27 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Verilog::CodeGen
+

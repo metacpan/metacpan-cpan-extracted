@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+use VCfs;
+
+my $dir = shift(@ARGV) || '.';
+my $v = VCfs->new($dir);
+print join("\n", $v->taglist, '');
+
+# vim:ts=2:sw=2:et:sta

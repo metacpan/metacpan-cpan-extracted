@@ -1,0 +1,18 @@
+---
+abstract: 'Module for validation, parsing and creating VCF files.'
+author:
+  - 'Stuart Watt <stuart@morungos.com>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VCF
+resources:
+  repository: http://github.com/morungos/p5-VCF
+version: '1.003'

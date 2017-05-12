@@ -1,0 +1,54 @@
+%define realname   Vote
+%define version    @VERSION@
+%define release    %mkrel 1
+
+Name:       Epoll
+Version:    %{version}
+Release:    %{release}
+License:    GPL or Artistic
+Group:      Development/Perl
+Summary:    A web voting application
+Source:     %{realname}-%{version}.tar.gz
+Url:        http://search.cpan.org/dist/%{realname}
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildArch:  noarch
+
+%description
+A web voting application
+
+%prep
+%setup -q -n %{realname}-%{version} 
+
+%build
+%{__perl} Makefile.PL INSTALLDIRS=vendor
+%make
+
+%if 0
+%check
+make test
+%endif
+make checkmd5
+
+%install
+rm -rf %buildroot
+%makeinstall_std
+
+mkdir -p %buildroot/etc
+install -m 700 epoll.yml.example %buildroot%_sysconfdir/epoll.yml
+mkdir -p %buildroot%_var/www/cgi-bin
+install -m 755 script/vote_cgi.pl %buildroot%_var/www/cgi-bin/vote_cgi.pl
+
+%clean
+rm -rf %buildroot
+
+%files
+%defattr(-,root,root)
+%doc Changes README
+%doc sql/postgres.dump
+%attr(0640,root,apache) %config(noreplace) %_sysconfdir/epoll.yml
+%_bindir/*
+%_var/www/cgi-bin/vote_cgi.pl
+%{_mandir}/man3/*
+%{_mandir}/man1/*
+%perl_vendorlib/*
+

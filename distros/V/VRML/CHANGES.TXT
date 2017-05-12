@@ -1,0 +1,40 @@
+1.09
+* add method "pointset" to VRML::VRML2
+* bug in method line fixed
+
+1.08
+* add method "torus" to VRML::VRML2
+
+1.07
+* add "language" to method text
+
+1.06 
+* remove a bug in VRML::VRML2::Standard::IndexedFaceSet (Thanx Bridget Kenyon)
+
+1.05
+* add "textrans" to method "appearance" in VRML::VRML2
+* ROUTEs now moved at the end of nodes
+
+1.04
+* add appearance to method "elevationgrid" in VRML::VRML2
+
+1.03
+* add method "elevationgrid" to VRML::VRML2
+* add 'defmat' and 'deftex' to method "appearance"
+* correct documentation of PointLight (add 'ambientIntensity')
+
+1.02
+* add methods "backgroundimage" and  "backgroundcolor" to VRML::VRML2
+* remove parameter 'ambientIntensity' from method "DirectionalLight" in modul
+  VRML::VRML1::Standard
+
+1.01
+* add method "worldinfo" to VRML::VRML1
+* add parameter 'top', 'side' and 'bottom' to method "cylinder"
+
+1.00
+* remove method VRML_head (->new() generates now the VRML-header)
+* remove auto switching degree <-> radiant
+
+0.97
+* beta release

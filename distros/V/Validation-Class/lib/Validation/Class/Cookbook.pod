@@ -1,0 +1,868 @@
+# PODNAME: Validation::Class::Cookbook
+# ABSTRACT: Recipes for Validation::Class
+
+# VERSION
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Validation::Class::Cookbook - Recipes for Validation::Class
+
+=head1 VERSION
+
+version 7.900057
+
+=head1 GUIDED TOUR
+
+The instructions contained in this documentation are also relevant for
+configuring any class derived from L<Validation::Class>. The validation logic
+that follows is not specific to a particular use-case.
+
+=head2 Parameter Handling
+
+There are three ways to declare parameters you wish to have validated. The first
+and most common approach is to supply the target parameters to the validation
+class constructor:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(params => $params);
+
+All input parameters are wrapped by the L<Validation::Class::Params> container
+which provides generic functionality for managing hashes. Additionally you can
+declare parameters by using the params object directly:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new;
+
+    $rules->params->clear;
+
+    $rules->params->add(user => 'admin', pass => 's3cret');
+
+    printf "%s parameters were submitted", $rules->params->count;
+
+Finally, any parameter which has corresponding validation rules that has been
+declared in a validation class derived from L<Validation::Class> will have an
+accessor which can be used directly or as an argument to the constructor:
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field 'name' => {
+        required => 1
+    };
+
+    package main;
+
+    my $rules = MyApp::Person->new(name => 'Egon Spangler');
+
+    $rules->name('Egon Spengler');
+
+=head2 Validation Rules
+
+Validation::Class comes with a complete standard set of validation rules which
+allows you to easily describe the constraints and operations that need to be
+performed per parameter.
+
+Validation rules are referred to as I<fields>, fields are named after the
+parameters they expect to be matched against. A field is also a hashref whose
+keys are called directives which correspond with the names of classes in the
+directives namespace, and whose values are arguments which control how
+directives carry-out their operations.
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new;
+
+    $rules->fields->clear;
+
+    $rules->fields->add(name => { required => 1, max_length => 255 });
+
+Fields can be specified as an argument to the class constructor, or managed
+directly using the L<Validation::Class::Fields> container. Every field is
+wrapped by the L<Validation::Class::Field> container which provides accessors
+for all core directives. Directives can be found under the directives namespace,
+e.g. the required directive refers to L<Validation::Class::Directive::Required>.
+Please see L<Validation::Class::Directives> for a list of all core directives.
+
+=head2 Flow Control
+
+A good data validation tool is not simply checking input against constraints,
+its also providing a means to easily handle different and often complex data
+input scenarios.
+
+The queue method allows you to designate and defer fields to be validated. It
+also allows you to set fields that must be validated regardless of what has been
+passed to the validate method. Additionally it allows you to conditionally
+specify constraints:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new;
+
+    $rules->queue('name'); # always validate the name parameter
+
+    $rules->queue('email', 'email2') if $rules->param('change_email');
+    $rules->queue('login', 'login2') if $rules->param('change_login');
+
+    # validate name
+    # validate email and email confirmation if change_email is true
+    # validate login and login confirmation if change_login is true
+
+    $rules->validate('password'); # additionally, validate password
+    $rules->clear_queue;          # reset the queue when finished
+
+Akin to the queue method is the stash method. At-times it is necessary to break
+out of the box in order to design constraints that fit your particular use-case.
+The stash method allows you to share arbitrary objects with routines used by
+validation classes.
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new;
+
+    $rules->fields->add(
+        email => {
+            # email validation relies on a stashed object
+            validation => sub {
+                my ($self, $field, $params) = @_;
+                return 0 if ! my $dbo = $self->stash('dbo');
+                return 0 if ! $dbo->email_exists($field->value);
+                return 1;
+            }
+        }
+    );
+
+    # elsewhere in the program
+    $rules->stash(dbo => $database_object); # stash the database object
+
+=head2 Error Handling
+
+When validation fails, and it will, you need to be able to report what failed
+and why. L<Validation::Class> give you complete control over error handling and
+messages. Errors can exist at the field-level and class-level (errors not
+specific to a particular field). All errors are wrapped in a
+L<Validation::Class::Errors> container.
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new;
+
+    # print a comma separated list of class and field errors
+    print $rules->errors_to_string unless $rules->validate;
+
+    # print a newline separated list of class and field errors
+    print $rules->errors_to_string("\n") unless $rules->validate;
+
+    # print a comma separated list of class and upper-cased field errors
+    print $rules->errors_to_string(undef, sub{ ucfirst lc shift })
+
+    # print total number of errors at the class and field levels
+    print "Found %s errors", $rules->error_count;
+
+    # return a hashref of fields with errors
+    my $errors = $rules->error_fields;
+
+    # get errors for specific fields only
+    my @errors = $rules->get_errors('email', 'login');
+
+=head2 Input Filtering
+
+Filtering data is one fringe benefits of a good data validation framework. The
+process is also known as scrubbing or sanitizing data. The process ensures that
+the data being passed to the business logic will be clean and consistent.
+
+Filtering data is not as simple and straight-forward as it may seem which is why
+it is necessary to think-through your applications interactions before
+implementation.
+
+Filtering is the process of applying transformations to the incoming data. The
+problem with filtering is that it permanently alters the data input and in the
+event of a failure could report inconsistent error messages:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new;
+
+    $rules->fields->add(
+        # even if the input is submitted as lowercase it will fail
+        # the filter is run as a pre-process by default
+        username => {
+            filters => ['uppercase'],
+            validation => sub {
+                return 0 if $_[1]->value =~ /[A-Z]/;
+                return 1;
+            }
+        }
+    );
+
+When designing a system to filter data, it is always necessary to differentiate
+pre-processing filters from post-processing filters. L<Validation::Class>
+provides a filtering directive which designates certain fields to run filters in
+post-processing:
+
+    $rules->fields->add(
+        # if the input is submitted as lowercase it will pass
+        username => {
+            filters => ['uppercase'],
+            filtering => 'post',
+            validation => sub {
+                return 0 if $_[1]->value =~ /[A-Z]/;
+                return 1;
+            }
+        }
+    );
+
+=head2 Handling Failures
+
+A data validation framework exists to handle failures, it is its main function
+and purpose, in-fact, the difference between a validation framework and a
+type-constraint system is how it responds to errors.
+
+When a type-constraint system finds an error it raises an exception. Exception
+handling is the process of responding to the occurrence, during computation, of
+exceptions (anomalous or exceptional situations).
+
+Typically the errors reported when an exception is raised includes a dump of the
+program's state up until the point of the exception which is apropos as exceptions
+are unexpected.
+
+A data validation framework can also be thought-of as a type system but one that
+is specifically designed to expect input errors and report user-friendly error
+messages.
+
+L<Validation::Class> may encounter exceptions as programmers defined validation
+rules which remain mutable. L<Validation::Class> provides attributes for
+determining how the validation engine reacts to exceptions and validation
+failures:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(
+        ignore_failure => 1, # do not throw errors if validation fails
+        ignore_unknown => 0, # throw errors if unknown directives are found
+        report_failure => 0, # register errors if "method validations" fail
+        report_unknown => 0, # register errors if "unknown directives" are found
+    );
+
+=head2 Data Validation
+
+Once your fields are defined and you have your parameter rules configured as
+desired you will like use the validate method to perform all required operations.
+The validation operations occur in the following order:
+
+    normalization   (resetting fields, clearing existing errors, etc)
+    pre-processing  (applying filters, etc)
+    validation      (processing directives, etc)
+    post-processing (applying filters, etc)
+
+What gets validated is determined by the state and arguments passed to the
+validate method. The validate method determines what to validate in the
+following order:
+
+    checks the validation queue for fields
+    checks arguments for regular expression objects and adds matching fields
+    validates fields with matching parameters if no fields are specified
+    validates all fields if no parameters are specified
+
+It is also important to under what it means to declare a field as being required.
+A field is a data validation rule matching a specific parameter, A required
+field simply means that if-and-when a parameter is submitted, it is required to
+have a value. It does not mean that a field is always required to be validated.
+
+Occasionally you may need to temporarily set a field as required or
+not-required for a specific validation operation. This requirement is referred
+to as the toggle function. The toggle function is enacted by prefixing a field
+name with a plus or minus sign (+|-) when passed to the validate method:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(fields => {...});
+
+    # meaning, email is always required to have a value
+    # however password and password2 can be submitted as empty strings
+    # but if password and password2 have values they will be validated
+    $rules->validate('+email', '-password', '-password2');
+
+Here are a few examples and explanations of using the validate method:
+
+    use Validation::Class::Simple;
+
+    my $rules = Validation::Class::Simple->new(fields => {...});
+
+    unless ($rules->validate) {
+        # validate all fields with matching parameters
+    }
+
+    unless ($rules->validate) {
+        # validate all fields because no parameters were submitted
+    }
+
+    unless ($rules->validate(qr/^email/)) {
+        # validate all fields whose name being with email
+        # e.g. email, email2, email_update
+    }
+
+    unless ($rules->validate('login', 'password')) {
+        # validate the login and password specifically
+        # regardless of what parameters have been set
+    }
+
+    unless ($rules->validate({ user => 'login', pass => 'password' })) {
+        # map user and pass parameters to the appropriate fields as aliases
+        # and validate login and password fields using the aliases
+    }
+
+=head1 BUILDING CLASSES
+
+This recipe displays the usage of keywords to configure a validation class.
+
+=head2 Problem
+
+You want to know how to use the L<Validation::Class> keywords to define a
+validation class.
+
+=head2 Solution
+
+Use the keywords exported by L<Validation::Class> to register validation rules,
+templates, profiles, methods and filters.
+
+=head2 Discussion
+
+Your validation class can be thought of as your data-model/input-firewall. The
+benefits this approach provides might require you to change your perspective
+on parameter handling and workflow. Typically when designing an application we
+tend to name parameters arbitrarily and validate the same data at various stages
+during a program's execution in various places in the application stack. This
+approach is inefficient and prone to bugs and security problems.
+
+To get the most out of Validation::Class you should consider each parameter
+hitting your application (individually) as a transmission fitting a very specific
+criteria, yes, like a field in a data model.
+
+Your validation rules will act as filters which will reject or accept and
+format the transmission for use within your application, yes, almost exactly
+like a firewall.
+
+A validation class is defined as follows:
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    # a validation rule template
+
+    mixin 'basic'  => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        filters    => ['lowercase', 'alphanumeric']
+    };
+
+    # a validation rule
+
+    field 'login'  => {
+        mixin      => 'basic',
+        label      => 'user login',
+        error      => 'login invalid',
+        validation => sub {
+
+            my ($self, $field, $params) = @_;
+
+            return $field->value eq 'admin' ? 1 : 0;
+
+        }
+    };
+
+    # a validation rule
+
+    field 'password'  => {
+        mixin         => 'basic',
+        label         => 'user password',
+        error         => 'password invalid',
+        validation    => sub {
+
+            my ($self, $field, $params) = @_;
+
+            return $field->value eq 'pass' ? 1 : 0;
+
+        }
+    };
+
+    # a validation profile
+
+    profile 'registration'  => sub {
+
+        my ($self, @args) = @_;
+
+        return $self->validate(qw(login password));
+
+    };
+
+    # an auto-validating method
+
+    method 'registers'  => {
+
+        input => 'registration',
+        using => sub {
+
+            my ($self, @args) = shift;
+
+            # ... do something
+
+        }
+
+    };
+
+    1;
+
+The fields defined will be used to validate the specified input parameters.
+You specify the input parameters at/after instantiation, parameters should take
+the form of a hashref of key/value pairs passed to the params attribute, or
+attribute/value pairs. The following is an example on using your validate class
+to validate input in various scenarios:
+
+    # web app
+    package MyApp;
+
+    use MyApp::User;
+    use Misc::WebAppFramework;
+
+    get '/auth' => sub {
+
+        # get user input parameters
+        my $params = shift;
+
+        # initialize validation class and set input parameters
+        my $user = MyApp::User->new(params => $params);
+
+        unless ($user->registers) {
+
+            # print errors to browser unless validation is successful
+            return $user->errors_to_string;
+
+        }
+
+        return 'you have authenticated';
+
+    };
+
+A field can have aliases, parameter names that if detected will be mapped to
+the parameter name matching the field definition. Multiple fields cannot have
+the same alias defined, such a configuration would result in a runtime error.
+
+    use MyApp::User;
+
+    my $user = MyApp::User->new(params => $params);
+
+    unless ($user->validate) {
+
+        return $input->errors_to_string;
+
+    }
+
+    package MyApp::User;
+
+    field 'email' => {
+        ...,
+        alias => [
+            'emails',
+            'email_address',
+            'email_addresses'
+        ]
+
+    };
+
+    package main;
+
+    use MyApp::User;
+
+    my  $user = MyApp::User->new(params => { email_address => '...' });
+
+    unless ($user->validate('email'){
+
+        return $user->errors_to_string;
+
+    }
+
+    # valid because email_address is an alias on the email field
+
+=head1 INTEGRATING CLASSES AND FRAMEWORKS
+
+This recipe displays methods of configuring your validation class to cooperate
+with your pre-existing classes and object-system.
+
+=head2 Problem
+
+You want to know how to configure L<Validation::Class> to cooperate with
+pre-existing classes or object systems like L<Mo>, L<Moo>, L<Mouse>, and L<Moose>.
+
+=head2 Solution
+
+Use a combination of techniques such as excluding keywords exported by
+L<Validation::Class> and utilizing the initialize_validator method.
+
+=head2 Discussion
+
+L<Validation::Class> will atuomatically inject a method name
+`initialize_validator` if a pre-existing `new` method is dicovered which allows
+you to execute certain validation class normalization routines. When, the
+initialize_validator method is called is not important, it is only important
+that it is called before your object is used as a validation class object.
+
+A validation class using Moose as an object system could be configured as follows:
+
+    package MyApp::Person;
+
+    use Moose;
+    use Validation::Class qw(fld mxn);
+
+    # the order in which these frameworks are used is important
+    # loading Moose first ensures that the Moose::Object constructor
+    # has precendence
+
+    sub BUILD {
+
+        my ($self, $params) = @_;
+
+        $self->initialize_validator($params);
+
+    }
+
+    mxn 'basic'  => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255,
+        filters    => ['lowercase', 'alphanumeric']
+    };
+
+    fld 'login'  => {
+        mixin => 'basic',
+        label => 'user login',
+        error => 'login invalid'
+    };
+
+    fld 'password'  => {
+        mixin => 'basic',
+        label => 'user password',
+        error => 'password invalid'
+    };
+
+    has 'profile' => (
+        is  => 'rw',
+        isa => 'MyApp::Person::Profile'
+    );
+
+    1;
+
+=head1 FILTERING DATA
+
+This recipe describes how to define filtering in your validation class rules.
+
+=head2 Problem
+
+You want to know how to define filters to sanatize and transform your data
+although some transformations may need to occur after a successful validation.
+
+=head2 Solution
+
+Data validation rules can be configured to apply filtering as both pre-and-post
+processing operations.
+
+=head2 Discussion
+
+Validation::Class supports pre/post filtering but is configured to pre-filter
+incoming data by default. This means that based upon the filtering options
+supplied within the individual fields, filtering will happen before validation
+(technically at instantiation and again just before validation). As expected,
+this is configurable via the filtering attribute.
+
+A WORD OF CAUTION: Validation::Class is configured to pre-filter incoming data
+which boosts application security and is best used with passive filtering
+(e.g. converting character case - filtering which only alters the input in
+predictable ways), versus aggressive filtering (e.g. formatting a telephone
+number) which completely and permanently changes the incoming data ... so much
+so that if the validation still fails ... errors that are reported may not
+match the data that was submitted.
+
+If you're sure you'd rather employ aggressive filtering, I suggest setting
+the filtering attribute to 'post' for post-filtering or setting it to null
+and applying the filters manually by calling the apply_filters() method.
+
+=head1 DELEGATING VALIDATION
+
+This recipe describes how to separate validation logic between multiple related
+classes.
+
+=head2 Problem
+
+You want to know how to define multiple validation classes and pass input
+data and input parameters between them.
+
+=head2 Solution
+
+Use classes as validation domains, as a space to logically group related
+validation rules, then use built-in methods to have multiple validation classes
+validate in-concert.
+
+=head2 Discussion
+
+For larger applications where a single validation class might become cluttered
+and inefficient, Validation::Class comes equipped to help you separate your
+validation rules into separate classes.
+
+The idea is that you'll end up with a main validation class (most likely empty)
+that will simply serve as your point of entry into your relative (child)
+classes. The following is an example of this:
+
+    package MyApp::User;
+
+    use Validation::Class;
+
+    field name      => { ... };
+    field email     => { ... };
+    field login     => { ... };
+    field password  => { ... };
+
+    package MyApp::Profile;
+
+    use Validation::Class;
+
+    field age       => { ... };
+    field sex       => { ... };
+    field birthday  => { ... };
+
+    package MyApp;
+
+    use Validation::Class;
+
+    set classes => 1;
+
+    package main;
+
+    my $input = MyApp->new(params => $params);
+
+    my $user = $input->class('user');
+
+    my $profile = $input->class('profile');
+
+    1;
+
+=head1 INTROSPECT AND EXTEND
+
+This recipe describes how to peek under the curtain and leverage the framework
+for other purposes.
+
+=head2 Problem
+
+You want to know how to use your data validation classes to perform other tasks
+programatically (e.g. generate documentation, etc).
+
+=head2 Solution
+
+By using the prototype class associated with your validation class you can
+introspect it's configuration and perform additional tasks programatically.
+
+=head2 Discussion
+
+Most users will never venture beyond the public API, but powerful abilities
+await the more adventureous developer and this section was written specifically
+for you. To assist you on along your journey, let me explain exactly what
+happens when you define and instantiate a validation class.
+
+Classes are defined using keywords (field, mixin, filter, etc) which register
+rule definitions on a cached class profile (of-sorts) associated with the class
+which is being constructed. On instantiation, the cached class profile is cloned
+then merged with any arguments provided to the constructor, this means that even
+in a persistent environment the original class profile is never altered.
+
+To begin introspection, simply look into the attributes attached to the class
+prototype, e.g. fields, mixins, filters, etc., the following examples will give
+you an idea of how to use introspection to extend your application code using
+Validation::Class.
+
+Please keep in mind that Validation::Class is likely to already have most of the
+functionalty you would need to introspect your codebase. The following is an
+introspection design template that will work in most cases:
+
+    package MyApp::Introspect;
+
+    use Validation::Class;
+
+    load classes => 'MyApp'; # load MyApp and all child classes
+
+    sub per_class {
+
+        my ($self, $code) = @_;
+
+        my %relatives = %{$self->proto->settings->{relatives}};
+
+        while (my($parent, $children) =  each(%relatives)) {
+
+            while (my($nickname, $namespace) = each(%{$children})) {
+
+                # do something with each class
+                $code->($namespace);
+
+            }
+
+        }
+
+    }
+
+    sub per_field_per_class {
+
+        my ($self, $code) = @_;
+
+        $self->per_class(sub{
+
+            my $namespace = shift;
+
+            my $class = $namespace->new;
+
+            foreach my $field ($class->fields->values) {
+
+                # do something with each field in each class
+                $code->($class, $class->fields->{$field});
+
+            }
+
+        });
+
+    }
+
+=head1 CLIENT-SIDE VALIDATION
+
+This recipe describes how to generate JSON objects which can be used to validate
+user input in the web-browser (client-side).
+
+=head2 Problem
+
+You want to know how to make the most out of your data validation rules by
+making your configuration available as JSON objects in the browser.
+
+=head2 Solution
+
+Using introspection, you can leverage the prototype class associated with your
+validation class to generate JSON objects based on your validation class
+configuration.
+
+=head2 Discussion
+
+In the context of a web-application, it is often best to perform the initial
+input validation on the client (web-browser) before submitting data to the
+server for further validation and processing. In the following code we will
+generate javascript objects that match our Validation::Class data models which
+we will then use with some js library to validate form data, etc.
+
+... example validation class
+
+    package MyApp::Model;
+
+    use Validation::Class;
+    use Validation::Class::Plugin::JavascriptObjects;
+
+    mxn scrub => {
+        filters => ['trim', 'strip']
+    };
+
+    fld login => {
+        mixin    => 'scrub'
+        email    => 1,
+        required => 1,
+        alias    => 'user',
+    };
+
+    fld password    => {
+        mixin       => 'scrub',
+        required    => 1,
+        alias       => 'pass',
+        min_length  => 5,
+        min_symbols => 1,
+        min_alpha   => 1,
+        min_digits  => 1
+    };
+
+... in your webapp controller
+
+    get '/js/model'   => sub {
+
+        my $model     = MyApp::Model->new;
+
+        # generate the JS object
+        my $data = $model->plugin('javascript_objects')->render(
+            namespace => 'validate.model',
+            fields    => [qw/email password/],
+            include   => [qw/required email minlength maxlength/]
+        )
+
+        return print $data;
+
+    };
+
+The output of the /js/model route should generate a javascript object which
+looks similar to the following:
+
+    var validate = {
+        "model" : {
+            "email" : {
+               "minlength" : 3,
+               "required" : 1,
+               "maxlength" : 255
+            },
+            "password" : {
+               "minlength" : 5,
+               "required" : 1,
+               "maxlength" : 255
+            }
+        }
+    };
+
+If its not obvious yet, we can now easily use this generated javascript API with
+jQuery (or other client-side library) to validate form data, etc.
+
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>AUTH REQUIRED</title>
+            <script type="text/javascript" src="/js/jquery.js"></script>
+            <script type="text/javascript" src="/js/jquery.validate.js"></script>
+            <script type="text/javascript" src="/js/model"></script>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $("#form").validate({rules:validate.model});
+                });
+            </script>
+        </head>
+        <body>
+            <div>[% input.errors_to_string %]</div>
+            <form id="form" autocomplete="off" method="post" action="/">
+            <fieldset>
+                <legend><h2><strong>Halt</strong>, who goes there?</h2></legend>
+                <label for="email">Email</label><br/>
+                <input id="email" name="email" value="" /><br/>
+                <label for="password">Password</label><br/>
+                <input id="password" name="password" type="password" /><br/>
+                <br/><input type="submit" value="Submit" />
+            </fieldset>
+            </form>
+        </body>
+    </html>
+
+=head1 AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

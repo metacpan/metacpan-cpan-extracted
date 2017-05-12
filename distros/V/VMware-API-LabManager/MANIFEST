@@ -1,0 +1,23 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+TODO
+lib/VMware/API/LabManager.pm
+t/00-pod.t
+t/01-load.t
+t/02-header.t
+examples/conditions.pl
+examples/delete-all.pl
+examples/hwupgrade.pl
+examples/list-configurations.pl
+examples/list-machines.pl
+examples/list-networks.pl
+examples/list-organization.pl
+examples/list-templates.pl
+examples/list-users.pl
+examples/list-workspaces.pl
+examples/move.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

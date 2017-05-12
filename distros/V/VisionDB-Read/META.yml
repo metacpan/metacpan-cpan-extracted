@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               VisionDB-Read
+version:            0.04
+abstract:           Vision DB v.4-5 files parser
+author:
+    - R.Scussat <r.scussat@dsplabs.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

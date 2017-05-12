@@ -1,0 +1,51 @@
+$date
+	Tue Feb  9 16:21:09 2010
+$end
+
+$version
+	Synopsys VCS version B-2008.12-10
+$end
+
+$timescale
+	10ps
+$end
+
+$comment Csum: 1 20708e55cba79ffd $end
+
+
+$scope module chip $end
+
+$scope module cpu $end
+
+$scope module alu $end
+
+$scope begin toggle $end
+$var reg 1 + sss $end
+$upscope $end
+
+$upscope $end
+
+$upscope $end
+
+$upscope $end
+
+
+$enddefinitions $end
+#0
+$dumpvars
+1+
+$end
+#12
+0+
+#24
+1+
+#36
+0+
+#48
+1+
+#60
+0+
+#72
+1+
+#84
+0+

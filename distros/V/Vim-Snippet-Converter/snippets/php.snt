@@ -1,0 +1,80 @@
+%php%
+<?php
+	<<>>
+?>
+%end%
+
+%class%
+class <<Name>> 
+{
+	<<>>
+}
+%end%
+
+%itf%
+interface <<Name>>
+{
+	<<>>
+}
+%end%
+
+%f%
+function <<Name>> ( <<Parameters>> )
+{
+	<<statement>>
+}
+%end%
+
+%for%
+for ( <<init>> ; <<condition>> ; <<step>> ) {
+	<<statement>>
+}
+%end%
+
+%fore%
+foreach ( <<element>> as <<elements>> ) {
+	<<statement>>
+}
+%end%
+
+%if%
+if ( <<condition>> ) {
+	<<statement>>
+}
+%end%
+
+%else%
+else {
+	<<statement>>
+}
+%end%
+
+%elseif%
+elseif ( <<condition>> ) {
+	<<statement>>
+}
+%end%
+
+%while%
+while ( <<condition>> ) {
+	<<statement>>
+}
+%end%
+
+%R%
+$_REQUEST[ '<<Key>>' ]<<>>
+%end%
+
+%P%
+$_POST[ '<<Key>>' ]<<>>
+%end%
+
+%S%
+$_SERVER[ '<<Key>>' ]<<>>
+%end%
+
+
+
+
+
+

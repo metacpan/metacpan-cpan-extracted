@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+
+use Pod::Usage;
+use Getopt::Long;
+use FindBin qw($Bin);
+use List::Util qw(all sum max);
+use Path::Tiny;
+use IPC::Open3;
+use Text::Table;
+
+BEGIN{$ENV{VAYNE_HOME} = $Bin};
+use Vayne;
+use Vayne::Task;
+use Vayne::Tracker;
+
+use constant BATCH => 10000;
+
+
+=head1 SYNOPSIS
+
+   $0 --expire seconds --count count --worker worker --tracker 3
+
+=cut
+
+$| = 1;
+my %opt = (expire => 60, count => 1000, task=>3, worker=>3, tracker=>3);
+ 
+GetOptions(\%opt, qw( expire=i count=i task=i worker=i tracker=i) ) or pod2usage(2);
+
+my $logfile = path("$Bin/test.log");
+$logfile->remove;
+
+my @taskid;
+my($tracker, %task, $gen_task_tm, @process) = Vayne::Tracker->new;
+sub gen_task
+{
+    my $begin = time;
+    my %gen;
+    for(1..$opt{task})
+    {
+        my $w = IO::Handle->new;
+        my $pid = open3(undef, $w, undef, "$Bin/generate_task -c $opt{count}");
+        $gen{$pid} = $w;
+    }
+    for(keys %gen)
+    {
+        my $fh = $gen{$_};
+        print my $return = <$fh>;
+        my($count, $tm, $taskid) = $return =~ /.+\[(.+?)\].+\[(.+?)\].+\[(.+?)\]/;
+        $task{$taskid}->{tm_gen} = $tm;
+        $task{$taskid}->{count}  = $count;
+        waitpid($_, 0);
+    }
+    $gen_task_tm = time - $begin;
+}
+
+sub gen_worker
+{
+    push @process, open3(undef, undef, undef, "$Bin/worker/benchmark") for(1..$opt{worker});
+    push @process, open3(undef, undef, undef, "$Bin/../../vayne/worker/tracker") for(1..$opt{tracker});
+    
+    printf "start worker: %s, tracker: %s. pid: %s\n", $opt{worker}, $opt{tracker}, join(' ', @process);
+}
+
+
+sub wait_expire
+{
+    my $begin = time;
+
+    until(
+        time - $begin >= $opt{expire} or
+        all{ my $task = $tracker->query_task($_); $task->{status} eq Vayne::Task::STATUS_COMPLETE    }keys %task
+    ){
+        $tracker->update_task();
+    }
+    
+    kill 'TERM', @process; printf "kill TERM workers %s\n", join(' ', @process);
+
+    waitpid($_ => 0) for @process; 
+}
+
+sub statistic
+{
+    my($c_job, @job_tat) = $tracker->collection_job;                                                                     
+
+    for(keys %task)
+    {
+        my($task, @job, $tm_end) = $tracker->query_task($_);
+        @job = $c_job->find( {taskid => $_} )->all;      
+        push @job_tat, map{$_->{time} - $_->{workload}}@job;
+
+        $task{$_}->{tm_start} = $task->{start};
+        $task{$_}->{tm_end} = max map{ $_->{time} }@job;
+
+        $task{$_}->{job_all} = scalar @{$task->{job}};
+        $task{$_}->{job_track} = scalar @job;
+        $task{$_}->{job_missing} = $task{$_}->{job_all} - $task{$_}->{job_track};
+        $task{$_}->{tm_run} = $task{$_}->{tm_end} - $task{$_}->{tm_start};
+
+    }
+    
+    my($table, @colum) = Text::Table->new(qw{ Task Job Missing gen_time(s) run_time(s) });
+
+    for my $id(keys %task)
+    {
+        push @colum, [ $id, map{ $task{$id}->{$_} }qw(job_all job_missing tm_gen tm_run )];
+    }
+    $table->load( @colum );
+    print $table;
+
+    printf "\nGen %s jobs, using %ss, [%.2f]jobs/s\n", 
+        $opt{task} * $opt{count},
+        $gen_task_tm,
+        $opt{task} * $opt{count} / $gen_task_tm;
+
+    printf "Job speed: avg [%.2f]s/job\n", sum map{ $_->{job_all} / $_->{tm_run} }values %task;
+
+    my($cmd, @throughput) = sprintf q{grep 'job' %s|awk '{print $1" "$2}'|sort |uniq -c|awk '{print $1}'}, $logfile;
+    chomp( @throughput = `$cmd`);
+    printf "Step speed: max [%s]step/s avg [%s]step/s\n\n", (max @throughput), int( (sum @throughput)/@throughput );
+
+
+}
+
+gen_worker;
+gen_task;
+wait_expire;
+statistic;
+
+__END__

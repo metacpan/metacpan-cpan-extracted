@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings qw(FATAL);
+
+use Vero::API;
+use Mojo::JSON 'j';
+use Pod::Usage;
+
+my $action = shift;
+if ($action !~ /^(identify|event)$/) {
+    pod2usage('Invalid action.');
+}
+
+my $token  = $ENV{'VERO_AUTH_TOKEN'} or die "Environment variable 'VERO_AUTH_TOKEN' not defined!";
+{
+    no strict 'refs';
+    $action->(@ARGV);
+    exit 0;
+}
+
+sub identify {
+    my $data_json = join(' ', @_);
+    my $data = j($data_json);
+
+    my $v = Vero::API->new(token => $token);
+    say j $v->identify_user(%{$data});
+}
+
+sub event {
+    my $event_name = shift;
+    my $data_json = join(' ', @_);
+    my $data = j($data_json);
+
+    my $v = Vero::API->new(token => $token);
+    say j $v->track_event($event_name, %{$data});
+}
+
+__END__
+
+=head1 NAME
+
+verocli - Command-line interface to Vero::API
+
+=head1 USAGE
+
+    export VERO_AUTH_TOKEN='..token..'
+
+    Usage:
+        verocli identify '{"id":"ID1234","email":"client@example.com","name":"Jose da Silva"}'
+        verocli event created-account '{"id":"ID1234","account_type":"gold"}'
+
+=head1 SEE ALSO
+
+L<Vero::API>

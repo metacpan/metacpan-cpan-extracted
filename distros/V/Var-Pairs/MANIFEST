@@ -1,0 +1,29 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Var/Pairs.pm
+lib/Var/Pairs/Pair_BuiltIn.pm
+lib/Var/Pairs/Pair_DataAlias.pm
+t/00.load.t
+t/array.t
+t/array_while.t
+t/arrayref.t
+t/autobox.t
+t/coercions.t
+t/diagnostics.t
+t/hash.t
+t/hash_while.t
+t/hashref.t
+t/kv.t
+t/kvs.t
+t/lvalue.t
+t/nested.t
+t/nested_kv.t
+t/one_liner.t
+t/to_pair.t
+t/nexted_kv_same_statement.t
+t/hash_while_kv.t
+t/each_via_ref.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

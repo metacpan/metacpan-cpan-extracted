@@ -1,0 +1,86 @@
+#!/bin/perl
+#
+# Example script for using VBTK::Http.  See the POD documentation for more
+# details.
+
+use VBTK;
+use VBTK::Http;
+
+# Define a pre-processor routine which strips out the jsession and session
+# identifiers so that they don't confuse the baseline.  You may or may not
+# need to use this, depending on the site you're monitoring.
+my $preProcessor = sub {
+    my ($data) = @_;
+    grep(s/;jsessionid=\w+//g,@{$data});
+    grep(s/;\$sessionid\$\w+//g,@{$data});
+};
+
+
+# Make a list of URL's for which we want to test, measure the response
+# time and graph.  Run this every 5 minutes.
+my %urlList = (
+    'http://cnn.com'     => '.external.http.cnn',
+    'http://yahoo.com'   => '.external.http.yahoo',
+);
+
+while(($url,$objName) = each(%urlList))
+{
+    $obj = new VBTK::Http (
+        Interval     => 60 * 5,
+        URL          => $url,
+        PreProcessor => $preProcessor,
+    );
+
+    $obj->addVBObj (
+        VBObjName         => "$objName.resp" 
+    );
+}
+
+
+# For this list of URL's we'll also set the baseline, so we can tell if the
+# html changes.  (ie: If we got hacked, or the content got changed)
+my %urlList = (
+    'http://myhost1'         => '.external.http.myhost1',
+    'http://myhost2'         => '.external.http.myhost2',
+);
+
+while(($url,$objName) = each(%urlList)
+{
+    $obj = new VBTK::Http (
+        URL          => $url,
+        PreProcessor => $preProcessor,
+    );
+
+    $obj->addVBObj (
+        VBObjName         => "$objName.resp",
+        BaselineVBObjName => "$objName.baseline"
+    );
+}
+
+
+# For this list of URL's, we don't want a baseline and we want to turn off
+# graphing.  The only thing we're interested in is a status of up or down.
+# Run this every two minutes.
+my %urlList = (
+    'http://myhost3'     => '.myhost.http',
+    'http://myhost4:81'  => '.myhost.http',
+);
+
+while(($url,$objName) = each(%urlList))
+{
+    $obj = new VBTK::Http (
+        Interval     => 60 * 2,
+        URL          => $url,
+        PreProcessor => $preProcessor,
+    );
+
+    # Setting RrdColumns to [] over-rides the default and disables graphing.
+    $obj->addVBObj (
+        VBObjName         => "$objName.resp",
+        RrdColumns        => [],
+    );
+}
+
+# Call this at the very end to start monitoring everything
+VBTK::runAll;
+

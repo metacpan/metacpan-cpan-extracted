@@ -1,0 +1,388 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+ccm_project_diff - show differences between two projects
+
+=head1 SYNOPSIS
+
+ccm_project_diff [options] old_project new_project
+
+  old_project, new_project
+              project specs, either in the form "proj_vers"
+              or as four part objectname
+
+  Options:
+
+  -t | --terse       terse diff listing (default)
+  -d | --diff        produce diff listing like "diff -ur"
+  -p | --patch       produce patch listing like "diff -urN"
+  -h | --hide        hide contents of added/deleted subtrees (for --terse)
+  -r | --recursive   recurse into sub projects
+
+  Synergy options:
+
+  -D PATH | --database PATH       database path
+  -H HOST | --host HOST           engine host
+  -U NAME | --user NAME           user name
+  -P STRING | --password STRING   user's password
+  --ui_database_dir PATH          path to copy database information to
+
+=head1 DESCRIPTION
+
+C<ccm_project_diff> shows the differences between two projects
+in terms of the workarea paths of the projects' members.
+It does I<not> need maintained workareas, though.
+
+=head2 C<--terse> listing (default)
+
+C<ccm_project_diff> traverses both projects and outputs the differences in the
+following form:
+
+  a toolkit-1.0:project:1 2002-11-26 23:26:36     released
+  b toolkit-darcy:project:1       2002-12-17 01:46:21     working
+  ! toolkit/editor/sources/main.c main.c-1:csrc:2 main.c-2:csrc:2
+  + toolkit/guilib/includes/fonts.h fonts.h-1:incl:1
+  ! toolkit/guilib/makefile makefile-1:makefile:3 makefile-2:makefile:3
+  + toolkit/guilib/sources/fonts.c fonts.c-1:csrc:1
+  ! toolkit/misc/readme readme-1:ascii:1 readme-2:ascii:1
+  ...
+
+After the two header lines showing information about the projects,
+lines start with one of C<+>, C<->, C<!>, or C<~> 
+followed by the workarea pathname
+of the object in the project, followed by additional information
+(separated by tabs):
+
+=over 4
+
+=item C<+>
+
+marks a path added in new_project; 
+the correponding objectname is given as additional info
+
+=item C<->
+
+marks a path deleted from old_project;
+the correponding objectname is given as additional info
+
+=item C<!>
+
+marks a path where the corresponding objects have different versions
+in old_project and new_project;
+the objectnames are given as additional info
+
+=item C<~>
+
+marks a path where the corresponding objects are of different "lineage":
+either different instances
+(e.g. object was deleted and a new object created with the same name)
+or a different cvtype 
+(e.g. a  directory was replaced by a regular file);
+the objectnames are given as additional info
+
+=back
+
+All objects in an added/deleted subtree are shown. This can be suppressed
+with option C<--hide> which will only show the root of such a subtree.
+
+=head2 C<--diff> listing
+
+With this option the output resembles that of B<diff -ur>:
+
+  synergy a: toolkit-1.0:project:1	Tue Nov 26 23:26:36 2002
+  synergy b: toolkit-darcy:project:1	Tue Dec 17 01:46:21 2002
+  Only in b: toolkit/guilib/includes/fonts.h
+  synergy b: fonts.h-1:incl:1	Wed Nov 17 04:23:11 1999
+  diff -u a/toolkit/guilib/makefile b/toolkit/guilib/makefile
+  synergy a: makefile-1:makefile:3	Wed Nov 17 04:23:10 1999
+  synergy b: makefile-2:makefile:3	Wed Nov 17 04:23:11 1999
+  --- a/toolkit/guilib/makefile
+  +++ b/toolkit/guilib/makefile
+  @@ -2,7 +2,8 @@
+   INCLUDE_DIR =	includes
+   
+   OBJ_FILES = 	$(SOURCE_DIR)/main.o \
+  -				$(SOURCE_DIR)/controls.o
+  +				$(SOURCE_DIR)/controls.o \
+  +				$(SOURCE_DIR)/fonts.o
+   
+   INCLUDES =		-I$(INCLUDE_DIR)
+   OPT_CFLAGS =	-g
+  ...
+
+Files that are only present in one project are indicated
+by "Only in a: ..." or "Only in b: ..." lines.
+An object that changes cvtype from "dir" to non-"dir" or vice versa is
+indicated by a line of the form:
+
+  File a/foo is a regular file while file b/foo is a directory
+
+Differences in directories (i.e. both objects are of 
+cvtype "dir", but different versions) are not shown.
+
+Additional Synergy information (objectname, modified_time)
+is given by lines starting with "synergy a:" or "synergy b:"
+immediately following any of the above "header" lines.
+
+Note that C<--diff> implies C<--hide> (the top of a added/deleted
+subtree is still indicated by a "Only in ..." line).
+
+=head2 C<--patch> listing
+
+With this option the output resembles that of B<diff -urN>.
+This is the same as C<--diff> output except that "absent" objects are
+treated as empty files and added/deleted subtrees are not hidden.
+This listing is suitable to "patch up" a checked out I<old_project> 
+to a copy of I<new_project> with the command:
+
+  patch -p1 -E < project.patch
+
+=head1 OPTIONS
+
+=head2 C<-r>, C<--recursive>
+
+Traverse also subprojects.
+
+=head2 C<-h>, C<--hide>
+
+Hide added/deleted subtrees in C<--terse> output format.
+
+=head2 SYNERGY OPTIONS
+
+See L<VCS::CMSynergy::Helper/GetOptions>.
+
+=head1 EXIT STATUS
+
+Exit status is 0 if the projects are identical, 1 if some differences
+were found, 2 if some error occurred.
+
+=head1 AUTHORS
+
+Roderich Schupp, argumentum GmbH <schupp@argumentum.de>
+
+=cut
+
+use strict;
+use warnings; 
+
+use Getopt::Long qw(:config bundling);
+use Pod::Usage;
+use VCS::CMSynergy 1.35 qw(:cached_attributes :tied_objects);
+use VCS::CMSynergy::Helper; 
+
+{
+    package Terse;
+
+    sub new	{ my ($class) = @_; bless { ndiffs => 0 }, $class; }
+    sub start	{ }
+    sub finish	{ my ($self) = @_; return $self->{ndiffs}; }
+
+    sub deleted
+    { 
+	my ($self, $path, $old) = @_; 
+	print "- $path\t$old\n"; 
+	$self->{ndiffs}++; 
+    }
+    sub added
+    { 
+	my ($self, $path, $new) = @_; 
+	print "+ $path\t$new\n";
+	$self->{ndiffs}++; 
+    }
+    sub identical { }
+
+    sub changed
+    {
+	my ($self, $path, $old, $new) = @_;
+	my $indicator = ($old->cvtype eq $new->cvtype 
+	                 && $old->instance eq $new->instance) ?  "!" : "~";
+	print "$indicator $path\t$old\t$new\n";
+	$self->{ndiffs}++; 
+    }
+}
+
+{
+    package Diff;
+
+    use base qw/Terse/;
+    use File::Temp;
+
+    use constant OLD => 0;
+    use constant NEW => 1;
+
+    # diff program including options
+    my @diff_prog = qw/diff -u/;		
+
+    # how to annotate items from old/new project
+    our ($a, $b) = qw(a b);
+
+    sub start
+    {
+	my ($self, $old_project, $new_project) = @_;
+
+	$self->{ccm} = $old_project->ccm;
+	(undef, $self->{diff_output}) = File::Temp::tempfile();
+
+	# NOTE: On Windows, Synergy executes cli_compare_cmd without
+	# using the command interpreter, hence redirections don't work.
+	# If we do not redirect it, the output of cli_compare_cmd
+	# goes into the bit-bucket (i.e. can't be captured from $ccm->diff).
+	# Hence, force the use of cmd.exe (this causes annoying
+	# "flashing" command windows, though).
+	$self->{saved_cli_compare_cmd} = $self->{ccm}->set(
+	    cli_compare_cmd => $^O eq "MSWin32" ? 
+		"cmd /c @diff_prog %file1 %file2 > $self->{diff_output}" :
+		# FIXME maybe better - no flicker?
+		# qq[$^X -e "open STDOUT, '>', pop \@ARGV; system \@ARGV;" @diff_prog %file1 %file2 $self->{diff_output}]
+		qq[@diff_prog %file1 %file2 > $self->{diff_output}]);
+
+	$self->_meta(OLD, $old_project);
+	$self->_meta(NEW, $new_project);
+    }
+
+    sub finish
+    {
+	my ($self) = @_;
+
+	# restore setting of cli_compare_cmd, clean up temp file
+	$self->{ccm}->set(cli_compare_cmd => $self->{saved_cli_compare_cmd});
+	unlink($self->{diff_output}) if $self->{diff_output};
+    }
+
+    sub deleted	
+    { 
+	my ($self, $path, $old) = @_;
+	print "Only in $a: $path\n";
+	$self->_meta($a, $old);
+    }
+
+    sub added	
+    { 
+	my ($self, $path, $new) = @_;
+	print "Only in $b: $path\n";
+	$self->_meta($b, $new);
+    }
+
+    sub changed
+    {
+	my ($self, $path, $old, $new) = @_;
+
+	unless ($old->is_dir || $new->is_dir)
+	{
+
+	    print "diff -u $a/$path $b/$path\n";
+	    $self->_meta(OLD, $old);
+	    $self->_meta(NEW, $new);
+
+	    # generate diff
+	    $self->{ccm}->diff($old, $new);
+
+	    open my $fh, "<", $self->{diff_output};
+
+	    # eat and fake the two header lines (because they contain
+	    # pathnames that point either into the Synergy database's
+	    # cache area, the work area or a temp file)
+	    <$fh>; print "--- $a/$path\n";
+	    <$fh>; print "+++ $b/$path\n";
+
+	    # copy through the rest
+	    print while <$fh>;
+
+	    close $fh;
+	    return;
+	}
+
+	# one or both of $old and $new are dir's
+	# NOTE: suppress output if both are dir's
+	unless ($old->is_dir && $new->is_dir)
+	{
+	    print $old->is_dir ?
+		"File $a/$path is a directory while file $b/$path is a regular file\n" :
+		"File $a/$path is a regular file while file $b/$path is a directory\n";
+	}
+    }
+
+    sub _meta
+    {
+	my ($self, $a_or_b, $obj) = @_;
+	print "synergy $a_or_b: $obj\t$obj->{modify_time}\n";
+    }
+}
+
+{
+    package Patch;
+
+    use base qw/Diff/;
+
+    sub deleted	
+    { 
+	my ($self, $path, $old) = @_;
+
+	print "diff -u $Diff::a/$path $Diff::b/$path\n";
+	$self->_meta($Diff::a, $old);
+	$self->_fake_diff(Diff::OLD, $path, $old);
+    }
+
+    sub added	
+    { 
+	my ($self, $path, $new) = @_;
+
+	print "diff -u $Diff::a/$path $Diff::b/$path\n";
+	$self->_meta($Diff::b, $new);
+	$self->_fake_diff(Diff::NEW, $path, $new);
+    }
+
+    # fake a diff of $obj with /dev/null (where $obj is $new_or_old version)
+    sub _fake_diff
+    {
+	my ($self, $new_or_old, $path, $obj) = @_;
+
+	my @lines;
+	$self->{ccm}->cat_object($obj, \@lines);
+
+	my $sign = ("-", "+")[$new_or_old];
+	my @range = ("0,0", "0,0");
+	my $nlines = @lines;
+	$range[$new_or_old] = $nlines == 1 ? "1" : "1,$nlines";
+
+	print "--- $Diff::a/$path\n",
+	      "+++ $Diff::b/$path\n",
+	      "\@\@ -$range[0] +$range[1] \@\@\n";
+	print $sign, $_ foreach @lines;
+    }
+}
+
+# extract CCM start options first...
+my $ccm_opts = VCS::CMSynergy::Helper::GetOptions or pod2usage(2) ;
+
+# ...then script-specific options
+my $Differ = "Terse";
+my $recursive = 0;
+my $hide_sub_trees = 0;
+(GetOptions(
+    'r|recursive'	=> \$recursive,		# include subprojects
+    'd|diff'		=> sub { $Differ = "Diff"; $hide_sub_trees = 1; },
+    'p|patch'		=> sub { $Differ = "Patch"; $hide_sub_trees = 0; },
+    't|terse'		=> sub { $Differ = "Terse"; $hide_sub_trees = 0; },
+    'h|hide'		=> \$hide_sub_trees,	# hide deleted/added sub trees
+) && @ARGV == 2) or pod2usage(2);
+
+
+my $ccm = VCS::CMSynergy->new(
+    %$ccm_opts,
+    RaiseError	=> 1,
+    PrintError	=> 0);
+
+my ($old_project, $new_project) = map { $ccm->project_object($_) } @ARGV;
+
+my $ndiffs = $ccm->project_diff(
+    { 
+	hide_sub_trees => $hide_sub_trees,
+	subprojects => $recursive,
+	attributes  => [ qw/modify_time/ ],
+	pathsep     => "/"
+    }, 
+    $old_project, $new_project, $Differ->new);
+
+exit($ndiffs ? 1 : 0);

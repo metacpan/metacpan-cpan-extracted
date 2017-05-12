@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Valence
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Electron: '0.102'
+  AnyEvent: '0'
+  Callback::Frame: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  JSON::XS: '0'
+  common::sense: '0'
+resources:
+  bugtracker: https://github.com/hoytech/Valence-p5/issues
+  repository: git://github.com/hoytech/Valence-p5.git
+version: '0.201'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

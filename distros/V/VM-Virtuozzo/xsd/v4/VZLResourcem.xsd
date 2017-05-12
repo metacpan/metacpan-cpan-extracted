@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/resourcem" elementFormDefault="qualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/resourcem" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="resourcem" type="resourcemType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Global agent configuration operator.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="resourcemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice minOccurs="0">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="add_resource"/>
+						<xs:element ref="remove_resource"/>
+						<xs:element ref="set_pool"/>
+						<xs:element ref="get_pool"/>
+						<xs:element ref="allocate"/>
+						<xs:element ref="release"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="resource"/>
+						<xs:element ref="resource_pool"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="allocate">
+		<xs:annotation>
+			<xs:documentation>Allocate resource from given pool</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource_pool" minOccurs="0"/>
+				<xs:element ref="resource" minOccurs="0"/>
+				<xs:element name="count" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of allocated resource items. If not specified - allocate 1 item.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="release">
+		<xs:annotation>
+			<xs:documentation>Release resource</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_pool">
+		<xs:annotation>
+			<xs:documentation>Replace resource pool configuration. Replacment may be with empty resource configuration.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource_pool" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_pool">
+		<xs:annotation>
+			<xs:documentation>Get resource pool configuration of given pool(s) . If type not specified - returns list of all pools ids.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource_pool" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_resource">
+		<xs:annotation>
+			<xs:documentation>Add resource configuration to the given pool(s)</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource_pool" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove_resource">
+		<xs:annotation>
+			<xs:documentation>Remove resource definition from the given pool. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource_pool" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="resourceType">
+		<xs:annotation>
+			<xs:documentation>Generic resource type</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:element name="resource" type="resourceType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Abstract resource element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="resource_poolType">
+		<xs:annotation>
+			<xs:documentation>Generic resource pool configuration type</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="type" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Type of resource pool. Avaliable types: resource_ip</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="resource_pool" type="resource_poolType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Abstract resource pool configuration element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="resource_ip_poolType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>IP pool resource configuration</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="resource_poolType">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Either of</xs:documentation>
+					</xs:annotation>
+					<xs:element name="ip_range">
+						<xs:annotation>
+							<xs:documentation>Range of IPs.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="start_ip" type="vzlt:ip_type">
+									<xs:annotation>
+										<xs:documentation>First IP.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="end_ip" type="vzlt:ip_type">
+									<xs:annotation>
+										<xs:documentation>Last IP.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="ip" type="vzlt:ip_type">
+						<xs:annotation>
+							<xs:documentation>IP address.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="resource_ipType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>IP resource type</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="resourceType">
+				<xs:sequence>
+					<xs:element name="ip" type="vzlt:ip_type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>IP address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="allocateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="releaseResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_poolResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_poolResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="resource_pool" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_resourceResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove_resourceResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

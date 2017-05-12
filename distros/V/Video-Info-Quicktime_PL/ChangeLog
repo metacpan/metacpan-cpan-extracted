@@ -1,0 +1,5 @@
+2003-11-12  Scott Hoge  <shoge at sourceforge dot net>
+
+	* Quicktime_PL.pm: changed the probe method to be more robust.
+	Now correctly handles MOV files created by ffmpeg and oqtencoder.
+

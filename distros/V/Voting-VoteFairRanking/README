@@ -1,0 +1,125 @@
+Voting::VoteFairRanking
+
+This module calculates VoteFair Ranking results.  VoteFair Ranking consists of:
+
+* VoteFair popularity ranking.  This voting method calculates the full popularity ranking of all candidates (or choices in the case of a survey) from most popular and second-most popular down to least popular.  It uses the preference information collected on 1-2-3 ballots (or any equivalent way of expressing "ranked" preferences).  When a single position is being filled, the most popular candidate is declared the winner.  This calculation method is mathematically equivalent to the Condorcet-Kemeny election method.
+
+* VoteFair representation ranking.  This voting method is used to elect a second candidate from the same district, or to fill multiple board-of-director positions, or to choose a second simultaneous activity in addition to the most popular activity.  This method reduces the influence of the voters who are already well-represented by the most popular candidate (or choice).  Without this adjustment the same voters who prefer the first winner also can determine the second winner, and this can leave large numbers of other voters unrepresented.
+
+* VoteFair party ranking.  This voting method ranks political parties according to a different kind of "popularity".  It can be used in high-stakes elections that otherwise attract too many candidates.  In such elections the two or three most popular political parties can be limited to offering just two candidates from each party, and other parties that are somewhat popular can be allowed to offer one candidate each.  Such limits have not been needed in the past because the fear of vote splitting has limited parties to offering only one candidate in each contest.
+
+For detailed descriptions of VoteFair Ranking, see www.VoteFair.org or the book "Ending The Hidden Unfairness In U.S. Elections" by Richard Fobes.
+
+In addition to being useful for elections, VoteFair Ranking also is useful for calculating results for surveys and polls, ranking the popularity of songs and movies, and much more.
+
+Version 5.01
+
+This module has no dependencies.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+EASIER INSTALLATION INSTRUCTIONS
+
+From a command line (on Linux/Unix or Mac OS X or using Strawberry Perl [www.strawberryperl.com] on Windows),
+execute the following commands.  These commands download (through your internet connection) and install
+the CPAN installer ("cpanm") and the Voting::VoteFairRanking and Language::Dashrep modules from the CPAN
+archives:
+
+    cpan App::cpanminus
+
+    cpanm Voting::VoteFairRanking
+
+    cpanm Language::Dashrep
+
+After successfully executing these commands, download from the CPSolver account at GitHub the Dashrep-language
+definitions in the Vote-Info-Split-Join project, and put them into a new folder/directory.
+
+
+RUNNING THE VOTE-INFO-SPLIT-JOIN DEMO
+
+In your command-line interface (Strawberry Perl for Windows OS), use the "cd" (change-directory) command
+to navigate to the folder/directory into which you put the VISJ files.
+
+Then enter the following commands:
+
+    perl votefair_ranking_do.pl < input_empty_file.txt > output_empty_results.txt
+
+    perl dashrep_do_translation.pl < votefair_visj_split.txt > output_split_messages.txt
+
+    perl votefair_ranking_do.pl < output_visj_step_05_data_numeric_only.txt > output_from_vote_calc_sw_visj_results.txt
+
+    perl dashrep_do_translation.pl < votefair_visj_join.txt > output_join_messages.txt
+
+The final results are placed into the following file, which should be viewed using your browser:
+
+    output_visj_step_10_final_results.html
+
+If you run into problems, execute the following command to verify that the Voting::VoteFairRanking code is
+executing correctly:
+
+    perl votefair_ranking_sample.pl > output_sample.txt
+
+The output of the "votefair_ranking_sample.pl" software are the following files:
+
+    output_sample.txt  (criptic calculated results)
+
+    output_votefair_debug_info.txt  (step-by-step calculation details)
+
+
+VOTE-INFO-SPLIT-JOIN FRAMEWORK FOR ELECTION USAGE
+
+After you have successfully executed the supplied VISJ demo, you can adapt the VISJ files to handle your
+election data if it is in XML (which includes EML).
+
+The following files are the ones that are most likely to need modification to adapt the input and output
+to your needs:
+
+    vote_info_dashrep_definitions_prefilter.txt  (adapts to different input-data XML tags)
+
+    vote_info_dashrep_definitions_text_after_calc.txt  (affects layout of results)
+
+    votefair_specific_visj_text_after_calc.txt  (affects layout of results)
+
+    votefair_specific_visj_language_en.txt  (determines the output language, which is currently English)
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Voting::VoteFairRanking
+
+If you encounter bugs using this CPAN version, please report them using the normal CPAN bug-tracking system.
+
+Please report other bugs and any feature requests at the CPSolver account on GitHub.
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Voting::VoteFairRanking
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Voting::VoteFairRanking
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Voting::VoteFairRanking
+
+    Search CPAN
+        http://search.cpan.org/dist/Voting::VoteFairRanking
+
+
+COPYRIGHT AND LICENSE
+
+(c) Copyright 1991 through 2011 Richard Fobes at www.VoteFair.org.  You can redistribute and/or modify this VoteFairRanking library module under the Perl Artistic license version 2.0 (a copy of which is included in the LICENSE file).  The mathematical algorithms of VoteFair Ranking are in the public domain.
+
+Conversion of this code into another programming language is also covered by the above license terms.

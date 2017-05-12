@@ -1,0 +1,56 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Valence",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Electron" : "0.102",
+            "AnyEvent" : "0",
+            "Callback::Frame" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "JSON::XS" : "0",
+            "common::sense" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoytech/Valence-p5/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/hoytech/Valence-p5.git"
+      }
+   },
+   "version" : "0.201",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,29 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2007.09.02.23.41.38;	author mkanat;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@This is a new file
+And it actually has some contents.
+Go figure!
+--- diff -u a/something b/something
+
+@

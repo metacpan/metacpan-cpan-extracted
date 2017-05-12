@@ -1,0 +1,21 @@
+README for VMS::Queue
+
+Copyright (c) 1997, 1998 Dan Sugalski
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets you fetch information on, create, and manipulate, queues,
+entries, queue managers, forms, and characteristics. If you can manipulate
+something queue-ish in DCL, or fetch the information in DCL via F$GETQUI,
+odds are you can do it at least as well (if not better) with VMS::Queue.
+
+perl Makefile.pl
+mms
+mms test
+
+to build and test the extension. If it tests OK, then
+
+mms install
+
+to install it. More info is in the POD documentation in the Queue.PM file.

@@ -1,0 +1,283 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.05.01.19.42.26;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@<?PHP
+
+
+class HTOM_TableAttributesSet extends HTOM_Element
+{
+  public function __construct( $attribs=NULL )
+  {
+    $this->SetAttributes( $attribs );
+    $this->Init();
+  }
+
+  // Get the attributes specification
+  public function Evaluate()
+  {
+    return $this->Attributes();
+  }
+}
+
+/*! \class HTOM_Table
+ * \brief Class represents a table object.
+ *
+ * The table objec is organized in a rows colums sheet. Each cel may be filled by the HTOM_Element object or be empty.
+ * It is possible to assign properties to particual columns rows and cels.
+ *
+ * \example htom_table_example.php
+ */
+class HTOM_Table extends HTOM_Element
+{
+  /*! Create a table object and initialize the style.
+   * \param attributes either the HTOM_Attribute or an array of HTOM_Attribute objects.
+  */
+  public function __construct( $attributes=NULL )
+  {
+    $this->ID = HTOM_IDManager::ID();
+    $this->SetAttributes($attributes);
+    $this->Init();
+  }
+
+  //! Set the table style.
+  /*!Methos sets the style that will be used to all elements in the table as a parent style.
+   * \param $style  HTOM_Style object, style class name or the style inline definition.
+   */
+  public function SetStyle( $style )
+  {
+    $this->SetAttributes(new HTOM_Style($style));
+  }
+
+  //! Set spacing between cels.
+  public function SetCelhtomacing( $spacing )
+  {
+    $this->SetAttributes( new HTOM_SimpleAttribute("celhtomacing",$spacing) );
+  }
+
+  //! Set spacing within cells.
+  public function SetCellPadding( $spacing )
+  {
+    $this->SetAttributes( new HTOM_SimpleAttribute("cellpadding",$spacing) );
+  }
+
+  //! Set the row attributes.
+  /*! Method may be used to modify the attributes of a specified row. 
+   * \param row the row number where the attribute shall be set.
+   * \param attributes object or an array of HTOM_Attribute objects.
+   */
+  public function SetRowAttributes(  $row, $attributes )
+  {
+    if (!isset($this->rowDef[$row]))
+      $this->rowDef[$row]=new HTOM_TableAttributesSet();
+    $this->rowDef[$row]->SetAttributes( $attributes );
+  }
+
+  //! Set the column attributes.
+  /*! Method may be used to modify the attributes of a specified row. 
+   * \param column the column number where the attribute shall be set.
+   * \param attributes parameter may be a HTOM_Attribute object or an array of HTOM_Attribute objects.
+   */
+  public function SetColumnAttributes(  $column, $attributes )
+  {
+    if (!isset($this->columnDef[$column]))
+      $this->columnDef[$column]=new HTOM_TableAttributesSet();
+    $this->columnDef[$column]->SetAttributes( $attributes );
+  }
+
+
+  //! Set the row style.
+  /*  Method sets the style attribute to the specified row. It effects axactly like call 
+   * to the SetRowAttributes with the HTOM_Style object in the second argument.
+   * \param row the row number
+   * \param syle either the HTOM_Style object, style inline specification or style class name
+   */
+  public function SetRowStyle( $row, $style )
+  {
+    $this->SetRowAttributes( $row, new HTOM_Style( $style ) );
+  }
+
+  //! Set the column style.
+  /* Method sets the style attribute to the specified columb. It effects axactly like call 
+   * to the SetColumnAttributes with the HTOM_Style object in the second argument.
+   * \param column the column number
+   * \param syle either the HTOM_Style object, style inline specification or style class name
+   */
+  public function SetColumnStyle( $column, $style )
+  {
+    $this->SetColumnAttributes( $column, new HTOM_Style( $style ) );
+  }
+
+  // assing new IDs for each element in table from 0 up to $max
+  private function AssignIDs( &$t, $max)
+  {
+    for ($i=0; $i<=$max; $i++) {
+      if  (!isset($t[$i])) {
+	$t[$i] = HTOM_IDManager::ID();
+      }
+    }
+  }
+
+  //! Add an element to the table.
+  /* The element will be displayed at the specified position in the table. 
+   * Function automatically extends the table to the maximal row and maximal column number.
+   * \note The columns and rows numbers are starting from 0.
+   * \param $row a row number where the element will be displayed
+   * \param $column a column number where the element will be displayed
+   * \param $element any object that class implement the HTOM_Evaluable interface, or a raw HTML string.
+   * \param attributes parameter may be a HTOM_Attribute object or an array of HTOM_Attribute objects.
+   */
+  public function AddElement( $row, $column, $element, $attributes=NULL )
+  {
+    $celID = NULL;
+    if (isset($attributes) && !($attributes instanceof HTOM_Attribute || is_array($attributes))) {
+      HTOM_Debug::Out("HTOM_Table::AddElement: WARNING the atribute is not HTOM_Attribute object",0);
+    }
+    if (!isset($this->table[$row]))
+      {
+	HTOM_Debug::Out("HTOM_Table::AddElement: add a columns array to the row ".$row,3,"HTOM.Table");
+	$this->table[$row]=array();
+      }
+
+    // assign ID for each new row and column
+    HTOM_Table::AssignIDs($this->rowIDs,$row);
+    HTOM_Table::AssignIDs($this->columnIDs,$column);
+  
+
+    $elementStyle=new HTOM_TableAttributesSet($attributes);
+   
+    if (is_string($element))  {
+	$celID = HTOM_IDManager::ID();
+	$this->table[$row][$column]=array("element"=>new HTOM_Static($element),"style"=>$elementStyle,"ID"=>$celID);
+    } else if ($element instanceof HTOM_Evaluable)   {
+      $celID = HTOM_IDManager::ID();
+      $this->table[$row][$column]=array("element"=>$element,"style"=>$elementStyle,"ID"=>$celID);
+    } else  {
+      HTOM_Debug::Out("WARNING: the element passed tot he HTOM_Table::AddElement is not a string or HTOM_Evaluable<br>",0);
+    }
+    if ($this->rows<$row) 
+      $this->rows=$row;
+    if ($this->columns<$column)
+      $this->columns=$column;
+    return $celID;
+  }
+
+  //! Remove the element at specified position from the table
+  public function RemoveElement(  $row,  $column )
+  {
+    if ($this->table[$row]) {
+      $this->table[$row][$column]=NULL;
+    }
+  }
+
+  //! Check if the table cel is set.
+  public function Exists( $row, $column )
+  {
+    $rc = false;
+    HTOM_Debug::Out("HTOM_Table::Exists: check row=".$row." column=".$column,3,"HTOM.Table");
+    if (isset($this->table[$row])) {
+      HTOM_Debug::Out("HTOM_Table::Exists: row is set",3,"HTOM.Table");
+      if (is_array($this->table[$row])) {
+	HTOM_Debug::Out("HTOM_Table::Exists: row is array",3,"HTOM.Table");
+	if ( isset($this->table[$row][$column]) ) {
+	  HTOM_Debug::Out("HTOM_Table::Exists: column is set",3,"HTOM.Table");
+	  if (is_array($this->table[$row][$column])) {
+	    HTOM_Debug::Out("HTOM_Table::Exists: column is array ",3,"HTOM.Table");
+	    $rc = true;
+	  }
+	}
+      }
+    } 
+       
+       
+    return $rc;
+  }
+  //! Evaluate a table
+  public function Evaluate()
+  {
+    $result="";
+    $result .= "<table ".$this->Attributes().">\r\n";
+    
+      for ($row=0; $row<=$this->rows; $row++)
+	{
+	// build the <TR [style]> tag
+	$result.="<tr ".$this->rowIDs[$row]->Evaluate();
+	if (isset($this->rowDef[$row])) // the style is set only if the row has a coresponding style chage
+	  $result.=$this->rowDef[$row]->Evaluate();
+	$result.=">\r\n";
+	for ($column=0; $column<=$this->columns; $column++)
+	  {
+	    HTOM_Debug::Out("HTOM_Table::Evaluate add row=".$row." col=".$column." exists=".$this->Exists($row,$column));
+	    $result.="   <td ";
+	    // first check the column element style
+	    $celAttribs = new HTOM_TableAttributesSet();
+	    if (isset($this->columnDef[$column])) 
+	      {
+		$celAttribs->SetAttributes( $this->columnDef[$column]->GetAttributes() );
+	      }
+	    if ($this->Exists($row,$column) && isset($this->table[$row][$column]['style'])) { 
+	      $celAttribs->SetAttributes( $this->table[$row][$column]['style']->GetAttributes() );
+	    } 
+	    $result.=$celAttribs->Evaluate();
+	    $result.=">";
+	    if ($this->Exists($row,$column) && $this->table[$row][$column]['element'])
+	      {
+		$result.="   ".$this->table[$row][$column]['element']->Evaluate();
+	      }
+	    $result.="  </td>\r\n";
+	  }
+	$result.="</tr>";
+      }
+    $result .= "</table>";
+    return $result;
+  }
+  private $table=array();
+  private $style;
+  private $columns=-1;
+  private $rows=-1;
+  private $rowDef=array();
+  private $columnDef=array();
+  private $rowIDs=array();
+  private $columnIDs=array();
+  private $ID;
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d195 1
+a195 1
+    $result .= "<table ".$this->ID()->Evaluate().$this->Attributes().">\r\n";
+d207 1
+a207 1
+	    $result.="   <td ".$this->columnIDs[$column]->Evaluate();
+@
+

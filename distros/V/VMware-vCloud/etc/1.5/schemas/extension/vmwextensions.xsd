@@ -1,0 +1,1882 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © 2010 VMware, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Except as explicitly provided herein, no express or implied licenses, under any VMware patents, copyrights, trademarks, or any other intellectual property rights, are granted or waived by implication, exhaustion, estoppel, or otherwise, on modified versions of the Software.
+-->
+<xs:schema xmlns="http://www.vmware.com/vcloud/extension/v1.5" xmlns:vcloud="http://www.vmware.com/vcloud/v1.5" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.vmware.com/vcloud/extension/v1.5" version="1.0">
+
+    <xs:import namespace="http://www.vmware.com/vcloud/v1.5" schemaLocation="../master/master.xsd"/>
+
+    <xs:include schemaLocation="notification.xsd"/>
+    <xs:include schemaLocation="settings.xsd"/>
+    <xs:include schemaLocation="taskExtensionRequest.xsd"/>
+
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+            Schema for VMware's specific extensions of the vCloud API
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="VMWExtension" type="VMWExtensionType"/>
+    <xs:complexType name="VMWExtensionType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                List links to extension operations and entities.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ResourcePoolType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                vSphere resource pool information.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:EntityType">
+                <xs:sequence>
+                  <xs:element name="MoRef" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The vSphere managed object reference of the
+                                resource pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                  <xs:element name="VimObjectType" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The vCenter server that provides the resources
+                                in this pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                  <xs:element name="DataStoreRefs" type="VimObjectRefsType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vSphere datastores accessible from this
+                                resource pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                       </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="PrepareHostParams" type="PrepareHostParamsType"/>
+    <xs:complexType name="PrepareHostParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Parameters for preparing an ESX/ESXi host.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Username" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The user name to use for host preparation login.
+                       </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Password" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The cleartext password to use for host preparation login.
+                     </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ServerType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Information needed to connect to a vSphere or a vShield manager
+                server.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:EntityType">
+                <xs:sequence>
+                    <xs:element name="Username" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                User name to connect to the server.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Password" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Cleartext password to connect to the server.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Url" type="xs:anyURI">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                URL of the server.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="RegisterVimServerParams" type="RegisterVimServerParamsType"/>
+    <xs:complexType name="RegisterVimServerParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents parameters to register a vCenter server.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VimServer" type="VimServerType">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        vCenter administrator credentials. Required for
+                        register, modify.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ShieldManager" type="ShieldManagerType">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        vShield manager administrator credentials. Required for
+                        register, modify.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="VimServer" type="VimServerType"/>
+    <xs:complexType name="VimServerType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vCenter server information.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ServerType">
+                <xs:sequence>
+                    <xs:element name="IsEnabled" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                True if the vCenter server is enabled for use
+                                with vCloud Director.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="IsConnected" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                True if the vCenter server is connected.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ShieldManagerHost" type="xs:anyURI" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vShield manager IP address or fully qualified
+                                domain name.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ShieldManagerUserName" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vShield manager user name.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Uuid" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.5</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The instance UUID property of the vCenter server.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWVimServerReferences" type="VMWVimServerReferencesType"/>
+    <xs:complexType name="VMWVimServerReferencesType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                List of references to vCenter servers registered to vCloud
+                Director.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="VimServerReference" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a vCenter server.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ShieldManager" type="ShieldManagerType"/>
+    <xs:complexType name="ShieldManagerType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents credentials to a vShield Manager server.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ServerType">
+                <xs:sequence>
+                    <xs:element name="AssociatedVimServer" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to the vCenter server for this
+                                vShield manager.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VmObjectRefsList" type="VmObjectRefsListType"/>
+    <xs:complexType name="VmObjectRefsListType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                A list of references to virtual machines in vCenter inventory.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VmObjectRef" type="VmObjectRefType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                         A reference to a virtual machine in vCenter inventory.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="numberOfPages" type="xs:int" use="optional">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    The total number of pages in the response.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="page" type="xs:int" use="optional">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    The current page number. The first page is page number 1.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="VmObjectRefType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                A reference to a virtual machine in vCenter inventory.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="VimObjectRefType">
+                <xs:attribute name="name" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            The name of the virtual machine.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ImportVmAsVAppParams" type="ImportVmAsVAppParamsType"/>
+    <xs:complexType name="ImportVmAsVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Parameters to import a virtual machine as a vApp.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:VAppCreationParamsType">
+                <xs:sequence>
+                    <xs:element name="VmName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Name to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VAppScopedLocalId" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vApp scoped local id to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ComputerName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Computer name to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VmMoRef" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Managed object reference of VM to import.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Vdc" type="vcloud:ReferenceType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Target vDC for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="sourceMove" type="xs:boolean" default="false" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Set to true to delete the source object after the
+                            import is complete.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ImportVmIntoExistingVAppParams" type="ImportVmIntoExistingVAppParamsType" />
+    <xs:complexType name="ImportVmIntoExistingVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5
+            </xs:documentation>
+            <xs:documentation xml:lang="en">
+                Parameters to import a virtual machine into an existing VApp.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="VmName" type="xs:string"
+                        minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always
+                            </xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Name to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VmDescription" type="xs:string"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always
+                            </xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Description to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VAppScopedLocalId"
+                        type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always
+                            </xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vApp scoped local id to be used for imported
+                                VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ComputerName" type="xs:string"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always
+                            </xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Computer name to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VmMoRef" type="xs:string"
+                        minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always
+                            </xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                 Managed object reference of VM to import.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VApp" type="vcloud:ReferenceType"
+                        minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always
+                            </xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vApp to hold imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="sourceMove" type="xs:boolean"
+                    default="false" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always
+                        </xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Set to true to delete the source object after the
+                            import is complete.
+                </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ImportVmAsVAppTemplateParams" type="ImportVmAsVAppTemplateParamsType"/>
+    <xs:complexType name="ImportVmAsVAppTemplateParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Parameters to import a virtual machine as a vApp template.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ParamsType">
+                <xs:sequence>
+                    <xs:element name="VmName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Name to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VAppScopedLocalId" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vApp scoped local id to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ComputerName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Computer name to be used for imported VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VmMoRef" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Managed object reference of VM to import.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Vdc" type="vcloud:ReferenceType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Target vDC for imported vApp template.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Catalog" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Catalog in which the imported vApp template
+                                will be listed.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="sourceMove" type="xs:boolean" default="false" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Set to true to delete the source object after the
+                            import is complete.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="goldMaster" type="xs:boolean" default="false" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation source="since">1.5</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Attribute to specify if template is gold master, the default is false.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ImportMediaParams" type="ImportMediaParamsType"/>
+    <xs:complexType name="ImportMediaParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents parameters to import media from vSphere.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ParamsType">
+                <xs:sequence>
+                    <xs:element name="DatastoreMoRef" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Managed object reference of the datastore from which media file will be imported.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="SourcePath" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                A full path to media file on the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Vdc" type="vcloud:ReferenceType" minOccurs="1" maxOccurs="1">
+                         <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The vDC into which the media will be imported.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Catalog" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The catalog in which the imported media will be
+                                listed.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="sourceMove" type="xs:boolean" default="false" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="since">1.0</xs:documentation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Set to true to delete the source object after the
+                            import is complete.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="Host" type="HostType"/>
+    <xs:complexType name="HostType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Read only representation of one host in a vSphere server.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:EntityType">
+                <xs:sequence>
+                    <xs:element name="Ready" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Indicates whether the host is ready for use.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Available" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Indicates whether the host is available.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Enabled" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Indicated whether the host is enabled for use.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Busy" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Indicates whether the host is busy.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="EnableHostForHostSpanning" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Indicates whether the host is enabled for host
+                                spanning.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="CpuType" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The CPU type of the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="NumOfCpusPackages" type="xs:int">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                How many hardware CPUs the host has.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="NumOfCpusLogical" type="xs:int">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                How many logical CPUs the host has.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="CpuTotal" type="xs:long">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The total CPU power measured in MHz.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="MemUsed" type="xs:double">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The used memory in the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="MemTotal" type="xs:double">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The total memory in the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="HostOsName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                OS name of the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="HostOsVersion" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                OS version of the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="SystemMessages" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                System messages of the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VimPropertyPageUrl" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                URL to the VIM property page of the host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VmMoRef" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The host moref.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VimObjectRef" type="VimObjectRefType"/>
+    <xs:complexType name="VimObjectRefType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents the moref and the type of a vSphere object.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VimServerRef" type="vcloud:ReferenceType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The vCenter server reference.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="MoRef" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Managed object reference of the object.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="VimObjectType" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The vSphere type of the object. One of:
+                        RESOURCE_POOL (The object is a vSphere resource pool.),
+                        DATASTORE (The object is a vSphere datastore.),
+                        HOST (The object is an ESX/ESXi host.),
+                        VIRTUAL_MACHINE (The object is a vSphere VM.),
+                        VIRTUAL_APP (The object is a vSphere vApp.),
+                        NETWORK (The object is a vSphere network.),
+                        DV_PORTGROUP (The object is a vSphere distributed
+                        virtual portgroup.),
+                        DV_SWITCH (The object is a Sphere distributed
+                        virtual switch.)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="VimObjectRefsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                List of VimObjectRef elements.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VimObjectRef" type="VimObjectRefType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        A reference to a vSphere object.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="VMWProviderVdc" type="VMWProviderVdcType"/>
+    <xs:complexType name="VMWProviderVdcType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Extension representation of provider vDC type.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ProviderVdcType">
+                <xs:sequence>
+                    <xs:element name="DataStoreRefs" type="VimObjectRefsType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">0.9</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vSphere datastores backing this provider vDC.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ResourcePoolRefs" type="VimObjectRefsType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.5</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Resource pools backing this provider vDC. On
+                                create, you must specify a resource pool that
+                                is not used by (and is not the child of a
+                                resource pool used by) any other provider vDC.
+                                On modify, this element is required for schema
+                                validation, but its contents cannot be changed.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VimServer" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="since">0.9</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The vCenter server that provides the resource
+                                pools and datastores. A valid reference is
+                                required on create. On modify, this element is
+                                required for schema validation, but its
+                                contents cannot be changed.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="HostReferences" type="VMWHostReferencesType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Shows all hosts which are connected to VC server.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="HighestSupportedHardwareVersion" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The highest supported virtual hardware version in the provider vDC.
+                                The two possible values are:
+                                  vmx-07 -- virtual hardware version 7.
+                                  vmx-08 -- virtual hardware version 8.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWProviderVdcReferences" type="VMWProviderVdcReferencesType"/>
+    <xs:complexType name="VMWProviderVdcReferencesType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of available provider vDCs.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="ProviderVdcReference" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a provider vDC.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWExternalNetwork" type="VMWExternalNetworkType"/>
+    <xs:complexType name="VMWExternalNetworkType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                External network type.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:NetworkType">
+                <xs:sequence>
+                    <xs:element name="VimPortGroupRef" type="VimObjectRefType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The portgroup that backs this network.
+                                A valid reference to an existing network
+                                or dvportgroup in a vCenter server is required on
+                                create. On modify, this element is required
+                                for schema validation, but its contents cannot
+                                be changed.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWExternalNetworkReferences" type="VMWExternalNetworkReferencesType"/>
+    <xs:complexType name="VMWExternalNetworkReferencesType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of available external networks.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="ExternalNetworkReference" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to an external network.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWNetworkPoolReferences" type="VMWNetworkPoolReferencesType"/>
+    <xs:complexType name="VMWNetworkPoolReferencesType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of available network pools.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="NetworkPoolReference" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a network pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWNetworkPool" type="VMWNetworkPoolType"/>
+    <xs:complexType name="VMWNetworkPoolType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Base extension network pool type.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:NetworkPoolType">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="PortGroupPoolType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a network pool backed by one or more vSphere port groups.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="VMWNetworkPoolType">
+                <xs:sequence>
+                    <xs:element name="PortGroupRefs" type="VimObjectRefsType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                References to the vSphere port groups that support this network pool.
+                                Required at least one port group moref, for modify and create.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VimServer" type="vcloud:ReferenceType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to the vSphere which hosts the port groups.
+                                Required VC server on which the port groups exist, for modify and create.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UsedNetworksCount" type="xs:int" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                This is a read-only indication of how many networks in this pool are in use.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="VlanPoolType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a network pool backed by one or more vSphere VLANs.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="VMWNetworkPoolType">
+                <xs:sequence>
+                    <xs:element name="VlanRange" type="NumericRangeType" minOccurs="1" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                VLAN range used for this pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VimSwitchRef" type="VimObjectRefType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to the vSphere switch which is used for this pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UsedNetworksCount" type="xs:int" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                This is a read-only indication of how many networks in this pool are in use.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="PromiscuousMode" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>
+                                Internal use only.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="FencePoolType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a network pool backed by one or more vSphere isolated networks.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="VMWNetworkPoolType">
+                <xs:sequence>
+                    <xs:element name="FenceIdCount" type="xs:int" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Number of fence IDs in this pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VlanId" type="xs:int" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                VLAN ID to be used for this pool or 0 for no VLAN.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VimSwitchRef" type="VimObjectRefType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to the vSphere switch that supports this VLAN.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UsedNetworksCount" type="xs:int" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                This is a read-only indication of how many networks in this pool are in use.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="PromiscuousMode" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>
+                                Internal use only.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Mtu" type="xs:int" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                Maximum transmission unit of the underlying VMware vNetwork Distributed Switch.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="NumericRangeType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Range of integers.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Start" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Start integer number of the range.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="End" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        End integer number of the range.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="VMWHostReferences" type="VMWHostReferencesType"/>
+    <xs:complexType name="VMWHostReferencesType">
+         <xs:annotation>
+             <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of available hosts.
+            </xs:documentation>
+         </xs:annotation>
+         <xs:complexContent>
+             <xs:extension base="vcloud:ResourceType">
+                 <xs:sequence>
+                     <xs:element name="HostReference" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                 </xs:sequence>
+             </xs:extension>
+         </xs:complexContent>
+     </xs:complexType>
+
+    <xs:element name="ResourcePoolList" type="ResourcePoolListType"/>
+    <xs:complexType name="ResourcePoolListType">
+         <xs:annotation>
+             <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of available resource pools that have not been
+                assigned to any vDCs (provider or org).
+            </xs:documentation>
+         </xs:annotation>
+         <xs:complexContent>
+             <xs:extension base="vcloud:ResourceType">
+            <xs:sequence>
+                <xs:element name="ResourcePool" type="ResourcePoolType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Free resource pool information.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+            </xs:sequence>
+           </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="LicensingReport" type="LicensingReportType"/>
+    <xs:complexType name="LicensingReportType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a read-only licensing metric report.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="Sample" type="LicensingReportSampleType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                One licensing metric sample captured in the report.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="productSerialNumber" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Product serial number.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="reportDate" type="xs:dateTime" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            End of the period for which the report is generated.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="signature" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Cryptographic signature of the report.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="Sample" type="LicensingReportSampleType"/>
+    <xs:complexType name="LicensingReportSampleType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a single licensing data collection point.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ManagedServerMetrics">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Observed managed server metrics.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="ManagedServer" type="LicensingManagedServerType">
+                            <xs:annotation>
+                                <xs:documentation source="modifiable">none</xs:documentation>
+                                <xs:documentation xml:lang="en">
+                                    One managed server metric.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="VirtualMachineMetrics">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Observed virtual machine metrics.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="VirtualMachine" type="LicensingVirtualMachineType">
+                            <xs:annotation>
+                                <xs:documentation source="modifiable">none</xs:documentation>
+                                <xs:documentation xml:lang="en">
+                                    One virtual machine metric.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="observationDate" type="xs:dateTime" use="required">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    The date when the metrics were observed.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="ManagedServer" type="LicensingManagedServerType"/>
+    <xs:complexType name="LicensingManagedServerType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Captures a single set of metrics for a managed server for a given sample.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VimObjectRef" type="VimObjectRefType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Managed object reference of the server.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="cpu" type="xs:int" use="required">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    Number of CPUs in the server.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="memoryInstalled" type="xs:int" use="required">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    Installed memory, in MB, in the server.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="VirtualMachine" type="LicensingVirtualMachineType"/>
+    <xs:complexType name="LicensingVirtualMachineType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a single set of virtual machine metrics.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VimObjectRef" type="VimObjectRefType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Managed object reference of the virtual machine.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="cpu" type="xs:int" use="required">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    Virtual machine CPUs use.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="memory" type="xs:int" use="required">
+            <xs:annotation>
+                <xs:documentation source="modifiable">none</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    Virtual machine memory use.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="LicensingReports" type="LicensingReportListType"/>
+    <xs:complexType name="LicensingReportListType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of licensing reports.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Report" type="vcloud:LinkType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Link to a licensing report.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="Datastore" type="DatastoreType"/>
+    <xs:complexType name="DatastoreType">
+        <xs:annotation>
+             <xs:documentation xml:lang="en">
+                 Represents datastore object.
+             </xs:documentation>
+             <xs:documentation source="since">1.5</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:EntityType">
+                <xs:sequence>
+                    <xs:element name="VimObjectRef" type="VimObjectRefType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                The VIM object reference to this datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Enabled" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>
+                                Indicates whether the datastore is enabled.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Busy" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Indicates whether the datastore is busy.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ThresholdYellowGb" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation>
+                                Minimum free space, in GB, to trigger a yellow
+                                status for the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:int">
+                                <xs:minInclusive value="0"></xs:minInclusive>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="ThresholdRedGb" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation>
+                                Minimum free space, in GB, to trigger a red
+                                status for the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:int">
+                                <xs:minInclusive value="0"></xs:minInclusive>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="SystemMessages" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                System messages for the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DatastoreFsType" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Filesystem type of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VcDisplayName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                vCenter display name of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="MountHost" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Datastore mount host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="MountDirectory" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Datastore mountpoint.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="TotalCapacityMb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Total capacity, in MB, of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="TotalCapacityGb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                 Total capacity, in GB, of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UsedCapacityMb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                 Used capacity, in MB, of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UsedCapacityGb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                               Used capacity, in GB, of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UsedCapacityPercent" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                              Used capacity of the datastore, as a percentage.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ProvisionedSpaceMb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Provisioned capacity, in MB, of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ProvisionedSpaceGb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Provisioned capacity, in GB, of the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="RequestedStorageMb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Requested storage, in MB, for all the vCloud
+                                Director VMs on the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="RequestedStorageGb" type="xs:double" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                Requested storage, in GB, for all the vCloud
+                                Director VMs on the datastore.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="vimPropertyPageUrl" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                               URL to the VIM property page of the datastore host.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="DatastoreReferences" type="vcloud:ReferencesType" substitutionGroup="vcloud:References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Collection of datastore references.
+            </xs:documentation>
+            <xs:documentation source="since">1.5</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VimObjectRefList" type="VimObjectRefListType"/>
+    <xs:complexType name="VimObjectRefListType">
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="VimObjectRefs" type="VimObjectRefsType" minOccurs="1" maxOccurs="1">
+                         <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                               A list of VimServerObjRef objects.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="UberAdminSettings" type="UberAdminSettingsType"></xs:element>
+    <xs:complexType name="UberAdminSettingsType">
+       <xs:annotation>
+          <xs:documentation source="since">1.5</xs:documentation>
+             <xs:documentation xml:lang="en">
+                Internal use only.
+             </xs:documentation>
+          </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="DebugMode" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                         <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                               Internal use only.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VMWProviderVdcResourcePoolSet" type="VMWProviderVdcResourcePoolSetType"/>
+    <xs:complexType name="VMWProviderVdcResourcePoolSetType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                   Represents backing resource pool set
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="VMWProviderVdcResourcePool" type="VMWProviderVdcResourcePoolType" minOccurs="0" maxOccurs="unbounded">
+                         <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                The backing resource pool set
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="VMWProviderVdcResourcePoolType">
+        <xs:complexContent>
+            <xs:annotation>
+               <xs:documentation source="since">1.5</xs:documentation>
+               <xs:documentation xml:lang="en">
+                   Represents backing resource pool for provider vDC.
+               </xs:documentation>
+            </xs:annotation>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="ResourcePoolVimObjectRef" type="VimObjectRefType">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                Vim object reference to resource pool
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                     <xs:element name="ResourcePoolRef" type="vcloud:ReferenceType">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                Reference to resource pool
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Enabled" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                Resource pool enabled status
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="primary" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                True if this is primary resource pool for this
+                                providedr vDC.
+                        </xs:documentation>
+                    </xs:annotation>
+               </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="UpdateResourcePoolSetParams" type="UpdateResourcePoolSetParamsType"/>
+    <xs:complexType name="UpdateResourcePoolSetParamsType">
+        <xs:complexContent>
+            <xs:annotation>
+               <xs:documentation source="since">1.5</xs:documentation>
+               <xs:documentation xml:lang="en">
+                   Represents update parameters for resource pools backing provider vdc
+               </xs:documentation>
+            </xs:annotation>
+            <xs:extension base="vcloud:ParamsType">
+                <xs:sequence>
+                    <xs:element name="AddItem" type="VimObjectRefType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a secondary resource pool to add
+                                to the provider vDC resource pool set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DeleteItem" type="vcloud:ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a secondary resource pool to
+                                delete from the provider vDC resource pool set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="OrganizationResourcePoolSet" type="OrganizationResourcePoolSetType"/>
+    <xs:complexType name="OrganizationResourcePoolSetType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a set of resource pools that back an organization
+                vDC.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="vcloud:ResourceType">
+                <xs:sequence>
+                    <xs:element name="ResourcePoolVimObjectRef" type="VimObjectRefType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                               Vim object reference to an organization resource pool.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VmVimInfo" type="VmVimInfoType"/>
+    <xs:complexType name="VmVimInfoType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a vSphere VM information.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="VmVimObjectRef" type="VimObjectRefType">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Reference to a vim vm object.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="DatastoreVimObjectRef" type="VimObjectRefType">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The datastore where the VM disk file is stored.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="HostVimObjectRef" type="VimObjectRefType">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The host for this VM.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="VirtualDisksMaxChainLength" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        The maximum chain length of the VM's virtual disks.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

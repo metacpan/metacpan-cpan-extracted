@@ -1,0 +1,19 @@
+PIC P16F690;
+
+Main {
+    digital_output PORTC;
+    $display = 0;
+    timer_enable TMR0, 4kHz;
+    Loop {
+        timer TMR0, Action {
+            ++$display;
+            write PORTC, $display;
+        };
+    }
+}
+
+Simulator {
+    attach_led PORTC, 8, 'red';
+    stop_after 1s;
+    autorun;
+}

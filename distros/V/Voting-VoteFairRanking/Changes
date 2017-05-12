@@ -1,0 +1,22 @@
+Revision history for Voting::VoteFairRanking
+
+1.0    1991 (approximately)
+        Richard Fobes wrote the subroutine -- now named calc_all_sequence_scores -- that calculates VoteFair popularity ranking results.
+
+2.0    1997 (approximately)
+        Richard Fobes created the web-page-server (CGI) software that calculates VoteFair Ranking results at VoteFair.org.  It uses a modified version of the calc_all_sequence_scores subroutine, and added subroutines including the get_numbers_based_on_one_ballot and add_preferences_to_tally_table and related subroutines.
+
+3.0    2005
+        Richard Fobes wrote the subroutine that calculates VoteFair representation ranking results, which is now named the calc_votefair_representation_rank subroutine.
+
+4.0    2011-October
+        Richard Fobes wrote the calc_votefair_party_rank subroutine that calculates VoteFair party ranking results, and wrote the remainder of this module to use the VISJ framework.
+
+4.9    2011-December
+        This module was added to Perl's CPAN archives.
+
+5.0    2011-December
+       The calc_votefair_choice_specific_pairwise_score_popularity_rank and calc_votefair_insertion_sort_popularity_rank subroutines were added.  These subroutines, when used together, calculate VoteFair popularity ranking results fast -- in "polynomial time".  These two subroutines were developed during the year 2011, as improvements over the also-fast calculation subroutine used at VoteFair.org since about the year 2000.
+
+5.01   2011-December-26
+       Minor refinements, to match GitHub version.

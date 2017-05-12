@@ -1,0 +1,110 @@
+#! /bin/perl
+#############################################################################
+#
+#                 NOTE: This file under revision control using RCS
+#                       Any changes made without RCS will be lost
+#
+#              $Source: /usr/local/cvsroot/vbtk/bin/vbstatus,v $
+#            $Revision: 1.2 $
+#                $Date: 2002/01/18 19:25:03 $
+#              $Author: bhenry $
+#              $Locker:  $
+#               $State: Exp $
+#
+#              Purpose: A utility to set and retrieve vb object statuses
+#			on the associated pmserver.
+#			
+#          Description: This utility is used to connect to the vbserver
+#			process to set and retrieve object statuses.
+#			
+#           Directions: 
+#
+#     Default Location: /share/pkg/oemon/pm
+#
+#           Invoked by: 
+#
+#           Depends on: VBTK::Client
+#
+#############################################################################
+#
+#
+#       REVISION HISTORY:
+#
+#       $Log: vbstatus,v $
+#       Revision 1.2  2002/01/18 19:25:03  bhenry
+#       Warning Fixes
+#
+#       Revision 1.1.1.1  2002/01/17 18:05:56  bhenry
+#       VBTK Project
+#
+#       Revision 1.4  2001/11/16 11:04:17  bhenry
+#       Revision 1.3  2001/09/05 10:01:18  bhenry
+#       Revision 1.2  2001/08/27 09:35:29  bhenry
+#
+
+use strict;
+use warnings;
+
+use VBTK::Common;
+use VBTK::Client;
+use Getopt::Std;
+
+&show_usage if(@ARGV < 2);
+
+my(@stdin,$result);
+our ($opt_g,$opt_i);
+my $stdin_text = '';
+
+getopts('gsi');
+
+# If '-i' is specified, then slurp all text from STDIN into an array
+# and pass that to the pmserver as the text message
+if($opt_i)
+{
+    @stdin = (<STDIN>);
+    $stdin_text = join('',@stdin);
+}
+
+# Create a socket object
+my $obj = new VBTK::Client(RemoteURI=>"$::VBURI");
+
+if($opt_g)
+{
+    $result = $obj->getStatus($ARGV[0]);
+    print STDOUT "$result\n";
+}
+else
+{
+    $result = $obj->setStatus(
+    	name   => $ARGV[0],
+    	status => $ARGV[1],
+    	text   => $ARGV[2] . $stdin_text
+    );
+
+    print STDOUT $result if ($result ne '0');
+}
+
+exit 0;
+
+
+#-------------------------------------------------------------------------------
+# Function:     show_usage
+# Description:  Show detailed usage text and exit.
+# Input Parms:  None
+# Output Parms: None
+#-------------------------------------------------------------------------------
+sub show_usage
+{
+        my $help_string = <<"END_HELP";
+
+Usage: vbstatus [-ihgs] <object> <status> [text]
+
+Arguments: [-h] - Help.  Print this text.
+           [-i] - Read text from STDIN.
+           [-g] - Get status of specified object
+           [-s] - Set status of specified object (Default)
+END_HELP
+
+	print STDOUT "$help_string\n";
+        exit(0);
+}

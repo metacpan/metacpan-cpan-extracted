@@ -1,0 +1,35 @@
+---
+abstract: 'Client implementation of the Parallels Virtuozzo XML API'
+author:
+  - 'Richard Simões <rsimoes AT cpan DOT org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Requires: 0
+  XML::Compile::Tester: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: VM-Virtuozzo
+no_index:
+  namespace:
+    - VM::Virtuozzo::Response
+requires:
+  File::ShareDir: 0
+  IO: 0
+  XML::Compile::Cache: 0
+  XML::Compile::Util: 0
+  namespace::clean: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/rsimoes/vm-virtuozzo/issues
+  homepage: https://metacpan.org/release/VM-Virtuozzo
+  repository: git://github.com/rsimoes/vm-virtuozzo.git
+version: v0.0.5

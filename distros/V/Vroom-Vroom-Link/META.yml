@@ -1,0 +1,22 @@
+---
+abstract: 'Subclass Vroom::Vroom to make clickable links'
+author:
+  - 'Dr Bean <drbean at (a) cpan dot (.) org>'
+build_requires:
+  Test::More: 0
+  Vroom::Vroom: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vroom-Vroom-Link
+requires:
+  IO::All: 0
+  Template::Toolkit::Simple: 0
+  Vroom: 0
+  parent: 0
+version: 0.06

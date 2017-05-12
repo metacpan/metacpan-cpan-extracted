@@ -1,0 +1,131 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \class HTOM_State
+ *! \brief This class tepresent a static persistant object the holds the state of application.
+ *
+ * The state objet is used by the HTOM_Controler to find the action that should be called on the
+ * request, and the view that should be evaluated.
+ * The state is organized as a vector of named attributes. 
+ */
+class HTOM_State
+{
+  //! Initialise the state object.
+  public function Init()
+  {
+    $a = func_get_args();
+    while (current($a))
+      {
+        $v = HTOM_State::GetProperty(current($a));
+        if ( !isset($v) )
+          {
+            HTOM_State::SetProperty(current($a),NULL);
+          }
+        next($a);
+      }
+  }
+  //! Set the state vector property.
+  public function SetProperty( $propertyName, $propertyValue )
+  {
+    HTOM_Persistant::SetAttribute( "__HTOM_State_property_.".$propertyName, $propertyValue );
+  }
+
+  //! Get the property value.
+  public function GetProperty( $propertyName )
+  {
+    return HTOM_Persistant::GetAttribute( "__HTOM_State_property_.".$propertyName );
+  }
+
+  //! Get the name of property.
+  public function GetProperties()
+  {
+    $rc=array();
+    $a = HTOM_Persistant::GetAttributes();
+    while (current($a)) {
+      $matches=array();
+      if (preg_match("/^__HTOM_State_property_\\.(.*)/",key($a),$matches))
+        {
+          $rc[$matches[1]]=current($a);
+        }
+      next($a);
+    }
+    return $rc;
+  }
+
+  //! Check if the given vector matches the current state.
+  /*! This function check if all parameters from the vector passed in the argument are 
+   * set and correspponding keys values are set to this same value.
+   * \param $vector a array where each key contains a name of state property, and key value contains a required
+   * state peoperty value.
+   * \return Function returns true if passed vector matches the state, of false otherwice.
+   */
+  public function Match( $vector )
+  {
+    $rc = false;
+    $asoc = array_intersect_assoc( $vector, HTOM_State::GetProperties() );
+    if (count($asoc)==count($vector) and count($vector)==count(HTOM_State::GetProperties()))
+    //if ( count($asoc)==count($vector) )
+      $rc = true;
+    return $rc;
+  }
+  
+  //! Dump a current state
+  public function Dump()
+  {
+    echo "The apprilcation state:<br>";
+    array_walk(HTOM_State::GetProperties(),"HTOM_State_Dumper",NULL);
+  }
+}
+
+
+function HTOM_State_Dumper( $value, $key, $p )
+{
+  if (is_array($value)) {
+    array_walk($value,"HTOM_State_Dumper",$key);
+  } else {
+    if (isset($p)) {
+      echo $p."[".$key."]=".$value."<br>";
+    } else {
+      echo $key."=".$value."<br>";
+    }
+  }
+}
+
+
+?>
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

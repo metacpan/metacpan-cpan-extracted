@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+LICENSE
+lib/VisionDB/Read.pm
+t/00-load.t
+t/02-new_free_v4.t
+t/02-new_free_v5.t
+t/03-recno_v4.t
+t/04-recno_v5.t
+t/05-data_v4.t
+t/05-data_v5.t
+t/06-fields_v4.t
+t/07-fields_v5.t
+t/sampledata/test4-1_db
+t/sampledata/test4_db
+t/sampledata/test4_db.d01
+t/sampledata/test4_db.d02
+t/sampledata/test5-1_db
+t/sampledata/test5_db
+t/sampledata/test5_db.d01
+t/sampledata/test5_db.d02
+t/sampledata/test5_db.d03
+META.yml                                 Module meta-data (added by MakeMaker)

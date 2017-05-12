@@ -1,0 +1,15 @@
+---
+version: 0.05
+date: 一  9月 13 14:50:34 CST 2010
+changes:
+- Subclass Vroom instead of Vroom::Vroom
+---
+version: 0.04
+date: 五  6月 11 20:43:14 CST 2010
+changes:
+- Fix Vroom::Vroom link, test distzilla
+---
+version: 0.03
+date:    May 22 2010
+changes:
+- CPAN release

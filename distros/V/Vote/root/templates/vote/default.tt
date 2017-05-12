@@ -1,0 +1,20 @@
+<div style="text-align: right;"><a href="[% c.uri_for( '/admin', voteid ) %]">Administrer</a></div>
+
+[% vote = c.model('Vote') %]
+
+[% INCLUDE 'includes/poll.tt' %]
+
+[% SWITCH vote.vote_status(voteid) %]
+[% CASE 'RUNNING' %]
+[% INCLUDE 'includes/poll_running.tt' %]
+[% CASE 'BEFORE' %]
+<div class="page_box">
+<p>Ce scrutin n'est pas encore ouvert.</p>
+</div>
+[% INCLUDE 'includes/signing_list.tt' %]
+[% CASE 'AFTER' %]
+[% INCLUDE 'includes/poll_results.tt' %]
+[% INCLUDE 'includes/signing_list.tt' %]
+[% END %]
+
+

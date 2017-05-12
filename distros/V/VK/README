@@ -1,0 +1,29 @@
+VK version 0.09
+===============
+
+VK - This module allows to manage VKontakte account: make posts with images and links, create albumbs and upload images.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+URI::Escape;
+WWW::Mechanize
+WWW::Mechanize::Gzip
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012-2013 by Marat Shaymardanov, LeonMedia LLC 2012-2013
+
+This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+return sub
+{
+    #could use $param  $job->workload;
+    my($param, $job, @regions) = @_;
+    my $order = int(rand( scalar @regions ));
+    $regions[$order];
+}

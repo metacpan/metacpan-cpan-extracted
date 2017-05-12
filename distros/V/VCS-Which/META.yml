@@ -1,0 +1,55 @@
+---
+abstract: 'Generically interface with version control systems'
+author:
+  - 'Ivan Wills <ivan.wills@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::MinimumVersion: '0'
+  Test::More: '0.88'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VCS-Which
+provides:
+  VCS::Which:
+    file: lib/VCS/Which.pm
+    version: v0.6.4
+  VCS::Which::Plugin:
+    file: lib/VCS/Which/Plugin.pm
+    version: v0.6.4
+  VCS::Which::Plugin::Bazaar:
+    file: lib/VCS/Which/Plugin/Bazaar.pm
+    version: v0.6.4
+  VCS::Which::Plugin::CVS:
+    file: lib/VCS/Which/Plugin/CVS.pm
+    version: v0.6.4
+  VCS::Which::Plugin::Git:
+    file: lib/VCS/Which/Plugin/Git.pm
+    version: v0.6.4
+  VCS::Which::Plugin::Subversion:
+    file: lib/VCS/Which/Plugin/Subversion.pm
+    version: v0.6.4
+recommends:
+  Time::HiRes: '0'
+requires:
+  Contextual::Return: '0'
+  File::chdir: '0'
+  IO::Prompt: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  perl: '5.01'
+  version: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=VCS-Which
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/ivanwills/VCS-Which
+version: v0.6.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

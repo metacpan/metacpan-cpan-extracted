@@ -1,0 +1,41 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # Setup variables used in the commonHeader.phtml file
+  $refresh=120;
+  my $currTab="History";
+-->
+<!--#include virtual="/commonHeader.phtml" -->
+<!--#include virtual="/checkRemoteServers.phtml -->
+<!--#include virtual="/commonTabs.phtml" -->
+
+<!-- table of field and values -->
+<table width="620" border="0" cellspacing="0" cellpadding="1" >
+  <!--#perl 
+    my @historyObjList = $vbObj->getHistoryObjList;
+    foreach my $histObj (@historyObjList)
+    {
+      my $timestamp = $histObj->getTimestamp;
+      my $histFile  = $histObj->getFileName;
+      my $status    = $histObj->getStatus;
+      my $repeated  = $histObj->getRepeated;
+      my $timestampText = &Date::Manip::UnixDate("epoch $timestamp", "%C");
+      my $statusColor = $STATUS_FGCOLOR{$status};
+      my $repeatedText = ($repeated > 1) ? " (Repeated $repeated times)" : '';
+   -->
+      <TR VALIGN="TOP" ALIGN="LEFT">
+        <TD>
+          <A HREF="$statusUrl?name=$name&histFile=$histFile">
+            $timestampText
+          </A>
+        </TD>
+        <TD>
+        </TD> 
+        <TD>
+          <FONT COLOR='$statusColor'>$status</FONT>$repeatedText 
+        </TD>
+      </TR> 
+  <!--#perl } -->
+</table>&nbsp<br>
+
+<!--#include virtual="/commonFooter.phtml" -->

@@ -1,0 +1,86 @@
+Revision history for Perl extension Video::Capture::V4l.
+
+0.902 Thu Jul 24 22:54:34 CEST 2008
+	- fix another lvalue-cast isn't lvalue bug in rtjpeg.c
+
+0.901 Tue Jun  6 01:35:18 CEST 2006
+	- fix lvalue-cast isn't lvalue bug in rtjpeg.c
+
+0.9   Fri Nov  4 22:20:53 CET 2005
+	- fix RTJpeg compilation flags.
+        - expose decode_vps and decode_vt subfunctions.
+        - fix CNI decoding.
+        - updated VPS_CNI and 8/30 format 1 and format 2 codes,
+          added X/26 codes, from TR-101-231 2005-10, and converted
+          to utf-8.
+
+0.225 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+0.224 Sun Jun 13 18:02:32 CEST 2004
+	- fix some compile bugs, very very small documentation updates.
+        - Video::Capture::V4l2 might replace this module in the future,
+          details unclear.
+
+0.222 Mon Feb 25 00:23:43 CET 2002
+	- work around missing cancellation bug in linux by explicitly
+          calling testcancel.
+
+0.221 Thu May 11 18:28:29 CEST 2000
+	- fixed oh so stupid bug reported by M C Lincoln.
+
+0.22  Thu May 11 03:22:52 CEST 2000
+	- changed VBI_VT format so that the full data is always returned in
+          slot #3.
+        - updated GPL to version 2.
+        - minor fixes.
+
+0.21  Sun Apr 16 11:13:04 CEST 2000
+        - moved scripts to the example subdir, fixed a few bugs, writing an
+          article in tpj ;)
+        - added RTjpeg codec module.
+
+0.20  Wed Dec  1 21:21:02 CET 1999
+	- fixed segfault problems due to non-reentrant malloc on many systems
+          (by pre-allocating lotsamemory of cousre ;).
+
+0.11  Wed Nov 24 18:45:23 CET 1999
+	- added epgview-simple (hack!), a regularly updated "coming next" screen.
+        - added epgview, which requires Curses and is much nicer.
+        - made it compile with perl-5.005_03.
+        - removed epgview-simple again ;)
+        - fixed "no dot in PATH" problem in V4l.
+
+0.10  Sun Oct 24 21:18:00 CEST 1999
+	- added Video::XawTV.
+        - backlog(0) now cancels vbi frame grabbing.
+        - added autotune.
+        - the automatic re-centering was causing too many bit errors.
+
+0.08  Sat Sep  4 19:17:42 CEST 1999
+	- added dumpepg and renamed epg to getepg.
+        - many bugfixes.
+        - added VBI_OTHER (for other types of lines).
+        - improved epg decoder & viewer.
+        - fixed VPS/VT CNI code (damned %%&$& bit reversals).
+        - vastly improved detection reliability.
+        - added %VPS_CNI and %VT_NI tables.
+        - preliminary premiere crypt data capturing.
+
+0.04  Fri Aug 13 00:32:17 CEST 1999
+	- added more example apps: vbi-info, epg.
+        - vastly improved teletext decoding.
+
+0.03  Wed Aug  4 21:15:28 CEST 1999
+	- added VBI module and example videotext-decoder.
+        - "cleaned" up file structure, as advised by Nick.
+        - renamed Video::Capture::Frequencies to Video::Frequencies.
+
+0.02  Wed Jul 14 14:21:37 CEST 1999
+	- added the Video::Capture::Frequencies module.
+        - added finder/indexer sample applications.
+        - the frequency formula was bogus.
+
+0.01  Thu Jul  1 20:32:32 1999
+	- original version; created by h2xs 1.19
+

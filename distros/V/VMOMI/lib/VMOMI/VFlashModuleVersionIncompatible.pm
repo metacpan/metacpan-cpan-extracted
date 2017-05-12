@@ -1,0 +1,29 @@
+package VMOMI::VFlashModuleVersionIncompatible;
+use parent 'VMOMI::VimFault';
+
+use strict;
+use warnings;
+
+our @class_ancestors = ( 
+    'VimFault',
+    'MethodFault',
+);
+
+our @class_members = ( 
+    ['moduleName', undef, 0, ],
+    ['vmRequestModuleVersion', undef, 0, ],
+    ['hostMinSupportedVerson', undef, 0, ],
+    ['hostModuleVersion', undef, 0, ],
+);
+
+sub get_class_ancestors {
+    return @class_ancestors;
+}
+
+sub get_class_members {
+    my $class = shift;
+    my @super_members = $class->SUPER::get_class_members();
+    return (@super_members, @class_members);
+}
+
+1;

@@ -1,0 +1,106 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+/*! \class  HTOM_Controler
+ *\brief The appllication state controler object.
+
+ * The application controler is designed as a event driven state machine. Each state of the machine is
+ * described by the stat vector of attributes. In the simplest solution the machine state is described by only one
+ * attribute.
+ */
+class HTOM_Controler
+{
+  //! Thie method registers an action handler that will be called on the entry of the state.
+  /*! \param $stateVector an array containing the state vector (see the HTOM_State::Matcht method).
+   * \param $event the event value that will trigger the action in the state. 
+   * The event may contain any comparable value (string, bool, number).
+   * \param $actionClassName a mane of the class that will handle the request.
+   */
+  public function RegisterAction( $event,  $actionClassName )
+  {
+    self::$actions[$event] =$actionClassName;
+  }
+ 
+
+  //! Set the default view.
+  /*! The default view will be used in case if there is no view returned from an page action handler.
+   * \param defaultPage a name of the class that implements an HTOM_Evaluable interface.
+   */
+  public function SetDefaultView( $defaultPage )
+  {
+    self::$defaultPage=$defaultPage;
+  }
+
+  //! Handle the user request.
+  /*! Method check the current state of the applicaiton, and 
+   * calls to the appropriate action handler and view handler (accordingly to the current 
+   * application state.
+   * The action handler may modify the state in order to change the page rendering.
+   */
+  public function Execute( $event )
+  {
+    $a = NULL;
+    $view = NULL;
+    if (isset(self::$actions[$event]))
+    {
+      $a = self::$actions[$event];
+      if (isset($a)) {
+	HTOM_Debug::Out("Call to the action from: :".$a,3,"HTOM_Controler");
+        $handler = eval( "return new ".$a."();"); // create an instance of the action handler;
+        $view = $handler->Action(); //call to the handler action      
+      }
+    }
+    if ($view==NULL)
+      {
+	if ( isset(self::$defaultPage) )
+	  $view = eval( "return new ".self::$defaultPage."();"); // create an instance of the action handler;
+      }    
+    if ($view instanceof HTOM_Evaluable) {
+      echo $view->Evaluate(); //call to the handler action
+    } else {
+      echo "ERROR: Class handler ".get_class($view)." is not an instance of the HTOM_Evaluable interface.";
+    }
+
+  }
+
+  private static $actions=array();
+  private static $defaultPage;
+}
+
+?>
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

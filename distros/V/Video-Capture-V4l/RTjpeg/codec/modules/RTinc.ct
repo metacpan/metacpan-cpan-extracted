@@ -1,0 +1,18 @@
+/*
+
+Main Routines
+
+This file contains most of the initialisation and control functions
+
+(C) Justin Schoeman 1998
+
+*/
+
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef MMX
+#include <mmx.h>
+#endif

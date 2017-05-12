@@ -1,0 +1,64 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+//!  Class represents a text input object.
+class  HTOM_TextInput extends HTOM_Input
+{
+  /*! \brief Initialize the HTOM_TextInput object
+
+  * \param $id identifier of input
+  * \param $default a default value of the string.
+  * \param $isPassword is set to TRUE the test input will be thread as a password input.
+  * \param $attributes either the HTOM_Attribute or an array of HTOM_Attribute objects.
+  */
+  public function __construct($id, $default=NULL , $isPassword=FALSE, $attributes=NULL )
+  {
+    if ($isPassword) {
+      parent::__construct($id, "password", $attributes);
+    } else {
+      parent::__construct($id, "text", $attributes);
+    }
+
+    if (isset($default)) {
+      $this->SetAttributes( new HTOM_Default($default) );
+    }
+  }
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

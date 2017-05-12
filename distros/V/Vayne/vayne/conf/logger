@@ -1,0 +1,2 @@
+- level: INFO
+  layout: '%d [%p] [%C:%L]> %m%n'

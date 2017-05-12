@@ -1,0 +1,16 @@
+.bdy
+MANIFEST			This list of files
+Makefile.PL
+README
+TODO
+examples/FindEvent/Example.pm
+examples/config.xml
+examples/go.pl
+lib/Video/Event.pm
+lib/Video/Event/Manual.pm
+lib/Video/FindEvent.pm
+lib/Video/FindEvent/Manual.pm
+lib/Video/Function.pm
+lib/Video/Manip.pm
+t/001.t
+t/002.t

@@ -1,0 +1,130 @@
+VCS/SaVeS version 0.12
+======================
+
+NEW FEATURES
+
+- Revision numbers go oldest to newest
+- Added -r<rev> to svs diff
+- Eliminated RCS branching (a good thing)
+- Implemented 'svs delete' command
+- Fixed many bugs
+- Updated doc
+
+INTRO
+
+SaVeS(tm) is the "Standalone Versioning System". It is a single user,
+easy to use, yet powerful Version Control System (VCS) tool. It has most
+of the features of other VCSs like CVS, but is completely contained
+within whatever filesystem directory you are using it in.
+
+This distribution installs the SaVeS software. It consists of some Perl
+modules, and a couple of bin scripts. The software is primarily intended
+to be used as a command line tool.
+
+  modules:
+    - VCS::SaVeS - Placeholder for future VCS::* backend support
+    - VCS::SaVeS::Config - Support for 'svs config' functionality XXX
+    - VCS::SaVeS::Help - Support for the 'svs help' command
+    - VCS::SaVeS::SVS - Support for the 'svs' program
+
+  scripts:
+    - svs - Primary SaVeS interface program
+    - saves - A shortcut for backing up a directory all at once
+
+USAGE
+
+After installation, type 'svs help' at the command line. This will give you
+more information on how to use the system.
+
+QUICK GUIDE
+
+saves                     # backup the entire contents of the current directory
+svs import file-list      # create a new repository (possibly from archive)
+svs save file-list        # save revisions of files
+svs restore file-or-list  # restore file(s) to a specific revision
+svs status file-list      # show current status of files
+svs history file          # show revision history for a specific file
+svs manifest              # list or modify the repository manifest
+                          # (the manifest is the list of active files)
+svs add file-list         # add file to the manifest
+svs remove file-list      # remove files from the manifest
+svs diff file-list        # show the difference between two revisions
+svs help [command]        # get additonal help
+svs delete file-list      # delete revision history of files
+svs break                 # set a breakpoint in a directory
+svs merge directory       # merge a repository in a subdirectory into current
+svs archive file-list     # create an archive of files
+svs find regexp-pattern   # find active files matching a pattern
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make install
+
+The above will install programs into your Perl library tree, and your
+Perl binary (bin) directory. If you do not have write access to these
+directories, you can install SaVeS locally in your home directory.
+
+The easiest way to do this is to pass the following flags to Makefile.PL:
+
+    perl Makefile.PL INSTALLSCRIPT=~/bin INSTALLSITELIB=~/perl/lib \
+         INSTALLSITEMAN1DIR=~/perl/man INSTALLSITEMAN3DIR=~/perl/man
+    make install
+
+The make sure '~/bin' is in your path.
+
+DEPENDENCIES
+
+The SaVeS software currently requires these other programs and modules:
+
+   RCS (Revision Control System)
+     - bin/rcs
+     - bin/co
+     - bin/ci
+     - bin/rlog
+     - bin/rcsdiff
+
+   UNIX
+     - cat
+     - sh
+     - xargs
+
+   YAML-0.35
+
+RATIONALE
+
+Why invent yet another VCS?
+
+Saving and restoring revisions should be really easy to do. It shouldn't
+require much thinking, and it shouldn't ever get in your way. It should
+be completely reliable, yet completely disposable.
+
+SaVeS is my attempt at making simple things simple. No client-server. No
+network required. No main repository. Available on demand. Just type
+'saves', and everything is backed up. It works the way I like to work.
+And when it doesn't, I'll fix it to do so.
+
+SaVeS isn't meant to be a replacement for CVS. (The SaVeS source code is
+stored in Perforce, for example.) It's merely a lightweight alternative
+that can very easily be used in conjunction with other VCSs.
+
+If you find SaVeS useful, drop me a line at ingy@cpan.org.
+
+BUGS
+
+Should work in most normal Unixish environments. Probably won't work
+elsewhere. Windows users will probably need a healthy Cygwin install.
+
+Only the basic commands have been implemented, and only in the most basic
+fashion. This is an alpha release. To see proposed commands that are not
+implemented, look for XXX in 'svs help commands'.
+
+COPYRIGHT
+
+Copyright (c) 2002 Brian Ingerson. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

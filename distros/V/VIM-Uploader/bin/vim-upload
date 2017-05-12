@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+# vim:fdm=marker:fdl=0:
+use warnings;
+use strict;
+use VIM::Uploader;
+#use File::Temp 'tempfile';
+use Cwd qw(abs_path);
+
+my $pwd = qx(pwd);
+my $basename = qx(basename $pwd);
+chomp($basename,$pwd);
+my $upload_template = "$basename.upload";
+
+if( ! -e $upload_template ) {
+    my $dist = shift @ARGV;
+    unless( $dist ) {
+        print "Usage:\n";
+        print "   vim-upload path/to/your_script_dist_file\n";
+        exit;
+    }
+
+    $dist = abs_path( $dist );
+
+    if( ! -e $dist ) {
+        die "$dist doesnot exist.";
+    }
+
+    print "Going to upload $dist file.";
+# {{{
+    open FH, ">" , $upload_template;
+    print FH <<END;
+script_name:
+
+    [script name]
+
+script_file:
+
+    $dist
+
+script_type:
+
+    color scheme
+    ftplugin
+    game
+    indent
+    syntax
+    utility
+    patch
+
+vim_version:
+
+    5.7
+    6.0
+    7.0
+    7.2
+
+script_id:
+
+script_version: 
+
+    0.1
+
+summary:
+
+    [summary]
+
+description:
+
+    [description]
+
+install_details:
+
+    [install details]
+
+version_note:
+
+END
+    close FH;
+    system( qq(vim $upload_template) );
+# }}}
+}
+
+open FH , "<" , $upload_template;
+local $/;
+my $content = <FH>;
+close FH;
+
+# parse content
+my @lines = split /\n/,$content;
+
+my $section;
+my %parts;
+my @buffer;
+
+sub flush_buffer {
+    my ($section) = @_;
+    if( @buffer and $section ) {
+        $parts{ $section } = join "\n", @buffer;
+        @buffer = ( );
+    }
+}
+
+for my $l ( @lines ) {
+    if ( $l =~ m{^(\w+):\s*$} ) {
+        flush_buffer( $section );
+        $section = $1;
+        next;
+    }
+    else {
+        push @buffer,$l;
+    }
+}
+flush_buffer( $section );
+
+# oneline arguments
+for ( qw(script_name script_file script_id script_type vim_version script_version) ) {
+    $parts{ $_ } =~ s{\n}{}g;
+    $parts{ $_ } =~ s{^\s*}{}g;
+    $parts{ $_ } =~ s{\s*$}{}g;
+}
+
+$parts{ script_name } =~ s{\s}{-}g;
+
+my $uploader = VIM::Uploader->new();
+$uploader->login();
+if( $parts{script_id} ) {
+    $uploader->upload( 
+        %parts,
+        version_comment => 
+            $parts{'version_note_'.$parts{script_version}} 
+                || $parts{version_note}
+    );
+}
+else{
+    $uploader->upload_new( %parts );
+}
+print "Done";

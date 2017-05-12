@@ -1,0 +1,45 @@
+u8 RTjpeg_alldata[2*64+4*64+4*64+4*64+4*64+32];
+
+s16 *RTjpeg_block;
+s32 *RTjpeg_lqt;
+s32 *RTjpeg_cqt;
+u32 *RTjpeg_liqt;
+u32 *RTjpeg_ciqt;
+
+unsigned char RTjpeg_lb8;
+unsigned char RTjpeg_cb8;
+int RTjpeg_width, RTjpeg_height;
+
+s16 *RTjpeg_old=NULL;
+
+#ifdef MMX
+mmx_t RTjpeg_lmask;
+mmx_t RTjpeg_cmask;
+#else
+u16 RTjpeg_lmask;
+u16 RTjpeg_cmask;
+#endif
+int RTjpeg_mtest=0;
+
+static const unsigned char RTjpeg_lum_quant_tbl[64] = {
+    16,  11,  10,  16,  24,  40,  51,  61,
+    12,  12,  14,  19,  26,  58,  60,  55,
+    14,  13,  16,  24,  40,  57,  69,  56,
+    14,  17,  22,  29,  51,  87,  80,  62,
+    18,  22,  37,  56,  68, 109, 103,  77,
+    24,  35,  55,  64,  81, 104, 113,  92,
+    49,  64,  78,  87, 103, 121, 120, 101,
+    72,  92,  95,  98, 112, 100, 103,  99
+ };
+
+static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
+    17,  18,  24,  47,  99,  99,  99,  99,
+    18,  21,  26,  66,  99,  99,  99,  99,
+    24,  26,  56,  99,  99,  99,  99,  99,
+    47,  66,  99,  99,  99,  99,  99,  99,
+    99,  99,  99,  99,  99,  99,  99,  99,
+    99,  99,  99,  99,  99,  99,  99,  99,
+    99,  99,  99,  99,  99,  99,  99,  99,
+    99,  99,  99,  99,  99,  99,  99,  99
+ };
+ 

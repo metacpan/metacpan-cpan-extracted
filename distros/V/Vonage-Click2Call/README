@@ -1,0 +1,32 @@
+Vonage-Click2Call version 0.10
+==============================
+
+Use the Vonage™ Click-2-Call third party interface (see https://secure.click2callu.com/) to
+place a call from your Vonage line to another party.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ LWP::UserAgent (with SSL support)
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Matt Sanford
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,75 @@
+Revision history for Perl module Vi::QuickFix
+
+Revision 1.101 Fri Mar 12 22:56:37 2004
+       - original version; created by ExtUtils::ModuleMaker 0.32
+
+rel_1_110 Mon Mar 15 19:58:49 CET 2004
+       - first release
+
+rel_1_114 Fri Mar 19 18:47:41 CET 2004
+       - bugfix in message-recognizing regex
+       - give warning except in silent mode, erase empty error file
+       - pod revised, README added
+       - second release
+
+rel_1_116 Sat Mar 20 12:49:38 CET 2004
+       - work around bug in perl 5.8.0 (goto label not found)
+         (compare testers result FAIL Vi-QuickFix-1.114 i586-linux 2.4.22-4tr)
+
+Sun Mar 21 23:26:28 CET 2004
+       - Bad tests on 5.8.0 and earlier show that tied STDOUT isn't
+         respected by all system messages.
+
+Vi-QuickFix-1_121 Sun May  9 00:17:32 CEST 2004
+       - The fix (use %SIG when tie doesn't work) results in a major
+         re-write.  Added doc chapters IMPLEMENTATION and CONFLICTS
+         to the pod.
+
+Vi-QuickFix-1_122 Thu Jul 29 19:45:18 CEST 2004
+       - Doc changes: Now describing ":cf" instead of "vi -q".
+       - Another reason for a re-release with little change is that
+         spurious failed tests have come back from CPAN testers.
+         (The target machine(s) failed to load a standard module.)
+         The re-release will hopefully heal that.
+
+Sun Oct  3 18:32:01 CEST 2004
+       - Added pid check to END{} block, so forked kids don't execute it
+
+Thu Oct 28 18:21:57 CEST 2004
+       - Cleaned up a messy bit in Vi::QuickFix::Destructor::DESTROY
+         when run under -c, added tests
+
+Sat Jan  8 22:04:05 CET 2005
+       - Cleaned up failing tests under Win32 (thanks to rjbs)
+
+Sun Jan  9 16:22:40 CET 2005
+       - added environment dependency on VI_QUICKFIX_SOURCEFILE
+       - cleaned up (removed) ca 30 spurious "open" tests
+
+Vi-QuickFix-1_129 Tue Jan 11 12:48:55 CET 2005
+       - fixed bug concerning "perl -MVi::QuickFix source" when source also
+         has "use Vi::QuickFix" (there was some double processing)
+       - released
+
+Vi-QuickFix-1_132 Tue Jan  1 02:51:29 CET 2008
+       - Fixed bugs that came up with different warnings processing in 5.10.0
+       - Added eval-detection in sig mode
+       - Made error file handle autoflushing
+       - Fixed obligatory message so invocation is correctly identified
+
+Thu Jan  3 03:07:41 CET 2008
+       - Parsing of ambigous message texts, with existence test
+       - Added fork mode (experimental, tests fail intermittently)
+
+Sat Jan  5 04:23:34 CET 2008
+       - released
+
+Vi-QuickFix-1_133 Sat Jan  5 18:36:06 CET 2008
+       - removed test in fork mode
+       - released
+
+Vi_QuickFix_1_134 Sun Jan  6 23:56:31 CET 2008
+       - fixed a rather embarrassing mistake in t/001_basic. Calling
+         $^X now instead of 'perl'.  That would account for "mysterious"
+         fails with cpan testers.
+       - released

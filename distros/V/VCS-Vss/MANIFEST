@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/connect.t
+t/dir.t
+t/file.t
+t/get_root.pl
+t/version.t
+Vss.pm
+Vss/File.pm
+Vss/Dir.pm
+Vss/Version.pm

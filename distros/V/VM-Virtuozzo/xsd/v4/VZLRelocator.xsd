@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/relocator" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/relocator" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:element name="relocator" type="relocatorType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Program Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="relocatorType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Program Management.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice minOccurs="0">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="migrate_p2v"/>
+						<xs:element ref="migrate_v2v"/>
+						<xs:element ref="migrate_v2p"/>
+						<xs:element ref="calc_env_config"/>
+						<xs:element ref="move"/>
+						<xs:element ref="clone"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="config"/>
+						<xs:element ref="eid"/>
+						<xs:element ref="eid_list"/>
+						<xs:element ref="hw_notes"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="migrate_p2v">
+		<xs:annotation>
+			<xs:documentation>P2V migration. Returns EID of created environment.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="options" type="p2v_migrate_optionsType" minOccurs="0"/>
+				<xs:element name="src" type="vzlt:connection_infoType">
+					<xs:annotation>
+						<xs:documentation>Source node which will be replicated to environment.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="calc_env_config">
+		<xs:annotation>
+			<xs:documentation>Calculate Environment config that present hardware node. It should be used before p2v migration. Return "config"/Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="migrate_v2p">
+		<xs:annotation>
+			<xs:documentation>V2P migration. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="options" type="v2p_migrate_optionsType" minOccurs="0"/>
+				<xs:element name="eid" type="vzlt:eid_type">
+					<xs:annotation>
+						<xs:documentation>Environment to migrate.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="dst" type="vzlt:connection_infoType">
+					<xs:annotation>
+						<xs:documentation>Destination node.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="migrate_v2v">
+		<xs:annotation>
+			<xs:documentation>V2V migration (usual migration). Returns Ok/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="options" type="v2v_migrate_optionsType" minOccurs="0"/>
+				<xs:element name="eid_list" type="vzlt:eid_listType" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>List of Environments to be mirgated. At least one ID must be specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="dst" type="vzlt:connection_infoType">
+					<xs:annotation>
+						<xs:documentation>Node where environment will  be migrated to.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="move">
+		<xs:annotation>
+			<xs:documentation>Change location paramters of Environement. Like private/root area, or ctid in Parallels Agent. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type">
+					<xs:annotation>
+						<xs:documentation>id of environment to move</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="config" type="vzlt:env_configType">
+					<xs:annotation>
+						<xs:documentation>New parameters of environment after move.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="clone">
+		<xs:annotation>
+			<xs:documentation>returns eid_list</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type">
+					<xs:annotation>
+						<xs:documentation>id of environment to clone</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="count" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>number of copies to create</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="options" type="clone_optionsType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="config" type="vzlt:env_configType">
+		<xs:annotation>
+			<xs:documentation>Calculated Environment config.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="eid" type="vzlt:eid_type">
+		<xs:annotation>
+			<xs:documentation>ID of created Environment</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="eid_list" type="vzlt:eid_listType">
+		<xs:annotation>
+			<xs:documentation>List of Environment IDs</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="clone_optionsType">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="p2v_migrate_optionsType">
+		<xs:sequence>
+			<xs:element name="exclude" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Pathes that will be excluded during data transfer.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="path" type="xs:base64Binary" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="keep_dst" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Keep transfered data in case of error (to decrease time of subsequent attempt).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="config" type="vzlt:env_configType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Parameters of environment after migration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="service" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List of services that will be stopped on Source Node during migration.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="name" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Service name.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="quota" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Quota prameters.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="partition">
+							<xs:annotation>
+								<xs:documentation>Partition of source node, where from quota info will be get.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="name" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>Partition name.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v2v_migrate_optionsType">
+		<xs:sequence>
+			<xs:element name="force" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Force migration</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="nostart" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Don't start Environment on destination if it is running on source</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remove" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remove environment data from source</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="config" type="vzlt:env_configType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Parameters of environment after migration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="type" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type of migration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v2p_migrate_optionsType">
+		<xs:sequence>
+			<xs:element name="config" type="vzlt:env_configType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Parameters of physical environment after migration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="migrate_p2vResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="calc_env_configResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="config"/>
+				<xs:element ref="hw_notes"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="migrate_v2pResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="migrate_v2vResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="moveResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cloneResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid_list"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="hw_notes" type="hw_notesTypes">
+		<xs:annotation>
+			<xs:documentation>additional information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="hw_notesTypes">
+		<xs:sequence/>
+	</xs:complexType>
+</xs:schema>

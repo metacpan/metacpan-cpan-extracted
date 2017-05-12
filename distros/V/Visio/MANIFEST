@@ -1,0 +1,19 @@
+MSPATENTLICENSE
+LICENSE
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+Visio.pm
+Visio/Layout.pm
+Visio/Line.pm
+Visio/Master.pm
+Visio/Page.pm
+Visio/PageProps.pm
+Visio/PageSheet.pm
+Visio/Shape.pm
+Visio/Hyperlink.pm
+sample/golden.vsx
+sample/sample.pl
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)

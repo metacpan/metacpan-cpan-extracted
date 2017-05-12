@@ -1,0 +1,8 @@
+<div id="poll_confirm" class="page_box">
+<form action="[% c.uri_for(reqid) %]" method="POST">
+[% c.model('Vote').poll_request_info(reqid).label | html %]<br>
+<p>Saisissez un mot de passe pour administrer votre vote</p>
+<p><input type="password" name="passwd"></p>
+<p><input type="submit"></p>
+</form>
+</div>

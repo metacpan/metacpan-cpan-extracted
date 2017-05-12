@@ -1,0 +1,43 @@
+#!/bin/perl
+#
+# Example script for using VBTK::Smtp and VBTK::Pop3 to monitor the full
+# mail cycle.  See the POD documentation for each module for more details.
+#
+# This script runs the sender and collector in the same process.  You 
+# could split these apart and run them from two separate networks if 
+# you're trying to test a specific route through the network.
+
+use VBTK;
+use VBTK::Pop3;
+use VBTK::Smtp;
+
+# Initialize a sender object
+$obj = new VBTK::Smtp (
+    Host    => 'mysmtphost',
+    To      => 'vbtk@mydomain.com',
+    Subject => "VBTK Test from $HOST",
+);
+    
+# Add Rules
+$obj->addVBObj (
+    VBObjName    => '.mysmtphost.smtp.from-$HOST',
+);
+
+
+# Initialize a collector object which will read and delete any messages
+# with a matching subject.
+$obj = new VBTK::Pop3 (
+    Host           => 'mypophost',
+    User           => 'vbtk',
+    Password       => 'passwd',
+    RetrieveFilter => "VBTK Test from $HOST",
+);
+    
+# Add Rules
+$obj->addVBObj (
+    VBObjName    => ".mypophost.pop3.from-$HOST",
+);
+
+# Call this at the very end to start monitoring everything.
+&VBTK::runAll;
+

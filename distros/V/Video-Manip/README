@@ -1,0 +1,14 @@
+Video::Manip and friends -- Manipulate Video from Perl
+
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+EXAMPLES
+
+look at examples/* for example code

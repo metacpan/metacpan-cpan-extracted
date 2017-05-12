@@ -1,0 +1,24 @@
+This is the README file VMS::FileUtils, which contains routines for
+    VMS::FileUtils::SafeName
+and VMS::FileUtils::Root
+
+The VMS::FileUtils::SafeName module contains utilities for converting
+filenames and paths into "vms-safe" form.  The conversion is
+reversible, and is used by NFS software (UCX and Multinet) when
+dealing with cross-platform NFS service.
+
+In addition a (non-reversible) converter for archive filenames into
+a VMS-acceptable form is also provided; this is primarily of use for
+things like CPAN archive names, converting "HTML-Parser-1.07.tar.gz"
+into "HTML-Parser-1_07.tar-gz".
+
+The VMS::FileUtils::Root utilities are for using "rooted logicals"
+($ define/trans=conceal  myroot  disk$here:[dir1.dir2.])
+to evade the RMS's depth limitation of 8 directories.  It's an
+object-oriented syntax.
+
+Current version is 0.01.
+
+VMS::FileUtils::* was written by Charles Lane
+(lane@duphy4.physics.drexel.edu), and is released for free public use
+under the terms of the Perl Artistic License.  Share and enjoy.

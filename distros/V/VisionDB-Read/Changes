@@ -1,0 +1,15 @@
+Revision history for VisionDB-Read
+
+0.04	2011-02-17 00:06:11
+		First public release
+
+0.03	2010-04-24 03:59:09
+		Added Exporter support	
+
+0.02	2010-03-12 01:47:58
+		Fixed some bugs under Win32 (and I think under MacOS too)
+		Fixed some typos in docs
+
+0.01	2010-02-27 00:16:00
+		First version, released on an unsuspecting world.
+

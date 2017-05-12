@@ -1,0 +1,14 @@
+[Changes for 0.03 - 2008-01-01]
+
+* Renamed to VS::RuleEngine::Writer::XML
+* Fixed README which looked a bit funny because missing -t switch when perldoc:ing it [DOC]
+* Write engine class if not Kvasir::Engine
+* Write defaults key/values sorted by key [BUG]
+
+[Changes for 0.02 - 2007-10-08]
+
+* Add support for defaults introduced in Kvasir 0.07
+
+[Changes for 0.01 - 2007-10-06]
+
+* Initial release to CPAN

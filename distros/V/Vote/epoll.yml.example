@@ -1,0 +1,7 @@
+---
+name: Vote
+-- db: connection, see libpq documentation
+-- dbname=BASENAME;host=SERVER;user=USER;password=PASS
+db: dbname=vote
+-- The smtp serveur to use, default is localhost
+smtp:

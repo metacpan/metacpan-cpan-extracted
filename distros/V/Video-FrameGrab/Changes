@@ -1,0 +1,33 @@
+######################################################################
+Revision history for Perl extension FrameGrab
+
+0.07  (2009/10/04)
+    (ms) Warning now if a frame can't be read instead of dying.
+    (ms) Added missing Imager dependency (reported by Andreas König).
+
+0.06  (2009/07/19)
+    (ms) Overlaying several frames now to obtain reliable cropping
+         suggestion.
+
+0.05  (2009/03/22)
+    (ms) Added aspect_ratio_guess.
+    (ms) Added dimensions() to determine width/height in absense of
+         meta data.
+    (ms) dimensions() now snaps an image at the start of the video file
+         to avoid problems with files where length() is too far off.
+    (ms) dimensions() now caches width/height
+    (ms) Different algorithms for crop detection. Defaults to 
+         home-grown detection.
+
+0.04  2009/03/15
+    (ms) Added cropdect, cropdetect_average.
+
+0.03  2009/03/14
+    (ms) Added meta_data().
+    (ms) Added equidistant_snap_times().
+
+0.02  2009/03/03
+    (ms) Fixed skipped tests
+
+0.01  2009/02/21
+    (ms) Where it all began.

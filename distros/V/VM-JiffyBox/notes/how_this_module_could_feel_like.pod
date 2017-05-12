@@ -1,0 +1,73 @@
+=head1 Some ideas of how the implementation could be like
+
+Initialisie a VM object:
+
+ use VM::JiffyBox;
+
+ my $secret_token = 'secretbla1234567890';
+ my $hypervisor   = VM::JiffyBox->new( auth_token => $secret_token);
+
+Get a specific box:
+
+ my $vm_id = 'master_box123';
+ my $vm    = $hypervisor->get_vm( $vm_id );
+
+Create a new box:
+
+ my $image = 'hfsidhfvksdhverw24ths';
+ my $vm    = $hypervisor->create_vm( $image );
+
+Or get all boxes:
+
+ my @vms   = $hypervisor->get_vms();
+
+Get specific ID for box-name:
+
+ my $vm_id = $hypervisor->get_id_for_name( 'KundeA' );
+
+Do stuff with a specific box:
+
+ $vm->stop();
+ $vm->delete();
+
+ my $ip    = $vm->get_information()->{result}->{ips}->{public}->[0];
+ my $ip    = $vm->get_ip();
+
+ my $image = $vm->get_backup_id( 'daily' );
+
+Forther stuff which is needed:
+
+ # tell a box a specific API-Token,
+ # represented with the hypervisor
+ $vm->set_hypervisor( $hypervisor );
+
+ # Interface for authentikation token
+ $hypervisor->set_auth_token( 'usfhisfh22fsfhs' );
+
+=head2 Example how to use
+
+This is an example how we then could use this interface:
+
+ use VM::JiffyBox;
+
+ my $jiffy        = VM::JiffyBox->new( auth_token => 'geheim' );
+
+ my $box_id_A     = $jiffy->get_id_for_name( 'Kunde_A' );
+
+ my $box_A       = $jiffy->get_vm( $box_id_A );
+
+ my $backup_img_A = $box_A->get_backup_id( 'daily' );
+
+ my $test_box_A   = $jiffy->create_vm( $backup_img_A );
+
+ my $test_ip_A    = $test_box_A->get_ip(); 
+
+ # Do some stuff with the clone
+ #
+ # MAGIC GOES HERE (with Rex e.g.)
+ #
+ # ssh on IP and so on...
+
+ $test_box_A->stop();
+ $test_box_A->delete();
+

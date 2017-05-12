@@ -1,0 +1,35 @@
+README for VMS::System
+
+Copyright (c) 1997 Dan Sugalski and Linn-Benton Community College
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets you retrieve most of the info available via the system
+service GETSYI, or the DCL lexical F$GETSYI. It also allows retrieval of
+all the system parameters available from SYSGEN.
+
+perl Makefile.pl
+mms
+mms test
+
+to build and test the extension. If it tests OK, then
+
+mms install
+
+to install it. More info is in the POD documentation in the System.PM file.
+
+VMS::System allows Perl programs to retrieve info about systems.  The
+information it returns is pretty much equivalent to DCL's F$GETSYI
+function, or what SYSGEN provides.
+
+This module can't violate VMS system security in any way that DCL can't, so
+if you can see something with F$GETSYI, you can see it with VMS::System.
+If you can't in DCL or SYSGEN, you can't here, either.
+
+WHAT'S NEW SINCE 1.03?
+
+Added support for four neato-keen, but undocumented items--FAN_VECTOR,
+THERMAL_VECTOR, TEMPERATURE_VECTOR, and POWER_VECTOR. They're only
+available in VMS 7.1-1h1 and up, and only for AlphaServer 4000, 4100, 1200,
+1000A, and 8400. 

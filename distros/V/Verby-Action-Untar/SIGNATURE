@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 14062388818c8c406b49393d748f4ad53d075c55 MANIFEST
+SHA1 544252489d5157103ce2a7123f9f912f84f40273 MANIFEST.SKIP
+SHA1 de1121ec6cfb678039c302a07f28fe58fce5a141 META.yml
+SHA1 8640bc2b47cb2c941b6b1aea361a9fc1f2e9e213 Makefile.PL
+SHA1 c1a1c969d618445e11d23553bbc75f56677dd10d foo.tar.gz
+SHA1 c67a45a587cfe018916f78e113bd3b04a266a2dc lib/Verby/Action/Untar.pm
+SHA1 86e11312dc7481e672755c3d40dae00b0ed0fdbc t/verby_action_untar.t
+SHA1 14994a9fba8380aa1d700f4304a7b03768dc8d51 t/verby_action_untar.t.log
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFH8OmCVCwRwOvSdBgRAszKAJ9kIQEdSAMw4qVsaNGU3U4zJeLzGQCfUfbp
+nF8sl5FW5/0PnSL+CZGWiu0=
+=eXae
+-----END PGP SIGNATURE-----

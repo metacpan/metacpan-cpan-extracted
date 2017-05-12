@@ -1,0 +1,77 @@
+#!/bin/perl
+#
+# Example script for using VBTK::DBI and it's sub-classes.  See the POD
+# documentation for each module for more details.
+
+# In this case, we're using Oracle, so set the ORACLE_HOME variable.
+$ENV{ORACLE_HOME} = "/share/oracle/product/8.0.6";
+
+use VBTK::DBI::OraLogins;
+use VBTK::DBI::OraTableSpace;
+use VBTK;
+
+# Setup a monitor to show users connected to Oracle
+$obj = new VBTK::DBI::OraLogins (
+    DSN            => 'oracle.world',
+    User           => 'system',
+    Auth           => 'manager',
+);
+$vbObj = $obj->addVBObj( );
+
+# Setup an Oracle tablespace monitor
+$obj = new VBTK::DBI::OraTableSpace (
+    DSN            => 'oracle.world',
+    User           => 'system',
+    Auth           => 'manager',
+);
+$vbObj = $obj->addVBObj( );
+
+
+# Setup a custom monitor to watch and graph the max value in a table
+$obj = new VBTK::DBI (
+    Interval       => 5 * 60,
+    DSN            => 'oracle.world',
+    User           => 'system',
+    Auth           => 'manager',
+    Attr           => 'Oracle',
+    VBHeader       => [
+        'Time               Total Entries',
+        '------------------ -------------' ],
+    VBDetail       => [
+        '@<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>',
+        '$time, $data[0]' ],
+    LogDetail      => [
+        '@<<<<<<<<<<<<<<<<< @>>>>>>>>>>>>',
+        '$time, $data[0]' ],
+    SqlClause      =>
+        qq( select max(total) from mytable ),
+);
+
+# Setup the VBObject for this custom monitor
+$vbObj = $obj->addVBObj(
+    VBObjName          => '.oracle.db.mytableTot',
+    TextHistoryLimit   => 50,
+    ReverseText        => 1,
+    # If the max value goes over 50, then warn.  If over 100, then fail.
+    Rules              => {
+        '$data[0] > 50' => 'Warn',
+        '$data[0] > 100' => 'Fail' },
+    StatusUpgradeRules =>
+        'Upgrade to Failed if Warning occurs 5 times in 2 hours',
+    ExpireAfter        => '20 min',
+    Description        => qq(
+        This object monitors the max 'total' from mytable in the oracle database ),
+    RrdTimeCol         => '$log[0]',
+    RrdColumns         => [ '$log[1]' ],
+);
+
+# Now define the graph for this VBObject
+$vbObj->addGraphGroup (
+    GroupNumber    => 1,
+    Labels         => 'max total',
+    Title          => 'Max total for mytable',
+);
+
+
+# Call this at the very end to start looping and checking everything
+VBTK::runAll;

@@ -1,0 +1,6 @@
+Revision history for Perl extension VBTK.
+
+0.01  Wed Jan  9 08:28:17 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n VBTK
+

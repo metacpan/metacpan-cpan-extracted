@@ -1,0 +1,17 @@
+#VRML V1.0 ascii
+Separator {
+	Transform {
+		translation 0 0 -1
+		rotation 0 0 1 0.78539815
+	}
+	Group {
+		Material {
+			diffuseColor	0 0.501960784313725 0
+		}
+		Cube {
+			width	4
+			height	4
+			depth	4
+		}
+	}
+}

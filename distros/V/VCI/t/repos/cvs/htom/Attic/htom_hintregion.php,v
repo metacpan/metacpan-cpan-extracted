@@ -1,0 +1,78 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+//! This class may be used to create a region that will display a hint message.
+/*! The hint region may contain any HTOM_Element object as a content. The hint message will
+ * be displayed when mouse pointer will get to the element object, and disaperas when 
+ * mouse pointer is moved out.
+ */
+class HTOM_HintRegion implements HTOM_Evaluable
+{
+  public function __construct( HTOM_Element $element, $hint, 
+			       $hintStyle=" font-size: 10px; text-align:left; font-family:Verdana;" )
+  {
+    $this->element = $element;
+    $this->hint = $hint;
+    $this->hintStyle = $hintStyle;
+  }
+
+  public function Evaluate()
+  {
+    $mt = new HTOM_Table();
+
+    $hint = new HTOM_Container($this->hint, new HTOM_Style("visibility:hidden; display:inline; position:absolute; border-top: 1px solid white; background: yellow; z-index:10000; width:200" ));
+    
+    $showAction = new HTOM_JScript("document.getElementById('{DIVID}').style.visibility='visible';");
+    $showAction->SetKeywordValue("DIVID",$hint->ID()->GetValue());
+    $hideAction = new HTOM_JScript("document.getElementById('{DIVID}').style.visibility='hidden';");
+    $hideAction->SetKeywordValue("DIVID",$hint->ID()->GetValue());
+
+    $element = new HTOM_Container($this->element);
+    $element->SetJSAction("onmouseover",$showAction);
+    $element->SetJSAction("onmouseout",$hideAction,new HTOM_Style($this->hintStyle));
+
+    $mt->AddElement(0,0,$element);
+    $mt->AddElement(0,1,$hint);
+    return $mt->Evaluate();
+  }
+  private $element;
+  private $hint;
+  private $hintStyle;
+};
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

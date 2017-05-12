@@ -1,0 +1,173 @@
+img {
+    border: 0;
+    vertical-align: middle;
+}
+
+td {
+    padding: 4px;
+}
+
+tr {
+    vertical-align: top;
+    padding: 4px;
+}
+
+h1 {
+	border-bottom:1px solid #E3AB2C;
+	color:#000000;
+	margin-left:50px;
+	text-align:left;
+	width:500px;
+	font-size:18px;
+}
+
+a {
+	color:#3344FF;
+	font-weight:bold;
+}
+
+ul {
+    margin: 0px;
+}
+
+/* The CLASS used in epoll */
+
+.alert {
+    color: red;
+}
+
+.warning {
+    background-color: red;
+}
+
+div.page_box {
+    border-style: outset;
+    border-width: 5px;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 5px;
+}
+
+div.login_box {
+    border-style: outset;
+    border-width: 5px;
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 5px;
+    /* background-color: red; */
+}
+
+div.box {
+    border-style: outset;
+    border-width: 5px;
+    padding: 1em;
+}
+
+.majabs {
+    background-color: #FF9933;
+}
+
+.selected {
+    background-color: #FF9999;
+}
+
+.notselected {
+}
+
+/* The ID used in epoll */
+
+#now {
+    font-size: 0.8em;
+    padding: 0.4em;
+    top: 1em;
+    right: 2em;
+    position: absolute;
+}
+
+#header {
+    background-color:#CCFF99;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+}
+
+#title {
+    font-size: 1.5em;
+}
+
+#menu {
+    font-size: 0.9em;
+}
+
+#footer {
+    padding-top: 1em;
+    margin-top: 1em;
+    text-align: right;
+}
+
+#poll_summary {
+    border-style: outset;
+    border-width: 5px;
+    padding: 1em;
+}
+
+#poll_label {}
+
+#voting_list {}
+
+#poll_running {
+    border-style: outset;
+    border-width: 5px;
+    padding: 1em;
+}
+
+#vote_done {}
+
+#ballot {
+    border-style: inset;
+    border-width: 10px;
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: Silver;
+}
+
+#admin_login {}
+
+#global_poll {
+    margin-left:30px;
+}
+
+#open_poll {
+    color:#E3AB2C;
+}
+
+#comming_poll {
+    color:#E3AB2C;
+}
+
+#closed_poll {
+    color:#E3AB2C;
+}
+
+#ballot_list {}
+
+#results {}
+
+#map_ballot {}
+
+#ballot_to_valid {}
+
+#poll_request {
+	margin-left: auto;
+	margin-right: auto;
+	width: 600px; 
+	text-align: left;
+}
+
+#poll_confirm {}

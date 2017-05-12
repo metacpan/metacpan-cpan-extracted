@@ -1,0 +1,35 @@
+0.08 2015-11-20T15:04:49+01:00
+ - Add 'ffmpeg_pixel_format' parameter.
+
+0.07 2015-11-20T11:36:09+01:00
+ - Add 'ffmpeg_video_codec' parameter.
+ - Add modules to SEE ALSO section in doc.
+ - Improve error (adding ffmpeg command to begin).
+
+0.06 2015-09-18T14:54:05+02:00
+ - Update to new Video::Pattern 0.08 version.
+
+0.05 2015-09-16T11:20:36+02:00
+ - Move author tests to xt/ directory.
+ - Rewrite to Video::Pattern 0.07 version and improve doc for 'duration'
+   parameter.
+
+0.04 2015-09-15T22:28:12+02:00
+ - Add tests for constructor.
+ - Add 'verbose' parameter.
+ - Fix ERRORS section in doc.
+ - Improve SEE ALSO section in doc.
+ - Improve doc for 'image_type' parameter.
+
+0.03 2015-08-07T13:53:06+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Rewrite usage of ffmpeg to FFmpeg::Command class.
+ - Update Module::Install to 1.16 version.
+
+0.02 2014-11-03T00:29:36+01:00
+ - Fix dependencies.
+ - Load Video::Delay::Const, if i am using it.
+
+0.01 2014-11-02T07:54:03+01:00
+ - First version.

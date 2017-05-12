@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Vimana;
+use Vimana::Command;
+require Vimana::Record;
+require Vimana::Command::Search;
+require Vimana::Command::Rate;
+require Vimana::Command::Install;
+require Vimana::Command::Update;
+require Vimana::Command::Remove;
+require JSON::PP;
+
+use Getopt::Long;
+
+$|++;
+my $cmd = shift @ARGV;
+
+if (!$cmd or $cmd =~ /^-{0,2}[Hh](?:elp)?$/) {
+    Vimana::Command->invoke('help', @ARGV);
+    exit 0;
+}
+
+{
+    my $show_version;
+    local *ARGV = [$cmd || ''];
+    GetOptions ('v|version' => \$show_version) or exit;
+
+    if ($show_version || ($cmd && $cmd eq 'version')) {
+	printf ( "Vimana - version %f\n", $Vimana::VERSION );
+	exit 0;
+    }
+}
+
+
+Vimana::Command->invoke($cmd, @ARGV);
+
+=encoding utf8
+
+=head1 NAME
+
+vimana
+
+=head1 USAGE
+
+to update index
+
+    $ vimana update
+
+check rails.vim plugin info
+
+    $ vimana info rails.vim
+
+to search jifty script
+
+    $ vimana search rails
+
+to install rails.vim package:
+
+    $ vimana install rails.vim
+
+
+=head1 AUTHORS
+
+Cornelius E<lt>cornelius.howl@gmail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2003-2005 by You-An Lin (Cornelius) E<lt>cornelius.howl@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut
+
+# vim: ts=8

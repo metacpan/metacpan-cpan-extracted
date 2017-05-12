@@ -1,0 +1,263 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+
+eval "use Time::HiRes 'sleep'";
+
+use Video::Xine;
+use Video::Xine::Stream qw/:status_constants :info_constants/;
+use Video::Xine::Driver::Video qw/:constants/;
+use Video::Xine::Event qw/:type_constants/;
+use Video::Xine::Event::Queue;
+use Video::Xine::Util;
+
+my $config_file      = "$ENV{'HOME'}/.xine/config";
+my $loop             = 0;
+my $null_video       = 0;
+my $null_audio       = 0;
+my $log_level        = 0;
+my $broadcaster_port = 0;
+my $event_wait       = 1;
+my $frame_report     = 0;
+
+my $result = GetOptions(
+    'config=s'           => \$config_file,
+    'loop!'              => \$loop,
+    'no-video'           => \$null_video,
+    'no-audio'           => \$null_audio,
+    'verbosity=i'        => \$log_level,
+    'broadcaster-port=i' => \$broadcaster_port,
+    'event-wait!'        => \$event_wait,
+    'frame-report!'      => \$frame_report
+
+) or pod2usage(2);
+
+pod2usage("$0: No MRLs specified.\n") if ( @ARGV < 1 );
+
+my @mrls = @ARGV;
+
+MAIN: {
+    my $xine = make_xine();
+    $xine->set_param( XINE_ENGINE_PARAM_VERBOSITY, $log_level ) if $log_level;
+
+    my ( $vo, @vo_additional ) = make_video_driver($xine);
+    my ( $ao, @xo_additional ) = make_audio_driver($xine);
+
+    my $stream = $xine->stream_new( $ao, $vo );
+
+    # Set the broadcaster port
+    $stream->set_param( 16, $broadcaster_port );
+
+    # Set up the event queue
+    my $queue = Video::Xine::Event::Queue->new($stream);
+
+  LOOP: while (1) {
+      MRL: foreach my $mrl (@mrls) {
+            $stream->open($mrl)
+              or do {
+                print STDERR "Couldn't open '$mrl': ", $stream->get_error(),
+                  "\n";
+                next MRL;
+              };
+            $stream->play();
+          EVENTLOOP: while (1) {
+                my $event = wait_for_event($queue);
+                if ( $event->get_type() == XINE_EVENT_UI_PLAYBACK_FINISHED ) {
+                    last EVENTLOOP;
+                }
+            }
+
+            if ($frame_report) {
+                report_frames( $mrl, $stream );
+            }
+
+            $stream->close();
+
+            $loop or last LOOP;
+        }
+
+        $vo = undef;
+        $ao = undef;
+
+    }
+}
+
+sub report_frames {
+    my ( $mrl, $stream ) = @_;
+
+    print "'$mrl': ",
+      $stream->get_info(XINE_STREAM_INFO_SKIPPED_FRAMES),   " skipped, ",
+      $stream->get_info(XINE_STREAM_INFO_DISCARDED_FRAMES), " discarded",
+      "\n";
+
+}
+
+sub wait_for_event {
+    my ($queue) = @_;
+
+    if ($event_wait) {
+        return $queue->wait_event();
+    }
+    else {
+        while (1) {
+            my $event = $queue->get_event();
+            if ( defined $event ) {
+                return $event;
+            }
+            else {
+                sleep 1;
+            }
+        }
+    }
+
+}
+
+sub make_null_driver {
+    my ($xine) = @_;
+    return Video::Xine::Driver::Video->new( $xine, 'none' );
+}
+
+sub make_video_driver {
+    my ($xine) = @_;
+
+    if (   ( !$null_video )
+        && ( my ( $x11_driver, @x11_extra ) = make_x11_driver($xine) ) )
+    {
+        return $x11_driver, @x11_extra;
+    }
+    elsif ( my $null_driver = make_null_driver($xine) ) {
+        return $null_driver;
+    }
+    else {
+        die "Unable to create video driver";
+    }
+}
+
+sub make_x11_driver {
+    my ($xine) = @_;
+
+    if ( !defined $ENV{'DISPLAY'} ) {
+        warn "DISPLAY not set\n";
+        return;
+    }
+
+    eval { require X11::FullScreen; };
+    if ($@) {
+        warn("X11::FullScreen module not found\n");
+        return;
+    }
+
+    my $display_str = defined $ENV{'DISPLAY'} ? $ENV{'DISPLAY'} : ':0.0';
+
+    my $display = X11::FullScreen->new($display_str)
+      or do {
+        warn("X11::FullScreen did not initialize");
+        return;
+      };
+
+    my $window = $display->show();
+    $display->sync();
+    my $x11_visual =
+      Video::Xine::Util::make_x11_fs_visual( $display );
+
+    my $driver =
+      Video::Xine::Driver::Video->new( $xine, "auto", XINE_VISUAL_TYPE_X11,
+        $x11_visual, $display )
+      or return;
+
+    return ( $driver, $window, $x11_visual, $display );
+}
+
+sub make_xine {
+    my %config = ();
+
+    if ( defined($config_file) && -e $config_file ) {
+        $config{'config_file'} = $config_file;
+    }
+
+    return Video::Xine->new(%config);
+
+}
+
+sub make_audio_driver {
+    my ($xine) = @_;
+
+    if ($null_audio) {
+        return Video::Xine::Driver::Audio->new( $xine, 'none' );
+    }
+    else {
+        return Video::Xine::Driver::Audio->new($xine);
+    }
+}
+
+__END__
+
+=head1 NAME
+
+xine_play - Plays a movie using Xine
+
+=head1 SYNOPSIS
+
+xine_play [options] [mrl ...]
+
+  Options:
+    --config            Configuration file
+    --loop              Play the list of MRLs forever
+    --no-audio          Turn off audio play
+    --no-video          Turn off video play
+    --verbosity         Set verbosity level (0-2)
+    --broadcaster-port  Set the master port
+    --event-wait        Use event-wait (not event-get) to get events
+    --frame-report      Print out discarded and skipped frames after each event
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--config>
+
+Read Xine configuration from a particular file
+
+=item B<--loop>
+
+Keep replaying the URL list.
+
+=item B<--no-video>
+
+Sets the video driver to 'none', instead of the default X11 driver.
+
+=item B<--no-audio>
+
+Sets the audio driver to 'none', instead of choosing automatically.
+
+=item B<--verbosity>
+
+Set the verbosity level of the Xine engine output. The Xine engine log
+gets printed to STDOUT. Possible values are 0 (no output), 1 (log
+output), or 2 (debug output).
+
+=item B<--broadcaster-port>
+
+If set, Xine will attempt to open a port on which each stream will be
+broadcast. Use 'xine slave://address:port' in another instance to display this data.
+
+=item B<--event-wait>
+
+Causes C<xine_play> to use the less skippy "event-wait" method of
+getting events.
+
+=item B<--frame-report>
+
+Causes C<xine_play> to print out how many skipped or discarded frames
+we had after each MRL.
+
+=back
+
+=head1 DESCRIPTION
+
+C<xine_play> will do its best to play the MRLs provided on the command
+line. See xine(5) for MRL syntax.

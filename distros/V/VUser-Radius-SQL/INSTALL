@@ -1,0 +1,33 @@
+$Id: INSTALL,v 1.1 2006/08/18 18:03:55 perlstalker Exp $
+
+Required Modules: 
+
+VUser-Radius-SQL requires the following modules that are not included with Perl:
+- vuser 0.2.0 or greater
+- DBI
+
+Basic Installation:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+That will install vuser on your system in /usr (or /usr/local) by default.
+You can define a different install path by setting PREFIX when running
+Makefile.PL. For example, to install vuser in your home directory
+
+        perl Makefile.PL PREFIX=~
+
+or to install in /opt
+
+        perl Makefile.PL PREFIX=/opt
+
+The install script will create lib, share and sbin directories in PREFIX.
+
+If you install in a PREFIX that is not included in perl's default library
+paths, you will need to set PERL5LIB to include the new directory. For
+example, if you set PREFIX=/opt, you might add this to your .profile (or
+/etc/profile).
+
+        export PERL5LIB=/opt/lib/perl5/site_perl/

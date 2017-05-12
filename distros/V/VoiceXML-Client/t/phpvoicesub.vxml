@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml xmlns="http://www.w3.org/2001/vxml" version="2.0">
+  <form id="intro">
+  <block>
+  <prompt bargein="false">
+	<audio src="hellojosh.wav" />
+ </prompt>
+</block>
+<subdialog src="#subbie">
+  <param name="fname" value="Josh"/>
+  <param name="lname" value="Turner"/>
+  </subdialog>
+<block>
+  <prompt bargein="false">
+   The date of birth given was, 
+ <value expr="result.dob"/>
+	<audio src="subdiagdone.wav" />
+ </prompt>
+</block>
+<exit />
+</form>
+
+
+<form id="subbie">
+  <var name="dob" />
+  <var name="fname" expr="Josh" />
+  <var name="lname" expr="Turner" />
+  
+<prompt>
+   Please state your date of birth Josh Turner.
+ </prompt>
+  <assign name="dob" expr="19710928" />
+  <return namelist="dob" />
+</form>
+</vxml>

@@ -1,0 +1,59 @@
+
+[% vote = c.model('Vote') %]
+
+
+[% FOREACH id = vote.list_running_vote %]
+[% IF loop.first %]
+<div id="global_poll">
+<div id="open_poll">
+<h1>Vote en cours</h1>
+<table>
+<tbody>
+[% END %]
+<tr>
+<td><lu><li><a href="[% c.uri_for( '/vote', id ) %]">[% vote.vote_info(id).label | html %]</a></lu></td></td>
+<td>&gt;<a href="[% c.uri_for( '/ballot', id ) %]"> Voter</a></td>
+</tr>
+[% IF loop.last %]
+</tbody>
+</table>
+</div>
+[% END %]
+[% END %]
+
+[% FOREACH id = vote.list_comming_vote %]
+[% IF loop.first %]
+<div id="comming_poll">
+<h1>Vote à venir</h1>
+<table>
+<tbody>
+[% END %]
+<tr>
+<td><lu><li><a href="[% c.uri_for( 'vote', id ) %]">[% vote.vote_info(id).label | html %]</a></li></lu></td>
+<td>&gt;<a href="[% c.uri_for( '/admin', id ) %]"> Administrer</a></td>
+</tr>
+[% IF loop.last %]
+</tbody>
+</table>
+</div>
+[% END %]
+[% END %]
+
+
+[% FOREACH id = vote.list_closed_vote %]
+[% IF loop.first %]
+<div id="closed_poll">
+<h1>Vote Ferm&eacute;</h1>
+<table>
+<tbody>
+[% END %]
+<tr>
+<td><lu><li><a href="[% c.uri_for( 'vote', id ) %]">[% vote.vote_info(id).label | html %]</a></lu></td></td>
+</tr>
+[% IF loop.last %]
+</tbody>
+</table>
+</div>
+</div>
+[% END %]
+[% END %]

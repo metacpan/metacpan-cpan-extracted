@@ -1,0 +1,4 @@
+/var/log/playback_machine.log {
+    rotate 5
+    daily
+}

@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         VisualDreams-Yubikey-online
+version:      0.06
+version_from: online.pm
+installdirs:  site
+author:
+    - Gunther Voet <oss@xsrv.net>
+license:            perl
+requires:
+    Digest::HMAC_SHA1:             0
+    LWP::Simple:                   0
+    MIME::Base64:                  0
+    URI::Escape:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

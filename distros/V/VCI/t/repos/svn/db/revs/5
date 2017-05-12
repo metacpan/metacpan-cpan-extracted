@@ -1,0 +1,33 @@
+PLAIN
+K 8
+branches
+V 16
+dir 9.0.r4/27757
+K 4
+tags
+V 16
+dir a.0.r4/27825
+K 5
+trunk
+V 16
+dir b.0.r4/27637
+END
+ENDREP
+id: 0.0.r5/115
+type: dir
+pred: 0.0.r4/28228
+count: 5
+text: 5 0 102 102 2adedcfe6b9873e0f86081267004af08
+cpath: /
+copyroot: 0 /
+
+6.0.r3/20440 delete false false /GQProtocol_HalfLife.inc.php
+
+8.0.r3/20735 delete false false /GQTemplate_Dump.inc.php
+
+7.0.r3/20874 delete false false /GQProtocol_SourceEngine.inc.php
+
+5.0.r3/21023 delete false false /GQProtocol_GameSpy2.inc.php
+
+
+115 243

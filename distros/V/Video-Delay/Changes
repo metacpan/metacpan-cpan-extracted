@@ -1,0 +1,36 @@
+0.06 2015-09-16T20:02:25+02:00
+ [Common]
+ - Move author tests to xt/ directory.
+
+0.05 2015-09-15T21:30:37+02:00
+ [Common]
+ - Improve LICENSE AND COPYRIGHT sections in doc.
+ - Improve SEE ALSO sections in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2014-11-03T12:55:54+01:00
+ [Video::Delay::Func]
+ - Fix test (precision).
+
+0.03 2014-11-03T07:29:41+01:00
+ [Video::Delay::Array]
+ - Add tests.
+
+ [Video::Delay::Const]
+ - Add tests.
+
+ [Video::Delay::Func]
+ - Add callback for 'func' parameter.
+ - Add EXAMPLE section to doc.
+ - Add error check for 'func' parameter.
+ - Add tests.
+ - Improve error message.
+ - Rewrite default value of 'func' to subroutine reference.
+
+0.02 2014-10-31T08:04:17+01:00
+ - Add README file.
+ - Add Video::Delay module.
+
+0.01 2014-10-31T07:56:31+01:00
+ - First version.

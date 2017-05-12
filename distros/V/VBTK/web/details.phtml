@@ -1,0 +1,162 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # Setup variables used in the commonHeader.phtml file
+  $refresh=120;
+
+  # Setup variables used in the commonTabs.phtml file
+  my $currTab = "Info";
+-->
+  <!--#include virtual="/commonHeader.phtml" -->
+  <!--#include virtual="/checkRemoteServers.phtml -->
+  <!--#include virtual="/commonTabs.phtml" -->
+
+<!--#perl 
+
+  my $status                  = $vbObj->getStatus;
+  my $statusColor             = $STATUS_FGCOLOR{$status};
+  my $timestampText           = $vbObj->getTimestampText;
+  my $expirationText          = $vbObj->getExpirationText;
+  my $expireAfter             = $vbObj->getExpireAfter;
+  my $description             = $vbObj->getDescription;
+  my @statusUpgradeRuleList   = $vbObj->getUpgradeRuleObjText;
+  my @statusChangeActionList  = $vbObj->getChangeActionObjText;
+  my $interval                = $vbObj->getInterval;
+  my $baselineDiffStatus      = $vbObj->getBaselineDiffStatus;
+  my $runningFrom             = $vbObj->getRunningFrom;
+  my $scriptName              = $vbObj->getScriptName;
+  my $logFile                 = $vbObj->getLogFile;
+
+  my $template                = $vbObj->getTemplate;
+  my $tPattern                = $template->getPattern;
+  my $tExpireAfter	      = $template->getExpireAfter;
+  my $tDescription            = $template->getDescription;
+  my @tStatusUpgradeRuleList  = $template->getUpgradeRuleObjText;
+  my @tStatusChangeActionList = $template->getChangeActionObjText;
+
+  my ($descriptionMsg,$expireAfterMsg,$changeActionMsg,$upgradeRuleMsg);
+
+  # Default description using template values if not set  
+  if((! $description)&&($tDescription))
+  {
+  	$descriptionMsg = '&nbsp;(template)';
+  	$description = $tDescription;
+  }
+
+  # Default expireAfter using template values if not set
+  if((! $expireAfter)&&($tExpireAfter))
+  {
+  	$expireAfterMsg = '&nbsp;(template)';
+  	$expireAfter = $tExpireAfter;
+  }
+
+  # Default upgradeRuleList using template values if not set  
+  if((@statusUpgradeRuleList < 1)&&(@tStatusUpgradeRuleList > 0))
+  {
+  	$upgradeRuleMsg = '&nbsp;(template)';
+  	@statusUpgradeRuleList = @tStatusUpgradeRuleList;
+  }
+
+  # Default changeActionList using template values if not set  
+  if((@statusChangeActionList < 1)&&(@tStatusChangeActionList > 0))
+  {
+  	$changeActionMsg = '&nbsp;(template)';
+  	@statusChangeActionList = @tStatusChangeActionList;
+  }
+
+-->  
+
+<!-- table of field and values -->
+<table width="620" border="0">
+  <tr valign="top">
+    <th width="195" align=right>Test:</th>
+    <td width="425">&nbsp
+      <!--#perl 
+        my @segments = split(/\./,$name);
+        my $lastSegName = pop(@segments);
+        my ($segName,$fullName);
+        foreach my $pos (0..($#segments)) 
+        { 
+          $segName = $segments[$pos];
+          $fullName = join('.',@segments[0..$pos]);
+       -->
+        <A HREF="$matrixUrl?name=$fullName">$segName</A>.
+      <!--#perl } -->
+      <A HREF="$statusUrl?name=$name">$lastSegName</A>
+    </td>
+  </tr>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Description${descriptionMsg}:</TH>
+    <TD>$description</TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Current Status:&nbsp</TH>
+    <TD><FONT COLOR='$statusColor'>$status</FONT></TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Last Test:&nbsp</TH>
+    <TD>$timestampText</TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Expiration:</TH>
+    <TD>$expirationText</TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Expire&nbsp;After${expireAfterMsg}:</TH>
+    <TD>$expireAfter</TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Interval:</TH>
+    <TD>$interval seconds</TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Actions${changeActionMsg}:</TH>
+    <TD>
+      <ul>
+        <!--#perl foreach my $str (@statusChangeActionList) { -->
+          <li>$str</li>
+        <!--#perl } -->
+      </ul>
+    </TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Upgrade Rules${upgradeRuleMsg}:</TH>
+    <TD>
+      <ul>
+        <!--#perl foreach my $str (@statusUpgradeRuleList) { -->
+          <li>$str</li>
+        <!--#perl } -->
+      </ul>
+    </TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Template:</TH>
+    <TD>$tPattern</TD>
+  </TR>
+  
+  <TR VALIGN="TOP">
+    <TH align="right">Running&nbsp;From:</TH>
+    <TD>$runningFrom</TD>
+  </TR>
+  
+  <TR VALIGN="TOP">
+    <TH align="right">Script&nbsp;Name:</TH>
+    <TD>$scriptName</TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Log&nbsp;File:</TH>
+    <TD>$logFile</TD>
+  </TR>
+</table>
+
+<!--#include virtual="/commonFooter.phtml" -->

@@ -1,0 +1,5 @@
+
+;has
+has '<<ACC>>' => (is => '<<PERM>>', isa => '<<PROTOTYPE>>');
+<<>>
+;end

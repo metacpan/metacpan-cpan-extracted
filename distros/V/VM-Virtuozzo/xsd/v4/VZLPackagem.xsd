@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/packagem" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/packagem" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:element name="packagem" type="packagemType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Package management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="packagemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="install"/>
+						<xs:element ref="remove"/>
+						<xs:element ref="update"/>
+						<xs:element ref="list"/>
+						<xs:element ref="get_info"/>
+						<xs:element ref="clean"/>
+						<xs:element ref="fetch"/>
+						<xs:element ref="migrate"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="packages" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Package structure.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="pkg_paramsType"/>
+	<xs:complexType name="package_linuxType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:packageType">
+				<xs:sequence>
+					<xs:element name="path" type="xs:base64Binary" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Where get package</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="package_rpmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="package_linuxType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="package_debType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="package_linuxType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="install">
+		<xs:annotation>
+			<xs:documentation>Install packages into Environment. Packages is not  optional. Returns "packages"/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="pkg_setup_cmdType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove">
+		<xs:annotation>
+			<xs:documentation>Remove packages from Environment. Packages is not  optional. Returns  "packages"/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="pkg_cmdType">
+					<xs:sequence>
+						<xs:element name="options" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="check" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Instead of real action do the check.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="force" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Force the operation if possible.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="dependencies" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Remove all packages dependent on these ones.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="update">
+		<xs:annotation>
+			<xs:documentation>Update package(s) in Environment. Returns "packages"/Error. If specified vz_emplate and if path is not specified "update" makes cache update only.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="pkg_setup_cmdType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list">
+		<xs:annotation>
+			<xs:documentation>List packages. Returns  "packages" or Error.
+1. Eid is defined: list packages installed into eid
+2. Eid is absent, packages are defined: list packages compatible with packages</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="pkg_cmdType">
+					<xs:sequence>
+						<xs:element name="options" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+										<xs:annotation>
+											<xs:documentation>Filter only for the provided types of packages. Look at Parallels Agent XML API reference for values.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="summary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Get summary for packages</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="compatible" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Compatible to packages</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_info">
+		<xs:annotation>
+			<xs:documentation>Get information about packages. Packages is not  optional. Returns "packages" with all of its properties or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="pkg_cmdType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="clean">
+		<xs:annotation>
+			<xs:documentation>Clean package manager cache. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="pkg_setup_cmdType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>don't use installation_package/package and installation_package/path simultaneously. path is ignored when valid package is available. Note: dependencies option is ignored.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="pkg_paramsType">
+				<xs:sequence>
+					<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+					<xs:element name="installation_package" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:choice>
+								<xs:element name="package" type="vzlt:packageType"/>
+								<xs:element name="path" type="xs:base64Binary"/>
+							</xs:choice>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="options" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="check" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Instead of real action do the check.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="force" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Force the operation if possible.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="dependencies" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Remove all packages dependent on these ones.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="pkg_cmdType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="pkg_paramsType">
+				<xs:sequence>
+					<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+					<xs:element ref="packages" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="packages" type="packagesType"/>
+	<xs:element name="package" type="vzlt:packageType"/>
+	<xs:element name="fetch">
+		<xs:annotation>
+			<xs:documentation>Download and convert packages for  specified  OS and its application templates.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="migrate">
+		<xs:annotation>
+			<xs:documentation>Migrates packages from src Environment to dst Environments. Returns "packages"/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+				<xs:element name="src" type="vzlt:connection_infoType" minOccurs="0"/>
+				<xs:element name="dst" type="vzlt:connection_infoType" minOccurs="0"/>
+				<xs:element name="options" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="policy" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="ignore_error" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>In case of multiple package migrate. Don't terminate on first error. Reports mix of "packages" and Error. </xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="packagesType">
+		<xs:choice>
+			<xs:element ref="package" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="installResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="removeResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_infoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cleanResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="fetchResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="migrateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="packages"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 77ad7871c276b1ef2a226d850bf4356152c4644e Build.PL
+SHA1 90cdf2fa29101ed980201b473e6a81ce54172175 Changes
+SHA1 9d2649315bee0c5bec46fbdf41b627309c26a0af LICENSE
+SHA1 b9afab47d1af1d1c61351711aee990a7bdb6b4ae MANIFEST
+SHA1 950ee503d1aae5ba7436471278e2012c88b5aad6 MANIFEST.SKIP
+SHA1 d0cd3f1c7b07c663533d68d41bde27ee9b4d664b META.yml
+SHA1 e505dbbacdfd27db00c4ee1cf5b866575ddaec1f README
+SHA1 9e1a3935d77b26c76ba98a4112023f2a1d22e789 examples/fourcc.pl
+SHA1 db4ebcf2a51a58e44fec8003863d065ffb53ef91 examples/peekvideo.pl
+SHA1 e2ab44142a0e55cd760e12d72dc727b550ad0a70 inc/My/Builder.pm
+SHA1 b942cbacf10c37b101153df3ddea2d479ee253d0 lib/Video/FourCC/Info.pm
+SHA1 4aeecf15b8e2edede3536974277ebcb3210dc254 lib/Video/FourCC/source-data.sql
+SHA1 645b35a8bd83ceebe33587199abc20714de85320 t/00signature.t
+SHA1 f39500ac2345602b180327443ddcb535c2030961 t/01manifest.t
+SHA1 f1e0b8e871b8f353d69e15e539143ee3e3ab705a t/02compile.t
+SHA1 9f63f29810a18baf34dcb851ce07348c81a4c537 t/03core.t
+SHA1 c677f055999bb68dea970995e3b0048322fb7df6 t/03exceptions.t
+SHA1 4a01916e822e2e9c68ea47e55001bd9fe7c808aa t/03fallback.t
+SHA1 ff03bdf8e3a624020a8af1ede2f09dda83477d5b t/97pod.t
+SHA1 0b82ea13e9338a4309fa6d0852a7fe566d7fce84 t/98pod-coverage.t
+SHA1 06d54eebf6bfdf33a9985d0efe269c1ee3e76439 t/99data.t
+SHA1 9fe6231b381701823f57cd1ba7282609a9f87539 t/99kwalitee.t
+SHA1 3cf0f796fdd9d7041f1cc851b0962474747d3a07 t/99meta.t
+SHA1 4288a7a95bc505f1beeac6fa15f6d575ebf3e0db t/99min-perl.t
+SHA1 525f9bbb635611635f9676eef8330addbd4d2944 t/99portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBCAAGBQJLMAy4AAoJEPPC9oiiHLZIqUUQALpsiehTXRCgkJAb5+bSyhE1
+Nzf7zraFMP2TjWotQ1xgcrZ3MwjXId4Te+qa8NT1T/uptU9dqQkvGKJGmQ/OIDs7
+HIBWi0FEB1qkVf4tVaM8iiydP/lcNnlT0LXs2Ph+D8AInXQ71r0nZDJrckNCIo9d
+ft9zeRr4MDnd7VItmZyw9NxKcQ/w8syUYiFCopH2NFZo8UnTQni5/4mmbgJkAsSj
+Grv/u1dC6q9BXp/Om9oU7EHxk2N/wGby222YxMz6qKsL14LAgX9pQM3vE8nhc3Dq
+xw8kIsz1v+cpJB45O2cCg91gPI8oaXLTvdnWHLkWVbXXGfJaUSQndzbXDFfz7Qp6
+9EhKYpHIeaROY5iBQYJ8jDcKbAYVeQbocWj4RYYGu7CHaHdlQ/KeddPzQ0UpA2lA
+0Z60ogQQFGxIAHf2cnkaHGL11H8q3wGGGvqVyNaJs9s8hvX0FwNnLF3ASzr77X1D
+iCiv9Aza9an8WVhA1VWd1LUnp6SpFs7eWLC7Uq/Cn6GlJAGMxxS5ZVvQDfQXN6l3
+tBhYRg5LwDaEDq64zu3tx7+7H2ebdZdOhCJtxtciXt/7Wx18BIImsMu5slHW9Xvu
+0ZeQgXYSWe9P7DHmpSDx2NWRkCEhwPhffkg6IJXGAecT5WzYCfHVy8GO3+AksdUc
+hZJFDR2WK+XtLh1dBteA
+=Luj/
+-----END PGP SIGNATURE-----

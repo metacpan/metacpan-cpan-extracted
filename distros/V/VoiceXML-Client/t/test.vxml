@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<vxml version="2.1">
+	<var name="box" />
+	<var name="step" />
+	<var name="jumptobox" />
+	
+	<assign expr="100" name="box" />
+	<assign expr="box + 42" name="step" />
+	
+	<form id="jumptotheend">
+		<goto nextitem="getouttahere" />
+	</form>
+	
+	<form id="nonebox">
+  	
+		<field name="movetosel" type="digits" numdigits="1">
+	  	
+			
+			
+			
+			
+			
+			<prompt timeout="5s">
+				<audio src="/home/malcalypse/Projects/vocpmessages/root.rmd" />
+			</prompt>
+			
+			
+			 
+			 
+			
+			 	
+			 	<noinput>
+					<audio src="/home/malcalypse/Projects/vocpmessages/system/entersomething.rmd" />
+					<reprompt />
+				</noinput>
+				<noinput count="3">
+					<audio src="/home/malcalypse/Projects/vocpmessages/system/notworkingout.rmd" />
+					<disconnect />
+				</noinput>
+
+			
+			
+			
+			
+			
+			
+			
+			  <filled>
+			  
+				
+				
+					<if cond="movetosel == 0">
+				
+					    <assign expr="998" name="box" />
+			  
+				
+				
+				 	 <elseif cond="movetosel == 1" />
+				
+					    <assign expr="011" name="box" />
+			  
+				
+				
+				 	 <elseif cond="movetosel == 2" />
+				
+					    <assign expr="012" name="box" />
+			  
+				
+				
+				 	 <elseif cond="movetosel == 3" />
+				
+					    <assign expr="300" name="box" />
+			  
+				
+				
+				 	 <elseif cond="movetosel == 4" />
+				
+					    <assign expr="500" name="box" />
+			  
+			  	
+			  		 <elseif cond="movetosel &lt; 100" />
+					    <audio src="/home/malcalypse/Projects/vocpmessages/system/invalidselection.rmd" />
+					    <reprompt />
+					  <else />
+					     <assign name="jumptobox" expr="movetosel" />
+					     <assign name="step" expr="'directboxnum'" />
+					     <submit next="vocp.cgi" namelist="box jumptobox step" />
+				
+					 </if>
+			   </filled>
+			 
+		</field>
+	</form>
+	<form id="boxselected">
+		<submit next="vocp.cgi" namelist="box" />
+	</form>
+	<form id="getouttahere">
+		<disconnect />
+	</form>
+</vxml>
+

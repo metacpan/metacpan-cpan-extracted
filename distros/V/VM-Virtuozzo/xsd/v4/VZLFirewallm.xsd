@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/firewallm" elementFormDefault="qualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/firewallm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="firewallm" type="firewallmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Firewall Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="firewallmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get" minOccurs="0"/>
+						<xs:element ref="set" minOccurs="0"/>
+						<xs:element ref="delete" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="is_enabled" minOccurs="0"/>
+						<xs:element ref="enable" minOccurs="0"/>
+						<xs:element ref="disable" minOccurs="0"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="rule" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="status" minOccurs="0"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="port_rangeType">
+		<xs:annotation>
+			<xs:documentation>Firewall port range.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="first_port" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Start of the range.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="last_port" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>End of the range.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ruleType">
+		<xs:annotation>
+			<xs:documentation>Firewall rule.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="protocol" type="vzlt:transport_type">
+				<xs:annotation>
+					<xs:documentation>tcp or udp</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="chain" type="chainType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Chain to which the rule is applied. (INPUT, OUTPUT, FORWARD).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="policy" type="policyType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>What to do with such a packet. (ACCEPT, DROP, REJECT).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="allowed" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>1 means that the protocol is enabled, when firewall is switched on.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="src_addr" type="vzlt:net_addressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Source address .</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dst_addr" type="vzlt:net_addressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Destination address.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="src_ports" type="port_rangeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Source ports range.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dst_ports" type="port_rangeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Destination ports range.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="input_iface" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Input interface.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="output_iface" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Output interface.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="chainType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="INPUT"/>
+			<xs:enumeration value="OUTPUT"/>
+			<xs:enumeration value="FORWARD"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="policyType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ACCEPT"/>
+			<xs:enumeration value="DROP"/>
+			<xs:enumeration value="REJECT"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="get">
+		<xs:annotation>
+			<xs:documentation>List all of the firewall rules. Returns list of "rule"s or Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="set">
+		<xs:annotation>
+			<xs:documentation>Add a rule to the firewall, or bans/permits the existing one. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="rule" type="ruleType" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Firewall rule to set.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="delete">
+		<xs:annotation>
+			<xs:documentation>Delete a rule from the firewall. If "rule" is not specified delete all of the rules. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="rule" type="ruleType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Firewall rule to delete.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="is_enabled">
+		<xs:annotation>
+			<xs:documentation>Check if the firewall is enabled. Returns "status"/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="enable">
+		<xs:annotation>
+			<xs:documentation>Enable the firewall. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="disable">
+		<xs:annotation>
+			<xs:documentation>Disable the firewall. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="rule" type="ruleType">
+		<xs:annotation>
+			<xs:documentation>Firewall rule structure.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="status" type="xs:boolean">
+		<xs:annotation>
+			<xs:documentation>Result of is_enabled command. 1 means enabled.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="getResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="rule" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="setResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deleteResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="is_enabledResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="status"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="enableResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="disableResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

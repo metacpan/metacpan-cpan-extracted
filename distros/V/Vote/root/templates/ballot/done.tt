@@ -1,0 +1,10 @@
+[% INCLUDE 'includes/poll.tt' %]
+
+<div id="ballot" class="page_box">
+<p>Vous venez de voter, le numéro de votre bulletin est le <b>[% ballotid %]</b>.</p>
+
+<p>Notez le si vous désirez reconnaître votre vote au dépouillement.</p> 
+
+<p>Les résultats seront disponibles
+<a href="[% c.uri_for('/vote', voteid) %]">Ici</a>.</p>
+</div>

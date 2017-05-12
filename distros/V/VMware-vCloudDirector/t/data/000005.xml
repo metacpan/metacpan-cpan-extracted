@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<Vdc xmlns="http://www.vmware.com/vcloud/v1.5" xmlns:vmext="http://www.vmware.com/vcloud/extension/v1.5" status="1" name="Example Working VDC" id="urn:vcloud:vdc:3425485b-e7c8-11e6-9cfe-a71fcbe754fd" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd" type="application/vnd.vmware.vcloud.vdc+xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vmware.com/vcloud/extension/v1.5 http://vcloud.example.com/api/v1.5/schema/vmwextensions.xsd http://www.vmware.com/vcloud/v1.5 http://vcloud.example.com/api/v1.5/schema/master.xsd">
+    <VCloudExtension required="false">
+        <vmext:VimObjectRef>
+            <vmext:VimServerRef href="https://vcloud.example.com/api/admin/extension/vimServer/34257f3d-e7c8-11e6-9cfe-ef15b30bb456" name="VC" type="application/vnd.vmware.admin.vmwvirtualcenter+xml"/>
+            <vmext:MoRef>resgroup-112</vmext:MoRef>
+            <vmext:VimObjectType>RESOURCE_POOL</vmext:VimObjectType>
+        </vmext:VimObjectRef>
+    </VCloudExtension>
+    <Link rel="up" href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f" type="application/vnd.vmware.vcloud.org+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/metadata" type="application/vnd.vmware.vcloud.metadata+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/uploadVAppTemplate" type="application/vnd.vmware.vcloud.uploadVAppTemplateParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/media" type="application/vnd.vmware.vcloud.media+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/instantiateOvf" type="application/vnd.vmware.vcloud.instantiateOvfParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/instantiateVAppTemplate" type="application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/cloneVApp" type="application/vnd.vmware.vcloud.cloneVAppParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/cloneVAppTemplate" type="application/vnd.vmware.vcloud.cloneVAppTemplateParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/cloneMedia" type="application/vnd.vmware.vcloud.cloneMediaParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/captureVApp" type="application/vnd.vmware.vcloud.captureVAppParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/action/composeVApp" type="application/vnd.vmware.vcloud.composeVAppParams+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/disk" type="application/vnd.vmware.vcloud.diskCreateParams+xml"/>
+    <Link rel="edgeGateways" href="https://vcloud.example.com/api/admin/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/edgeGateways" type="application/vnd.vmware.vcloud.query.records+xml"/>
+    <Link rel="add" href="https://vcloud.example.com/api/admin/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/networks" type="application/vnd.vmware.vcloud.orgVdcNetwork+xml"/>
+    <Link rel="orgVdcNetworks" href="https://vcloud.example.com/api/admin/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd/networks" type="application/vnd.vmware.vcloud.query.records+xml"/>
+    <Description/>
+    <AllocationModel>AllocationVApp</AllocationModel>
+    <ComputeCapacity>
+        <Cpu>
+            <Units>MHz</Units>
+            <Allocated>0</Allocated>
+            <Limit>0</Limit>
+            <Reserved>0</Reserved>
+            <Used>7800</Used>
+            <Overhead>0</Overhead>
+        </Cpu>
+        <Memory>
+            <Units>MB</Units>
+            <Allocated>0</Allocated>
+            <Limit>0</Limit>
+            <Reserved>0</Reserved>
+            <Used>12288</Used>
+            <Overhead>139</Overhead>
+        </Memory>
+    </ComputeCapacity>
+    <ResourceEntities>
+        <ResourceEntity href="https://vcloud.example.com/api/vAppTemplate/vappTemplate-342580ae-e7c8-11e6-9cfe-ca405b580e3a" name="CentOS Linux 6.6 x64 (Minimal Install)" type="application/vnd.vmware.vcloud.vAppTemplate+xml"/>
+        <ResourceEntity href="https://vcloud.example.com/api/vAppTemplate/vappTemplate-34258144-e7c8-11e6-9cfe-943d19dd3426" name="Windows Server 2012 R2 Standard Edition" type="application/vnd.vmware.vcloud.vAppTemplate+xml"/>
+        <ResourceEntity href="https://vcloud.example.com/api/vAppTemplate/vappTemplate-342581c7-e7c8-11e6-9cfe-f4f5bafe918a" name="CentOS Linux 6.6 x64 (Minimal Install) v2" type="application/vnd.vmware.vcloud.vAppTemplate+xml"/>
+        <ResourceEntity href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca" name="CentOS Linux 6.6 x64 (Minimal Install)" type="application/vnd.vmware.vcloud.vApp+xml"/>
+        <ResourceEntity href="https://vcloud.example.com/api/vApp/vapp-342582ac-e7c8-11e6-9cfe-ea7435803cc3" name="Windows Server 2012 R2 Standard Edition 2" type="application/vnd.vmware.vcloud.vApp+xml"/>
+        <ResourceEntity href="https://vcloud.example.com/api/vApp/vapp-34258326-e7c8-11e6-9cfe-f83fead57d3f" name="vApp_system_2" type="application/vnd.vmware.vcloud.vApp+xml"/>
+        <ResourceEntity href="https://vcloud.example.com/api/vApp/vapp-342583b0-e7c8-11e6-9cfe-af000f5cd0e8" name="Windows Server 2012 R2 Standard Edition" type="application/vnd.vmware.vcloud.vApp+xml"/>
+    </ResourceEntities>
+    <AvailableNetworks>
+        <Network href="https://vcloud.example.com/api/network/34254a1d-e7c8-11e6-9cfe-b36a4e644096" name="org net" type="application/vnd.vmware.vcloud.network+xml"/>
+    </AvailableNetworks>
+    <Capabilities>
+        <SupportedHardwareVersions>
+            <SupportedHardwareVersion>vmx-04</SupportedHardwareVersion>
+            <SupportedHardwareVersion>vmx-07</SupportedHardwareVersion>
+            <SupportedHardwareVersion>vmx-08</SupportedHardwareVersion>
+            <SupportedHardwareVersion>vmx-09</SupportedHardwareVersion>
+        </SupportedHardwareVersions>
+    </Capabilities>
+    <NicQuota>0</NicQuota>
+    <NetworkQuota>5</NetworkQuota>
+    <UsedNetworkCount>1</UsedNetworkCount>
+    <VmQuota>100</VmQuota>
+    <IsEnabled>true</IsEnabled>
+    <VdcStorageProfiles>
+        <VdcStorageProfile href="https://vcloud.example.com/api/vdcStorageProfile/3425842a-e7c8-11e6-9cfe-96d1601c41e2" name="Standard Disk" type="application/vnd.vmware.vcloud.vdcStorageProfile+xml"/>
+        <VdcStorageProfile href="https://vcloud.example.com/api/vdcStorageProfile/342585ff-e7c8-11e6-9cfe-f68b770f01d4" name="High Performance Disk" type="application/vnd.vmware.vcloud.vdcStorageProfile+xml"/>
+    </VdcStorageProfiles>
+</Vdc>

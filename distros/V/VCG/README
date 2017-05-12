@@ -1,0 +1,30 @@
+VCG version 0.1
+===================
+
+This module provides an interface to to the vcg graphing tool. It supports a 
+limited selection of options and file formats.
+
+This module is based very heavily on Leon Brocard's GraphViz module, it tries
+to provide a similar interface to offer some sense of consistency
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IPC::Run
+
+COPYRIGHT AND LICENCE
+
+This code is released and distributed under the same license as perl itself.
+
+Copyright (C) 2003 Aaron J Trevena, Leon Brocard
+

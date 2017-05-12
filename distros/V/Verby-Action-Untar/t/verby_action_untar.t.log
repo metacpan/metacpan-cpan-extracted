@@ -1,0 +1,12 @@
+[Mon Mar 31 15:39:10 2008] [info] Starting test t/verby_action_untar.t, pid = 99518
+[Mon Mar 31 15:39:11 2008] [info] TAP: ok 1 - use Verby::Action::Untar;
+[Mon Mar 31 15:39:11 2008] [info] TAP: ok 2 - verify failed
+[Mon Mar 31 15:39:11 2008] [info] untarring 'foo.tar.gz' into '/var/folders/Pu/PuT3KPqEHRCOpJzmhly+3E+++TI/-Tmp-/5AMFbqb4GZ'
+[Mon Mar 31 15:39:11 2008] [info] started Archive::Tar child
+[Mon Mar 31 15:39:11 2008] [info] program Archive::Tar child closed all outputs
+[Mon Mar 31 15:39:12 2008] [debug] sigchild 99521
+[Mon Mar 31 15:39:12 2008] [info] Wheel::Run subsession closing
+[Mon Mar 31 15:39:12 2008] [info] finished untarring
+[Mon Mar 31 15:39:12 2008] [info] TAP: ok 3 - verify passed
+[Mon Mar 31 15:39:12 2008] [info] Finishing test t/verby_action_untar.t
+[Mon Mar 31 15:39:12 2008] [info] TAP: 1..3

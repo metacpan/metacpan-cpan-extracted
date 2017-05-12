@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzapackagem" elementFormDefault="qualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzat="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns:vzlpackagem="http://www.swsoft.com/webservices/vzl/4.0.0/packagem" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzapackagem" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" schemaLocation="VZACommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/packagem" schemaLocation="../../vzl/4.0.0/VZLPackagem.xsd"/>
+	<xs:element name="vzapackagem" type="vzapackagemType">
+		<xs:annotation>
+			<xs:documentation>Template Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzapackagemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlpackagem:packagemType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="packages" type="vzlpackagem:packagesType"/>
+	<xs:element name="package_vztemplate" type="vzat:package_vztemplateType"/>
+</xs:schema>

@@ -1,0 +1,41 @@
+---
+abstract: 'expand variables exist at any level.'
+author:
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Variable-Expand-AnyLevel
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Variable::Expand::AnyLevel:
+    file: lib/Variable/Expand/AnyLevel.pm
+    version: '0.03'
+requires:
+  PadWalker: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/tsucchi/p5-Variable-Expand-AnyLevel/issues
+  homepage: https://github.com/tsucchi/p5-Variable-Expand-AnyLevel
+  repository: git://github.com/tsucchi/p5-Variable-Expand-AnyLevel.git
+version: '0.03'
+x_authority: cpan:TSUCCHI
+x_contributors:
+  - 'tsucchi <takuya.tsuchida at gmail.com>'

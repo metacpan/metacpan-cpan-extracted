@@ -1,0 +1,68 @@
+NAME
+    Vitacilina - ¡Ah, qué buena medicina!
+
+DESCRIPTION
+    A simple feeds engine exporter that uses YAML to get list of feeds and
+    TT as templating system. Some people would call it an aggregator. It was
+    intended to be a reliable Planet (<http://planetplanet.org>)
+    alternative, then some development ideas evolved into rFeed
+    (http://github.com/damog/rfeed). Vitacilina runs on production services
+    on a couple of systems.
+
+SYNOPSIS
+     use Vitacilina;
+
+     my $v = Vitacilina->new(
+       config => 'config.yaml',
+       template => 'template.tt',
+       output => 'output.html',
+       limit => '20',
+     );
+
+     $v->render;
+
+FILES
+  config
+    The "config" parameter specifies the path to a YAML file specifying a
+    list of feeds. Use this format:
+
+     http://myserver.com/myfeed:
+       name: Some Cool Feed
+     http://feeds.feedburner.com/InfinitePigTheorem:
+       name: InfinitePigTheorem
+     ...
+
+  template
+    A "Template::Toolkit" file which will be taken as the template for
+    output. Format:
+
+     [% FOREACH p IN data %]
+      <a href="[% p.permalink %]">[% p.title %]</a>
+       by <a href="[% p.channelUrl %]">[% p.author %]</a>
+      <br />
+     [% END %]
+
+    The "data" is an ordered array with a bunch of hashes with the simple
+    data such as "permalink", "title", "channelUrl", "author", etc.
+
+  output
+    File path where the output will be written.
+
+EXAMPLES
+    Take a look at the "examples/" directory for fully working example.
+
+SEE ALSO
+    Git repository is located at <http://github.com/damog/vitacilina>. Also
+    take a look at the Stereonaut! blog where similar developments from the
+    author are announced and sampled, <http://log.damog.net/>.
+
+AUTHOR
+    David Moreno, david@axiombox.com. Alexandr Ciornii contributed with
+    patches.
+
+COPYRIGHT
+    Copyright (C) 2009 by David Moreno.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

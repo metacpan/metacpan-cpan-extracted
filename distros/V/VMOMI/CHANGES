@@ -1,0 +1,82 @@
+==================================================
+Changes from 2016-05-03 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.02 at 2017-05-03 15:10:26 +0000
+-----------------------------------------
+
+  Change: 93e8cb0482a0618c9413dad5a528978ec03eb9cd
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-03 11:02:45 +0000
+
+    removed duplicated integration test 
+
+  Change: 1042d52f7b9056d547f357c0cafe0c06ac37b275
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-03 10:58:05 +0000
+
+    added use strict & use warnings to generated files and added simple
+    integration tests 
+
+  Change: 675c25608321087ee1a6b50d04e9b37d05ab6d96
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-03 00:14:05 +0000
+
+    define module prereqs through cpanfile 
+
+  Change: acdc716671cadad3f7ce6a670a70b1a65f10c614
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-02 23:09:09 +0000
+
+    Added manual prereq for LWP::Protocol::https to dist.ini 
+
+-----------------------------------------
+version 0.01 at 2017-05-02 23:15:41 +0000
+-----------------------------------------
+
+  Change: a96eef6ae19b261505f4688746abfe8114e9f318
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-02 19:15:41 +0000
+
+    edit to VMOMI.pm POD 
+
+  Change: 45c200bb835336c5466dd8153c84ed09303ab655
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-02 18:42:02 +0000
+
+    added POD to VMOMI.pm 
+
+  Change: 6176753a58757227e2a713558f0d7d2d3da8c14b
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-02 12:49:38 +0000
+
+    Added function VMOMI::find_entities and script examples/list_vms.pl 
+
+  Change: 0847d644fa047986009d2d646e7f2e0cb1385b3f
+  Author: Reuben Stump <reuben.stump@gmail.com>
+  Date : 2017-05-01 14:16:08 +0000
+
+    cleanup ManagedObject.pm AUTOLOAD 
+
+  Change: 9b9d921de04b26e8b4311ecc15f0131d68b15072
+  Author: Reuben Stump <reuben@Hades.local>
+  Date : 2017-05-01 13:27:07 +0000
+
+    added dist.ini, generated 6.5 stub classes and added initial tests 
+
+  Change: 427e60a8fcc53d25031290adb2387bfd76a70a7f
+  Author: Reuben Stump <stumpr@users.noreply.github.com>
+  Date : 2017-04-25 20:15:48 +0000
+
+    Create LICENSE 
+
+  Change: b29367bab5349b68e4c318dc98c7f262c7f873c5
+  Author: Reuben Stump <stumpr@users.noreply.github.com>
+  Date : 2017-04-25 17:42:22 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

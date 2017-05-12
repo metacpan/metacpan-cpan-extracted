@@ -1,0 +1,10 @@
+PIC P16F690;
+
+Main {
+    delay 100ms;
+    sim_assert "*** EARLY STOP ***";
+}
+
+Simulator {
+    stopwatch 100ms;
+}

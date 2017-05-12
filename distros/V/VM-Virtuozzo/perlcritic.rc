@@ -1,0 +1,4 @@
+severity = 3
+verbose  = 9
+exclude  = ValuesAndExpressions::ProhibitVersionStrings ValuesAndExpressions::ProhibitConstantPragma TestingAndDebugging::ProhibitNoStrict
+include  = Variables::ProhibitPackageVars

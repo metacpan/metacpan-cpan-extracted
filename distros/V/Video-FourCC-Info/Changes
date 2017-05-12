@@ -1,0 +1,120 @@
+1.005 - 21 Dec 2009 - Jonathan Yu <jawnsy@cpan.org>
+
+  + Changed my mail address to jawnsy@cpan.org
+  + Update MANIFEST.SKIP according to new defaults provided by
+    ExtUtils::Manifest
+  + Remove pass-through Build.PL
+  + Updates to POD formatting style
+
+1.004 - 29 Aug 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Prevent codecs.dat from being installed (add to MANIFEST.SKIP)
+
+1.003 - 28 Aug 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Add DBI and DBD::SQLite to build_requires (this should
+    fix the UNKNOWN reports)
+
+1.002 - 23 Aug 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Remove generated files from the repository
+  + Use a simple string version, per David Golden's article:
+    http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+  + No longer use Perl::Critic to test
+  + Changed test sequence
+  + Remove modules available in core since Perl 5.6 from requires
+  + Generate codecs.dat at build time, rather than bundle a binary
+    copy -- this should make things a bit more robust
+
+1.1.7 - 25 Jul 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Removed useless headers, reference the main module
+    for license and copyright info
+  + Fixed peekvideo name
+  + No longer test Perl::Critic during AUTOMATED_TESTING,
+    only RELEASE_TESTING. Thanks to Elliot Shank for the
+    discussion in a private mail.
+  + Changed critic.rc to ignore PodSpelling policy
+
+1.1.6 - 24 Jul 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Silence Module::CPANTS::Kwalitee notes about what we're
+    using (Test::Pod and Test::Pod::Coverage)
+  + The last variables using TEST_AUTHOR now use
+    RELEASE_TESTING|AUTOMATED_TESTING
+  + More cleanup of author tests
+  + Overhaul test scripts, remove them from Recommends
+    (Alias' journal #5375)
+  + Update LICENSE and README to a smaller format. Clarify
+    POD. No longer generates a readme using pod2text
+  + Require Internet (TEST_INTERNET) to do the signature
+    test, since it tries to download the key from a keyserver
+  + No longer enforce "one dot only" in filenames. This
+    breaks compatibility with OpenVMS.
+  + Updated perlcriticrc
+
+1.1.5 - 12 May 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Used clearer license - PD (fallback on MIT, Artistic-2+,
+    GPL-2+)
+  + Added the databases' SQL source as source-data.sql
+  + Moved bin/peekvideo to an example file because it
+    depends on Video::Info which is non-free
+  + Removed t/03scripts.t and related requirements
+    (Test::Script etc) because peekvideo is no longer
+    in bin/
+
+1.1.4 - 30 Apr 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Dropped TEST_DATA from t/99data.t
+  + Made t/03scripts.t still work in case the tests are
+    skipped
+
+1.1.3 - 29 Apr 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Changed t/03scripts.t to only run if Video::Info is
+    installed (otherwise compile fails since it's required
+    for the peekvideo script)
+  + Updated to version 1.20 for DBD::SQLite, since the
+    multiple defines error is fixed in that version
+    o the hack code was removed
+    o This should also improve code coverage
+
+1.1.2 - 29 Apr 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Updated license & copyright information
+  + Fixed bin/peekvideo (using {*FH} calls to print)
+  + Removed CHANGES file (which is automatically generated
+    now)
+  + Changed license to Public Domain
+  + Minor doc changes in Video/FourCC/Info.pm
+  + Makefile.PL changed to passthrough from traditional
+  + Added ignore for debian/ control files and .tmp files
+  + Removed interface description from README; you can get
+    that from the POD
+  + Added Build.bat to MANIFEST.SKIP for Win32 builds...
+  + Removed version-specific stuff from the README so I can
+    be lazy (it was out-of-date anyway)
+  + Added tests (99data.t) to ensure data integrity
+  + Forced PerlCritic to ignore that hackish thing I did
+    with DBD::SQLite::sqlite_version
+  + Removed the check for defined $description; it must
+    always be defined per the data constraint check
+  + Updated the codecs.dat - fixed typos and stuff.
+  + Put braces around {STDERR} filehandle for peekvideo
+  + Silenced the complaint about package variables, since
+    we are using that hack to prevent a bug from DBD::SQLite
+    from causing warnings
+
+1.1.1 - 07 Feb 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Hopefully fixed some failing tests due to upstream
+    DBD::SQLite
+  + Updated Build.PL and META.yml accordingly
+  + Added recommended dependency Test::Without::Module
+  + Fixed error with multiple plans for 02fallback.t
+  + Now assumes FourCC's are not case sensitive
+
+1.0 - 17 Jan 2009 - Jonathan Yu <frequency@cpan.org>
+
+  + Initial release

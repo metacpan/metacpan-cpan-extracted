@@ -1,0 +1,27 @@
+User.pm interface to the security mechanisms (access.db)
+
+optional vsql support and attribute queries to DB 
+instead of going to the shell
+
+better docs 
+
+many more examples
+
+Interface the command execution component to PVCS DTK.
+Also the config file reader.  This will require, of course,
+more code to execute triggers, etc.  I've not heard great
+things about the stability of the DTK, either.
+
+or
+
+Short-circuit some of the folder/project operators to avoid
+calling the tool for each member.  Instead, call the tool
+for all members in the folder/archive.  Just doing this may
+help alot.
+
+
+Possibly do something with PVCSPRIV.  I dunno if it's so important.
+
+
+
+

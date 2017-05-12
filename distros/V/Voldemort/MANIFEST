@@ -1,0 +1,25 @@
+Changes
+lib/Voldemort.pm
+lib/Voldemort/Connection.pm
+lib/Voldemort/Message.pm
+lib/Voldemort/ProtoBuff/BaseMessage.pm
+lib/Voldemort/ProtoBuff/Connection.pm
+lib/Voldemort/ProtoBuff/DefaultResolver.pm
+lib/Voldemort/ProtoBuff/DeleteMessage.pm
+lib/Voldemort/ProtoBuff/GetMessage.pm
+lib/Voldemort/ProtoBuff/PutMessage.pm
+lib/Voldemort/ProtoBuff/Resolver.pm
+lib/Voldemort/ProtoBuff/Spec2.pm
+lib/Voldemort/Store.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+scripts/example.pl
+t/001_load.t
+t/002_integration_test.t
+t/003_mock_sync_tests.t
+t/004_mock_async_tests.t
+t/005_protobuff_tests.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

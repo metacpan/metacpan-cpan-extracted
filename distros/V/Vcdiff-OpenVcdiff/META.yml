@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Alien::OpenVcdiff: 0
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  Alien::OpenVcdiff: 0
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vcdiff-OpenVcdiff
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::OpenVcdiff: 0
+  Carp: 0
+  Guard: 0
+  Sys::Mmap: 0
+  Vcdiff: 0.505
+resources:
+  bugtracker: https://github.com/hoytech/Vcdiff-OpenVcdiff/issues
+  repository: git://github.com/hoytech/Vcdiff-OpenVcdiff.git
+version: 0.106

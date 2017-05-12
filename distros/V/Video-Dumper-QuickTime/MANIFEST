@@ -1,0 +1,12 @@
+Changes
+lib/Video/Dumper/QuickTime.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+samples/DumpQuickTime.pl
+t/01_general.t
+t/Sample.mov
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

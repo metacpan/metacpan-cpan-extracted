@@ -1,0 +1,78 @@
+VendorAPI-2Checkout-Client
+
+This module is only useful to you if you have a vendor account at 2Checkout.com.
+In order to test your ability to interact with the 2checkout Vendor API, you'll 
+need to pass your vendor API username and password to 'make test' via environment
+variables, so the test can use them when calling new().
+
+If the preceeding paragraph does not make any sense to you, then this module
+just might not be for you.
+
+The two environment variables are:
+  VAPI_2CO_UID=myapiuserid 
+  VAPI_2CO_PWD=myapiuserpassword 
+
+If you don't have a vendor account, or have not set up an API user yet, don't set the 
+variables, and we'll skip the tests.
+
+You may need to log into your 2checkout account and create a new user for API access. You can't
+use your regular Vendor Area login for API access, as API access and Vendor Area 
+are mutually exclusive.
+
+This module uses Params::Validate which likes to die if the parameters do not pass validation, 
+so wrap your calls in evals, etc.
+
+If you have sales, set VAPI_HAS_SALES=1 - if you have none, unset it, or don't set it. 
+If you have coupons, set VAPI_HAS_COUPONS=1 - if you have none, unset it, or don't set it. 
+If you have payments, set VAPI_HAS_PAYMENTS=1 - if you have none, unset it, or don't set it. 
+If you have products, set VAPI_HAS_PRODUCTS=1 - if you have none, unset it, or don't set it. 
+If you have options, set VAPI_HAS_OPTIONS=1 - if you have none, unset it, or don't set it. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+        export VAPI_HAS_SALES=1 VAPI_HAS_COUPONS=1 VAPI_HAS_PAYMENTS=1 
+        export VAPI_HAS_PRODUCTS=1 VAPI_HAS_OPTIONS=1
+	env VAPI_2CO_UID=myapiuser VAPI_2CO_PWD=mypasswd make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VendorAPI::2Checkout::Client
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=VendorAPI-2Checkout-Client
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/VendorAPI-2Checkout-Client
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/VendorAPI-2Checkout-Client
+
+    Search CPAN
+        http://search.cpan.org/dist/VendorAPI-2Checkout-Client/
+
+GITHUB
+   Source code for this module is available on Github at https://github.com/vampirechicken/VendorAPI--2Checkout--Client
+
+2CHECKOUT
+   2Checkout's web site is at http://www.2checkout.com/   
+   Their API documentation lives at http://www.2checkout.com/documentation/api/
+
+LICENSE AND COPYRIGHT
+Copyright (C) 2011 Len Jaffe
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

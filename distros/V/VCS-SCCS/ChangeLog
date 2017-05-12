@@ -1,0 +1,112 @@
+0.24	- 12 May 2016, H.Merijn Brand
+    * Add CONTRIBUTING.md
+    * It's 2016
+    * Tested with perl 5.24.0
+
+0.23	- 12 Feb 2015, H.Merijn Brand
+    * Copyright 2015
+    * Move repo to github
+    * Remove perl recommendation from META as it breaks cpan clients
+
+0.22	- 08 Aug 2014, H.Merijn Brand
+    * Use new style git invocation for checkout in examples
+    * Redo TZ offset. It should be in +HHMM, not +SSSS
+    * Copyright 2014
+    * Update SCCS url's
+
+0.21	- 16 May 2013, H.Merijn Brand
+    * Support for binary files (^Af e 1)
+    * Copyright 2013
+
+0.20	- 07 Sep 2011, H.Merijn Brand
+    * NAME / DISTNAME in Makefile.PL
+
+0.19	- 07 Sep 2011, H.Merijn Brand
+    * More cross-checks for META data
+
+0.18	- 02 Jun 2011, H.Merijn Brand
+    * Mention links for SCCS source location
+    * Add documentation for missing flags (^Af x ...)
+
+0.17	- 30 Sep 2010, H.Merijn Brand
+    * Spell check
+    * SCCS directories can be lower case (Russ Tremain)
+
+0.16	- 16 Mar 2010, H.Merijn Brand
+    * Upped copyright to 2010
+    * Dropped YAML spec to 1.0
+
+0.15	- 20 Mar 2009, H.Merijn Brand
+    * Wrong e-mail in META.yml
+    * Copyright 2009
+    * Added Test::NoWarnings
+
+0.14	- 21 Oct 2008, H.Merijn Brand
+    * Makefile.PL added wrong META.yml
+
+0.13	- 21 Oct 2008, H.Merijn Brand
+    * examples/sccs2git-r was not in MANIFEST
+    * provides in META.yml was wrong
+
+0.12	- 21 Oct 2008, H.Merijn Brand
+    * Pod fixes
+    * $sccs->file () should return file name without sub-folder
+    * added examples/sccs2git-r : recursive collect SCCS repos into
+      a single GIT repo
+
+0.11	- 02 Jan 2008, H.Merijn Brand
+    * Update copyrights to 2008
+    * Tested under perl-5.10.0
+    * Added the prereq's to Makefile.PL
+
+0.10	- 05 Dec 2007, H.Merijn Brand
+    * examples/sccs2git-gfi uses git-fast-import (Sam Vilain)
+    * examples/sccs2git-add uses a file-by file approach
+    * win32 has strange ways of dealing with /dev/null^WFile::Spec->devnull ()
+    * Module itself now also under git :)
+
+0.09	- 03 Dec 2007, H.Merijn Brand
+    * Found a "R" delta to test
+    * Checked a complete SCCS tree
+    * examples/sccs2git now applies in original order accross files and
+      adds most usefull info from sccs
+    * More translate work
+
+0.08	- 03 Dec 2007, H.Merijn Brand
+    * /dev/null unknown on braindead OS's, skip to File::Spec->devnull ()
+      . Does MSWin support SCCS at all?
+    * make dist now automatically makes a tgz, so I don't have to move
+      it to .tgz
+    * moved SCCS files to files/SCCS/ for a better reflection of the truth
+      and preparation of conversion tests
+    * examples/sccs2git actually works now! Let's rock ...
+
+0.07	- 03 Dec 2007, H.Merijn Brand
+    * Test suite assumed chmod 0000, file to work on windows and cygwin
+    * Added docs for SCCS keywords
+    * Added keyword translations (currently only SCCS and custom)
+    * Added tests for keyword translations
+    * Implemented delta () method
+    * Documented much more
+
+0.06	- 30 Nov 2007, H.Merijn Brand
+    * Basic documentation
+    * Basic tests for implemented functionality (Devel::Cover++)
+
+0.05	- 30 Nov 2007, H.Merijn Brand
+    * In testing 0.03, I accidentally remove the requirement for 5.006
+    * Lifted the 5.8 requirement in README
+
+0.04	- 30 Nov 2007, H.Merijn Brand
+    * Remove the last remains of the needless refs to Dynaloader
+    * I'm sure I removed that defined-or before. Anyway, 5.006 is back
+
+0.03	- 29 Nov 2007, H.Merijn Brand
+    * Require perl-5.8. 5.6.2 fails, and I have no idea why
+      Chickening out, but I have no tuits to find out
+
+0.02	- 29 Nov 2007, H.Merijn Brand
+    * First real tests and incorporated feedback from Johan Vromans
+
+0.01	- 29 Nov 2007, H.Merijn Brand
+    * Initial attempt started at Wed 28 Nov 2007

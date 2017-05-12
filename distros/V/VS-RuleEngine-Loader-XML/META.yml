@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                VS-RuleEngine-Loader-XML
+version:             0.05
+abstract:            Load VS::RuleEngine engine declarations in XML
+license:             MIT
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Object::Tiny:                  0
+    Scalar::Util:                  0
+    Test::Exception:               0
+    Test::More:                    0
+    VS::RuleEngine:                0.08
+    XML::LibXML:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Claes Jakobsson <claesjac@cpan.org>

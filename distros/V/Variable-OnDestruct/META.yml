@@ -1,0 +1,30 @@
+---
+name: Variable-OnDestruct
+version: 0.03
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+abstract: Call a subroutine on destruction of a variable.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Variable-OnDestruct
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/Leont/variable-ondestruct/tree
+build_requires:
+  ExtUtils::CBuilder: 0
+  Module::Build: 0.28
+  Test::More: 0
+requires:
+  Exporter: 5.57
+  perl: 5.007003
+configure_requires:
+  Module::Build: 0.28
+provides:
+  Variable::OnDestruct:
+    file: lib/Variable/OnDestruct.pm
+    version: 0.03
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - destructor

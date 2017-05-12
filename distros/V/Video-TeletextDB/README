@@ -1,0 +1,70 @@
+Video-TeletextDB version 0.01
+=============================
+
+DESCRIPTION
+
+The idea behind a teletext database is to separate the process of collecting
+teletext pages from the process of presentation. This makes programs both
+shorter (you don't have to implement the side your're not interested in) and
+more flexible (you can read teletext pages long after the collector stopped
+running and you don't have to be tuned in to the channel you want to read).
+
+In fact, the simple script L<TeleCollect|TeleCollect> coming with this package
+will be good enough for most teletext collection purposes, so that you can
+concentrate on the page processing.
+
+This modules provides you with methods to both store and retrieve pages into
+a database and some rudimentary support to manage a set of databases
+(typically one for each channel). The pages will be stored in raw form
+so that a client can decide for itself how to handle things like transmission
+errors (there are of suggested methods provided in the module though, so
+you don't have to reinvent the wheel every time).
+
+It (currently) use a Berkeley DB with an external lockfile for the actual
+storage. It only uses the version 1.85 features, so it should work almost
+everywhere. There will be one database and lockfile for each channel and all
+channel databases and locks will normally be collected in one directory.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   # Answer some questions
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Exporter::Tidy      always needed
+  DB_File	      always needed (comes with core perl but is only compiled
+                      if you have the right database libraries)
+  Test::More"	      only needed to run the selftests
+  HTML::Entities      only needed for the Video::TeletextDB::Page::html method
+  Video::Capture::V4l only used by demo program TeleCollect, but you'll need
+                      it or something equivalent if you ever want to fill the
+                      database
+  FCGI                only used by the TeleFcgi demo program
+
+AUTHOR
+
+Ton Hospel, <Video-TeletextDB@ton.iguana.be>
+
+Parts are based on Video::Capture::V4l, alevtd and libzvbi.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 by Ton Hospel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

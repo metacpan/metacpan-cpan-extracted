@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+
+use Storable;
+use POSIX 'strftime';
+use Carp;
+use Curses;
+
+my $pair = 0;
+
+my $db_name = $ARGV[0];
+
+END { endwin };
+
+initscr; start_color;
+cbreak; noecho;
+nonl; intrflush 0; keypad 1;
+immedok 0; idlok 1; scrollok 0; leaveok 1;
+clear;
+
+sub cattr($$) {
+   return $cattr{$_[0],$_[1]} if defined $cattr{$_[0], $_[1]};
+   $pair++;
+   init_pair ($pair, $_[0], $_[1]);
+   $cattr{$_[0],$_[1]} = COLOR_PAIR($pair);
+}
+
+sub date2unix {
+   my($date,$time,$lto)=@_;
+   381283200
+   + ($date-45000) * 86400
+   + ($time >> 12     ) * 10 * 60 * 60
+   + ($time >>  8 & 15) * 60 * 60
+   + ($time >>  4 & 15) * 10 * 60
+   + ($time       & 15) * 60
+   + $lto * 15;
+}
+
+sub date2text {
+   sprintf "{%04x}", $_[0];
+}
+
+sub time2text {
+   sprintf "%02x:%02x", $_[0] >> 8, $_[0] & 0xff;
+}
+
+my $wofs = -5*60;
+my $to;
+my $mtime = -1;
+my @pi;
+my $current = 1;
+my $shortinfo = 1;
+
+sub load_db {
+   return if -M $db_name == $mtime;
+   $mtime = -M $db_name;
+   *db = eval { Storable::retrieve($db_name) } || { };
+   @pi = map values %$_, values %{$db{pi}};
+   for (@pi) {
+      $_->{start_time} = date2unix($_->{start_date}, $_->{start_time}, $db{ai}{networks}[$_->{netwop_no}]{LTO});
+      $_->{stop_time}  = date2unix($_->{start_date}, $_->{stop_time} , $db{ai}{networks}[$_->{netwop_no}]{LTO});
+      $_->{stop_time} += 86400 if $_->{stop_time} < $_->{start_time};
+   }
+   @pi = sort { $a->{start_time} <=> $b->{start_time} ||
+                $a->{netwop_no}  <=> $b->{netwop_no} } @pi;
+}
+
+move (1,0); standout; addch "=" for 1..$COLS; standend;
+
+for(;;) {
+   load_db;
+   $now = time;
+   $to = $now + 60;
+   move (0,0); addstr sprintf "%s (window offset %5d)\n", strftime("%H:%M:%S", localtime $now), int($wofs / 60);
+   show_current();
+   move (0, 40); addstr ($to-$now);
+   refresh;
+   while (time < $to) {
+      my $r = ""; vec ($r, fileno STDIN, 1) = 1;
+      select $r,undef,undef,1;
+      if (vec ($r, fileno STDIN, 1)) {
+         my $key = getch;
+         exit                     if $key eq "q" || $key eq "\x1b";
+         $current   = !$current   if $key eq "c";
+         $shortinfo = !$shortinfo if $key eq "s";
+         $wofs  = -300            if $key eq "." || $key == KEY_HOME;
+         $wofs -=  300            if $key eq "k" || $key == KEY_UP;
+         $wofs +=  300            if $key eq "j" || $key == KEY_DOWN;
+         $wofs -= 3600            if $key eq ""|| $key == KEY_PPAGE;
+         $wofs += 3600            if $key eq ""|| $key == KEY_NPAGE;
+         last;
+      } elsif (-M $db_name != $mtime) {
+         last;
+      }
+   }
+}
+
+my ($y,$x);
+
+sub outstr {
+   my $s = shift;
+   my($l,$r);
+   for (;;) {
+      $l = length $s;
+      $r = $COLS - $x;
+      if ($l < $r) {
+         addstr ($s);
+         $x += $l;
+         last;
+      }
+      addstr $1 if $s =~ s/^(.{1,$r})([\x00-\x20]+|$)//;
+      $y++;
+      move $y, 35;
+      $x = 35;
+   }
+}
+
+sub addttstr($$) {
+   my ($fg, $bg) = (COLOR_WHITE, COLOR_BLACK);
+   my $y1;
+   local $_ = shift;
+   y/~{|}[]/ßäöüÄÜÖ/; # buggy as hell :(
+   s/\s*([\x00-\x20])\s*/$1/g; # wipe away superflous spaces
+   getyx $y, $x; $y1 = $y;
+   for(;;) {
+      if (/\G([\x20-\xff]+)/gc) {
+         attrset (cattr ($fg, $bg));
+         outstr $1;
+      } elsif (/\G([\x00-\x07])/gc) {
+         $fg = COLOR_BLACK	if $1 eq "\x00";
+         $fg = COLOR_RED	if $1 eq "\x01";
+         $fg = COLOR_GREEN	if $1 eq "\x02";
+         $fg = COLOR_YELLOW	if $1 eq "\x03";
+         $fg = COLOR_BLUE	if $1 eq "\x04";
+         $fg = COLOR_MAGENTA	if $1 eq "\x05";
+         $fg = COLOR_CYAN	if $1 eq "\x06";
+         $fg = COLOR_WHITE	if $1 eq "\x07";
+         outstr " ";
+      } elsif (/\G\x1d/gc) {
+         $bg = $fg;
+         outstr " ";
+      } elsif (/\G./gc) {
+         # nop
+      } else {
+         last;
+      }
+   }
+   attrset (cattr (COLOR_WHITE, COLOR_BLACK));
+   #s/([\x00-\x07])/sprintf " [%dm", ord($1)+30/ge;
+   #s/([\x00-\x09\x0b-\x1a\x1c-\x1f])/sprintf "·[%02x]",ord $1/ge;
+   #s/^ //g;
+   #$_."[37m";
+   $_[1] += $y-$y1;
+}
+
+sub show_current {
+   my $trenn = 2;
+   my $lines = $LINES - 2;
+   move (2, 0);
+   clrtobot;
+   for (@pi) {
+      if ($_->{start_time} < $now + $wofs) {
+         next if !$current || $_->{stop_time} < $now;
+         $to = $_->{stop_time}  if $to > $_->{stop_time}  && $_->{stop_time}  >= $now;
+      } else {
+         $to = $_->{start_time} if $to > $_->{start_time} && $_->{start_time} > $now;
+      }
+      my $start = $_->{start_time};
+      my $stop  = $_->{stop_time};
+      if ($start > $now) {
+         if ($trenn == 1) {
+            addch (ACS_HLINE) for 1..$COLS;
+            $lines--;
+         }
+         $trenn = 0;
+      } elsif ($trenn == 2) {
+         $trenn = 1;
+      }
+
+      addstr sprintf "%s-%s (%+4d) %-10.10s ",
+             strftime("%H:%M", localtime $start), strftime("%H:%M (%d)", localtime $stop),
+             int (($start-$now)/60),
+             $db{ai}{networks}[$_->{netwop_no}]{netwop_name};
+
+      my $si;
+      if ($shortinfo) {
+         unless ($_->{sinfo}) {
+            $si = delete $_->{shortinfo};
+            my $li = delete $_->{longinfo};
+            for ($si, $li) {
+               s/(.{40})/$1 /g;
+               s/\s\s+/ /g;
+            }
+            for (my $x = length($si); $x; $x--) {
+               if (substr ($si, -$x) eq substr ($li, 0, $x)) {
+                  substr ($si, -$x) = $li;
+                  last;
+               }
+            }
+            $si =~ s/[\x00-\x20]+$//;
+            $_->{sinfo} = $si;
+         }
+         $si = $_->{sinfo};
+      }
+      addttstr ($_->{title}.$si, $lines);
+
+      addch ("\n");
+      last unless --$lines;
+   }
+   clrtobot;
+}

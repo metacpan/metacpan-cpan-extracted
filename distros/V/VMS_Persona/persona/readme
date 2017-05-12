@@ -1,0 +1,23 @@
+README for VMS::Persona
+
+Copyright (c) 1997 Dan Sugalski
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets your process assume the identity of another user. This
+assumtion is more complete than a simple $SET UIC--you can get everything,
+username, rightslist, UIC, the works. 
+
+Before running the test, edit [.t]basic.t and set the two username
+variables to two users on your system.
+
+perl Makefile.pl
+mms
+mms test
+
+to build and test the extension. If it tests OK, then
+
+mms install
+
+to install it.

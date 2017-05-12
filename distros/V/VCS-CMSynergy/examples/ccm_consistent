@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+use VCS::CMSynergy;
+use strict;
+
+@ARGV == 1 or die "usage: $0 project";
+
+my ($root_project) = @ARGV;
+
+# assume existing Synergy session
+my $ccm = VCS::CMSynergy->new(
+    CCM_ADDR	=> $ENV{CCM_ADDR}, 
+    PrintError	=> 0,
+    RaiseError	=> 1);
+
+my @projects = @{ $ccm->query_object(
+    "hierarchy_project_members('$root_project', 'none')") };
+die "can't find sub projects of project \"$root_project\"\n" unless @projects;
+
+my %members;		# name:cvtype:instance -> objectname -> @projects
+foreach my $proj (@projects)
+{
+    foreach (@{ $ccm->query_object([ is_member_of => $proj ]) })
+    {
+	my $pedigree = join(":", $_->name, $_->cvtype, $_->instance);
+	push @{ $members{$pedigree}->{$_} }, $proj;
+    }
+}
+
+my $inconsistent = 0;
+while (my ($pedigree, $versions) = each %members)
+{
+    next if keys %$versions == 1;
+  
+    print "different versions found for $pedigree\n";
+    while (my ($obj, $projs) = each %$versions)
+    {
+	print "\t$obj used in @$projs\n";
+    }
+    $inconsistent++;
+}
+
+exit($inconsistent == 0);

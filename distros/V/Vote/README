@@ -1,0 +1,51 @@
+* Requirements *
+
+- perl
+- Catalyst (http://www.catalystframework.org/)
+- postgresql (http://www.postgresql.org/)
+- a smtp server
+
+* Installation from source code *
+
+perl Makefile.PL
+make install
+
+On the database serveur:
+
+- You may want to create a specific user:
+  From postgres as administrator:
+    CREATE ROLE 'rolename' WITH LOGIN PASSWORD 'rolepassword';
+  From command line:
+    createuser 'rolename' --password
+
+- Create a database owned by this role:
+  From postgres as administrator:
+    CREATE DATABASE 'basename' OWNER TO 'rolename';
+  From command line:
+    createdb basename -O rolename
+
+- restore the based schema with sql/postgres.dump AS rolename
+  psql -u rolename basename < sql/postgres.dump
+
+(Refer to postgresql documentation for more options)
+
+Copy the vote.yml.example to /etc/vote.yml then edit it:
+- change the db settings (and probably the smtp one)
+
+- configure apache to use either the cgi or fast_cgi program or run
+  it as a standalone server.
+
+Enjoy !
+
+* WARNING *
+
+This application is provide as is, without any warranty.
+
+This file is just a quick installation guide to install the
+application does it best to respect basic rules of elections
+but do not provide information about security YOU should provide
+around to avoid fraud.
+
+* Contact *
+
+Olivier Thauvin <olivier dot thauvin at latmos dot ipsl dot fr>

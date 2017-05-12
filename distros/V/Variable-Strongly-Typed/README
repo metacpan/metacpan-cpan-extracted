@@ -1,0 +1,93 @@
+Variable-Strongly-Typed version 1.1.0
+
+    This modules allow you to strongly type your variables.  Also known
+    as the 'no fun' module - it can greatly enhance you code's quality
+    and robustness.
+
+    By enforcing types on some (or all) of your variables you will eliminate
+    a large class of careless (& not so careless) errors.
+
+    This could also aid an editor or code-browsing tools to verify code 
+    correctness without having to execute the script.
+
+    use Variable::Strongly::Typed;
+
+    my $int             :TYPE('int');       # must have an 'int' value
+    my $float           :TYPE('float');     # must have a 'float' value
+    my $string          :TYPE('string');    # must not be a reference
+    my $file            :TYPE('IO::File');  # must be an IO::File
+    my @array_of_ints   :TYPE('int');       # Each slot must contain an int
+    my %hash_of_floats  :TYPE('float');     # Each value must be a float
+
+    my $int_own_error   :TYPE('int', \&my_own_error_handler);
+                                            # Roll my own error handler
+
+    my @array_of_rgb :TYPE(\&red_green_blue); # my enumerated type
+
+    # For subs!!
+     sub return_an_int :TYPE('int') {
+        # .. do some stuff ..
+        return $something;
+     }
+
+    # ... and later ...
+
+    $int = 23;          # All is well
+    $int = 'howdy!';    # This line will croak with a good error message
+
+    $float = 3.23;              # All is well, nothing to see here
+    $float = new XML::Parser;   # croak!
+
+    $array_of_ints[23] = 44;    # Groovy
+    $array_of_ints[12] = 'yah'; # croak!
+
+    $hash_of_floats{pi} = 3.14159;      # no problem
+    $hash_of_floats{e}  = new IO::File; # croak!
+
+    # Return 1 if this val is RED, BLUE, or GREEN
+    #   0 otherwise
+    sub red_green_blue {
+        local $_ = shift;
+
+        /\A RED \z/xms || /\A BLUE \z/xms || /\A GREEN \z/xms;
+    }
+
+    $array_of_my_very_own_types[23] = 99;       # croak!
+    $array_of_my_very_own_types[2] = 'BLUE';    # OK!
+
+    $int_own_error = 'lksdklwe';    # The sub 'my_own_error_hanlder'
+                                    #   will be #   called with the
+                                    #   offending value
+
+    my $got_it = return_an_int();   # Will 'croak' (or call your error
+                                    #   function) #   if this sub doesn't
+                                    #   return an 'int'
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+Class::Std::Utils
+Attribute::Handlers
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Mark Ethan Trostler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

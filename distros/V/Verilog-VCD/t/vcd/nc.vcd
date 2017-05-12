@@ -1,0 +1,86 @@
+$comment
+    manually added one line
+$end
+
+$date
+    Aug 11, 2015  16:49:23
+$end
+$version
+    TOOL:	ncsim	14.10-s013
+$end
+$timescale
+    1 us
+$end
+
+$comment
+    manually added 3 lines
+    2nd line
+    3rd line
+$end
+$comment manually added another one line $end
+
+$scope module tb $end
+$var reg       1 !    foo  $end
+$var reg       8 "    data [7:0] $end
+$var real     64 #    fp  $end
+$upscope $end
+
+$enddefinitions $end
+#115
+$dumpvars
+1!
+b110111 "
+r3.1459 #
+$end
+#120
+0!
+#125
+1!
+#130
+0!
+#135
+1!
+#335
+$dumpall
+1!
+b110111 "
+r3.1459 #
+$end
+#338
+r3.22 #
+#348
+b1001101 "
+#448
+$dumpoff
+x!
+bx "
+r0 #
+$end
+#597
+$comment manually added one sim line $end
+$dumpon
+0!
+b1001101 "
+r3.22 #
+$end
+#598
+b1100011 "
+#599
+r9.99 #
+#601
+$dumpall
+0!
+b1100011 "
+r9.99 #
+$end
+#611
+$comment
+    manually added two lines
+    and here is the 2nd
+$end
+$dumpoff
+x!
+bx "
+r0 #
+$end
+#1041

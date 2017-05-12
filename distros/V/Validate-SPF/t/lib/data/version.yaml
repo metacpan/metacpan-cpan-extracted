@@ -1,0 +1,18 @@
+#
+# Parser tests: "version"
+#
+---
+positive:
+    'v=spf1':
+        version: 'v=spf1'
+
+negative:
+    'v=spf2':
+        code: E_INVALID_VERSION
+        context: 'v=spf2'
+    'v=SPF1':
+        code: E_INVALID_VERSION
+        context: 'v=SPF1'
+    'v=spf-foo':
+        code: E_INVALID_VERSION
+        context: 'v=spf-foo'

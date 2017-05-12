@@ -1,0 +1,213 @@
+NAME
+    Video::Generator - Perl class for video generation.
+
+SYNOPSIS
+     use Video::Generator;
+     my $obj = Video::Generator->new(%parameters);
+     my $type = $obj->create($out_path);
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "delay_generator"
+
+                     Delay generator.
+                     Default value is object below:
+                       Video::Delay::Const->new(
+                               'const' => 1000,
+                       )
+
+            *       "duration"
+
+                     Video duration used for implicit 'video_pattern' parameter.
+                     Possible suffixes are:
+                     - ms for milisendons.
+                     - s for seconds.
+                     - min for minute.
+                     - h for hour.
+                     Default value is 10000 (10s).
+
+            *       "ffmpeg_pixel_format"
+
+                     FFmpeg pixel format.
+                     Default value is undef, use default ffmpeg.
+
+            *       "ffmpeg_video_codec"
+
+                     FFmpeg video codec.
+                     Default value is undef, use default ffmpeg.
+
+            *       "fps"
+
+                     Frames per second.
+                     Default value is 60.
+
+            *       "height"
+
+                     Height.
+                     Default value is 1080.
+
+            *       "image_generator"
+
+                     Image generator.
+                     Default value is object below:
+                       Image::Random->new(
+                               'height' => $self->{'height'},
+                               'type' => $self->{'image_type'},
+                               'width' => $self->{'width'},
+                       )
+
+            *       "image_type"
+
+                     Image type used for implicit 'image_generator' parameter.
+                     List of supported types: bmp, gif, jpeg, png, pnm, raw, sgi, tga, tiff.
+                     Defult image type is 'bmp'.
+
+            *       "temp_dir"
+
+                     Temporary dir.
+                     Default value is File::Temp::tempdir().
+
+            *       "verbose"
+
+                     Verbose mode.
+                     Default value is 0.
+
+            *       "video_pattern"
+
+                     Video pattern generator.
+                     Default value is object below:
+                       Video::Pattern->new(
+                               'delay_generator' => $self->{'delay_generator'},
+                               'duration' => $self->{'duration'},
+                               'fps' => $self->{'fps'},
+                               'image_generator' => $self->{'image_generator'},
+                       )
+
+            *       "width"
+
+                     Width.
+                     Default value is 1920.
+
+    "create($out_path)"
+             Create video.
+             Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils:
+                     Unknown parameter '%s'.
+             From Image::Random:
+                     Image type '%s' doesn't supported.
+             From Video::Pattern:
+                     Parameter 'duration' must be numeric value or numeric value with time suffix.
+                     Parameter 'fps' must be numeric value.
+
+     create():
+             Error with command '%s'.
+                     STDERR, %s
+                     ..
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Path qw(rmtree);
+     use File::Spec::Functions qw(catfile);
+     use File::Temp qw(tempdir);
+     use Video::Generator;
+
+     # Temporary directory.
+     my $temp_dir = tempdir();
+
+     # Object.
+     my $obj = Video::Generator->new;
+
+     # Create video.
+     my $video_file = catfile($temp_dir, 'foo.mpg');
+     $obj->create($video_file);
+
+     # Print out type.
+     system "ffprobe -hide_banner $video_file";
+
+     # Clean.
+     rmtree $temp_dir;
+
+     # Output:
+     # Input #0, mpeg, from '/tmp/GoCCk50JSO/foo.mpg':
+     #   Duration: 00:00:09.98, start: 0.516667, bitrate: 1626 kb/s
+     #     Stream #0:0[0x1e0]: Video: mpeg1video, yuv420p(tv), 1920x1080 [SAR 1:1 DAR 16:9], 104857 kb/s, 60 fps, 60 tbr, 90k tbn, 60 tbc
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use File::Path qw(rmtree);
+     use File::Spec::Functions qw(catfile);
+     use File::Temp qw(tempdir);
+     use Video::Generator;
+
+     # Temporary directory.
+     my $temp_dir = tempdir();
+
+     # Object.
+     my $obj = Video::Generator->new(
+             'verbose' => 1,
+     );
+
+     # Create video.
+     my $video_file = catfile($temp_dir, 'foo.mpg');
+     $obj->create($video_file);
+
+     # Clean.
+     rmtree $temp_dir;
+
+     # Output:
+     # Video pattern generator created images for video in temporary directory.
+     # Created video file.
+     # Removed temporary directory.
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, FFmpeg::Command, File::Path,
+    File::Spec::Functions, File::Temp, IO::CaptureOutput, Image::Random,
+    Readonly, Video::Delay::Const, Video::Pattern.
+
+SEE ALSO
+    Image::Random
+        Perl class for creating random image.
+
+    Image::Select
+        Selecting image from images directory.
+
+    Image::Select::Array
+        Selecting image from list with checking.
+
+    Image::Select::Date
+        Selecting image from images directory by date.
+
+    Video::Delay
+        Perl classes for delays between frames generation.
+
+    Video::Pattern
+        Video class for frame generation.
+
+REPOSITORY
+    <https://github.com/tupinek/Video-Generator>.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.08
+

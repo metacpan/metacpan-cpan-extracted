@@ -1,0 +1,26 @@
+Changes
+lib/VendorAPI/2Checkout/Client.pm
+lib/VendorAPI/2Checkout/Client/NoMoose.pm
+lib/VendorAPI/2Checkout/Client/Moose.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-instantiate.t
+t/02-list_sales.t
+t/03-detail_sale.t
+t/04-list_coupons.t
+t/05-detail_coupon.t
+t/06-list_payments.t
+t/07-list_products.t
+t/08-list_options.t
+t/boilerplate.t
+t/FormatTests.pm
+t/FormatTests/Factory.pm
+t/FormatTests/JSON.pm
+t/FormatTests/XML.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

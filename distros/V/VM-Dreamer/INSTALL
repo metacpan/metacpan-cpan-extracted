@@ -1,0 +1,19 @@
+Dreamer itself relies only on Perl. The test-suite relies on Test::More
+which should be included with most modern Perl distributions.
+
+To install Dreamer from CPAN, you just need to type:
+
+   # cpan VM::Dreamer
+
+Installing manually is also fairly simple.
+
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   # make install
+
+If you want to clean up
+
+   $ make clean
+
+Note: you may need to issue the # commands as root or sudo.

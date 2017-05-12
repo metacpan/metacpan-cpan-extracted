@@ -1,0 +1,41 @@
+   // comment
+1
+2
+    3   
+ babe dade 
+
+// blank lines
+
+
+
+00005   // leading zeroes
+
+
+ 1 2 3 4 eee dddd abcd_ef01     // multiple data on line
+
+1_2_3________4_     // underscores
+
+///
+
+/**/
+ 777 /* 888_999 */ 000  // 9999999
+/**/
+  //353535 /*//*/
+ ddd_ccc /*  dude
+  more less 
+  //*/
+ fade 		 0123   // tabs
+
+// According to the IEEE spec, data can be separated by comments.
+// Therefore, the following should be 2 separate values: "123 789"
+// Simulators ncverilog and vcs both treat these as separate values.
+// perlfaq6 treats these as 1 value.
+123/*456*/789
+//123 789
+
+ffff_ffff   // max 32-bit value
+
+1A2b_CdEf   // mixed upper/lower case
+
+//************ another common tricky comment
+

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/alertm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/alertm" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="alertm" type="alertmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Alerts Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="alertmType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Alerts Management.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_alerts"/>
+						<xs:element ref="subscribe_alert"/>
+						<xs:element ref="unsubscribe_alert"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="alert" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="resource_alertType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:alert_dataType">
+				<xs:sequence>
+					<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+					<xs:element name="class" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>perfcounter's class (network, cpu, etc)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="instance" type="xs:string"/>
+					<xs:element name="counter" type="xs:string"/>
+					<xs:element name="cur" type="xs:anySimpleType"/>
+					<xs:element name="hard" type="xs:anySimpleType"/>
+					<xs:element name="soft" type="xs:anySimpleType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="server_group_alertType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:alert_dataType">
+				<xs:sequence>
+					<xs:element name="eid" type="vzlt:eid_type"/>
+					<xs:element name="address" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Slave node address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="title" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Slave node title</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="description" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Failure description</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="code" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Failure code</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get_alerts">
+		<xs:annotation>
+			<xs:documentation>Returns current alert states for the specified list of Environments</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid_list" type="vzlt:eid_listType" minOccurs="0"/>
+				<xs:element name="category" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Category of alerts to return.  Return all categories if not specified. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="env_type" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Return alerts only on specified enviroments type. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="subscribe_alert">
+		<xs:annotation>
+			<xs:documentation>Subscribes for alerts on specified Environments to be sent to "email"s with the template, specified by "name". Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid_list" type="vzlt:eid_listType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>List of Environments.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="email" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Email where alert will be sent. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Name of the template, configured by "mailc" operator. If not specified then default template for given alert will be used.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:choice minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>This section specifies alert type. QOS alerts is default if nothing is specified. </xs:documentation>
+					</xs:annotation>
+					<xs:element name="services">
+						<xs:annotation>
+							<xs:documentation>Get alerts on changing service status. NOTE: this alert type doesn't accept ve_range, only veid or non-specifid veid.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="service" type="xs:string" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Service name.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="unsubscribe_alert">
+		<xs:annotation>
+			<xs:documentation>Unsubscribe previousle subscribed alert.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid_list" type="vzlt:eid_listType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>List of Environments.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="email" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Email on which alert was subscribed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:choice minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>This section specifies alert type. QOS alerts is default if nothing is specified.</xs:documentation>
+					</xs:annotation>
+					<xs:element name="services">
+						<xs:annotation>
+							<xs:documentation>Get Alerts on changing service status.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType/>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="alert" type="vzlt:eventType">
+		<xs:annotation>
+			<xs:documentation>Current alerts information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="configuration">
+		<xs:annotation>
+			<xs:documentation>Operator configuration.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="support_email" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Default email to put as a reply address in alert emails.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="mute_alert_period" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Minimal time between two alerts on given Environment. If -1 then only one alert will be sent, after which you should resubscribe.</xs:documentation>
+						<xs:documentation>Period of default logging.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_alertsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="alert" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="subscribe_alertResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="unsubscribe_alertResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

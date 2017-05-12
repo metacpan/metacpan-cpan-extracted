@@ -1,0 +1,38 @@
+Revision history for VSGDR::TestScriptGen
+
+0.01    28/05/2014
+        First version, released on an unsuspecting world.  Broken.
+0.02    29/05/2014
+        Added db function support.
+0.03    09/06/2014
+        Handles varchar(max)
+0.04    16/06/2014
+        Defaults values fon non-nullable parameters.  Better formatting of output.
+0.05    25/06/2014
+        Strawberry Perl login name implemented.
+0.06    15/07/2014
+        Added option to not run tests on generation.  Improved testfilename generation.  Switched to using IO::Dir from IO::File
+0.07    11/08/2014
+        Kwalitee changes.
+0.08    13/08/2014
+        Quoted sp/fn references in output.
+0.09    13/08/2014
+        Fixed generation of test results tables.
+0.10    13/08/2014
+        Quoted temp table column names.
+0.11    15/09/2014
+        Fixed 'empty' output table generation bug.
+0.12    27/02/2015
+        Support for user-defined data types.
+0.13    11/03/2015
+        Now accepts the name of an optional existing test file, so that the generated tests no longer include those already in a smoketest project.
+0.14    02/09/2015
+        Fixed new perl 5.22 error message.
+		#     Error:  Can't use an array as a reference at C:\PerlModules\VSGDR-TestScriptGen-0.13\blib\lib/VSGDR/TestScriptGen.pm line 230.
+0.15	05/09/2015
+	xact_state() must be checked it's not sufficient to check @@trancount because of SQL Server's stupidly complicated
+	transaction system.
+0.16	12/10/2016
+	Anonymous columns in stored procedure output sets are now called Column_1, Column_2 etc.
+	If this clashes will real columns more complex logic will be needed.
+	

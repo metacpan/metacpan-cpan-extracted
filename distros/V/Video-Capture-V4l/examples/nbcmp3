@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+use Video::Capture::VBI;
+use Fcntl;
+
+$vbi = new Video::Capture::V4l::VBI or die;
+
+# the next line is optional (it enables buffering)
+$vbi->backlog(50); # max. 1 second backlog (~900kB)
+
+open $fh, ">/dev/null" or die;
+
+# 162203 -> 162586 jinglesize (5000)
+# line 0 - relatively normal teletext line (80a Data)
+# line 1 - hhFFOOOOLLLLcccccc
+#          h maybe vertical/horizontal ecc like in intercast?
+#          F fileno?
+#          O offset in file
+#          L length of file
+#          c checksum?
+
+my $head;
+my $body;
+
+for (;;) {
+   for (decode_field $vbi->field, VBI_VT) {
+      if ($_->[1] == 0) {
+         if ($_->[2] == 0) {
+            printf "\n %04x %s", $_->[5], (unpack "H*", $_->[3]);
+         } elsif ($_->[2] == 1) {
+            $head = $_->[3];
+            $body = "";
+         } else {
+            print " ",unpack "H8", $_->[3];
+            $body .= substr ($_->[3], 1);
+            if ($_->[2] == 23 && length($body) == (22*39) && $head) {
+               my ($fno, $t2, $t3) = unpack "xxvVV", $head;
+               my $seq = Video::Capture::VBI::unham8($head);
+               if ($t2 <= $t3 && $fno) {
+                  (print "\n$seq X"), next if substr($head,0,1) eq "\xea";
+                  (print "\n$seq Y"), next if substr($head,0,1) eq "\xfd";
+                  my ($s) = unpack "H*", $head;
+                  printf "\n(%2x, %5d, %8d, %8d) # %s-%s", $seq, $fno, $t2, $t3, substr($s,12*2,6*2), substr($s,18*2);
+                  print "X" if substr($head,0,1) eq "\xea";
+                  print "Y" if substr($head,0,1) eq "\xfd";
+                  sysopen FH, "/tmp/nbc/$fno", O_CREAT|O_RDWR, 0666 or die "/tmp/nbc/$fno: $!";
+                  seek FH, $t2, 0;
+                  print " offset $t2 appending (",tell(FH),")";
+                  print FH substr($head, 18);
+                  print FH $body;
+                  close FH;
+               }
+            }
+         }
+      }
+   }
+}

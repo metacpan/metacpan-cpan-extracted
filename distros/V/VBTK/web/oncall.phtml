@@ -1,0 +1,51 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # Setup variables used in the commonHeader.phtml file
+  $refresh=0;
+  $title="On-call Schedule";
+
+  # Define a list of admin id's
+  my @adminList = ( 'sysop1','sysop2');
+
+  # What month is it
+  my $mm = (localtime(time))[4];
+
+  # Uncomment this to rotate the admin array around according to the month.
+  # That way you take turns being the first one on the call list.
+  while($mm-- > 0) { push(@adminList,shift(@adminList)); }
+
+-->  
+<!--#include virtual="/commonHeader.phtml" -->
+
+<!-- table of admins -->
+<table width="620" border="1">
+  <tr>
+    <th>Call Order</TH>
+    <th colspan="3">Administrator</TH>
+  </tr>
+  <!--#perl
+    foreach my $pos (0..$#adminList)
+    {
+      my $callNum = $pos+1;
+      my $name = $adminList[$pos];
+      my $domain = '@settomydomain.com';
+   -->
+      <tr>
+        <td align="CENTER">$callNum</td>
+        <td align="CENTER">
+             $name
+        </td>
+        <td align="CENTER">
+           <a href="mailto:$name$domain" target="_blank">
+             mail</a>
+        </td>
+        <td align="CENTER">
+           <a href="mailto:page.$name$domain" target="_blank">
+             page</a>
+        </td>
+      </tr>
+   <!--#perl } --> 
+</table>&nbsp<br>
+
+<!--#include virtual="/commonFooter.phtml" -->

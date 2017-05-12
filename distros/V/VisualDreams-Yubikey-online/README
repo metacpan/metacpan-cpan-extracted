@@ -1,0 +1,61 @@
+VisualDreams::Yubikey::online
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+  use VisualDreams::Yubikey::online;
+
+  my $yubify = VisualDreams::Yubikey::online->new("ID","Base64 encoded API key");
+
+  my $yubirecord = $yubify->verifyOnline($otp);
+  
+  my $url = $yubify->createUrl($otp);
+  my $signedurl = $yubify->createSignedUrl($otp);
+  my $signUrl = $yubify->signUrl($url);
+  
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl 5, 
+
+Digest::HMAC_SHA1,
+for the generation of the SHA1 HMAC;
+
+LWP::Simple,
+for the connection towards the Yubico API site;
+
+MIME::Base64,
+to encode the SHA1 HMAC;
+
+URI::Escape,
+to keep things working like specified!
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Gunther Voet. All rights reserved.
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+
+VISUALDREAMS
+
+The VisualDreams engine consists of years of programming experience by Gunther Voet.
+Some of this code will be gradually released towards the outside world. Most of this
+code still needs to be made modular before it can be used by the general public.
+
+The engine is specifically written towards rapid processing of rich-media files,
+xml in-output and realtime conversion, rpc-xml and server routines. This to ensure
+compatibility towards different platforms and devices. 

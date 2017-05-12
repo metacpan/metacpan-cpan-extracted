@@ -1,0 +1,50 @@
+#!/usr/bin/env perl 
+use warnings;
+use strict;
+use VIM::Packager;
+use VIM::Packager::Command;
+
+$|++;
+my $cmd = shift @ARGV;
+my $ret = VIM::Packager::Command->invoke( $cmd, @ARGV );
+
+# exit (defined $ret ? $ret : 1);
+
+1;
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+
+=head1 SYNOPSIS
+
+Do "vim-packager help" lists commands.
+Do "vim-packager help <command_name>" if you need to know the detail about command.
+
+=head1 USAGE
+
+=head1 AUTHORS
+
+Cornelius E<lt>cornelius.howl@gmail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2003-2005 by You-An Lin (Cornelius) E<lt>cornelius.howl@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut
+
+
+
+
+
+
+
+
+

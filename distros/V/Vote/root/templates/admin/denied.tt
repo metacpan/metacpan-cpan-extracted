@@ -1,0 +1,5 @@
+<!-- $Id: denied.tt 47 2009-03-17 00:55:27Z nanardon $ -->
+
+<div class="alert">
+<p>Impossible de modifier un vote entamé ou fini</p>
+</div>

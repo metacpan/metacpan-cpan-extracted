@@ -1,0 +1,31 @@
+Revision history for Perl extension VMS::Monitor.
+
+0.01  Thu Sep 17 10:55:15 1998
+	- original version; created by h2xs 1.18
+
+0.02  Thu Sep 17 14:57:03 1998
+    - Added in monitor_info_names and all the getspi entries
+
+0.02  Thu Sep 17 16:34:34 1998
+    - Added in code for one_monitor_piece
+
+0.02  Fri Sep 18 09:10:12 1998
+    - We need an event flag just 'cause. Now we've got one and it works!
+
+0.03  Fri Sep 18 17:11:34 1998
+    - Added in the SCS class fetch
+
+0.04  Mon Sep 21 11:04:32 1998
+    - Added in the DISK class fetch
+
+0.05  Mon Sep 21 15:45:03 1998
+    - Added in the PROC and MODES fetch. Proc's not working yet, though.
+
+0.06  Tue Oct 13 11:23:43 1998
+    - Fixed call to sys$clref (takes an event flag #, not pointer. Duh!).
+      Fix courtesy of Kent Covert
+
+0.07  Sat Apr 11 11:06:00 2009
+    - Changed C<#ifdef __ALPHA> to C<#ifndef __VAX> so we can run on OpenVMS I64.
+    - Modernized a few global variables (e.g., sv_yes -> PL_sv_yes).
+

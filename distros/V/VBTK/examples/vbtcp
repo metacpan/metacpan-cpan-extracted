@@ -1,0 +1,32 @@
+#!/bin/perl
+#
+# Example script for using VBTK::Tcp.  You can use this to check any TCP
+# listener.  It just connects and then hangs up.  It's good for monitoring
+# SSL, FTP, telnet, etc., when you just want to do a quick check.
+
+use VBTK;
+use VBTK::Tcp;
+
+# Initialize a test for an SSL server
+$obj = new VBTK::Tcp
+    (Host     => 'mywebhost',
+     Port     => 443 );
+$obj->addVBObj
+    (VBObjName    => '.mywebhost.https' );
+
+# Initialize a test for an FTP server
+$obj = new VBTK::Tcp
+    (Host     => 'myftphost',
+     Port     => 21 );
+$obj->addVBObj
+    (VBObjName    => '.myftphost.ftp' );
+
+# Initialize a test for a telnet host
+$obj = new VBTK::Tcp
+    (Host     => 'mytelnethost',
+     Port     => 23 );
+$obj->addVBObj
+    (VBObjName    => '.mytelnethost.telnet' );
+
+# Call this at the very end to start looping and checking everything
+VBTK::runAll;

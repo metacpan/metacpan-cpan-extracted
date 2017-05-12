@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzaproc_info" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+xmlns:proc_info="http://www.swsoft.com/webservices/vzl/4.0.0/proc_info" targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzaproc_info" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/proc_info" schemaLocation="../../vzl/4.0.0/VZLProc_info.xsd"/>
+	<xs:element name="vzaproc_info" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Reports information about the Environment processes ( like ps ).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="vzaproc_infoType">
+					<xs:choice minOccurs="0">
+						<xs:choice minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Input</xs:documentation>
+							</xs:annotation>
+							<xs:element ref="get"/>
+						</xs:choice>
+						<xs:choice>
+							<xs:annotation>
+								<xs:documentation>Output</xs:documentation>
+							</xs:annotation>
+							<xs:element ref="ps_info"/>
+						</xs:choice>
+					</xs:choice>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="vzaproc_infoType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="proc_info:proc_infoType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get">
+		<xs:annotation>
+			<xs:documentation>Gets the Environment processes list immediately. Returns ps_info or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="key" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Parameter by which sorting will be done. List of such parameters can be found in Agent vocabulary. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="limit" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of processes limitation.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="descending" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Order of sorting if present. Otherwise ascending.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ps_info" type="vzlt:ps_infoType">
+		<xs:annotation>
+			<xs:documentation>Processes information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="getResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ps_info"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

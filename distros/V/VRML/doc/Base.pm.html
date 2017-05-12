@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>VRML::Base.pm - common basic methods for VRML in/output</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#internals">Internals</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>VRML::Base.pm - common basic methods for VRML in/output</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use VRML::Base;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Following methods are implemented.</p>
+<dl>
+<dt><strong><a name="item_new">new</a></strong><br />
+</dt>
+<dd>
+<a href="#item_new"><code>new</code></a>
+</dd>
+<dd>
+<p>Creates a new VRML scene object.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_comment">comment</a></strong><br />
+</dt>
+<dd>
+<a href="#item_comment"><code>comment('string')</code></a>
+</dd>
+<dd>
+<p>Inserts a single comment line at the current position.
+You don't need to write the # in front. If no string is given, the method
+inserts only a #.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_insert">insert</a></strong><br />
+</dt>
+<dd>
+<a href="#item_insert"><code>insert('string')</code></a>
+</dd>
+<dd>
+<p>Inserts the string at the current position in the VRML scene.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_insert__data__">insert__DATA__</a></strong><br />
+</dt>
+<dd>
+<a href="#item_insert__data__"><code>insert__DATA__()</code></a>
+</dd>
+<dd>
+<p>Inserts the text block after __DATA__ of the current perl script
+in the VRML scene. Remember there are two underscores in front and
+at the end of the word DATA.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_include">include</a></strong><br />
+</dt>
+<dd>
+<a href="#item_include"><code>include('filename')</code></a>
+</dd>
+<dd>
+<p>Inserts the VRML code of the specified file in the current scene.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_print">print</a></strong><br />
+</dt>
+<dd>
+<a href="#item_print"><code>print('mime', 'pipe')</code></a>
+</dd>
+<dd>
+<p>Prints the VRML scene to STDOUT. If <em>mime</em> (bool) is given, this method
+prints the scene to STDOUT with the Content-type of the current scene. If
+<em>pipe</em> is given, then first the stream is send to the pipe and after that to
+STDOUT. This is usefull to compress the VRML code with GNU-ZIP.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<p>1.  <em>$vrml-&gt;print</em></p>
+</dd>
+<dd>
+<p>2.  <em>$vrml-&gt;print(1, 'gzip -f9')</em></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_save">save</a></strong><br />
+</dt>
+<dd>
+<a href="#item_save"><code>save('filename', 'pipe')</code></a>
+</dd>
+<dd>
+<p>Saves the VRML code to the specified name in <em>filename</em>. If no filename is
+given, this method uses the name of the perl script and changes the extension
+against <code>.wrl</code>. If <em>pipe</em> is given, then first the stream is send to the pipe
+and after that to STDOUT. This is usefull to compress the VRML code with
+GNU-ZIP.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<p>1.  <em>$vrml-&gt;save</em></p>
+</dd>
+<dd>
+<p>2.  <em>$vrml-&gt;save(undef, 'gzip -f9')</em></p>
+</dd>
+<dd>
+<p>3.  <em>$vrml-&gt;save('myScene.wrl')</em></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_as_string">as_string</a></strong><br />
+</dt>
+<dd>
+<a href="#item_as_string"><code>as_string</code></a>
+</dd>
+<dd>
+<p>Returns the VRML scene as string. Possible it uses too much memory to
+build the string.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="internals">Internals</a></h1>
+<p>You don't need the following 'native' methods.
+If yet, tell it me and I'll describe it in the next version.</p>
+<dl>
+<dt><strong><a name="item_debug">debug</a></strong><br />
+</dt>
+<dd>
+<a href="#item_debug"><code>debug</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__init">_init</a></strong><br />
+</dt>
+<dd>
+<a href="#item__init"><code>_init('VRML')</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__add">_add</a></strong><br />
+</dt>
+<dd>
+<a href="#item__add"><code>_add</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__trim">_trim</a></strong><br />
+</dt>
+<dd>
+<a href="#item__trim"><code>_trim</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__swap">_swap</a></strong><br />
+</dt>
+<dd>
+<a href="#item__swap"><code>_swap</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__put">_put</a></strong><br />
+</dt>
+<dd>
+<a href="#item__put"><code>_put</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__row">_row</a></strong><br />
+</dt>
+<dd>
+<a href="#item__row"><code>_row</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__pos">_pos</a></strong><br />
+</dt>
+<dd>
+<a href="#item__pos"><code>_pos</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item__format">_format</a></strong><br />
+</dt>
+<dd>
+<a href="#item__format"><code>_format</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Hartmut Palm <em>&lt;<a href="mailto:palm@gfz-potsdam.de">palm@gfz-potsdam.de</a>&gt;</em></p>
+
+</body>
+
+</html>

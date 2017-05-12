@@ -1,0 +1,58 @@
+#
+# Parser tests: mechanism "mx"
+#
+---
+positive:
+    'mx':
+        qualifier: '+'
+        domain: '@'
+    '?mx':
+        qualifier: '?'
+        domain: '@'
+    '-mx':
+        qualifier: '-'
+        domain: '@'
+    '~mx':
+        qualifier: '~'
+        domain: '@'
+    '+mx':
+        qualifier: '+'
+        domain: '@'
+    '-mx/25':
+        qualifier: '-'
+        domain: '@'
+        bitmask: '25'
+    'mx:mail.example.com':
+        qualifier: '+'
+        domain: 'mail.example.com'
+    '-mx:www.example.com':
+        qualifier: '-'
+        domain: 'www.example.com'
+    '~mx:example.net':
+        qualifier: '~'
+        domain: 'example.net'
+    'mx:foo.com/26':
+        qualifier: '+'
+        domain: 'foo.com'
+        bitmask: '26'
+    '?mx:bar.com/8':
+        qualifier: '?'
+        domain: 'bar.com'
+        bitmask: '8'
+
+negative:
+    'mx:10.17.1.0':
+        code: E_UNEXPECTED_IPADDR
+        context: 'mx:10.17.1.0'
+    '?mx:172.16.23.0/26':
+        code: E_UNEXPECTED_IPADDR
+        context: '?mx:172.16.23.0/26'
+    '-mx:2001::abe0':
+        code: E_UNEXPECTED_IPADDR
+        context: '-mx:2001::abe0'
+    '~mx:30a9:a37::ff0f/96':
+        code: E_UNEXPECTED_IPADDR
+        context: '~mx:30a9:a37::ff0f/96'
+    '%mx':
+        code: E_SYNTAX
+        context: '<*>%mx'

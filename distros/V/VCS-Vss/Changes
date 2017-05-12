@@ -1,0 +1,10 @@
+Revision history for Perl extension VCS::Vss.
+
+0.10  Thu Sep 19 09:32:05 2002
+	- original version; created by h2xs 1.21 with options
+		-n VCS::Vss -X -A
+0.20  Wed Jun 18 08:45:00 2003
+	- added missing test files to MANIFEST & repackaged.  
+	- Moved erroneous VSS folder out of Vss subfolder
+	- Added patch from Tim Hood <timhood40@yahoo.com> to handle spaces in VCS::Vss::_fix_path function
+

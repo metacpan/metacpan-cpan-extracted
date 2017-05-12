@@ -1,0 +1,17 @@
+^blib
+foo.*
+rename_plan\.txt
+~$
+^[^/]+\.pl$
+\.bak$
+_SKIP$
+^\.
+^_build
+^MYMETA.yml$
+^Build$
+\.xml$
+\.dat$
+^MYMETA\.json$
+\.tar.gz$
+\#
+^TO-FIX

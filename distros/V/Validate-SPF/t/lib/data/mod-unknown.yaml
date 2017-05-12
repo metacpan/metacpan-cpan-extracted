@@ -1,0 +1,25 @@
+#
+# Parser tests: unknown modifiers
+#
+---
+positive:
+    'foo=bar':
+        dummy: ~
+    'bar=bar.example.com':
+        dummy: ~
+    'baz=127.0.0.1':
+        dummy: ~
+    'qux=10.0.0.0/8':
+        dummy: ~
+
+negative:
+    'qux=':
+        code: E_SYNTAX
+        context: '<*>qux='
+    'quux':
+        code: E_SYNTAX
+        context: '<*>quux'
+    # TODO:
+    # 'idn=тест.example.com':
+    #     code: E_SYNTAX
+    #     context: 'idn=<*>тест.example.com'

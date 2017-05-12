@@ -1,0 +1,55 @@
+VMS-CMS version 0.03
+====================
+
+This modules provides access to the VMS Code Management System (CMS)
+using its callable interface.  CMS is an optional layered product that is
+separately licensed from VMS itself.  CMS is part of the DECset family of
+products.
+
+64-BIT CODE ISSUES
+
+The CMS shared image on Alpha appears to use some 64-bit code.  This
+module worked fine on Itanium but failed with errors signaled by the
+STR$ routines on Alpha.
+
+After some debugging I found that CMS was passing 64-bit descriptors
+to the callback routines.  I added code to handle this and then found
+it was also passing 64-bit pointers to time values.  These addresses
+are not passed correctly with CMS V4.5 (they are sign extended to 64
+bits) but this appears to be fixed with V4.6.
+
+I made some changes to the argument handling so that these pointers
+are received as unsigned ints, then moved to an unsigned 64-bit int
+before passing them to sys$asctim() as the address of the time value.
+As a result, times are properly returned from these callbacks.  This
+kludge should work until CMS passes an address that uses 33 bits.
+
+I have not yet noticed CMS passing a P2 space address to a string ID
+but I suppose it could.  If that happens, a similar kludge will be
+necessary for those pointers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires OpenVMS.
+
+This module requires that the Code Management System (CMS) from the
+DECset tools has been previously installed on the system.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, 2010, 2011, 2012 by Thomas Pfau.
+
+This module is free software.  You can redistribute it and/or modify
+it under the terms of the Artistic License 2.0.
+
+This module is distributed in the hope that it will be useful but it
+is provided "as is"and without any express or implied warranties.

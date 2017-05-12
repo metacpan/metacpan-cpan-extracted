@@ -1,0 +1,96 @@
+{
+   "abstract" : "Validates SPF text string",
+   "author" : [
+      "Anton Gerasimov <chim@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Validate-SPF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "examples",
+         "corpus"
+      ],
+      "namespace" : [
+         "t::lib"
+      ],
+      "package" : [
+         "Parse::Yapp::Driver",
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Regexp::Common" : "2013031301",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0.98",
+            "Test::Spec" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Validate::SPF" : {
+         "file" : "lib/Validate/SPF.pm",
+         "version" : "0.005"
+      },
+      "Validate::SPF::Parser" : {
+         "file" : "lib/Validate/SPF/Parser.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Wu-Wu/Validate-SPF/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Validate-SPF",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Wu-Wu/Validate-SPF.git",
+         "web" : "https://github.com/Wu-Wu/Validate-SPF"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:CHIM"
+}
+

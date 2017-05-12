@@ -1,0 +1,4 @@
+- require perl 5.006 (Alexandr Ciornii)
+- correct list of prereqs (Alexandr Ciornii)
+- repository in META.yml (Alexandr Ciornii)
+- simple test added (Alexandr Ciornii)

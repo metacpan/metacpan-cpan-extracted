@@ -1,0 +1,76 @@
+#!/usr/bin/perl 
+use v5.10;
+use strict;
+use warnings;
+use FindBin;
+use Term::ReadLine;
+use English;
+use lib "$FindBin::Bin/../lib";
+use VANAMBURG::BCS;
+use VANAMBURG::SiStebbins;
+
+my $menu = <<END;
+
+Rosary Trainer Menu
+======================
+Enter 1 for Breakthrough Card System
+Enter 2 for Si Stebbins CHaSed  (step = 3)
+Enter 3 for Si Stebbins CHaSed  (step = 4)
+Enter 4 for Si Stebbins SHoCkeD (step = 3)
+Enter 5 for Si Stebbins SHoCkeD (step = 4)
+
+Enter q to quit
+END
+say $menu;
+my $term = Term::ReadLine->new("BCS Test");
+my $test = $term->readline("Enter choice: ");
+exit if ( $test =~ /q/i );
+exit if !( $test ~~ [ 1, 2, 3, 4, 5 ] );
+
+my $deck;
+given ($test) {
+	when (/1/) { $deck = VANAMBURG::BCS->new; }
+	when (/2/) { $deck = VANAMBURG::SiStebbins->new; }
+	when (/3/) { $deck = VANAMBURG::SiStebbins->new( step => 4 ); }
+	when (/4/) {
+		$deck = VANAMBURG::SiStebbins->new( suit_order => 'SHoCkeD' );
+	}
+	when (/5/) {
+		$deck =
+		  VANAMBURG::SiStebbins->new( suit_order => 'SHoCkeD', step => 4 );
+	}
+	default { say "unknown option $test. quitting"; exit; }
+}
+
+my $sub_menu = <<END;
+
+Direction Menu
+======================
+Enter 1 for Top to Bottom 
+Enter 2 for Bottom to Top
+END
+say $sub_menu;
+my $direction = $term->readline("Enter choice: ");
+if ( !( $direction ~~ [ 1, 2 ] ) ) {
+	say "invalid option";
+	exit;
+}
+
+my @locations = ( 1 .. 52 );
+@locations = reverse @locations if ( $direction == 2 );
+my $first_location = shift @locations;
+
+my $current_card   = $deck->card_at_location($first_location);
+my $before_after = $direction == 2? 'before':'after';
+for my $location (@locations) {
+	my $next_card = $deck->card_at_location($location);
+	my $answer    = uc $term->readline(
+		"What comes $before_after " . $current_card->abbreviation . '? ' );
+	if ( $answer eq $next_card->abbreviation ) {
+		say "Correct";
+	}
+	else {
+		say "Wrong - correct answer is " . $next_card->abbreviation;
+	}
+	$current_card = $next_card;
+}

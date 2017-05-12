@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/event_log" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/event_log" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="event_log" type="event_logType">
+		<xs:annotation>
+			<xs:documentation>Log of Events.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="event_logType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_events"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="event" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get_events">
+		<xs:annotation>
+			<xs:documentation>Get log of events for specified parameters. Returns list of events.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice minOccurs="0">
+					<xs:element name="eid" type="vzlt:eid_type">
+						<xs:annotation>
+							<xs:documentation>The eid is the id of the enviroment that generated the event.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="subject" type="vzlt:eid_type">
+						<xs:annotation>
+							<xs:documentation>The environment identifier where the event was happened.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:element name="start_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Start time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="end_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>End time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="records" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of last records
+ to retrieve.Records will be presented in reverse order, i.e. oldest record is the last.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="sid" type="vzlt:sidType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Report events only with this sid.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="source" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Report events only with this source.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="category" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Report events only with this category.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="data" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Report 'data' in events if present. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="event" type="vzlt:eventType"/>
+	<xs:element name="get_eventsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="event"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="event_log_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="events" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Age of oldest event to keep in log.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

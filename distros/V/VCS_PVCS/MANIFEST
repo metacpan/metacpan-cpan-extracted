@@ -1,0 +1,18 @@
+Changes
+MANIFEST		This file
+Makefile.PL		Perl MakeMaker Makefile
+README
+VCS/PVCS.pm		(v0.01) Base class for VCS::PVCS
+VCS/PVCS/Commands.pm	(v0.01) Commands class for VCS::PVCS
+VCS/PVCS/Folder.pm	(v0.01) Folder class for VCS::PVCS
+VCS/PVCS/Project.pm	(v0.01) Project class for VCS::PVCS
+VCS/PVCS/Archive.pm	(v0.01) Archive file class for VCS::PVCS
+VCS/PVCS/Attributes.pm	(v0.01) Attributes class for VCS::PVCS
+t/00setup.t
+t/01simple.t
+t/02folder.t
+t/03project.t
+t/04commands.t
+t/README
+t/PVCSPROJ/MASTER.CFG
+t/PVCSPROJ/README

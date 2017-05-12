@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                V
+version:             0.13
+abstract:            Print version of the specified module(s).
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Abe Timmerman <abeltje@cpan.org>

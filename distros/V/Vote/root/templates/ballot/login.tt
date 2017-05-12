@@ -1,0 +1,21 @@
+[% INCLUDE 'includes/poll.tt' %]
+
+<div id="login" class="login_box">
+[% IF login_failure %]
+<p class="alert">Mauvais login et/ou mot de passe. Etes-vous sur les listes électorales ?</p>
+[% END %]
+<p>Veuillez vous authentifier pour voter:</p>
+<form action="[% c.uri_for(voteid) %]" method="POST">
+<table border="0" align="center">
+<tr>
+<td>Email:</td>
+<td><input type="text" name="mail" value="[% c.req.param('mail') %]"></td>
+</tr>
+<tr>
+<td>Mot de passe:</td>
+<td><input type="password" name="password" value=""></td>
+</tr>
+<tr><td colspan="2" align="center"><input type="submit"></td></tr>
+</table>
+</form>
+</div>

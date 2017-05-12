@@ -1,0 +1,85 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # If no mode is specified, then use the first one in the list.
+  my $currTab = 'Availability';
+  my $logObj = new VBTK::AdminLog("$::VBOBJ/$currTab.log");
+  my @headers = ('Start','Len (Min)','Sev','Area','Description|LEFT');
+  
+  my $start  = $_parms->{start};
+  my $len    = $_parms->{len};
+  my $sev    = $_parms->{sev};
+  my $area   = $_parms->{area};
+  my $desc   = $_parms->{desc};
+  my $submit = $_parms->{submit};
+  my $delete = $_parms->{delete};
+  my $sortCol = $_parms->{sortCol} || -1;
+  my $posListRef = $_parms->{'list','pos'};
+  
+  # Delete an entry if the 'delete' parm was specified
+  if($delete && $posListRef && @{$posListRef} > 0)
+  {
+     $logObj->delEntry(@{$posListRef});
+  }
+
+  # Save new entry if specified.  
+  if($start && $desc && $submit)
+  {
+      print STDOUT "desc=$desc\n";
+      $logObj->addEntry($start,$len,$sev,$area,$desc);
+  }
+
+  # Setup variables used in the commonHeader.phtml file
+  $title="Admin Logs - $currTab";
+  $refresh=0;
+  
+  my $now = &Date::Manip::UnixDate("today", "%Y-%m-%d %H:%M:%S");
+-->  
+<!--#include virtual="/commonHeader.phtml" -->
+<!--#include virtual="/adminLogTabs.phtml" -->
+<!--#include virtual="/adminLogEntries.phtml" -->
+  <tr align="CENTER" valign="TOP">
+    <td>
+      <textarea name="start" cols="11" rows="2" wrap="soft">$now</textarea>
+    </td>
+    <td>
+      <textarea name="len" cols="4" rows="2" wrap="soft"></textarea>
+    </td>
+    <td>
+      <select name="sev">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+    </td>
+    <td>
+      <select name="area">
+        <option value="App">App</option>
+        <option value="Net">Net</option>
+        <option value="DB">DB</option>
+        <option value="FW">FW</option>
+        <option value="MM">MM</option>
+        <option value="Web">Web</option>
+      </select>
+    </td>
+    <td>
+      <textarea name="desc" cols="40" rows="8" wrap="soft"></textarea>
+    </td>
+  </tr>
+  <tr align="CENTER" valign="TOP">
+    <td colspan="6">
+      <input type="submit" name="submit" value="Add Entry">
+      <input type="submit" name="delete" value="Delete Marked">
+    </td>
+  </tr>
+</table>
+</form>
+
+<!--#include virtual="/commonFooter.phtml" -->

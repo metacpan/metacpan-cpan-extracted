@@ -1,0 +1,34 @@
+#
+# Parser tests: modifier "exp"
+#
+---
+positive:
+    'exp=_spf.google.com':
+        domain: '_spf.google.com'
+    # TODO
+    # 'exp=%{ir}.example.com':
+    #     domain: '.google.com'
+
+negative:
+    'exp=':
+        code: E_DOMAIN_EXPECTED
+        context: 'exp'
+    'exp':
+        code: E_DOMAIN_EXPECTED
+        context: 'exp'
+    # TODO: more specific error?
+    'exp=тест.com':
+        code: E_SYNTAX
+        context: 'exp=<*>тест.com'
+    'exp=127.0.0.1':
+        code: E_DOMAIN_EXPECTED
+        context: '127.0.0.1'
+    'exp=127.0.0.1/8':
+        code: E_DOMAIN_EXPECTED
+        context: '127.0.0.1/8'
+    'exp=2a00:f940::37':
+        code: E_DOMAIN_EXPECTED
+        context: '2a00:f940::37'
+    'exp=2a00:f940::38/96':
+        code: E_DOMAIN_EXPECTED
+        context: '2a00:f940::38/96'

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+        Copyright © 2011 VMware, Inc. All rights reserved. Permission is
+        hereby granted, free of charge, to any person obtaining a copy of this
+        software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the
+        rights to use, copy, modify, merge, publish, distribute, sublicense,
+        and/or sell copies of the Software, and to permit persons to whom the
+        Software is furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software. THE
+        SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. Except as
+        explicitly provided herein, no express or implied licenses, under any
+        VMware patents, copyrights, trademarks, or any other intellectual
+        property rights, are granted or waived by implication, exhaustion,
+        estoppel, or otherwise, on modified versions of the Software.
+    -->
+<xs:schema xmlns="http://www.vmware.com/vcloud/v1.5" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified" targetNamespace="http://www.vmware.com/vcloud/v1.5"
+    version="1.0">
+    <xs:include schemaLocation="../vcloud/vcloud.xsd" />
+
+    <xs:complexType name="TaskRequestBaseType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents generic request to a task.
+                This is not supposed to be standalone type.
+             </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="EntityType">
+                <xs:sequence>
+                    <xs:element name="Organization" type="ReferenceType"
+                        minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                The organization in which the blocking task
+                                runs.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="User" type="ReferenceType" minOccurs="0"
+                        maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                The user who triggered the blocking task.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="TaskOwner" type="ReferenceType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation>
+                                The owner of the blocking task.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+
+                <xs:attribute name="createdTime" type="xs:dateTime" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation>
+                            The creation date/time of the request itself.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="timeoutDate" type="xs:dateTime" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation>
+                            The date/time at which this request times out.
+                            Requests time out if is not acted upon within a
+                            configured interval. When a request times out, it
+                            is automatically resumed, aborted or failed.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="timeoutAction" type="xs:string"
+                    use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Action that is automatically taken when a request
+                            times out. One of:
+                            resume (The task will be resumed.),
+                            abort (The task will be aborted. Transient
+                            objects are cleaned up. Task status is set to
+                            ABORTED.),
+                            fail (The task will be failed. Transient object
+                            status and task status are set to ERROR.)
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RequestOperationParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents parameters to a request.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ResourceType">
+                <xs:sequence>
+                    <xs:element name="Message" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                                <xs:documentation xml:lang="en">
+                                   Message that will be associated with the
+                                   action.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>

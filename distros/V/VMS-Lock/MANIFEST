@@ -1,0 +1,10 @@
+Changes
+Lock.pm
+Lock.xs
+Makefile.PL
+MANIFEST
+t/basic.t
+t/deadlock.t
+t/value_block.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

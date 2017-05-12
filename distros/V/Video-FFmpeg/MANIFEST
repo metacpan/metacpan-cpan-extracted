@@ -1,0 +1,17 @@
+Changes
+FFmpeg.xs
+Makefile.PL
+MANIFEST
+META.yml
+ppport.h
+README
+test
+test.mp4
+typemap
+t/Video-FFmpeg.t
+lib/Video/FFmpeg.pm
+lib/Video/FFmpeg/AVFormat.pm
+lib/Video/FFmpeg/AVStream/Subtitle.pm
+lib/Video/FFmpeg/AVStream/Audio.pm
+lib/Video/FFmpeg/AVStream/Video.pm
+lib/Video/FFmpeg/AVStream.pm

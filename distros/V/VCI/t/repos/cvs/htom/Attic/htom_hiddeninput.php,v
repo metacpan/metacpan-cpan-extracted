@@ -1,0 +1,56 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+//!  Class represents a file input object.
+class  HTOM_HiddenInput extends HTOM_Input
+{
+  /*! \brief Initialize the HTOM_TextInput object
+
+  * \param $id input element name.
+  * \param $value a default value of the hidden object.
+  * \param attributes either the HTOM_Attribute or an array of HTOM_Attribute objects.
+  */
+  public function __construct($id, $value, $attributes=NULL )
+  {
+    parent::__construct($id, "hidden", $attributes);
+    $this->SetAttributes( new HTOM_SimpleAttribute("value",$value) );
+  }
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

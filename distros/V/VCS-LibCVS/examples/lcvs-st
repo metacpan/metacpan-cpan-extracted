@@ -1,0 +1,535 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2003,2004,2005 Alexander Taler (dissent@0--0.org)
+#
+# All rights reserved. This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+#
+
+###############################################################################
+### Report CVS status in a compact format
+###############################################################################
+
+# This is an example of how to use VCS::LibCVS, but is also a useful tool in
+# its own right.  For usage and explanation of output, use the --help option.
+
+################################################################################
+### IMPROVEMENTS
+################################################################################
+
+####################
+### Add these short forms, print them by default:
+
+# U = UUU (up-to-date)
+# ? = NMU (unknown)
+# A = AUU (locally added)
+# R = RUU (locally removed)
+# M = UMU (locally modified)
+# C = UCU (unmodified since a merge which resulted in a conflict)
+# m = UMM (locally and remotely modified, no conflict)
+# c = UMM (locally and remotely modified, will conflict on merge)
+
+# There do exist other states without short forms, such as:
+
+# NUM  Added in the repository
+# NMM  In the way
+# AUM  been added locally, but already added in repository
+
+####################
+### Add these new states:
+
+# Admin State:
+#       S    Sticky tag or date on this file
+
+# Local State:
+#       I    The local file is in the way (This really is just an M file when
+#            there is no local revision, but a file in the repository.
+#            i.e. NMM could be written NIM) Might want to distinguish between
+#            one that has been added already.
+
+# Repository State:
+#       R    The file is dead in the latest revision
+
+####################
+### Add these options:
+
+# -s=a sort alphabetically
+#   =c order provided on command line
+#   =n print them as they are processed, no waiting
+
+# --revision-numbers   print revision numbers too
+# --sticky             print sticky tags/dates/revisions too
+# --branches           print branch tags too
+
+# --expect-branch      find files not on branch ...?  different tool maybe
+
+####################
+### And other stuff:
+
+# Write a man page
+
+###############################################################################
+
+use strict;
+use Carp;
+use Getopt::Long;
+use File::Spec;
+
+use VCS::LibCVS;
+
+# Various configuration options
+#$VCS::LibCVS::Cache_Repository = 0;
+#$VCS::LibCVS::Cache_FileRevision_Contents_by_Repository = 0;
+#$VCS::LibCVS::Cache_RepositoryFileOrDirectory = 0;
+#$VCS::LibCVS::Client::Connection::Pserver::Search_CvsPass = 1;
+#$VCS::LibCVS::Client::Connection::Pserver::Prompt = 1;
+#$VCS::LibCVS::Client::Connection::Pserver::Store_CvsPass =1;
+
+###############################################################################
+### Command line arguments processing
+# Any arguments that remain after this are file or directory names
+###############################################################################
+
+#
+# Commands
+#
+
+my ($cmd_help, $cmd_version);
+
+#
+# Options
+#
+
+# $opt_mod_state determines which files to report on, based on their
+# modification state.  Look in the help for possible values.
+my $opt_mod_state = "all";
+
+# $opt_dont_recurse indicates whether or not to recurse into subdirectories
+my $opt_dont_recurse = '';
+
+# $opt_debug indicates how much debugging information to generate
+my $opt_debug = 0;
+
+# $opt_debugfile indicates where to put the debugging output. undef for STDERR
+my $opt_debugfile;
+
+if (! GetOptions("help|h" => \$cmd_help,
+                 "version" => \$cmd_version,
+                 "modified-state|m=s" => \$opt_mod_state,
+                 "local|l" => \$opt_dont_recurse,
+                 "debug=i" => \$opt_debug,
+                 "debugfile=s" => \$opt_debugfile,
+                )) {
+  $cmd_help = 1;
+}
+
+#
+# Handle debugging options
+#
+
+# IO::File object to which debugging messages are written
+# used in sub debug_out
+my $debugfile;
+
+if ($opt_debug > 0) {
+  if (defined $opt_debugfile) {
+    $debugfile = IO::File->new(">> $opt_debugfile");
+  } else {
+    $debugfile = IO::Handle->new_from_fd(fileno(STDERR), ">>");
+  }
+
+  # Turn on Client debugging
+  $VCS::LibCVS::Client::DebugOut   = $opt_debugfile;
+
+  if ($opt_debug >= 4) {
+    $VCS::LibCVS::Client::DebugLevel = VCS::LibCVS::Client::DEBUG_OPTIONS;
+  }
+  if ($opt_debug >= 9) {
+    $VCS::LibCVS::Client::DebugLevel = VCS::LibCVS::Client::DEBUG_PROTOCOL;
+  }
+}
+
+# Name of the program
+my ($prog_name) = ($0 =~ /.*[\\\/](.*)/);
+
+# Check for non-default commands
+if ($cmd_version) {
+  print '$Header: /cvsroot/libcvs-perl/libcvs-perl/examples/lcvs-st,v 1.29 2005/10/10 12:52:12 dissent Exp $ ', "\n";
+  print "VCS::LibCVS::VERSION = $VCS::LibCVS::VERSION\n";
+  exit;
+}
+
+if ($cmd_help) {
+  print
+"Report CVS status in a compact format
+
+  $prog_name [--version] [--help|-h]
+  $prog_name [options] [<file or dir names . . .>]
+
+Report the status of the specified files, and files in the specified
+directories.  If no files or directories are specified, the current working
+directory is assumed.  The output looks like this:
+
+  UUU up-to-date-file
+  UMU locally-modified-file
+  UUM file-modified-in-repository
+  NMU unknown-file
+
+The status of the files is specified by the first three characters, whose
+meaning, from left to right, is:
+
+  1. Local Admin State  -- What's stored in CVS/Entries
+      (N)one           Nothing is known locally about the file
+      (U)Available     File is associated with a revision in the repository
+      (A)dded          Locally registered for addition
+      (R)emoved        Locally registered for removal
+
+  2. Local State of file compared with Local Admin state
+      (U)p-To-Date     File is locally unmodified
+      a(B)sent         The file is locally missing
+      (M)odified       File is modified from its associated revision
+      (C)onflict       Last merge resulted in conflicts, and the file hasn't
+                       been modified since
+
+  3. Repository State of file compared with Local Admin state
+      (U)p-To-Date     Local Revision is the latest.
+      a(B)sent         Should be in the repository, but isn't.
+      (M)odified       Local revision is not the latest.
+      Will (C)onflict  Changes in the repository conflict with local changes.
+
+Options:
+
+  --modified-state=<all|modified|locally-modified|remotely-modified|conflict>
+  -m=<a|m|l|r|c>
+
+  Print only files with the specified state.
+     'all' includes unmodified files.
+     'locally-modifed' are those with a local admin state of A or R,
+                   or a local admin state of U and a local state of B, M, or C,
+                   or a local admin state of N and a repository state of U.
+     'remotely-modifed' are those with a repository state of B, M or C.
+     'modified' are those which are remotely or locally modified.
+     'conflict' are those with local or repository state C,
+                as well as several other 'inconsistent' states.
+
+  --local  -l   Don't recurse into subdirectories.
+  --debug=[0-9] Level of debugging information to print (9 is most).
+"; exit; }
+
+###############################################################################
+### Start of code
+###############################################################################
+
+####################
+# As files and directories specified on the command line are processed,
+# information about each file is stored in a hash.  Once all arguments are
+# processed, the hash is culled according to any options provided.  Finally
+# information is printed, in the requested order.
+####################
+
+# Hash to store information on the files
+# Keys are the filenames, data are hash refs with the following keys:
+#   Name   => The name of the file
+#   LAdmin => The local administrative state
+#   LState => the local state of the file
+#   RState => the repository state of the file
+my %st_info;
+
+# If no files or directories were specified, assume the current directory
+push(@ARGV, ".") if (@ARGV == 0);
+
+foreach my $arg (@ARGV) {
+  if (-d $arg) {
+    process_directory($arg);
+  } elsif (-f $arg) {
+    process_file($arg);
+  } else {
+    # Doesn't exist locally, perhaps it's in the repository though
+    process_missing($arg);
+  }
+}
+
+print_output();
+
+exit;
+
+###############################################################################
+### Debug output
+###############################################################################
+
+# Arg 1: debug level
+# The rest of the args are passed to print
+sub debug_out {
+  my $level = shift;
+  if ($opt_debug >= $level) {
+    $debugfile->print(@_);
+    $debugfile->flush;
+  }
+}
+
+###############################################################################
+### process_* routines
+# These are used for processing stuff specified on the command line
+###############################################################################
+
+sub process_directory {
+  my $dir_name = shift;
+
+  debug_out(1, "process_directory: $dir_name\n");
+
+  # Construct a VCS::LibCVS::WorkingDirectory for this directory.
+  my $l_dir = VCS::LibCVS::WorkingDirectory->new($dir_name);
+
+  add_working_directory($l_dir);
+}
+
+sub process_file {
+  my $file_name = shift;
+
+  debug_out(1, "process_file: $file_name\n");
+
+  # Figure out if it's a CVS managed file or not
+  # One of these routines will throw an exception
+  # If both do, then it's an ignored file, so say nothing
+  my $l_file;  # If it's managed by CVS
+  my $u_file;  # If it's not managed by CVS
+  eval { $l_file = VCS::LibCVS::WorkingFile->new($file_name); };
+  eval { $u_file = VCS::LibCVS::WorkingUnmanagedFile->new($file_name); };
+
+  add_working_file($l_file) if ($l_file);
+  add_unmanaged_file($u_file) if ($u_file);
+
+  return;
+}
+
+# A filename that couldn't be found locally, it might be registered and absent,
+# or in the repository.  It could be a file or directory.
+
+# XXX when processing missing files deep in the tree, there is a challenge of
+# finding the right parent directory.  Best to start as deep as possible and
+# work back.
+
+# To simplify our life, we assume that the missing thing is a file.  If it's
+# locally registered into CVS, then process_file() will handle it fine.  If
+# it's not, then we find its parent directory on the local file system, and use
+# it to look for the missing file in the repo.  If its parent directory doesn't
+# exist, then we ignore it.
+sub process_missing {
+  my $file_name = shift;
+
+  debug_out(1, "process_missing: $file_name\n");
+
+  # Handle the easy case of a local file that's missing
+  process_file($file_name);
+  return if ($st_info{$file_name});
+
+
+  # Find the parent directory
+  my ($path_v, $path_d, $path_f) = File::Spec->splitpath($file_name);
+
+  # If there's no directory name, it must be the current dir.
+  $path_d ||= File::Spec->curdir;
+
+  my $l_dir = VCS::LibCVS::WorkingDirectory->new($path_d);
+  my $r_dir = $l_dir->get_remote_object();
+
+  # Get the RepositoryFile object, and add it.
+  add_repository_file($r_dir->get_file($path_f), $file_name);
+}
+
+###############################################################################
+### add_* routines
+# Used to add information from LibCVS objects to %st_info information.
+###############################################################################
+
+# Pass it a WorkingFile object
+sub add_working_file {
+  my $l_file = shift;
+
+  debug_out(1, "add_working_file: " . $l_file->get_name() . "\n");
+
+  my %f_info;
+  $f_info{Name} = $l_file->get_name();
+
+  # Get local admin state from scheduled actions
+  my $action = $l_file->get_scheduled_action();
+  $f_info{LAdmin} = "U" if $action == VCS::LibCVS::WorkingFile::ACTION_NONE;
+  $f_info{LAdmin} = "A" if $action == VCS::LibCVS::WorkingFile::ACTION_ADD;
+  $f_info{LAdmin} = "R" if $action == VCS::LibCVS::WorkingFile::ACTION_REMOVE;
+
+  # Get local state
+  my $state = $l_file->get_state();
+  $f_info{LState} = "U" if $state == VCS::LibCVS::WorkingFile::STATE_UPTODATE;
+  $f_info{LState} = "M" if $state == VCS::LibCVS::WorkingFile::STATE_MODIFIED;
+  $f_info{LState} = "C" if $state == VCS::LibCVS::WorkingFile::STATE_HADCONFLICTS;
+  $f_info{LState} = "B" if $state == VCS::LibCVS::WorkingFile::STATE_ABSENT;
+
+  # Get repository state
+  my $rstate = $l_file->get_rstate();
+  $f_info{RState} = "U" if $rstate == VCS::LibCVS::WorkingFile::STATE_UPTODATE;
+  $f_info{RState} = "M" if $rstate == VCS::LibCVS::WorkingFile::STATE_MODIFIED;
+  $f_info{RState} = "B" if $rstate == VCS::LibCVS::WorkingFile::STATE_ABSENT;
+  $f_info{RState} = "C" if $rstate == VCS::LibCVS::WorkingFile::STATE_WILLCONFLICT;
+
+  # Shove it into the hash ref
+  $st_info{$f_info{Name}} = \%f_info;
+  return;
+}
+
+# Pass it an UnmanagedFile object
+sub add_unmanaged_file {
+  my $u_file = shift;
+
+  debug_out(1, "add_unmanaged_file: " . $u_file->get_name() . "\n");
+
+  my %f_info;
+  $f_info{Name} = $u_file->get_name();
+
+  # Local admin is always N
+  $f_info{LAdmin} = "N";
+
+  # Local state is always M
+  $f_info{LState} = "M";
+
+  # Get repository state
+  $f_info{RState} = $u_file->is_in_the_way() ? "M" : "U";
+
+  # Shove it into the hash ref
+  $st_info{$f_info{Name}} = \%f_info;
+  return;
+}
+
+# Pass it a WorkingDirectory object
+# A working directory isn't added directly, but files in it are.
+sub add_working_directory {
+  my $w_dir = shift;
+
+  debug_out(1, "add_working_directory: " . $w_dir->get_name() . "\n");
+
+  ####################
+  # Add entries to %st_info for each file in a directory.
+  #
+  # There are three lists of files that are of interest:
+  #   1] Files in the repository: Those files with non-dead revisions at the tip
+  #                               of the sticky branch or trunk.
+  #   2] Local CVS files: Files which have been checked out of CVS already, as
+  #                       well as files scheduled for addition.
+  #   3] Local unmanaged files: Local files not recognized by CVS (neither added
+  #                             nor ignored.)
+  #
+  # Of course, the same file may appear in 1] as well as 2] or maybe 3], so the
+  # lists are handled in the following way (NB. By traverse I mean: add entries
+  # to st_info for each file in the list.):
+  #    + List 1] is fetched from LibCVS.
+  #    + List 2] is fetched from LibCVS.
+  #    + List 2] is traversed.  Any file also present in 1] is deleted from 1]
+  #    + List 3] is fetched from LibCVS.
+  #    + List 3] is traversed.  Any file also present in 1] is deleted from 1]
+  #    + The shortened list 1] is traversed.
+  ####################
+
+  # Get the list of files in the repository.  (list 1] above)
+  my $dir_branch = $w_dir->get_directory_branch();
+  my $r_files = $dir_branch->get_file_branches();
+
+  # Get the list of local CVS managed files in this directory.  (list 2] above)
+  my $l_files = $w_dir->get_files();
+  foreach my $l_file_name (keys %$l_files) {
+    add_working_file($l_files->{$l_file_name});
+    # Remove from the remote file list
+    delete($r_files->{$l_file_name});
+  }
+
+  # Get the list of unmanaged files.  (list 3] above)
+  my $u_files = $w_dir->get_unmanaged_files();
+  foreach my $u_file_name (keys %$u_files) {
+    add_unmanaged_file($u_files->{$u_file_name});
+    # Remove from the remote file list
+    delete($r_files->{$u_file_name});
+  }
+
+  # Process the remaining remote files (list 1] above)
+  foreach my $r_filename (keys %$r_files) {
+    $r_filename = File::Spec::Unix->catfile($w_dir->get_name(), $r_filename);
+    $r_filename = File::Spec::Unix->canonpath($r_filename);
+    $st_info{$r_filename} = { Name => $r_filename,
+                              LAdmin => "N",
+                              LState => "U",
+                              RState => "M" };
+  }
+
+  ####################
+  # Recurse into subdirectories
+  ####################
+  if (! $opt_dont_recurse) {
+    my $s_dirs = $w_dir->get_directories();
+    foreach my $s_dir (values %$s_dirs) {
+      add_working_directory($s_dir);
+    }
+  }
+}
+
+# Pass it a RepositoryFile object, and its local name
+sub add_repository_file {
+  my $r_file = shift;
+  my $l_name = shift;
+
+  debug_out(1, "add_repository_file: " . $r_file->get_name() . "\n");
+
+  my %f_info;
+  $f_info{Name} = $l_name;
+
+  # Local admin is always N
+  $f_info{LAdmin} = "N";
+
+  # Local state is always U
+  $f_info{LState} = "U";
+
+  # Repository state is always M
+  $f_info{RState} = "M";
+
+  # Shove it into the hash ref
+  $st_info{$f_info{Name}} = \%f_info;
+  return;
+}
+
+###############################################################################
+### Print routine
+###############################################################################
+sub print_output {
+  # Print output
+  foreach my $file_name (sort keys %st_info) {
+    my $f_info = $st_info{$file_name};
+    $f_info->{State} = $f_info->{LAdmin}.$f_info->{LState}.$f_info->{RState};
+
+    if (   ($opt_mod_state =~ /^(all|a)$/)
+        || (($opt_mod_state =~ /^(locally-modified|l)$/)
+             && ((($f_info->{LAdmin} =~ /U/) && ($f_info->{LState} =~ /[BMC]/))
+                 || (($f_info->{LAdmin} =~ /N/) && ($f_info->{RState} =~ /[U]/))
+                 || ($f_info->{LAdmin} =~ /[AR]/)))
+        || (($opt_mod_state =~ /^(remotely-modified|r)$/)
+            && ($f_info->{RState} =~ /[BMC]/))
+        || (($opt_mod_state =~ /^(modified|m)$/)
+             && ((($f_info->{LAdmin} =~ /U/) && ($f_info->{LState} =~ /[BMC]/))
+                 || (($f_info->{LAdmin} =~ /N/) && ($f_info->{RState} =~ /[U]/))
+                 || ($f_info->{LAdmin} =~ /[AR]/)
+                 || ($f_info->{RState} =~ /[BMC]/)))
+        || (($opt_mod_state =~ /^(conflict|c)$/)
+            # This reports more than just merge conflicts.
+            # It includes many other probably wrong states.
+            && (($f_info->{LState} =~ /C/)
+                || ($f_info->{RState} =~ /C/)
+                # If it's added or removed, nothing else should be changed
+                || (($f_info->{LAdmin} =~ /[AR]/) &&
+                    (($f_info->{LState} !~ /U/) || ($f_info->{RState} !~ /U/)))
+                # If a file is absent, it's bad
+                || (($f_info->{LState} =~ /B/) || ($f_info->{RState} =~ /B/))
+                # No local admin, but exists locally and remotely is bad
+                || (($f_info->{LAdmin} =~ /N/)
+                    && ($f_info->{LState} =~ /M/)
+                    && ($f_info->{RState} =~ /M/))
+               ))) {
+      print($f_info->{State} . " " . $f_info->{Name} . "\n");
+    }
+  }
+}

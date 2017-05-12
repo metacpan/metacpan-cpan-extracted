@@ -1,0 +1,81 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+//! This class represents an input query widget.
+class HTOM_QueryField implements HTOM_Input
+{
+  public function __construct( $caption, $hint, HTOM_Input $input, 
+			       $captionStyle="font-size: 12px; text-align:right; font-family:Verdana",
+			       $hintStyle=" font-size: 10px; text-align:left; font-family:Verdana;" )
+  {
+    $this->caption = $caption;
+    $this->hint = $hint;
+    $this->input = $input;
+    $this->captionStyle = $captionStyle;
+    $this->hintStyle = $hintStyle;
+  }
+
+  //! Evaluate an input field.
+  public function Evaluate()
+  {
+    $mt = new HTOM_Table();
+
+    $hint = new HTOM_Container($this->hint, new HTOM_Style("visibility:hidden; display:inline; position:absolute; border-top: 1px solid white; background: yellow;" ));
+    
+    $showAction = new HTOM_JScript("document.getElementById('{DIVID}').style.visibility='visible';");
+    $showAction->SetKeywordValue("DIVID",$hint->ID()->GetValue());
+    $hideAction = new HTOM_JScript("document.getElementById('{DIVID}').style.visibility='hidden';");
+    $hideAction->SetKeywordValue("DIVID",$hint->ID()->GetValue());
+
+    $caption = new HTOM_Container($this->caption, new HTOM_Style($this->captionStyle));
+    $caption->SetJSAction("onmouseover",$showAction);
+    $caption->SetJSAction("onmouseout",$hideAction,new HTOM_Style($this->hintStyle));
+
+    $mt->AddElement(0,0,$caption);
+    $mt->AddElement(1,0,$hint);
+    $mt->AddElement(0,1,$this->input);
+    return $mt->Evaluate();
+  }
+  private $caption;
+  private $captionStyle;
+  private $hint;
+  private $hintStyle;
+  private $input;
+};
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

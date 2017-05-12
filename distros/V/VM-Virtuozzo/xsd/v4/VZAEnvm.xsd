@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzat="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzaenvm" xmlns:vzlenvm="http://www.swsoft.com/webservices/vzl/4.0.0/envm" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzaenvm" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" schemaLocation="VZACommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/envm" schemaLocation="../../vzl/4.0.0/VZLEnvm.xsd"/>
+	<xs:element name="vzaenvm" type="vzaenvmType" substitutionGroup="vzlp:operator"/>
+	<xs:complexType name="vzaenvmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlenvm:envmType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="mount"/>
+						<xs:element ref="umount"/>
+						<xs:element ref="set_user_password"/>
+						<xs:element ref="upgrade"/>
+						<xs:element ref="determine_env"/>
+						<xs:element ref="set_ugid_quota"/>
+						<xs:element ref="get_ugid_quota"/>
+						<xs:element ref="get_split_conf"/>
+						<xs:element ref="validate"/>
+						<xs:element ref="get_script"/>
+						<xs:element ref="set_script"/>
+						<xs:element ref="del_script"/>
+						<xs:element ref="recover_template"/>
+					</xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="veid"/>
+						<xs:element name="ugid_quota" type="ugid_quota_info">
+							<xs:annotation>
+								<xs:documentation>Second level quota for user/group structure.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="config"/>
+						<xs:element ref="validation" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="script"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="mount">
+		<xs:annotation>
+			<xs:documentation>Mount Container. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="umount">
+		<xs:annotation>
+			<xs:documentation>Umount Container. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="allocate_veid"/>
+	<xs:element name="suspend">
+		<xs:annotation>
+			<xs:documentation>Suspend Container. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resume">
+		<xs:annotation>
+			<xs:documentation>Restore suspended Container. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="upgrade">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:sequence>
+					<xs:element name="options" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="force" minOccurs="0"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_user_password">
+		<xs:annotation>
+			<xs:documentation>Set user password in evironment. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Administrator login used when non-specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="password" type="xs:base64Binary"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="determine_env">
+		<xs:annotation>
+			<xs:documentation>Return EID of determined environment or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="link">
+					<xs:annotation>
+						<xs:documentation>Client connection parameters. That reported by browser. </xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ip" type="vzlt:ip_type">
+								<xs:annotation>
+									<xs:documentation>Server part IP address.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="port" type="xs:int" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Server part port.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="client_ip" type="vzlt:ip_type" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Client part IP address.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="client_port" type="xs:int" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Client part port.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="eid" type="vzlt:eid_type"/>
+	<xs:element name="veid" type="vzat:veid_type"/>
+	<xs:element name="set_ugid_quota">
+		<xs:annotation>
+			<xs:documentation>Sets second level quota for user/group. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+				<xs:element name="ugid_quota" type="ugid_quota_info">
+					<xs:annotation>
+						<xs:documentation>Second level quota for user/group structure.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="ugid_quota_info">
+		<xs:sequence>
+			<xs:element name="type" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Type of the quota: uid = 0 or gid = 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="quota" type="quota_type" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="grace_period" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Grace period for Container ugid quota (affects all of the Container ugid quotas).</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="inodes" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>Disk inodes grace period in seconds.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="space" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>Disk space grace period in seconds.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="quota_type">
+		<xs:sequence>
+			<xs:element name="id" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>UID or GID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="diskspace" type="quota_limit">
+				<xs:annotation>
+					<xs:documentation>Disk space limitations.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="diskinodes" type="quota_limit">
+				<xs:annotation>
+					<xs:documentation>Disk inodes limitation.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="get_ugid_quota">
+		<xs:annotation>
+			<xs:documentation>Gets second level quota for user/group. Returns "ugid_quota" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+				<xs:element name="id" type="xs:int" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>UID or GID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="type" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Type of the quota: uid = 0 or gid = 1</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="quota_limit">
+		<xs:sequence>
+			<xs:element name="cur" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>Current value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="soft" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>Soft limit.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hard" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>Hard limit.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="get_split_conf">
+		<xs:annotation>
+			<xs:documentation>Gets Container sample configuration based on a division of the Hardware Node by the specified "number" of Containers. Returns "ve_config" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="number" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Number of Containers to split the Hardware Node on.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="validation" type="validationType">
+		<xs:annotation>
+			<xs:documentation>QOS validation warning.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="validate">
+		<xs:annotation>
+			<xs:documentation>Validates the Container QoSes.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="validationType">
+		<xs:sequence>
+			<xs:element name="type" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Level of warning from 0 to 3. 0 means the most critical error.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="warning" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Text of the warning.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="formula" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Formula, which produced such a warning.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="qosID" type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>QoS ID that will be substituted, in this formula.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="allocate_veidResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="veid"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mountResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="umountResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="suspendResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resumeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_user_passwordResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="upgradeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="determine_envResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_split_confResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="config" type="vzat:venv_configType"/>
+	<xs:element name="script">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name of the script.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="type" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Script type: reinstall</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="description" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Description</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="body" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Optional body of script.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_script">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+				<xs:element name="type" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Filter script by type: reinstall.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Filter script by name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_scriptResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="script" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_script">
+		<xs:annotation>
+			<xs:documentation>Set script into Container. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+				<xs:element name="type" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Filter script by type: reinstall or action.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Filter script by name. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="body" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Script body. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_scriptResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_script">
+		<xs:annotation>
+			<xs:documentation>Delete script from Container. Returns Ok/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+				<xs:element name="type" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Filter script by type: reinstall or action.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Filter script by name. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_scriptResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="recover_template">
+		<xs:annotation>
+			<xs:documentation>Attempt to recover all Container templates. WARNING: this function can corrupt some of your config files. So be carefull.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+				<xs:element name="password" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>New root password. If specified - reset user credentials files. (/etc/passwd ...).</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="clean" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Create new private area, install all applications, copy Container credentials from old Container  if "resetpwdb" not  given   and  if "skipbackup"  option  not given moved old Container private area to /old directory. WARNING: if you have non-default configs on some services, they will be available only in /old, so some of the services can work incorrectly.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="skipbackup" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Skip creation backup of old Container private area.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="script" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Name of the script, got by vzaenvm/get_script.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="recover_templateResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="vzaenvm_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlenvm:envm_configurationType">
+				<xs:sequence>
+					<xs:element name="start_veid" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Minimal value of veid for auto allocation.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="end_veid" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Maximal value of veid for auto allocation.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="sve_visible" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>If 1 - Service Container is visible.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="timeouts">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="create" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Timeout for create operation.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="operate" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Timeout for other operations.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="init" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Timeout for init operation.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="clone" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Timeout for clone operation.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="move" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Timeout for move operation.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+Makefile.PL
+MANIFEST
+README
+Time.xs
+t/VMS-Time.t
+lib/VMS/Time.pm
+fallback/const-c.inc
+fallback/const-xs.inc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

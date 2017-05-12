@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>VRML::VRML2::Standard.pm - implements VRML 2.0/97 standard nodes</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#grouping_nodes">Grouping Nodes</a></li>
+		<li><a href="#special_groups">Special Groups</a></li>
+		<li><a href="#common_nodes">Common Nodes</a></li>
+		<li><a href="#geometry">Geometry</a></li>
+		<li><a href="#geometric_properties">Geometric Properties</a></li>
+		<li><a href="#appearance">Appearance</a></li>
+		<li><a href="#sensors">Sensors</a></li>
+		<li><a href="#interpolators">Interpolators</a></li>
+		<li><a href="#bindable_nodes">Bindable Nodes</a></li>
+		<li><a href="#other">other</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>VRML::VRML2::Standard.pm - implements VRML 2.0/97 standard nodes</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use VRML::VRML2::Standard;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Following nodes are currently implemented.</p>
+<p>[<code>Grouping Nodes</code>]
+[<code>Special Groups</code>]
+[<code>Common Nodes</code>]</p>
+<p>[<code>Geometry</code>]
+[<code>Geometric Properties</code>]
+[<a href="#item_appearance"><code>Appearance</code></a>]</p>
+<p>[<code>Sensors</code>]
+[<code>Interpolators</code>]
+[<code>Bindable Nodes</code>]</p>
+<p>
+</p>
+<h2><a name="grouping_nodes">Grouping Nodes</a></h2>
+<p>These nodes <strong>NEED</strong> <strong>End</strong> if the $children parameter is empty !</p>
+<dl>
+<dt><strong><a name="item_anchor">Anchor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_anchor"><code>Anchor($url, $description, $parameter, $bboxSize, $bboxCenter, $children)</code></a>
+</dd>
+<dd>
+<p>Currently only the first part of <em>$parameter</em> is supported.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_billboard">Billboard</a></strong><br />
+</dt>
+<dd>
+<a href="#item_billboard"><code>Billboard($axisOfRotation, $children)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_collision">Collision</a></strong><br />
+</dt>
+<dd>
+<a href="#item_collision"><code>Collision($collide, $proxy, $children)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_group">Group</a></strong><br />
+</dt>
+<dd>
+<a href="#item_group"><code>Group($bboxSize, $bboxCenter)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_transform">Transform</a></strong><br />
+</dt>
+<dd>
+<a href="#item_transform"><code>Transform($translation, $rotation, $scale, $scaleOrientation, $center, $bboxSize, $bboxCenter)</code></a>
+</dd>
+<dd>
+<p>$translation is a SFVec3f</p>
+</dd>
+<dd>
+<p>$rotation is a SFRotation</p>
+</dd>
+<dd>
+<p>$scale is a SFVec3f</p>
+</dd>
+<dd>
+<p>$scaleOrientation is a SFRotation</p>
+</dd>
+<dd>
+<p>$center is a SFVec3f</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="special_groups">Special Groups</a></h2>
+<dl>
+<dt><strong><a name="item_inline">Inline</a></strong><br />
+</dt>
+<dd>
+<a href="#item_inline"><code>Inline($url, $bboxSize, $bboxCenter)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_lod">LOD</a></strong><br />
+</dt>
+<dd>
+<a href="#item_lod"><code>LOD($range, $center)</code></a>
+</dd>
+<dd>
+<p>$range is a MFFloat</p>
+</dd>
+<dd>
+<p>$center is a SFVec3f</p>
+</dd>
+<dd>
+<p>Example: <a href="#item_lod"><code>LOD([1, 2, 5], '0 0 0')</code></a></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_switch">Switch</a></strong><br />
+</dt>
+<dd>
+<a href="#item_switch"><code>Switch($whichChoice)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="common_nodes">Common Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_directionallight">DirectionalLight</a></strong><br />
+</dt>
+<dd>
+<a href="#item_directionallight"><code>DirectionalLight($direction, $intensity, $ambientIntensity, $color, $on)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_pointlight">PointLight</a></strong><br />
+</dt>
+<dd>
+<a href="#item_pointlight"><code>PointLight($location, $intensity, $ambientIntensity, $color, $on)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_spotlight">SpotLight</a></strong><br />
+</dt>
+<dd>
+<a href="#item_spotlight"><code>SpotLight($location, $direction, $intensity, $color, $on)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_sound">Sound</a></strong><br />
+</dt>
+<dd>
+<a href="#item_sound"><code>Sound($source, $location, $direction, $intensity, $maxFront, $maxBack, $minFront, $minBack, $priority, $spatialize)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_audioclip">AudioClip</a></strong><br />
+</dt>
+<dd>
+<a href="#item_audioclip"><code>AudioClip($url, $description, $loop, $pitch, $startTime, $stopTime)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_worldinfo">WorldInfo</a></strong><br />
+</dt>
+<dd>
+<a href="#item_worldinfo"><code>WorldInfo($title, $info)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_shape">Shape</a></strong><br />
+</dt>
+<dd>
+<a href="#item_shape"><code>Shape($geometry, $appearance)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="geometry">Geometry</a></h2>
+<dl>
+<dt><strong><a name="item_box">Box</a></strong><br />
+</dt>
+<dd>
+<a href="#item_box"><code>Box($size)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_cone">Cone</a></strong><br />
+</dt>
+<dd>
+<a href="#item_cone"><code>Cone($radius, $height, $side, $bottom)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_cylinder">Cylinder</a></strong><br />
+</dt>
+<dd>
+<a href="#item_cylinder"><code>Cylinder($radius, $height, $top, $side, $bottom)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_elevationgrid">ElevationGrid</a></strong><br />
+</dt>
+<dd>
+<a href="#item_elevationgrid"><code>ElevationGrid($xDimension, $zDimension, $xSpacing, $zSpacing, $height, $creaseAngle, $color, $colorPerVertex, $solid)</code></a>
+</dd>
+<dd>
+<p>$height should be a reference of a list of height values
+like <code>['0 1 3 2', '2 3 5 4', ...]</code></p>
+</dd>
+<dd>
+<p>$color can be a reference to a subroutine or list of color values</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_extrusion">Extrusion</a></strong><br />
+</dt>
+<dd>
+<a href="#item_extrusion"><code>Extrusion($crossSection, $spine, $scale, $orientation, $beginCap, $endCap, $creaseAngle, $solid, $convex, $ccw)</code></a>
+</dd>
+<dd>
+<p>$crossSection must be a reference of a list of XY values
+like <code>[ '1 1', '1 -1', '-1 -1', '-1 1', '1  1' ]</code></p>
+</dd>
+<dd>
+<p>$spine must be a reference of a list of spine values
+like <code>['0 0 0', '0 1 0', ...]</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_indexedfaceset">IndexedFaceSet</a></strong><br />
+</dt>
+<dd>
+<a href="#item_indexedfaceset"><code>IndexedFaceSet($coord, $coordIndex, $color, $colorIndex, $colorPerVertex, $normal, $normalIndex, $texCoord, $texCoordIndex)</code></a>
+</dd>
+<dd>
+<p>$coordIndex can be a string with a list of point index
+like <code>'0 1 3 2', '2 3 5 4', ...</code> or a reference of list of point index</p>
+</dd>
+<dd>
+<p>$coordIndex can be a string or a reference of a list of colors index</p>
+</dd>
+<dd>
+<p>$normalIndex can be a string or a reference of a list of normals index</p>
+</dd>
+<dd>
+<p>$texCoordIndex can be a string or a reference of a list of textures index</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_indexedlineset">IndexedLineSet</a></strong><br />
+</dt>
+<dd>
+<a href="#item_indexedlineset"><code>IndexedLineSet($coord, $coordIndex, $color, $colorIndex, $colorPerVertex)</code></a>
+</dd>
+<dd>
+<p>$coord can be a string with the <a href="#item_coordinate"><code>Coordinate</code></a> node or a reference to a
+<a href="#item_coordinate"><code>Coordinate</code></a> method</p>
+</dd>
+<dd>
+<p>$coordIndex can be a string or a reference of a list of point index
+like <code>'0, 1, 3, 2', '2, 3, 5, 4', ...</code></p>
+</dd>
+<dd>
+<p>$color can be a string with the &lt;Color&gt; node or a reference of a &lt;Color&gt; method</p>
+</dd>
+<dd>
+<p>$colorIndex can be a string or a reference of a list of color index</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_pointset">PointSet</a></strong><br />
+</dt>
+<dd>
+<a href="#item_pointset"><code>PointSet($coord, $color)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_sphere">Sphere</a></strong><br />
+</dt>
+<dd>
+<a href="#item_sphere"><code>Sphere($radius)</code></a>
+</dd>
+<dd>
+<p>$radius have to be &gt; 0</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_text">Text</a></strong><br />
+</dt>
+<dd>
+<a href="#item_text"><code>Text($string, $fontStyle, $length, $maxExtent)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="geometric_properties">Geometric Properties</a></h2>
+<dl>
+<dt><strong><a name="item_coordinate">Coordinate</a></strong><br />
+</dt>
+<dd>
+<a href="#item_coordinate"><code>Coordinate(@point)</code></a>
+</dd>
+<dd>
+<p>@point should be a list of points with strings like <code>'1.0 0.0 0.0', '-1 2 0'</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_color">Color</a></strong><br />
+</dt>
+<dd>
+<a href="#item_color"><code>Color(@color)</code></a>
+</dd>
+<dd>
+<p>@color should be a list of colors with strings like <code>'1.0 0.0 0.0', '.3 .2 .1'</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_normal">Normal</a></strong><br />
+</dt>
+<dd>
+<a href="#item_normal"><code>Normal(@vector)</code></a>
+</dd>
+<dd>
+<p>@vector should be a list of vectors with strings like <code>'1.0 0.0 0.0', '.4 .2 0'</code></p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="appearance">Appearance</a></h2>
+<dl>
+<dt><strong><a name="item_appearance">Appearance</a></strong><br />
+</dt>
+<dd>
+<a href="#item_appearance"><code>Appearance($material, $texture, $textureTransform)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_fontstyle">Fontstyle</a></strong><br />
+</dt>
+<dd>
+<code>FontStyle($size, $family, $style, $justify, $language)</code>
+defines the current font style for the current <a href="#item_text"><code>Text</code></a> Nodes
+</dd>
+<dd>
+<p>$style can be 'PLAIN','BOLD','ITALIC','BOLD ITALIC'</p>
+</dd>
+<dd>
+<p>$familiy can be 'SERIF','SANS','TYPEWRITER'</p>
+</dd>
+<dd>
+<p>$justify can be 'BEGIN', 'MIDDLE', 'END'</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_material">Material</a></strong><br />
+</dt>
+<dd>
+<a href="#item_material"><code>Material(%materials)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_imagetexture">ImageTexture</a></strong><br />
+</dt>
+<dd>
+<a href="#item_imagetexture"><code>ImageTexture($url)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_movietexture">MovieTexture</a></strong><br />
+</dt>
+<dd>
+<a href="#item_movietexture"><code>MovieTexture($url)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="sensors">Sensors</a></h2>
+<dl>
+<dt><strong><a name="item_cylindersensor">CylinderSensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_cylindersensor"><code>CylinderSensor($maxAngle, $minAngle, $diskAngle, $offset, $autoOffset, $enabled)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_planesensor">PlaneSensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_planesensor"><code>PlaneSensor($maxPosition, $minPosition, $offset, $autoOffset, $enabled)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_proximitysensor">ProximitySensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_proximitysensor"><code>ProximitySensor($size, $center, $enabled)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_spheresensor">SphereSensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_spheresensor"><code>SphereSensor($offset, $autoOffset, $enabled)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_timesensor">TimeSensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_timesensor"><code>TimeSensor($cycleInterval, $loop, $startTime, $stopTime, $enabled)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_touchsensor">TouchSensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_touchsensor"><code>TouchSensor($enabled)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_visibilitysensor">VisibilitySensor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_visibilitysensor"><code>VisibilitySensor($size, $center, $enabled)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="interpolators">Interpolators</a></h2>
+<dl>
+<dt><strong><a name="item_colorinterpolator">ColorInterpolator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_colorinterpolator"><code>ColorInterpolator($key, $keyValue)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_coordinateinterpolator">CoordinateInterpolator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_coordinateinterpolator"><code>CoordinateInterpolator($key, $keyValue)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_orientationinterpolator">OrientationInterpolator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_orientationinterpolator"><code>OrientationInterpolator($key, $keyValue)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_normalinterpolator">NormalInterpolator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_normalinterpolator"><code>NormalInterpolator($key, $keyValue)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_positioninterpolator">PositionInterpolator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_positioninterpolator"><code>PositionInterpolator($key, $keyValue)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_scalarinterpolator">ScalarInterpolator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_scalarinterpolator"><code>ScalarInterpolator($key, $keyValue)</code></a>
+</dd>
+<dd>
+<p>$key    MFFloat
+$keyValue       MFFloat</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="bindable_nodes">Bindable Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_background">Background</a></strong><br />
+</dt>
+<dd>
+<a href="#item_background"><code>Background($hash)</code></a>
+</dd>
+<dd>
+<p>You only can use a hash. Parameter see VRML Spec</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_navigationinfo">NavigationInfo</a></strong><br />
+</dt>
+<dd>
+<a href="#item_navigationinfo"><code>NavigationInfo($type, $speed, $headlight, $visibilityLimit, $avatarSize)</code></a>
+</dd>
+<dd>
+<p>You can use a hash reference or all parameter in the same order above</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_viewpoint">Viewpoint</a></strong><br />
+</dt>
+<dd>
+<a href="#item_viewpoint"><code>Viewpoint($description, $position, $orientation, $fieldOfView, $jump)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_proto">PROTO</a></strong><br />
+</dt>
+<dd>
+<a href="#item_proto"><code>PROTO($name, $declaration, $definition)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="other">other</a></h2>
+<dl>
+<dt><strong><a name="item_use">USE</a></strong><br />
+</dt>
+<dd>
+<a href="#item_use"><code>USE($name)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_def">DEF</a></strong><br />
+</dt>
+<dd>
+<a href="#item_def"><code>DEF($name)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_route">ROUTE</a></strong><br />
+</dt>
+<dd>
+<a href="#item_route"><code>ROUTE($from, $to)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_end">End</a></strong><br />
+</dt>
+<dd>
+<a href="#item_end"><code>End($comment)</code></a>
+</dd>
+<dd>
+<p>Close an open node with }</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_endchildren">EndChildren</a></strong><br />
+</dt>
+<dd>
+<a href="#item_endchildren"><code>EndChildren($comment)</code></a>
+</dd>
+<dd>
+<p>Close an open children part with ]</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_endtransform">EndTransform</a></strong><br />
+</dt>
+<dd>
+<a href="#item_endtransform"><code>EndTransform($comment)</code></a>
+</dd>
+<dd>
+<p>Close an open children part with ] and the node with }</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>VRML::VRML2::Standard</p>
+<p>VRML::Base</p>
+<p><a href="http://www.gfz-potsdam.de/~palm/vrmlperl/">http://www.gfz-potsdam.de/~palm/vrmlperl/</a> for a description of <em>VRML-modules</em> and how to obtain it.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Compatibility with VRML1.pm is only given if you use <a href="#item_indexedfaceset"><code>IndexedFaceSet</code></a> and <a href="#item_indexedlineset"><code>IndexedLineSet</code></a>
+with references</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Hartmut Palm <em>&lt;<a href="mailto:palm@gfz-potsdam.de">palm@gfz-potsdam.de</a>&gt;</em></p>
+<p>Homepage <a href="http://www.gfz-potsdam.de/~palm/">http://www.gfz-potsdam.de/~palm/</a></p>
+
+</body>
+
+</html>

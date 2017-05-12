@@ -1,0 +1,32 @@
+Revision history for Perl extension VMS::Logical.
+
+0.6  Dec 31, 2012
+	- replaced LICENSE file with corrected version.
+
+	- Makefile.PL now searches for SYS$SHARE:CMSSHR.EXE and aborts
+	if not found.
+
+0.5  Dec 21, 2012
+	- mostly cosmetic changes
+
+	- added LICENSE file
+
+0.4  Jun 27, 2009
+	- updated author email address
+
+	- remove requirement for perl 5.8
+
+0.3  Apr 1, 2008
+  	- added getlogical
+
+	- filled out some documentation
+
+0.2  Mar 27, 2008
+	- reworked interface using feedback from vmsperl mailing list.
+	Thanks John, Carl, Craig and Hein.
+
+	- added create_table
+
+0.1  Mar 25, 2008
+	- original version
+

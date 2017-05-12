@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+require Vim::Helper;
+my $result = Vim::Helper->run( @ARGV );
+
+if ( $result->{stderr} ) {
+    $result->{stderr} = [ $result->{stderr} ]
+        unless ref $result->{stderr};
+
+    print STDERR @{ $result->{stderr} }
+}
+
+if ( $result->{stdout} ) {
+    $result->{stdout} = [ $result->{stdout} ]
+        unless ref $result->{stdout};
+
+    print @{ $result->{stdout} }
+}
+
+exit( $result->{code} || 0 );
+

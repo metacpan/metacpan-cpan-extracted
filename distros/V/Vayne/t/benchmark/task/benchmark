@@ -1,0 +1,14 @@
+- name: 'first'
+  worker: benchmark
+
+- name: 'second'
+  worker: benchmark
+
+- name: 'third'
+  worker: benchmark
+
+- name: 'fourth'
+  worker: benchmark
+
+- name: 'tracker'
+  worker: track

@@ -1,0 +1,43 @@
+OpenQuicktime version 1.00
+==========================
+
+From the OpenQuicktime site, http://www.openquicktime.org:
+
+"OpenQuicktime aims to be a portable library for handling Apple's
+QuickTime(TM) popular media files on Unix-like environments. It is
+aim is to provide encoding, authoring and editing support as well
+as video playback."
+
+OpenQuicktime is currently able to decode as well as encode video
+and audio streams.  The Video::OpenQuicktime library currently
+only supports extracting diagnostic information from Quicktime files,
+such as video dimensions, codecs used, and play length.
+
+I would like to add support for video and audio demux at some point,
+but don't have the time to develop it right now.  Given sufficient
+user interest or free time, I'll do it.  Patches are also welcome
+in case anyone else wants to help me out, see the contact information
+below.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Inline::C
+   libopenquicktime, and its dependencies
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Allen Day <allenday@ucla.edu>
+Aladdin Free Public License
+See included LICENSE file for licensing details.
+

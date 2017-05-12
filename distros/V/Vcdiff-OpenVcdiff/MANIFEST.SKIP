@@ -1,0 +1,14 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+README.pod
+.gitignore
+.git/
+blib/
+pm_to_blib
+MYMETA.*
+Vcdiff-OpenVcdiff.*tar[.]gz$
+Interface.bs
+OpenVcdiff.bs
+Interface.c
+Interface.o

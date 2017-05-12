@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+use ExtUtils::testlib;
+use Video::FFmpeg;
+use Switch;
+
+my $info = Video::FFmpeg::AVFormat->new($ARGV[0]);
+
+print "Duration: ",$info->duration,"\n";
+print "Duration (us): ",$info->duration_us,"\n";
+print "bitrate: ",$info->bit_rate,"\n";
+
+my @video = $info->video;
+print "num video streams: ",$#video+1,"\n";
+my @audio = $info->audio;
+print "num audio streams: ",$#audio+1,"\n";
+my @sub = $info->subtitle;
+print "num sub streams: ",$#sub+1,"\n";
+
+my @streams = $info->streams;
+for my $id (0 .. $#streams){
+  my $stream = $streams[$id];
+  print $stream->codec_type,"stream $id\n";
+  print "\ttype: ",$stream->codec_type,"\n";
+  print "\tcodec: ",$stream->codec,"\n";
+  print "\tlanguage: ",$stream->lang,"\n";
+  switch($stream->codec_type){
+    case "video" {
+      print "\tfps: ",$stream->fps,"\n";
+      print "\twidth: ",$stream->width,"\n";
+      print "\theight: ",$stream->height,"\n";
+      print "\tDAR: ",$stream->display_aspect,"\n";
+    }
+    case "audio" {
+      print "\tsample rate: ",$stream->sample_rate,"hz\n";
+      print "\taudio language: ",$stream->lang,"\n";
+    }
+    case "subtitle" {
+      print "\tsub codec: ",$stream->codec,"\n";
+      print "\tsub language: ",$stream->lang,"\n";
+    }
+  }
+};
+

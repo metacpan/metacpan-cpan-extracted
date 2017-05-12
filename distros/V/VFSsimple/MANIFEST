@@ -1,0 +1,9 @@
+bin/listmedia
+bin/vfsget
+lib/VFSsimple/Base.pm
+lib/VFSsimple.pm
+Makefile.PL
+MANIFEST
+t/01.t
+t/02-instanciate.t
+META.yml                                 Module meta-data (added by MakeMaker)

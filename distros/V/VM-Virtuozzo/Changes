@@ -1,0 +1,18 @@
+v0.0.5    2012-03-28 06:09:00 America/Chicago
+	- Added additional missing function import ^^;
+
+v0.0.4    2012-03-16 03:46:55 America/Chicago
+	- Added missing function import from Socket.pm
+
+v0.0.3    2012-02-27 19:39:59 America/Chicago
+	- Add warning and disclaimer.
+	- Corrected POD formatting.
+
+v0.0.2    2012-02-27 18:25:36 America/Chicago
+	- Miscellaneous code cleanup.
+	- Removed unused dependencies.
+	- Added documentation stubs for object methods.
+	- Removed regexp modifier valid only in Perl versions > v5.12.
+
+v0.0.1    2012-02-09 04:20:43 America/Chicago
+	- First version, released on an unsuspecting world.

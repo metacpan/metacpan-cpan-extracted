@@ -1,0 +1,71 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.05.01.19.42.03;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@<?PHP
+
+//! Class represents a multiline text input area.
+/*! The object evaluates to the TEXTAREA HTML tag.
+ */
+class HTOM_TextArea extends HTOM_Input
+{
+  //! Initialize text area object.
+  /*! \param $id a name of the text area.
+   * \param $rows number of rows in the area.
+   * \param $columns number of columns in the text area.
+   * \param $initialText a text to be set in the text area.
+   * \param $attributes a list of attribuites.
+   */
+  public function __construct($id, $rows=10, $columns=40, $initialText="", $attributes=NULL)
+  {
+    $this->SetAttributes( new HTOM_SimpleAttribute("name",$id) );
+    $this->SetAttributes( new HTOM_SimpleAttribute("rows",$rows));
+    $this->SetAttributes( new HTOM_SimpleAttribute("cols",$columns));
+    $this->initalText=$initialText;
+    $this->SetAttributes($attributes);
+    $this->Init( );
+  }
+  
+  public function Evaluate()
+  {
+    return "<TEXTAREA ".$this->Attributes().">".$this->initalText."</TEXTAREA>";
+  }
+  private  $initalText="";
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d27 1
+a27 1
+    return "<TEXTAREA ".$this->ID()->Evaluate().$this->Attributes().">".$this->initalText."</TEXTAREA>";
+@
+

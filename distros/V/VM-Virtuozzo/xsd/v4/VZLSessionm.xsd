@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/sessionm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/sessionm" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="sessionm" type="sessionmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Session management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="sessionmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="login" minOccurs="0"/>
+						<xs:element ref="login_as" minOccurs="0"/>
+						<xs:element ref="duplicate_session" minOccurs="0"/>
+						<xs:element ref="logout" minOccurs="0"/>
+						<xs:element ref="verify" minOccurs="0"/>
+						<xs:element ref="put" minOccurs="0"/>
+						<xs:element ref="get" minOccurs="0"/>
+						<xs:element ref="list_sessions" minOccurs="0"/>
+						<xs:element ref="register_client" minOccurs="0"/>
+						<xs:element ref="count_registered" minOccurs="0"/>
+						<xs:element ref="get_session" minOccurs="0"/>
+						<xs:element ref="update_session" minOccurs="0"/>
+					</xs:sequence>
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="session_id" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="data" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="session" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="pass" minOccurs="0"/>
+						<xs:element ref="token" minOccurs="0"/>
+						<xs:element ref="registered" minOccurs="0"/>
+					</xs:sequence>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sessionType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Session identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="creation" type="vzlt:datetime_type">
+				<xs:annotation>
+					<xs:documentation>Create time.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="access" type="vzlt:datetime_type">
+				<xs:annotation>
+					<xs:documentation>Last access time.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="user" type="vzlt:auth_nameType">
+				<xs:annotation>
+					<xs:documentation>Session owner.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="expiration" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Expiration. Session is persistent if expiration is absent.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="stamp" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Session timestamp.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="data" type="dataType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Custom data.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="token" type="vzlt:tokenType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="dataType">
+		<xs:sequence>
+			<xs:element name="key" type="xs:string"/>
+			<xs:element name="value" type="xs:anyType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="login">
+		<xs:annotation>
+			<xs:documentation>Logs user in. Returns "session_id" and "token" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="password" type="xs:base64Binary" minOccurs="0"/>
+						<xs:element name="expiration" type="xs:int" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="login_as">
+		<xs:annotation>
+			<xs:documentation>Logs user in using local user SID. Returns "session_id" and "token" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="sid" type="vzlt:sidType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="duplicate_session">
+		<xs:annotation>
+			<xs:documentation>Duplicates session. Returns "session_id" and "token" or "pass" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session_id" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Session identifier to dublicate.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:sequence minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>It's a choice.</xs:documentation>
+					</xs:annotation>
+					<xs:element name="expiration" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Session expiration.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="eid" type="vzlt:eid_type">
+						<xs:annotation>
+							<xs:documentation>***INTERNAL***</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="logout">
+		<xs:annotation>
+			<xs:documentation>Logs user out. Returs OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="verify">
+		<xs:annotation>
+			<xs:documentation>Verify session's availability. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="put">
+		<xs:annotation>
+			<xs:documentation>Add custom data for existing session. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="data" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Custom data</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="key" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Data key</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="value" type="xs:anyType" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Data value</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get">
+		<xs:annotation>
+			<xs:documentation>Retrieve custom data for existing session. Returns "data" list or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="key" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Data key for selection.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list_sessions">
+		<xs:annotation>
+			<xs:documentation>Returns existing "session"s (doesn't return session data and stamp).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="register_client">
+		<xs:annotation>
+			<xs:documentation>Registers a new client with the given ID. Used for clients licensing along with the function "count_registered". Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string"/>
+				<xs:element name="session_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session identifier.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="count_registered">
+		<xs:annotation>
+			<xs:documentation>Gets number of clients registered with the given ID.  If ID is absend, returns all of the clients. Returns "registered" or Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="update_session">
+		<xs:annotation>
+			<xs:documentation>***INTERNAL***. Updates session information. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="session_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="stamp" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Session timestamp</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_session">
+		<xs:annotation>
+			<xs:documentation>***INTERNAL***. Returns "session", "data", session_expiration and "stamp" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:sequence>
+					<xs:element name="session_id" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Session ID</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="pass" minOccurs="0"/>
+				</xs:sequence>
+				<xs:element name="stamp" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="session_id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Session ID returned by "login", "login_as" or "duplicate_session"</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="data" type="dataType">
+		<xs:annotation>
+			<xs:documentation>Custom data returned by "get".</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="session" type="sessionType"/>
+	<xs:element name="token" type="vzlt:tokenType"/>
+	<xs:element name="pass" type="vzlt:auth_nameType"/>
+	<xs:element name="registered">
+		<xs:annotation>
+			<xs:documentation>Number of registered clients.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string"/>
+				<xs:element name="count" type="xs:int"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="duplicate_sessionResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="session_id"/>
+				<xs:element ref="token"/>
+				<xs:element ref="pass"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="loginResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="session_id"/>
+				<xs:element ref="token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="login_asResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="session_id"/>
+				<xs:element ref="token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="logoutResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="verifyResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="putResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="data" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list_sessionsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="session" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="register_clientResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="count_registeredResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="registered"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="update_sessionResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_sessionResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="session"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="sessionm_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="session_expiration" type="xs:int"/>
+					<xs:element name="persistent_session_expiration" type="xs:int"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

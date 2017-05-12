@@ -1,0 +1,12 @@
+[% INCLUDE 'includes/poll.tt' %]
+
+[% vote = c.model('Vote') %]
+
+<div id="ballot">
+[% IF vote.vote_status(voteid) == 'BEFORE' %]
+Ce Vote n'est pas encore ouvert
+[% ELSIF vote.vote_status(voteid) == 'AFTER' %]
+Ce vote est terminé, les résultats sont disponibles
+<a href="[% c.uri_for('/vote', voteid) %]">ici</a>.
+[% END %]
+</div>

@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+# dumps "interesting" data about tv channels
+
+use Getopt::Long;
+
+use Video::Frequencies;
+use Video::Capture::V4l;
+use Video::Capture::VBI qw/:DEFAULT %VPS_CNI %VT_NI/;
+use Video::XawTV;
+
+GetOptions "+verbose|v" => \$verbose
+   or exit 1;
+
+$rc = new Video::XawTV;
+eval { $rc->load("$ENV{HOME}/.xawtv") };
+
+$ftab = $rc->opt('freqtab') || "pal-europe";
+$freq = $CHANLIST{$ftab} or die "no such frequency table: $ftab";
+
+$v4l = new Video::Capture::V4l;
+$tuner = $v4l->tuner(0);
+$channel = $v4l->channel(0);
+
+$tuner->mode(MODE_PAL); $tuner->set;
+$channel->norm(MODE_PAL); $channel->set;
+
+$vbi = new Video::Capture::V4l::VBI or die;
+$vbi_fd = $vbi->fileno;
+
+$|=1;
+
+my @channels;
+
+for $chan (sort keys %$freq) {
+   my $f = $freq->{$chan};
+   print "tuning to $chan ($f)...";
+   $v4l->freq($f);
+   select undef,undef,undef,0.2; # shit!
+   $vbi->backlog (10);
+   %fea = ();
+   scan_vbi (50);
+   $vbi->backlog (0);
+   if ($tuner->signal > 30000) {
+      my $cni = $VPS_CNI{$fea{CNI} & 0xfff};
+      my $ni = $VT_NI{$fea{NI}};
+      my $name;
+      if (defined $ni) {
+         $name = "$ni->[0] ($ni->[1])";
+      } elsif (defined $cni) {
+         $name = $cni;
+      } elsif ($fea{NAME}) {
+         $name = $fea{NAME};
+      } elsif (length $fea{VT} > 1) {
+         $name = $fea{VT};
+      } else {
+         $name = "channel $chan";
+      }
+      $name =~ s/\s*"\s*/ /g;
+      $name =~ s/\s*\(.*?\)\s*/ /g;
+      $name =~ s/^\s+//;
+      $name =~ s/\s+$//;
+      print " $name";
+      print " [";
+      while(my($k,$v)=each %fea) {
+         print " $k","[$v]";
+      }
+      print " ]";
+      my $c = { name => $name, channel => $chan, capture => 'on' };
+      if (1||$verbose) {
+         $c->{features} = join(":", %fea);
+      }
+      my $key = find_key ($name);
+      $c->{key} = $key if $key;
+      push @channels, $c;
+   } else {
+      print " no signal";
+   }
+   print "\n";
+}
+
+$rc->channels(@channels);
+$rc->save("xawtvrc");
+
+print "\nnew xawtvrc saved as ./xawtvrc\n";
+
+sub scan_vbi {
+   my $frames = shift;
+
+   my($name_,$name,$name2);
+
+   while ($frames) {
+      my $vbi_alloc;
+      $tuner->get; return if $tuner->signal < 30000;
+      $frames--;
+
+      return if (defined $VT_NI{$fea{NI}} || defined $VPS_CNI{$fea{CNI}}) && !$verbose;
+      
+      for (decode_field $vbi->field, VBI_VT|VBI_VPS|VBI_OTHER|VBI_EMPTY) {
+         if ($_->[0] == VBI_VPS) {
+            $fea{CNI}=$_->[3];
+            if (ord($_->[1]) > 127 or length $name_ >= 12) {
+               if ($name eq $name_) {
+                  $fea{NAME}=$name;
+               }
+               $name = $name_;
+            }
+            $name_ .= $_->[1] & "\x7f";
+            $fea{VPS}=sprintf "%04x", $_->[3];
+            $vbi_alloc .= "V";
+         } elsif ($_->[0] == VBI_VT) {
+            if ($_->[2] == 0) {
+               if ($_->[4] == 0x1df) {
+                  $fea{EPG}="";
+               } else {
+                  $fea{VT}=vt_2_name($_->[3]);
+               }
+            } elsif ($_->[2] == 30) {
+               if (($_->[3]>>1) == 0) {
+                  $fea{NI} = $_->[6];
+                  $fea{'NI30/1'}=sprintf "%04x", $_->[6];
+               } elsif (($_->[3]>>1) == 8) {
+                  $fea{PDC}="";
+               } else {
+                  $fea{"30"}="$_->[3]";
+               }
+            } elsif ($_->[2] == 31) {
+               if ($_->[4] == 0x500) {
+                  $fea{"$_->[1]/IC"}="";
+               } else {
+                  $fea{sprintf "$_->[1]/31[%x]",$_->[4]}++;
+               }
+            }
+            $vt++;
+            $vbi_alloc .= "T";
+         } elsif ($_->[0] == VBI_OTHER) {
+            $vbi_alloc .= $_->[1] == 1 ? "c" : "O";
+         } elsif ($_->[0] == VBI_EMPTY) {
+            $vbi_alloc .= ".";
+         } else {
+            $others++;
+         }
+      }
+      $fea{ALLOC}=$vbi_alloc;
+      select undef,undef,undef,0.1 unless $vbi->queued;
+   }
+}
+
+# try to guess sender name from videotext
+sub vt_2_name {
+   local $_ = substr (shift, 8, 20) & ("\x7f") x 20;
+   s/^\d+//;
+   s/^[\x00-\x1f ]+//;
+   s/\s*[\x00-\x1f].*//;
+   s/\W?text.*//i;
+   $_;
+}
+
+sub find_key  {
+   local $_ = shift;
+   return '.' if /3sat/;
+   return '1' if /ARD/;
+   return '2' if /ZDF/;
+   return '3' if /SW 3/;
+   return '7' if /PRO 7/;
+   return 'r' if /RTL Plus/;
+   return 't' if /RTL 2/;
+   return 'i' if /VIVA 2/;
+   return 'v' if /VIVA/;
+   return 'm' if /MTV/;
+   return 's' if /SAT 1/;
+   return 'k' if /Kabel 1/;
+   return 'e' if /EuroNews/;
+   return 'a' if /Arte/;
+   return 'x' if /VOX/;
+   ();
+}

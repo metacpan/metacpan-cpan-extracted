@@ -1,0 +1,16 @@
+
+
+Revision history for VIM-Packager
+
+2009.32306 -- 三 11/25 00:48:54 2009
+
+0.03    四 10/29 02:48:56 2009 
+        * support uninstall,install-deps, link features
+
+0.02    四 10/25 02:48:22 2009
+        * design the meta spec
+        * generate makefile from meta file. 
+
+0.01    四 10/22 02:49:35 2009
+        * i forgot
+

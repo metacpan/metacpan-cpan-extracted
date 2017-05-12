@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use YAML::XS;
+use Fcntl qw( :flock );
+use Data::Dumper;
+
+$/ = undef;
+
+my $CONF_DIR= shift @ARGV;
+
+die "conf dir not defined" unless -d $CONF_DIR;
+
+my %stat;
+
+for my $file(glob("$CONF_DIR/*"))
+{
+    open my $fh, '<', $file or next;
+
+    unless(flock $fh, LOCK_EX | LOCK_NB)
+    {
+        my $ref = eval{ YAML::XS::Load <$fh> };
+        push @{ $stat{$_} }, $ref->{$_} for keys %$ref
+
+    }else{
+
+        flock $fh, LOCK_UN;
+        warn "need to del $file\n";
+        unlink $file;
+    }
+}
+print YAML::XS::Dump \%stat;

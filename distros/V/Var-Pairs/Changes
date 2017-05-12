@@ -1,0 +1,112 @@
+Revision history for Var-Pairs
+
+0.000001  Fri May 25 06:52:11 2012
+       Initial release.
+
+
+
+0.001000  Wed Jul 18 13:54:16 2012
+
+    First public release
+
+
+
+0.001001  Wed Jul 18 13:55:31 2012
+
+    Update README
+
+
+
+0.001002  Sat Mar 23 07:58:28 2013
+
+    Removed autobox dependency for t/kvs.t
+    (Thanks Salvatore!)
+
+
+0.001003  Thu Aug  8 11:46:09 2013
+
+    Converted to use Devel::Callsite instead of Scope::Upper
+    in order to identify caller location for the each_...
+    family of functions.
+
+
+
+0.001005  Tue Mar 11 10:17:52 2014
+
+    Added export controls (thanks Rob)
+
+
+0.002000  Sat Apr  5 17:19:03 2014
+
+    Converted Pair class to array-based for a 50% speed-up
+    (thanks Toby!)
+
+    Added ->kv() to Pair type
+    (thanks Toby)
+
+
+0.002001  Wed Mar 11 20:04:58 2015
+
+    Swapped a doc nit (thanks Garry!)
+
+    Documented non-resettable nature of each_kv() iterators
+    (i.e. they don't reset when the original hash is key()'d)
+    (thanks John)
+
+    Allowed each_kv to work correctly on different containers
+    that are passed to the same call: each_kv( %{$some_ref} )
+    (thanks John!)
+
+
+0.002002  Wed Mar 11 20:13:33 2015
+
+    Allowed each_pair and pairs to also work correctly on different
+    containers that are passed to the same call
+
+
+
+0.002003  Wed Mar 11 20:42:14 2015
+
+    Fixed brittle testing approach in t/each_via_ref.t
+    (Thanks Slaven!)
+
+    Neutralized irritating experimental warnings on reference operations
+    (Thanks Slaven)
+
+
+0.002004  Wed Mar 11 21:01:52 2015
+
+    Sigh. Tweak experimentals warnings for 5.18.
+    (Thanks again Slaven)
+
+
+
+0.003000  Sat Aug 20 12:04:59 2016
+
+    Strip out autoderefs to continue working under 5.23+
+    (thanks, Slaven)
+
+    Improve identification of each unique context
+    (by adding use of context())
+
+    Refactor Var::Pairs::Pair to avoid use of Data::Alias
+    under Perl 5.24+
+    (thanks Salvatore)
+
+
+
+0.003002  Sat Aug 20 16:49:20 2016
+
+    Updated MANIFEST
+
+    Documented reliance on Data::Alias
+
+
+
+
+0.003004  Sat Aug 20 19:18:50 2016
+
+    Adjusted requirement for Data::Alias
+    down to pre-5.22
+
+

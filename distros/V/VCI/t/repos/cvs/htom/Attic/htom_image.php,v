@@ -1,0 +1,99 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.42.02;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \brief Class represents a image object. */
+class HTOM_Image extends HTOM_Element
+{
+  /*! Initialize the image object.
+\param url the image file location URL.
+\param descr the description of the image. Displayed by the browser if image is not available.
+\param attributes either the HTOM_Attribute object or an array of HTOM_Attribute objects
+  */
+  public function __construct( $url,  $descr=NULL, $attributes=NULL  )
+  {
+    $this->url = $url;
+    $this->descr=$descr;
+    $this->SetAttributes( $attributes );
+    $this->Init();
+  }
+
+
+  //! Set the alignment attribute.
+  /*! \param alignment - either the HTOM_Alignment object or alignment name string.
+   */
+  public function SetAlignment(  $alignment )
+  {
+    $this->SetAttributes( new HTOM_Alignment($alignment) );
+  }
+
+  //! Set the size property
+  /*! \param width the size parameter property, or NULL in order to reset the width.
+   * \param height the size parameter property, or NULL in order to reset the height.
+   */
+  public function SetSize( $width, $height )
+  {
+    $this->SetAttributes( new HTOM_Size($width,$height) );
+  }
+
+  //! Get the image HTML object
+  public function Evaluate()
+  {
+    return "<img src='".$this->url."' alt='".$this->descr."'".$this->Attributes().">";
+  }
+
+  private $url;
+  private $descr;
+}
+
+?>@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d40 1
+a40 1
+    return "<img src='".$this->url."' alt='".$this->descr."'".$this->ID()->Evaluate().$this->Attributes().">";
+@
+

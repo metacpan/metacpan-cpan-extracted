@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+B<names-codes> - Print all hierarchical signal names and codes
+
+=head1 SYNOPSIS
+
+names-codes file
+
+=head1 DESCRIPTION
+
+Display a list of all hierarchical signal names and codes found in the VCD
+file to STDOUT.
+
+Example: names-codes file.vcd
+
+=cut
+
+use warnings;
+use strict;
+use Verilog::VCD qw(parse_vcd);
+
+my $file = shift;
+my $vcd = parse_vcd($file, {only_sigs => 1});
+for my $code (keys %{ $vcd }) {
+    for my $net (@{ $vcd->{$code}->{nets} }) {
+        print "$code   $net->{hier}.$net->{name}\n";
+    }
+}

@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+use Video::Capture::VBI;
+
+package Decoder;
+
+use Video::Capture::VBI;
+
+# derive from videotext-decoder
+use base 'Video::Capture::VBI::VT';
+
+# just display the page
+sub enter_page {
+   my($self,$page)=@_;
+   my $sub = $page->{ctrl} & VTX_SUB;
+
+   #return unless $page->{page}>=0x110 && $page->{page}<=0x134;
+   #return unless $page->{page}==0x150;
+   my $x = join ("", map { $_ ne "" ? "*" : "-" } @{$page->{packet}});
+   printf "Teletext page %02x / %04x ($x)\n", $page->{page}, $sub;
+   #return unless $page->{page} == 0x1df;
+
+   # now print the page
+   for ($y=0; $y<25; $y++)
+     {
+       my $x = $page->{packet}[$y];
+       print $x ? decode_ansi decode_vtpage $x : "","\n";
+     }
+}
+
+sub enter_packet {
+   my $packet = $_;
+}
+
+package main;
+
+$vbi = new Video::Capture::V4l::VBI or die;
+
+# the next line is optional (it enables buffering)
+$vbi->backlog(25); # max. 1 second backlog (~900kB)
+
+$inp_fd = fileno STDIN;
+$vbi_fd = $vbi->fileno;
+
+$vt = new Decoder;
+
+print "Capturing VBI block. Make sure you have tuned in to a channel!\n";
+
+for(;;) {
+   my $r="";
+   vec($r,$inp_fd,1)=1;
+   vec($r,$vbi_fd,1)=1;
+   select $r,undef,undef,0.04;
+   $vt->feed(decode_field $vbi->field, VBI_VT) while $vbi->queued;
+   if (vec($r,$inp_fd,1)) {
+      #print "HI\n";
+      #sleep 5;
+   }
+}
+

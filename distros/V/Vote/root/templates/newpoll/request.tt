@@ -1,0 +1,6 @@
+<div id="poll_request" class="box">
+<p>Un mail indiquant la procédure de confirmation de création du vote vient
+d'être envoyé à l'adresse [% c.req.param('mail') | html %].</p>
+
+<p>Merci</p>
+</div>

@@ -1,0 +1,118 @@
+#!/usr/bin/perl 
+
+use v5.10;
+use strict;
+use warnings;
+use FindBin;
+use Term::ReadLine;
+use English;
+use lib "$FindBin::Bin/../lib";
+use VANAMBURG::PacketFactory;
+use VANAMBURG::RandomNumbers;
+
+
+my $term = Term::ReadLine->new("memdecktrainer");
+
+my $deckmenu = <<END;
+
+Deck Menu
+======================
+Enter 1 for Breakthrough Card System
+Enter 2 for Aronson Stack
+Enter 3 for Tamariz Mnemonica
+Enter 4 for Joyal SHoCked
+Enter 5 for Joyal CHaSeD
+Enter 6 for Si Stebbins CHaSed  (step = 3)
+Enter 7 for Si Stebbins CHaSed  (step = 4)
+Enter 8 for Si Stebbins SHoCkeD (step = 3)
+Enter 9 for Si Stebbins SHoCkeD (step = 4)
+
+END
+
+say $deckmenu;
+my $deck_choice = $term->readline("Enter choice: ");
+
+my $deck;
+given ($deck_choice) {
+	when (/1/) { $deck = VANAMBURG::PacketFactory->create_stack_breakthrough_card_system; }
+	when (/2/) { $deck = VANAMBURG::PacketFactory->create_stack_aronson; }
+	when (/3/) { $deck = VANAMBURG::PacketFactory->create_stack_mnemonica; }
+	when (/4/) { $deck = VANAMBURG::PacketFactory->create_stack_joyal_shocked }
+	when (/5/) { $deck = VANAMBURG::PacketFactory->create_stack_joyal_chased; }
+	when (/6/) { $deck = VANAMBURG::PacketFactory->create_si_stebbins_chased_3step; }
+	when (/7/) { $deck = VANAMBURG::PacketFactory->create_si_stebbins_chased_4step; }
+	when (/8/) { $deck = VANAMBURG::PacketFactory->create_si_stebbins_shocked_3step; }
+	when (/9/) { $deck = VANAMBURG::PacketFactory->create_si_stebbins_shocked_4step; }
+	default { say "unknown option $deck_choice. quitting"; exit; }
+}
+
+
+
+my %menu =
+  ( 1 => \&test_card_to_number, 2 => \&test_number_to_card, q => \&quit );
+
+my $menu = <<END;
+
+ Menu
+======================
+Enter 1 for Card to Number 
+Enter 2 for Number to Card
+Enter q to quit
+END
+say $menu;
+my $test = $term->readline("Enter choice: ");
+eval { $menu{$test}->() };
+say "Sorry, but your choice was not valid.\n$EVAL_ERROR" if ($EVAL_ERROR);
+quit();
+
+
+sub quit {
+	say "\nbye";
+	exit;
+}
+
+sub test_number_to_card {
+	my $instructions = <<END;
+Enter the abbreviation for the card (AS,JD, 2H, etc)
+when prompted with a stack number.  
+
+10 random stack numbers will be used.
+END
+	say $instructions;
+
+	for my $stacknum ( VANAMBURG::RandomNumbers->random_stacknumbers(10) )
+	{
+		my $card   = $deck->card_at_location($stacknum);
+		my $answer = uc $term->readline("Card at $stacknum: ");
+		if ( $answer eq $card->abbreviation ) {
+			say "Correct";
+		}
+		else {
+			say "Wrong - correct answer is " . $card->abbreviation;
+		}
+	}
+}
+
+sub test_card_to_number {
+	my $instructions = <<END;
+
+When presented with a card, enter the stack number and press enter.
+
+10 random cards will be presented.
+
+END
+	say $instructions;
+
+	$deck->shuffle_random;
+
+	for ( 0 .. 9 ) {
+		my $card   = $deck->get_card($_);
+		my $answer = $term->readline( $card->display_name . ": " );
+		if ( $answer == $card->stack_number ) {
+			say "Correct";
+		}
+		else {
+			say "Wrong - stack number = " . $card->stack_number;
+		}
+	}
+}

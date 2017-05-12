@@ -1,0 +1,92 @@
+==================================================
+Changes from 2014-08-23 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.25 at 2015-08-23 14:48:45 +0000
+-----------------------------------------
+
+  Change: 70224c58bf75755fef073fd0a9961b2dcae5c4d8
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-08-23 10:48:28 +0000
+
+    Fix spelling error. 
+
+-----------------------------------------
+version 0.24 at 2015-05-15 13:53:46 +0000
+-----------------------------------------
+
+  Change: 95f6e8a316390d2d5fee3626758bb2d3c86ccfa5
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-05-15 09:53:46 +0000
+
+    Correct misspelling. 
+
+  Change: d8da38d6f4e7229cec1bb5a684a65d50bdf14c0c
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-05 14:46:05 +0000
+
+    Fix bug with passed in time. 
+
+-----------------------------------------
+version 0.20 at 2015-01-03 22:19:37 +0000
+-----------------------------------------
+
+  Change: 285792d10fb0993573005ddbe40ca338c63ae696
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2015-01-03 17:19:37 +0000
+
+    Allow a cached time to be passed in and compare it using unix epoch
+    rather than a DateTime object. 
+
+-----------------------------------------
+version 0.17 at 2014-10-20 22:27:12 +0000
+-----------------------------------------
+
+  Change: 0bde5fc27ca3031ab2893cc5a2069958c5d5101f
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-20 18:27:12 +0000
+
+    Cleanup expiration logic 
+
+-----------------------------------------
+version 0.15 at 2014-10-17 04:47:04 +0000
+-----------------------------------------
+
+  Change: 553006af2eff9331fd11e50ebfd1cf90a8d5e949
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-17 00:47:04 +0000
+
+    Fix bug on expired credentials 
+
+  Change: 974192478b687babf469aea05870b5d94f1a6d3a
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-15 10:44:29 +0000
+
+    Fix some version sillyness 
+
+-----------------------------------------
+version 0.11 at 2014-10-15 13:32:35 +0000
+-----------------------------------------
+
+  Change: f6fc40597a076dcd19210b9dce77da8404f715b6
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-15 09:32:35 +0000
+
+    Fix bug with versioning 
+
+  Change: 583faab15ed97f8710bfad5bbc44891a7c4f4b9e
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 20:07:56 +0000
+
+    A few little fixes 
+
+  Change: 9d4ff1acff6d7f97a098fe382eaf2664660d67f8
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 20:01:53 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+GPL
+lib/VR/API.pm
+lib/VR/API/Partner.pm
+META.yml                                 Module meta-data (added by MakeMaker)

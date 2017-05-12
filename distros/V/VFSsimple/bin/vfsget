@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use VFSsimple;
+
+my $vfs = VFSsimple->new($ARGV[0]);
+$vfs->get($ARGV[1], $ARGV[2]);

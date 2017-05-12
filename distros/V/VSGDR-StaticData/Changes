@@ -1,0 +1,77 @@
+Revision history for VSGDR::StaticData
+
+0.01    12/07/2013
+        First version, released on an unsuspecting world.  Broken.
+0.02    16/07/2013
+        POD changes.
+0.03    30/07/2013
+        Minor changes to output. Removed Dumper statement.
+0.04    13/09/2013
+        Allowed for multiple column PKeys and no PKey.
+0.05    18/09/2013
+        Fixed quoting bug resulting from use of like a number on a line by line basis.
+        Added cut-off limit on update reporting of a 100+.
+        Added total non-updated count on update reporting of a 100+.
+0.06    27/11/2013
+        Bad bug fix.
+0.07    05/12/2013
+        Bad bug fix - nulls weren't handled.
+0.08    11/12/2013
+        Size extension to cope with varchar(max)
+0.09    28/01/2014
+        Cosmetic changes to output
+0.10    19/02/2014
+        Fixed non-numeric null value handling.
+0.11    20/02/2014
+        Stupid trailing column bug introduce in 0.08 removed.
+0.12    20/02/2014
+        Removed some obsolete dependencies.
+0.13    26/02/2014
+        Fixed data retrieval for computed columns
+0.14    03/03/2014
+        Minor cosmetic layout changes
+0.15    05/03/2014
+        Corrections to reporting of altered records count.
+0.16    03/06/2014
+        Added a check that the table name is a valid table name (before we hit a cryptic runtime error.)
+0.17    03/06/2014
+        Fixed introduced bug.
+0.18    11/06/2014
+        Enhanced to use a unique key for a table where a primary key is not defined.  Unique indexes are NOT covered by this change.
+0.19    11/06/2014
+        Better support for standard MS quoted table names and schemas.
+0.20    11/06/2014
+        Better support for non-pk identity columns.
+0.21    12/06/2014
+        Fixed bug in multiple pk/un selection.  Fixed reporting of large-scale changes.
+        Bugs identified in handling of multiple column primary key or unique constraints.
+0.22    16/06/2014
+        Added missing Graph dependency.
+        Improved datetime handling.
+0.23    25/06/2014
+        Strawberry perl support added.
+0.24    08/08/2014
+        Fixed output of collate properties against columns.
+0.25    30/09/2014
+        Added allTableDependencies.pl
+0.26    09/06/2015
+        Made StaticDataPopulationId an identity column.
+0.27    02/09/2015
+        Fixed new perl 5.22 error message.
+		Can't use an array as a reference at C:/strawberry-perl/perl/site/lib/VSGDR/StaticData.pm line 122.
+0.28    02/09/2015
+        Begin/End around rollback to savepoint and commit section.
+0.29    05/09/2015
+	Just found out about interaction between xact_state() and @@trancount.  Trying to fix the generated code.
+0.30    29/09/2015
+	Typo fix.
+0.31    20/10/2016
+	Quoted output column names.
+0.32    19/04/2016
+	Justified data columns.  May make this optional at a later date.
+        
+        
+        
+        
+        
+        

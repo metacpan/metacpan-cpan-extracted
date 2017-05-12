@@ -1,0 +1,20 @@
+#VRML V2.0 utf8
+Transform {
+    translation    0 0 0
+    children [
+	Shape {
+	   geometry PointSet {
+		   coord Coordinate {
+			   point [
+					1.0 1.0 1.0
+			      ]
+			}
+		   color Color {
+			   color [
+					1.0 0.0 0.0
+			      ]
+			}
+		}
+	}
+    ]
+}

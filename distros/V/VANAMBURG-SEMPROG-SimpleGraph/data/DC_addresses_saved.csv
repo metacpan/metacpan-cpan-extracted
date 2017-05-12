@@ -1,0 +1,14 @@
+"White House",is_a,"Tourist Attraction"
+"White House",address,"1600 Pennsylvania Ave, Washington, DC"
+Equinox,cost,expensive
+Equinox,is_a,restaurant
+Equinox,address,"818 Connecticut Ave, Washington, DC"
+"Pot Belly",cost,cheap
+"Pot Belly",is_a,restaurant
+"Pot Belly",address,"1701 Pennsylvania Ave, Washington, DC"
+Tosca,cost,midrange
+Tosca,is_a,restaurant
+Tosca,address,"112 F Street, Washington DC"
+Bossa,cost,expensive
+Bossa,is_a,restaurant
+Bossa,address,"2463 18th St, Washington, DC"

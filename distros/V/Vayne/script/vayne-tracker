@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use Vayne::Callback;
+use Vayne::Tracker;
+use Redis;
+
+=head1 NAME
+
+vayne-tracker - track all task.
+
+=head1 SYNOPSIS
+
+   $0 
+
+=cut
+
+my $tracker = Vayne::Tracker->new;
+my $conf = Vayne->conf('redis')->{callback};
+my $redis = Redis->new(%$conf);
+
+while(sleep 3)
+{
+    my @taskid = $tracker->update_task();
+    $redis->publish($Vayne::Callback::CHANNEL, $_) for @taskid;
+};

@@ -1,0 +1,15 @@
+<!--#perl 
+  my ($rrdObj,$lastTimestamp,$vbObj);
+
+  if($_parms->{name})
+  {
+    $vbObj = &VBTK::Objects::FindObjByName($_parms->{name});
+
+    if($vbObj)
+    {
+      $rrdObj = $vbObj->getRrdObj;
+      $lastTimestamp = $rrdObj->getLastTimestamp;
+    }
+  }
+   
+-->$lastTimestamp

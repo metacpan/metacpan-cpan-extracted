@@ -1,0 +1,127 @@
+These changes are from the Subversion repository at
+        Url: http://source.test-smoke.org/svn/V
+
+The filelists have a short symbolic indicator:
+        !  modified
+        +  added
+        -  deleted
+       !>  merged change
+       !<  replaced
+
+Enjoy!
+___________________________________________________________________________
+[  1126] By: abeltje                          on 2007-11-07 01:10:02 +0100
+        Log: * [CHANGE]
+	       * FIX: bug reported by Merijn:
+		     my $version = map { "$_ " . V::get_version( $_ ) }
+		     qw/ Cwd /;
+		 "Modification of a read-only value attempted"
+		 * local()ize $_ before reading the file to find the
+		   version
+        Url: http://source.test-smoke.org/svn/V
+           + /V/t/03bug.t
+           ! /V/MANIFEST, /V/V.pm
+___________________________________________________________________________
+[   938] By: abeltje                          on 2006-03-31 17:29:56 +0200
+        Log: * [CORE]
+	       * put the tests for the core-distribution in their own
+		 directory
+        Url: http://source.test-smoke.org/svn/V
+           + /V/core-t, /V/core-t/02useit.t
+           - /V/t/01core.t
+          !> /V/core-t/01core.t =(/V/t/01core.t:936)
+___________________________________________________________________________
+[   937] By: abeltje                          on 2006-03-31 17:28:21 +0200
+        Log: * [CHANGE]
+	       * small rework of the AUTHOR/LICENSE sections in pod
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/V.pm
+___________________________________________________________________________
+[   933] By: abeltje                          on 2006-02-03 18:07:51 +0100
+        Log: * Regenerate Changes for V 0.11
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/Changes
+___________________________________________________________________________
+[   932] By: abeltje                          on 2006-02-03 17:04:17 +0100
+        Log: * [CHANGE]
+	       + add untainting stuff by Stas Bekman (2004/03/24)
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/V.pm
+___________________________________________________________________________
+[   661] By: abeltje                          on 2004-03-24 07:44:42 +0100
+        Log: * Regen Changes for 0.10
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/Changes
+___________________________________________________________________________
+[   660] By: abeltje                          on 2004-03-24 07:43:27 +0100
+        Log: * [CHANGE]
+	       * added the license stuff
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/V.pm
+___________________________________________________________________________
+[   576] By: abeltje                          on 2004-01-16 14:13:13 +0100
+        Log: * regen Changes for 0.09
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/Changes
+___________________________________________________________________________
+[   575] By: abeltje                          on 2004-01-16 14:09:03 +0100
+        Log: * [ADD]
+	       + feature request by Merijn Brand:
+		 * Can you add a sub that returns the version only for a
+		   given module
+	       + added a test for V::get_version
+	       * VERSION += 0.01
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/README, /V/V.pm, /V/t/01basic.t, /V/t/02useit.t
+___________________________________________________________________________
+[   574] By: abeltje                          on 2004-01-16 13:58:27 +0100
+        Log: * [FIX] by Merijn Brand
+	       * fix a syntax error in the PREREQ_PM target
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/Makefile.PL
+___________________________________________________________________________
+[   406] By: abeltje                          on 2003-08-22 03:51:06 +0200
+        Log: * [CHANGE]
+	       * general cleanup and $VERSION += 0.01
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/MANIFEST, /V/Makefile.PL, /V/README, /V/V.pm
+___________________________________________________________________________
+[   405] By: abeltje                          on 2003-08-22 03:49:41 +0200
+        Log: * [FIX] make the tests pass again
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/t/01basic.t, /V/t/02useit.t
+___________________________________________________________________________
+[   404] By: abeltje                          on 2003-08-22 03:46:32 +0200
+        Log: * [REMOVE] No more Test::More, make it a PREREQ
+        Url: http://source.test-smoke.org/svn/V
+           - /V/t/lib
+___________________________________________________________________________
+[    52] By: abeltje                          on 2003-03-10 00:40:16 +0100
+        Log: $VERSION += 0.01
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/README
+___________________________________________________________________________
+[    51] By: abeltje                          on 2003-03-10 00:38:13 +0100
+        Log: $VERSION += 0.01
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/V.pm
+___________________________________________________________________________
+[    50] By: abeltje                          on 2003-03-10 00:37:05 +0100
+        Log: Change the way we C<< use lib $lib; >> for Test-More
+        Url: http://source.test-smoke.org/svn/V
+           ! /V/t/01basic.t, /V/t/02useit.t
+___________________________________________________________________________
+[    49] By: abeltje                          on 2003-03-10 00:17:33 +0100
+        Log: Initial import of V-0.06
+        Url: http://source.test-smoke.org/svn/V
+           + /V/Changes, /V/MANIFEST, /V/Makefile.PL, /V/README, /V/V.pm,
+	     /V/t, /V/t/01basic.t, /V/t/02useit.t, /V/t/lib,
+	     /V/t/lib/Test, /V/t/lib/Test/Builder.pm,
+	     /V/t/lib/Test/More.pm, /V/t/lib/Test/Simple.pm
+___________________________________________________________________________
+[    48] By: abeltje                          on 2003-03-10 00:16:24 +0100
+        Log: Create space for the V module
+        Url: http://source.test-smoke.org/svn/V
+           + /V
+
+-- Generated by 'svnchanges' (0.013) --

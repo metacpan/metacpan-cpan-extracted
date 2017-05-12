@@ -1,0 +1,15 @@
+Revision history for Video-CPL
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.07	Fri Jun  4 14:21:37 PDT 2010
+	Added various new modules, CPL::Youtube etc. 
+	Some changes to calling conventions, programs using earlier versions will likely break.
+	Some installation tests have been added.
+
+0.09	Tue Aug  3 13:11:10 PDT 2010
+        Renamed to Video::CPL etc. at the suggestion of CPAN.
+	Youtube, Youtubelist, DB moved out to Video::CPL::DB package.
+	Review in order to make Javascript version compatible.
+

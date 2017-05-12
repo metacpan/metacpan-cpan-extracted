@@ -1,0 +1,14 @@
+Makefile.PL
+MANIFEST
+README
+LICENSE
+Quicktime_PL.pm
+t/VIQt_PL_a.t
+t/VIQt_PL_b.t
+t/VIQt_PL_4.t
+t/VIQt_PL_5.t
+eg/rot_button.mov
+eg/p8241014.mov
+eg/sample4.mov
+eg/sample5.mov
+ChangeLog

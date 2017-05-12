@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Value/Canary.pm
+t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

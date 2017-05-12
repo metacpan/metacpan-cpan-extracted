@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         VUser-Install
+version:      0.1.0
+version_from: lib/VUser/Install.pm
+installdirs:  site
+requires:
+    Config::IniFiles:              0
+    Cwd:                           0
+    SOAP::Lite:                    0
+    Socket:                        0
+    Text::Template:                0
+    VUser::Extension:              	@ echo  VUser::ExtLib: @ echo     VUser::Meta:                   	@ echo  VUser::ResultSet: @ echo 
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,48 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?php
+
+//! This is an abstract class that must be inplemented by each tag attribute.
+interface HTOM_Attribute extends HTOM_Evaluable
+{
+  //! Get the unique name of the attribute (usualy the class name).
+  /*! The function shall be implemented as a static. */
+  public function Name();
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

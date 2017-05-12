@@ -1,0 +1,29 @@
+VCI - The Version Control Interface
+===================================
+
+VCI is an object-oriented interface that makes it easy to interact with many
+different version-control systems, while only having to write your code once.
+
+INSTALLATION
+
+To install VCI, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+REQUIREMENTS
+
+  When you run "make test" it will tell you if you are missing any
+dependencies. If you want to see what the dependencies are without
+having to run make, you can look at the contents of Makefile.PL,
+where the dependencies should be fairly clear.
+
+COPYRIGHT
+
+See COPYRIGHT AND LICENSE section in VCI.pm for the copyright and
+usage/distribution rights. The COPYRIGHT AND LICENSE section of VCI.pm
+applies to this entire distribution, except the testing repos included
+in t/repos/, which have their own copyrights and licenses. (However,
+all of them are compatible with the Artistic license and GPL.)

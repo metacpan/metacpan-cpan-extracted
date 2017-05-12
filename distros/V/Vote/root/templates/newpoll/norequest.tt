@@ -1,0 +1,5 @@
+<!-- $Id: norequest.tt 116 2009-03-26 17:47:15Z nanardon $ -->
+
+<div id="poll_request" class="box">
+<p class="alert">Je n'ai pas cette requête de création de vote.</p>
+</div>

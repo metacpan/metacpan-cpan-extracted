@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+
+# vkmp3 script
+# (c) Aleksander Alekseev 2011-2016 | http://eax.me/
+# Special thanks to Bekenev Ruslan ( http://bitbucket.org/KryDos ) 
+
+use strict;
+use warnings;
+use utf8;
+
+use Text::Unidecode;
+use MP3::Info;
+use VK::MP3;
+
+use constant {
+    VERSION => '0.11',
+    DEFAULT_LOGIN => 'billy@microsoft.com',
+    DEFAULT_PASSWORD => 'qwerty',
+    DEFAULT_SAVE_DIR => './',
+    DEFAULT_MAX_SHOW => 20,
+  };
+
+my ($login, $password, $save_dir, $max_show);
+for my $x (qw/login password save_dir max_show/) {
+    my $X = "\U$x";
+    my $cmd = qq{
+      \$$x = \$ENV{VKMP3_$X};
+      \$$x = DEFAULT_$X unless(defined(\$$x));
+    };
+    eval $cmd;
+}
+
+my $hidden_pass = "*" x length($password);
+
+my $query = join " ", @ARGV;
+die "vkmp3 ver ".VERSION." (VK::MP3 ".$VK::MP3::VERSION.")\n".
+    "Environment variables: VKMP3_LOGIN, VKMP3_PASSWORD, VKMP3_SAVE_DIR, VKMP3_MAX_SHOW\n".
+    "Usage:\n$0 <query>\n$0 --dialog\n$0 --sync\n"
+    unless($query);
+
+if($query eq '--dialog') {
+  dialog_loop();
+} elsif ($query eq '--sync') {
+  make_sync();
+} else {
+  search_query($query);
+}
+
+exit;
+
+sub dialog_loop {
+  print "Dialog mode, enter query or 'exit'\nvkmp3> ";
+  while($query = <STDIN>) {
+    chomp($query);
+    if(length($query)) {
+      last if((lc $query eq 'exit')or(lc $query eq 'quit'));
+      search_query($query);
+      print "\n";
+    }
+    print "vkmp3> ";
+  }
+}
+
+sub search_query {
+  my ($query) = @_;
+  print "Looking for '$query'...\n";
+  utf8::decode($query);
+
+  my $vk = VK::MP3->new(login => $login, password => $password);
+  my $rslt = $vk->search($query);
+
+  unless(@{$rslt}) {
+    print "Nothing found\n";
+    return;
+  }
+
+  my $i;
+  for my $t (@{$rslt}) {
+    my $name = $t->{name};
+    $name = substr($name,0,64)."..." if(length($name) > 64);
+
+    my $duration = $t->{duration};
+    $duration = $duration
+      ? sprintf("%02d:%02d", int($duration / 60), $duration % 60)
+      : "??:??";
+
+    utf8::encode($name);
+    print sprintf("%02d", ++$i)." [$duration] $name\n";
+    last if($i >= $max_show);
+  }
+
+  print "Your choice(s) [none]: ";
+  chomp(my $choice = <STDIN>);
+  my @choice_list = grep { $_ ne '' } split /\D/, $choice;
+  download_files($rslt, \@choice_list);
+}
+
+sub make_sync {
+  print "Syncing...\n";
+  my $vk = VK::MP3->new(login => $login, password => $password);
+  my $rslt = $vk->get_playlist;
+  my @choice_list = 1 .. scalar @{$rslt};
+  download_files($rslt, \@choice_list);
+}
+
+sub download_files {
+  my ($rslt, $choice_list) = @_;
+  for my $choice (@{$choice_list}) {
+    print "$choice - ignored" and next
+      unless($choice >= 1 and $choice <= scalar(@{$rslt}));
+
+    my $url = $rslt->[$choice-1]{link};
+    $url =~ s/'/\\'/g;
+
+    my $fname = unidecode($rslt->[$choice-1]{name}).'.mp3';
+    $fname =~ s/[^a-z0-9\-\_\.\ ]//gsi;
+    $fname =~ s/[\s\-]+/-/g;
+    $fname = $save_dir.$fname;
+
+    if(-e $fname) {
+      print "File $fname exists, skipping...\n";
+      next;
+    }
+ 
+    print "Downloading $url to $fname...\n";
+    system("lwp-download '$url' '$fname'");
+    die "Download: lwp-download returned $?\n" if $?;
+
+    my $bitrate = abs(get_mp3info($fname)->{BITRATE});
+    print "Bitrate = ".sprintf("%d",$bitrate)." kbps\n";
+    print "$fname\n";
+  }
+}

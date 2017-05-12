@@ -1,0 +1,1343 @@
+Revision history for Perl extension Verilog::Language.
+
+The contributors that suggested a given feature are shown in [].  [by ...]
+indicates the contributor was also the author of the fix; Thanks!
+
+* Verilog::Language 3.424 2017-04-26
+
+****	Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]
+
+
+* Verilog::Language 3.422 2016-11-24
+
+****    Add additional tests, msg1982. [by Stefan Tauner]
+
+****	Fix passing enum types in SigParser, bug1107. [by Lalit Chhabra]
+
+
+* Verilog::Language 3.420 2016-07-30
+
+***     Add vhier --skiplist option. [John Busco]
+
+****    Fix duplicate cells when delete cells, bug1049.  [by Stefan Tauner]
+
+****    Fix core dump on Storable store/retrieve, bug1063. [G Aydos]
+
+
+* Verilog::Language 3.418 2016-02-02
+
+****    Fix Flex 2.6.0 warnings.
+
+
+* Verilog::Language 3.416 2015-10-02
+
+****    Fix dumpcheck test false failures, bug939. [Gene Sullivan]
+
+****    Fix vrename missing first quote symbol msg1684. [Josef Wells]
+
+
+* Verilog::Language 3.414 2015-06-26
+
+****	Add Parser useProtected argument to aid runtime, bug899. [Corey Teffetalor]
+
+****	Fix Preproc loop under Perl-Tk, bug913. [Stefan Tauner]
+
+****	Fix vhier infinite loop on recursive modules.
+
+****	Fix preprocessing stringified newline escapes, bug915. [Anton Rapp]
+
+****	Fix building for Mac 10.10 with Perl 5.18.2, bug923. [S Liu]
+
+****	Fix parsing comments before signal end, bug917. [Raj G, Jeffrey Huynh]
+
+
+* Verilog::Language 3.412 2015-03-16
+
+****    Fix len error in 3.410, bug896. [Jon Nall]
+
+
+* Verilog::Language 3.410 2015-03-14
+
+****	Fix non-ANSI modport instantiations, bug868. [Kevin Thompson]
+
+****    Fix extra text in delay-number callback, bug893. [Greg Waters]
+
+****	Fix virtual modport without interface in classes, bug778. [Jon Nall]
+
+
+* Verilog::Language 3.408 2014-11-15
+
+***	Fix +define+A+B to define A and B to match other simulators, bug847. [Adam Krolnik]
+
+***	Show old and new value when redefining a define, bug846. [Adam Krolnik]
+
+****	Fix loss of trireg on output signals, msg1491. [Matt Lanahan]
+
+****	Fix quoted comment slashes in defines, bug845. [Adam Krolnik]
+
+
+* Verilog::Language 3.406 2014-09-21
+
+***     Add Verilog::Preproc->parent() method, bug813. [Ed Carstens]
+
+***     Add Verilog::Netlist::File->preproc() method, bug813. [Ed Carstens]
+
+****	Pass CFLAGS/CPPFLAGS for easier packaging, bug786. [Florian Schlichting]
+
+****	Fix width of byte, bug812. [Ed Carstens]
+
+****    Fix interfaces with variable dimension, bug818. [Glen Gibb]
+
+
+* Verilog::Language 3.404 2014-06-08
+
+***	Added Verilog::Netlist/Verilog::Parser parser option.
+
+****	In vppreproc, add option -P as alias of --noline to match GCC.
+
+****	Fix modport outside ANSI header, bug777. [Joe Dudas]
+
+****	Fix virtual modport without interface, bug778. [Jon Nall]
+
+****	Fix string corruption, bug780. [Derek Lockhart]
+
+****	Fix Bison 4.0 warnings.
+
+
+* Verilog::Language 3.403 2014-03-11
+
+****	Fix parsing "#0 'b0", bug256.
+
+****	Fix build on MacOS 5.12.4. [Robert Bell]
+
+****    Fix multiple pre-ANSI package imports on same line. [Brad Dobbie]
+
+
+* Verilog::Language 3.402 2013-10-17
+
+****	Fix function/task named parameter calls with empty parenthesis.
+
+****	Fix parameter assignment to mintypmax_expressions, bug671. [Arnaud Turier]
+
+
+* Verilog::Language 3.401 2013-05-21
+
+***	Fix recognizing type parameters as classes, bug627. [Jon Nall]
+
+****	Fix missing endtask callbacks in DPI and methods, bug641. [Jon Nall]
+
+
+* Verilog::Language 3.400 2013-02-27
+
+***	Support SystemVerilog 1800-2012.
+
+****	Predefine SV_COV_START and other IEEE mandated predefines.
+
+
+* Verilog::Language 3.318 2012-11-28
+
+****	Fix vpassert test failure in bleadperl 5.17.5-518, bug582.  [Andreas Koenig]
+
+
+* Verilog::Language 3.317 2012-10-01
+
+***	Gunzip Verilog::Preproc filenames ending in .gz, bug564. [Jingzhen Hu]
+
+****	Fix multidimensional unpacked wires. [Leif Tore Rusten]
+
+****	Fix MacOS 10.8 build error. [Oliver King-Smith]
+
+
+* Verilog::Language 3.316 2012-07-27
+
+****	Fix newlines in radix values, bug507. [Walter Lavino]
+
+****	Fix internal readWholefile error check, bug518. [Wei Song]
+
+****	Fix parsing hierarchical binds.  [Brian Mokrzycki]
+
+
+* Verilog::Language 3.315 2012-05-04
+
+***	Put root localparams into $root module, bug471. [Corey Teffetalor]
+
+****	Fix comment callback starting line, bug459. [Max Bjurling]
+
+****	Fix genvar and begin under generate, bug461.  [Alex Solomatnikov]
+
+****	Fix const class member parsing.
+
+****	Fix compile error on MS Windows.  [Ling Li Wang]
+
+****	Fix cpan-testers' tests on systems without perldoc.
+
+
+* Verilog::Language 3.314 2012-02-27
+
+***	Add vhier --forest and --instance.  [by John Busco]
+
+***	Fix expansion of back-slashed escaped macros, bug441.  [Alberto Del Rio]
+
+***	Fix -F relative filename parsing, bug444. [Jeremy Bennett]
+
+****	Fix c style var array declarations. [by Jack Cummings]
+
+****	Fix --debug parsing after -f files, bug442. [Jeremy Bennett]
+
+****	Fix hang on recursive substitution `defines, bug443. [Alex Solomatnikov]
+
+
+* Verilog::Language 3.313 2011-12-14
+
+***	Add Verilog-AMS keywords to Verilog::Language.
+
+***	Fix "always @ (* )", bug403, bug404.  [Walter Lavino]
+
+***	Fix empty generate region, bug422.  [Walter Lavino]
+
+
+* Verilog::Language 3.312 2011-10-20
+
+***	Fix $past with event_control, bug400. [Jon Nall]
+
+****	Fix 02_help.t error when pager highlights manpages.
+
+
+* Verilog::Language 3.311 2011-10-18
+
+**	Add SigParser class and endclass callbacks, bug391. [Jon Nall]
+
+***	Fix EditFiles confusing endmodule in nested comments. [Wu Ye]
+
+***	Fix --help output to go to stderr, not stdout.  [R. Diez]
+
+
+* Verilog::Language 3.310 2011-07-22
+
+**	Add --synthesis to vhier+Preproc to honor translate_offs. [Ozkan Dikmen]
+
+**	Add SigParser covergroup and endgroup callbacks. [Jon Nall]
+
+****	Fix covergroup callback giving empty datatype, bug361. [Jon Nall]
+
+****	Fix SigParser port callback missing paren expressions. [Sean Vo]
+
+
+* Verilog::Language 3.307 2011-06-22
+
+****	Add vhier --xml. [David Asher]
+
+****	Fix net used lint warnings after pin deletes, bug343. [David Chinnery]
+
+****	When making, turn down GCC optimization to O1 to avoid GCC hang bug.
+
+
+* Verilog::Language 3.306 2011-03-07
+
+****	Fix block comment not separating identifiers, bug311. [Gene Sullivan]
+
+
+* Verilog::Language 3.305 2010-12-03
+
+***	Add -F option to read relative option files, bug297. [Neil Hamilton]
+
+***	Fix env var expansion from Getopt, bug298.  [John Dickol]
+
+****	Fix removing defines without ` when non-SystemC, bug300. [John Dickol]
+
+
+* Verilog::Language 3.304 2010-10-25
+
+****	Fix file_substitute expanding ~, msg382.  [Neil Hamilton]
+
+****	Fix wrong filename on include file errors, bug289. [Brad Parker]
+
+
+* Verilog::Language 3.303 2010-09-20
+
+***	Add vrename --changelang option, to upgrade keywords. [Dan Moore]
+
+***	Add vrename --language option. [Dan Moore]
+
+***	Add Verilog::Language::language_maximum and language_keywords.
+
+****	Fix escaped identifiers that are keywords, bug282. [Dan Moore]
+
+****	Fix preprocessor `` of base define, bug283.  [Usha Priyadharshini]
+
+
+* Verilog::Language 3.302 2010-08-26
+
+****	Increase define recursions before error.  [Paul Liu]
+
+****	Fix documentation on verilog_text and link, bug278. [Mike Z]
+
+****	Use Digest::SHA instead of SHA1, bug277.  [Ahmed El-Mahmoudy]
+
+****	Fix false test failure if Math::BigInt not installed.
+
+
+* Verilog::Language 3.301 2010-08-04
+
+****	Improve Bison/flex skipping to increase CPAN-Testers pass rate.
+
+
+* Verilog::Language 3.300 2010-08-02
+
+**	Support SystemVerilog 2009 standard, including new keywords.
+
+***	Bison/flex are no longer required to build, unless sources are changed.
+
+****	Fix preprocessing ifdef `INDIRECT(DEFINE).
+
+****	Fix preprocessor preservation of newlines across macro substitutions.
+
+****	Fix preprocessor stringification of nested macros.
+
+****	Fix preprocessor whitespace on define arguments
+
+
+* Verilog::Language 3.251 2010-06-29
+
+***	Add vppreproc --dump-defines option.
+
+****	Fix vpassert "POSIX::BUFSIZ" error on Perl 5.8.8.  [Chitlesh Goorah]
+
+
+* Verilog::Language 3.250 2010-06-21
+
+**	Add parsing of "defparam", including SigParser::defparam callback,
+	Netlist::ContAssign object, and accessors. [Pierre-David Pfister]
+
+****	Fix complex {...} port declarations, bug262.  [Evgeni Stavinov]
+
+
+* Verilog::Language 3.241 2010-05-01
+
+***	Add vpassert --call-* switches to use user's PLI display functions.
+
+****	Disable Parser unreadback() data during std:: parsing. [Mark Nodine]
+
+****	Fix preprocessing some DOS carriage returns, broke in 3.240.
+
+
+* Verilog::Language 3.240 2010-03-29
+
+***	Add vpassert vp_coverage_off/on pragmas.
+
+***	Add vpassert --synthcov, --axiom and --vcs switches.
+
+****	Pass pin numbers for functions/tasks to SigParser::port_cb.
+
+****	Improve performance of large file parsing.  [Jeffrey Short]
+
+****	Fix parsing single files > 2GB.  [Jeffrey Short]
+
+****	Fix vpassert to insert `lines on every line where needed.
+
+****	Fix "disable iff {property_expr}", bug221.  [Rick Ramus]
+
+****	Fix UDPs with min:typ:max delays, bug228.  [Pihay Saelieo]
+
+****	Fix Pod::Usage dependency, rt51024.  [Andreas Koenig]
+
+****	Fix Mac OS-X compile issues.  [Joshua Wise]
+
+****	Fix Verilog::EditFiles documentation, bug222. [Evgeni Stavinov]
+
+
+* Verilog::Language 3.231 2010-02-21
+
+****	Support 1800-2009 /*comments*/ in define values.
+
+****	Fix DOS carriage returns leaking into comment output.
+
+****	Fix error on define comments w/o keep_whitespace, bug202. [Rick Ramus]
+
+****	Fix "parser thinks ending" error on unions, bug202. [Rick Ramus]
+
+****	Fix `defines with empty argument lists.
+
+
+* Verilog::Language 3.230 2010-01-21
+
+**	Support interface modports, bug200.  [by Thriller Wu]
+	Applications using interfaces may need to ignore the new callbacks.
+
+***	Support 1800-2009 defines with default arguments.
+
+***	Pedantic no longer disables `__FILE__ and `__LINE__ as they
+	are now part of SystemVerilog 2009 (IEEE 1800-2009).
+
+****	Fix memory leaks.  [Thriller Wu]
+
+
+* Verilog::Language 3.223 2009-12-20
+
+***	Support `undefineall.
+
+****	Add implied "input" to function var callbacks.
+
+****	Fix covergroup instantiation syntax error, bug192.  [Vesselin Kavalov]
+
+****	Fix parsing enums with implicit types.
+
+
+* Verilog::Language 3.222 2009-11-24
+
+****	Fix missing ; in ContAssign::verilog_text, bug177.  [Nicolas Wilhelm]
+
+****	Fix multi-dimensional arrayed typedefs, bug183.  [Vesselin Kavalov]
+
+****	Fix "assert () else" action_blocks.  [Vesselin Kavalov]
+
+****	Fix typedef scoping under anonymous begin blocks.
+
+****	Fix `define argument mis-replacing system task of same name, bug191.
+
+
+* Verilog::Language 3.221 2009-10-28
+
+****	Fix SystemPerl hitting "undefined find_interface..." in 3.220.
+
+****	Fix erroring on strings with backslashed newlines, bug168. [Pete Nixon]
+
+****	Fix compile error on RHEL3 with gettext, bug169. [Marek Rouchal]
+
+****	Fix line number miscounting with `pragma.
+
+
+* Verilog::Language 3.220 2009-09-30
+
+**	Add parsing of "assign", including SigParser::contassign callback,
+	Netlist::ContAssign object, and related accessors.
+
+***	Several code speedups to vhier, Verilog::Netlist, and the parsers.
+
+***	Add Preproc::getall to fetch all text instead of line-by-line.
+
+***	Add Parser::new(use_cb_{name}=>0) option to speed parsing.
+
+***	Add SigParser/Netlist::new(use_vars=>0) option to speed parsing.
+
+****	Fix deep defines causing flex scanner overflows. [Brad Dobbie]
+
+****	Fix preprocessing commas in deep parameterized macros. [Brad Dobbie]
+
+****	Fix Preproc::defSubstitute not being called on parameterized macros.
+
+****	Fix Perl 5.8.8 compile error, bug115. [Marek Rouchal]
+
+
+* Verilog::Language 3.213 2009-09-10
+
+***	Improved warning when "do" used as identifier.
+
+****	Fix compilation and installation on MacOS 10.4. [Robert Guenzel]
+
+****	Fix escaped preprocessor identifiers, bug106. [Nimrod Gileadi]
+
+****	Fix Perl 5.8.8 compile error, bug115. [Marek Rouchal]
+
+****	Fix Perl 5.8.0 compile error with callbackgen. [Kjeld Svendsen]
+
+
+* Verilog::Language 3.212 2009-07-20
+
+***	Fix syntax errors when using vhier/Netlist with --language 1364-2001.
+
+****	Fix dotted expressions returning "..", bug98. [Saul Cuellar]
+
+****	Fix Getopt::file_path to expand environment variables in filenames.
+
+
+* Verilog::Language 3.211 2009-06-17
+
+***	Add SigParser::var callbacks on struct members, bug91. [Saul Cuellar]
+
+***	Add Preproc::defSubstitute define callbacks, bug94. [by Saul Cuellar]
+
+****	Fix parsing empty commas in port lists, bug97.  [Noam Meir]
+
+****	Fix compatibility with Getopt-Long-2.38, bug167.  [by Marek Rouchal]
+
+****	Fix compile error under GCC 3.3.5.
+
+****	Work around compiler warning when using flex 2.5.35. [Jonathan Kimmitt]
+
+
+* Verilog::Language 3.210 2009-05-19
+
+***	`__FILE__ now expands to a string, per SystemVerilog 2009.
+
+***	Fix parsing external declarations using appropriate class scope.
+
+***	Fix parsing class member variables with multiple qualifiers.
+
+****	Fix Netlist errors with ported interfaces, bug86. [David A]
+
+****	Fix Netlist errors with interfaces-under-interfaces, bug87. [David A]
+
+****	Fix define formal arguments that contain newlines, bug84. [David A]
+
+****	Fix parsing arrayed instances with just "[#]" (no colon).
+
+****	Fix parsing "for (a=0;a;)".
+
+****	Fix parsing "super.new(...)"
+
+
+* Verilog::Language 3.202 2009-05-01
+
+****	Fix 3.200 mis-inheriting V2K port types.  [Derek Johnstone]
+
+
+* Verilog::Language 3.201 2009-04-28
+
+****	Fix "abort" compile error.  [Jayanand AK]
+
+
+* Verilog::Language 3.200 2009-04-15
+
+**	This is a major release that may break some scripts that worked with
+	earlier versions.  Some scripts may need modification to work with
+ 	this version of Verilog-Perl.
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+**	Verilog::Parser, SigParser and Netlist now support SystemVerilog.
+
+***	Verilog::SigParser's signal_decl and funcsignal callbacks no longer
+	work.  They are replaced by the "var" callback.
+
+***	Added Verilog::SigParser program and endprogram callbacks.
+
+***	Calling Verilog::SigParser->new now requires a symbol_table parameter,
+	if multiple modules are to be parsed as part of one compilation unit.
+
+***	Netlist::Port->type accessor is renamed data_type. [Horia Toma]
+
+***	Netlist::Net->type accessor is split into data_type,
+	decl_type and net_type accessors.
+
+***	Netlist::Module->ports_ordered now returns objects. [Horia Toma]
+
+***	Added Netlist::Interface and related accessors.
+
+***	Added Netlist::Module->keyword accessor, and use it for "program"s.
+
+****	Fix Macintosh BSD build error.  [Otacilio de Arujo Ramos Neto]
+
+****	Fix parallel make rule build error.  [Chitlesh Goorah]
+
+****	Fix const compile warning in VPreProc.cpp. [Chitlesh Goorah]
+
+****	Fix logic MSBs not being reported in 3.200 beta.  [Horia Toma]
+
+
+* Verilog::Language 3.121 2009-04-05
+
+****	Make cell names unique when duplicate cells encountered. [Paul Janson]
+
+****	Remove unused parameter in exit_if_error.  [Paul Janson]
+
+****	Fix modported instance name passed to SigParser::instant callback.
+
+
+* Verilog::Language 3.120 2009-02-25
+
+***	Add vhier --resolve-files option. [by Vasu Arasanipalai]
+
+***     Support "parameter integer" etc, bug64. [Jeff Kurtze]
+
+***	Support big-endian bit vectors, i.e. [0:2], bug65. [Devendra Singh]
+
+***	Return width() of 1 for non-vectored signals, bug65. [Devendra Singh]
+
+***	Add "'{" as an operator.
+
+****	Fix "assign {{x,y},z}", bug166. [Devendra Singh]
+
+****	Fix documentation on ports_ordered, bug66.  [Nicky Ayoub]
+
+****	Fix compile issues with GCC 4.3.  [Donavan Miller]
+
+****	Fix Bison 2.4 compile issues.
+
+
+* Verilog::Language 3.110 2009-01-28
+
+**	Support interface and import. [by Sandeep Gor]
+	Add new SigParser::interface, endinterface and import callbacks.
+
+***	Add vhier --top-module option, bug49.  [John Busco]
+
+***	Add vpassert $ucover_bits_clk. [Mahesh Kumashikar, et al]
+
+***	Add comments to Netlist::Net::verilog_text. [by Jeff Short]
+
+***	Support `pragma and `default_nettype.
+
+
+* Verilog::Language 3.100 2009-01-02
+
+**	Vppp is now renamed vppreproc; vpm is renamed vpassert.
+	This fixes naming conflicts with other packages.  [Chitlesh Goorah]
+	Note this breaks backward compatibility and any scripts that call
+	these programs will need updating.  Alternatively, add a symlink in
+	your bin directory from the old name.
+
+***	Fix missing module dependencies and Bison warning.  [Chitlesh Goorah]
+
+
+* Verilog::Language 3.045 2008-12-19
+
+***     Add vpm --noline option. [Vasu Arasanipalai]
+
+***     Add vpm --realintent option. [Vasu Arasanipalai]
+
+***	Fix vpm making long lines that upset Cadence's NC-Verilog. [Soon Koh]
+
+****	Fix Makefile issues with ActivePerl.  [Jose Ochoa]
+
+
+* Verilog::Language 3.044 2008-11-10
+
+***	Support SystemVerilog unique and priority case, bug33. [by Nicky Ayoub]
+
+***	Support SystemVerilog timeunit and timeprecision, bug34. [by Nicky Ayoub]
+
+***	Support SystemVerilog package items, bug39. [by Nick Ayoub]
+
+****	Expand environment variables in Verilog::Getopt.  [Lawrence Butcher]
+
+****	Fix Verilog::EditModules when modules wrapped in ifdef.  [Mat Zeno]
+
+
+* Verilog::Language 3.043 2008-09-28
+
+***	Ignore Verilog-XL defines (suppress_faults, etc).  [Nicky Ayoub]
+
+****	Fix cpan-testers mis-reporting FAIL when no flex installed.
+
+****	Fix Perl Critic error when not installed, bug164. [Andreas Koening]
+
+
+* Verilog::Language 3.042 2008-09-19
+
+***	Add Netlist net, port and module ->delete methods. [Daniel Schoch]
+
+***	Add Netlist modules_sorted_level and ->level method. [Daniel Schoch]
+
+***	Add vpm $uerror_clk and $uwarn_clk assertions.
+
+***	Add vpm $ucover_clk coverage expansions.
+
+***	Vpm now enables `line comments unless using Verilog 1995.
+
+****	Fix verilog_text to output wire values. [by Jeff Short]
+
+****	Fix parsing signals with negative lsbs.  [Stephane Laurent]
+
+
+* Verilog::Language 3.041 2008-09-03
+
+**	Verilog-Perl development versions are now available from a git server.
+	See Installing under http://www.veripool.org/verilog-perl for details.
+
+***     Netlist errors are now always reported through the new
+	Verilog::Netlist::Logger class.  This allows errors to be caught or
+	specially handled.  [Miguel Corazao, AMD]
+
+****	Fixed code to be Perl::Critic clean.
+
+
+* Verilog::Language 3.040 2008-08-20
+
+***	Add Netlist::Net->value containing parameter values.  [Ron D Smith]
+
+***	Added Verilog::Netlist/Verilog::Parser preproc option.
+	[by Miguel Corazao, AMD]
+
+***	Support +=, -=, etc, and ++, -- operators. [Sean de la Haye]
+
+***	Support "cover property."
+
+****	Eliminated automatic error printing upon application termination.
+	[by Miguel Corazao, AMD]
+
+****	Fix syntax error when "`include `defname" is ifdefed.  [John Dickol]
+
+****	Fix error when macro call has commas in concatenate. [John Dickol]
+
+****	Fix compile errors under Fedora 9, GCC 4.3.0.  [by Jeremy Bennett]
+
+
+* Verilog::Language 3.035 2008-05-07
+
+****	Fix "output reg name=expr;" bug34649 syntax error.  [Martin Scharrer]
+
+****	Fix functions with "input integer".  [Johan Wouters]
+
+****	Fix bug introduced in 3.024 with parametrized defines.
+
+****	Fix compiler warnings under GCC 4.2.1.
+
+****	Fix "endclass" keyword misspelling.  [John Dickol]
+
+****	Fix preprocessor `else after series of `elsif.  [Mark Nodine]
+
+****	Fix parametrized defines calling define with comma.  [Joshua Wise]
+
+
+* Verilog::Language 3.024 2008-04-02
+
+***	Verilog::Parser will now start parsing using the keywords
+	based on the Verilog::Language::language_standard setting.
+
+****	Fix vhier ignoring --language option.  [Martin Scharrer]
+
+****	Fix SystemVerilog parameterized defines with `` expansion,
+	and fix extra whitespace inserted on substitution. [Vladimir Matveyenko]
+
+****	Fix missing uwire keyword in Verilog::Language. [Jonathan David]
+
+****	Fix parse error on min:typ:max delay pairs, bug34575. [Martin Scharrer]
+
+
+* Verilog::Language 3.023 2008-02-12
+
+****	Fix arrayed input/output pins.  [Thomas Ziller]
+
+****	Fix "output reg unsigned" parse error.
+
+
+* Verilog::Language 3.022 2008-01-15
+
+***	Add ignoring of SystemVerilog enumerations.  [Thomas Ziller]
+
+****	Fix begin_keywords 1800-2005 error introduced in last release.
+
+
+* Verilog::Language 3.021 2008-01-07
+
+****	Fix endclass keyword parsing.  [David Plumb]
+
+****	Fix "://" parsing as ":/" operator instead of comment. [Mark Nodine]
+
+
+* Verilog::Language 3.020 2007-12-03
+
+**	Add SystemVerilog logic types.  [Thomas Ziller]
+	(SystemVerilog support is still a work in progress).
+
+***	Add SystemVerilog operators += ## @@ :: etc.
+
+***	Add specify operators &&& => *>.  [Mark Nodine]
+
+***	Add SystemVerilog times (10ns, etc).
+
+****	Fix concatenates in for loop assignments.  [Mark Nodine]
+
+****	Fix endmodule/endfunc callback line numbers.
+
+
+* Verilog::Language 3.013 2007-10-18
+
+****	Fix parsing module #(parameter x,y) declarations. [Oleg Rodionov]
+
+****	Fix parsing system functions with empty parens. [Oleg Rodionov]
+
+****	Fix Verilog::Netlist errors having wrong line number. [Oleg Rodionov]
+
+
+* Verilog::Language 3.012 2007-09-10
+
+**	Added Verilog::EditFiles module and vsplitmodule example.
+
+
+* Verilog::Language 3.011 2007-07-31
+
+***	Added event trigger -> operator. [Mark Nodine]
+
+****	Remove preprocessor adding newlines before `line. [Mark Nodine]
+
+
+* Verilog::Language 3.010 2007-07-18
+
+***	Added Parser::endparse callback. [Mark Nodine]
+
+***	Added SigParser::endmodule, endtaskfunc, and endcell callbacks.
+
+****	Fix attachment of comments to proceeding cells. [David Chinnery]
+
+
+* Verilog::Language 3.002 2007-07-16
+
+***	Find functions now search backslash escaped names.  [David Chinnery]
+
+***	Fix vrename breakage in 3.00* releases.  [David Price]
+
+****	Fix SigParser::comment to call Parser::Comment. [Mark Nodine]
+
+****	Fix Parser::unreadback to always return value. [Mark Nodine]
+
+****	Fix g++ bug giving "out of memory" on Cygwin.  [Pongstorn]
+
+
+* Verilog::Language 3.001 2007-06-20
+
+****	Support V2K function/task argument lists.
+
+****	Fix Preprocessor dropping some `line directives.  [Mark Nodine]
+
+****	Fix Netlist "not found" errors on primitives, bug27624. [Jeff Trull]
+
+
+* Verilog::Language 3.000 2007-06-12
+
+** 	Note this is a MAJOR release that may have incompatibilities with
+	earlier versions, although I've attempted to minimize problems.
+	Please email any problems to the author.
+
+**	Verilog::SigParser has been completely rewritten.  The good news is
+	it understands almost the entire Verilog 2005 language.  The bad
+	news is there are minor incompatibilities with previous versions,
+	and the parser now errors out when it does not understand something
+	rather than ignoring it.
+
+***	The Verilog::SigParser->pin callback now passes "" as the pin name
+	instead of "pin###" if connecting by position instead of by name.
+
+***	Added Verilog::SigParser->funcsignal callback for variables declared
+	inside a function or task.  bug26972.  [Mark Nodine]
+
+***	Added Verilog::SigParser->instant callbacks for gate primitives.
+	bug26969, bug27062. [Mark Nodine]
+
+***	Added Verilog::SigParser->parampin callbacks for parameter connections
+	to instantiations.
+
+***	Added Verilog::SigParser->signal_decl callbacks for all module vars,
+	including parameters and genvars.
+
+***	Added Verilog::SigParser->signal_decl callback argument with
+	initial values of parameters and wires. [Mark Nodine]
+
+**	Verilog::Parser has been replaced with the front end of the
+	SigParser.  The preproc and syscall callbacks were added
+
+***	Require call to Verilog::Parser->eof() at the end of all parsers.
+
+***	Changed Verilog::Parser->unreadback() method to not clear state.
+	You must now call unreadback('') to clear the unreadback characters.
+
+***	The long depreciated Verilog::Parse module has been removed.
+
+****	Fixed Verilog::Parser mis-parsing spaces in numbers, bug27070.
+
+****	Fixed Verilog::SigParser bug26141, bug26940, bug26968, bug26969,
+	bug26970, bug26972, bug26997, bug27009, bug27010, bug27013,
+	bug27036, bug27037, bug27039, bug27045, bug27062, bug27066,
+	bug27067, bug27072.  [Mark Nodine, et al]
+
+
+* Verilog::Language 2.380 2007-05-27
+
+***	Added new Verilog-Perl.pod documentation overview.
+
+***	Verilog::Parser and Verilog::SigParser objects must call the eof method
+	to insure forward compatibility.
+
+***	Vpm $info etc have been removed, now only $uinfo, etc are supported.
+	This avoids conflict with SystemVerilog $error function.  [Tad Truex]
+
+***	Verilog::Language keywords now uses the `begin_keywords standard names.
+
+***	Added Verilog::Language::number_bitvector and number_bigint for returning
+	Bit::Vector and Math::BigInt objects.  bug26967.  [Mark Nodine]
+
+****	Fix --help to use Pod::Usage instead of depreciated pod2text.
+
+****	Ignore quotes inside `protected/`endprotected blocks.
+
+****	Drop end-of-file ctrl-Z's when preprocessing input.
+
+
+* Verilog::Language 2.373 2007-04-02
+
+***     Fix vppp breaking with Getopt::Long 2.36.  [Andreas J. König]
+
+****	Fix modules without any ports causing lost declarations.  [Mark Nodine]
+
+
+* Verilog::Language 2.372 2007-02-28
+
+***	Add include_open_nonfatal option to Preproc and Netlist.  [Eric Miller]
+
+****	Fix bug24552; Verilog::Module::new_net now defaults net type
+	to 'wire'. [Takeo Komiyama]
+
+
+* Verilog::Language 2.371 2007-01-23
+
+***	Fix bug24345; supply statements cause lint warnings.  [Jeff Trull]
+
+
+* Verilog::Language 2.370 2007-01-10
+
+***	Fix bug24248; reg/tri/supply* declarations, etc are now stored in Net
+	structures as the declared type, instead of as 'wire'.  [Jeff Trull]
+
+***	Fix bug13462; parse {} concatenations in pin connections. [Jeff Trull]
+
+***	Remove backslashes in quoted symbols when they aren't needed.
+
+****	Fix vpm deleting output when file moved between directories.
+
+
+* Verilog::Language 2.361 2006-10-02
+
+**	Attach Verilog comments to Netlist objects.  [Monte Becker]
+
+***	Add parameters to Verilog::Parser instant callback.  [Monte Becker]
+
+
+* Verilog::Language 2.360 2006-09-14
+
+***	Added Preproc keep_whitespace=>0 option to delete whitespace.
+
+***	Preprocessor now strips all DOS carrage returns.
+
+***	Allow Verilog::Getopt::file_path to resolve module_dir and/or incdirs.
+	Use only module_dir to resolve Netlist modules.  [by John Tseng]
+
+****    Vrename --crypt now uses lower case random identifiers for readability.
+
+****	Fix DOS carrage returns in multiline defines.  [Ralf Karge]
+
+
+* Verilog::Language 2.352 2006-08-22
+
+***	Fix compile errors under Cygwin.  [Mattan Tsachi]
+
+
+* Verilog::Language 2.351 2006-06-08
+
+***     Add vhier --language option.  [Sean Nazareth]
+
+****	Fix Getopt::file_path when dir names match file names. [by John Tseng]
+
+
+* Verilog::Language 2.350 2006-05-19
+
+***	Vpm now emits $timeformat when passed the --timeformat-units switch.
+
+***	SigParser and the Netlister now ignore function and task IOs.
+
+****	Preproc line numbers being off due to multi-line defines.  [Mat Zeno]
+
+****	Fix `include `DEFINE.
+
+
+* Verilog::Language 2.341 2006-02-06
+
+***	Add SystemVerilog `0, `1, `x, `z.  [John Tseng]
+
+****	Fix module #() parameter declarations.  [Andy Kuo]
+
+****	Fix "output reg" and "output wire" declarations.  [Andy Kuo]
+
+
+* Verilog::Language 2.340 2006-01-16
+
+***     Added vpm --minimum switch.
+
+****	Added Verilog::Language::language_standard to allow setting
+	which language standard (1995,2001,SystemVerilog) is used for keywords.
+
+****	Fix vhier -o option. [Sean Nazareth]
+
+****	Add vhier --modules and --missing-modules options. [Sean Nazareth]
+
+
+* Verilog::Language 2.331 2005-10-05
+
+***     Added vhier example program. [Vasu Arasanipalai]
+
+
+* Verilog::Language 2.330 2005-09-06
+
+***	vpm now aliases $error to $uerror, etc, to avoid conflict
+	with SystemVerilog $error function.  [Tad Truex]
+
+***	$uassert_info now uses __message_on. [Vasu Arasanipalai]
+
+****	Fix preprocessor substitution of quoted parametrized defines.
+
+
+* Verilog::Language 2.321 2005-08-03
+
+***	Verilog::SigParser now sees cells inside generates.  [by Thomas Ziller]
+
+
+* Verilog::Language 2.320 2005-07-27
+
+***     Add vrename --cryptall option.
+
+***     Fix Language is_keywords to match V2K language spec. [Mark Grossman]
+	Deleted extern, makefile, supply.  Added ifnone, strength, unsigned.
+
+****	Fix core dump when missing newline in `define.  [David van der bokke]
+
+
+* Verilog::Language 2.316 2005-06-10
+
+****	Fix define substitution with incomplete defines.  [by Ronald Dean Smith]
+
+****	Fix C++ Comments causing Perl compile problems. [Merijn Brand]
+
+
+* Verilog::Language 2.315 2005-03-16
+
+****	Support for latest SystemC::Netlist version.
+
+
+* Verilog::Language 2.314 2005-03-14
+
+****	Support for latest SystemC::Netlist version.
+
+
+* Verilog::Language 2.313 2005-03-01
+
+***	Vrename no longer recurses into CVS or .svn directories.
+
+***	Add specparam keyword. [Mark Grossman]
+
+****	Add NC-Verilog, and Verilog::Parser tests.
+
+
+* Verilog::Language 2.312 2005-02-04
+
+***	Fix ignoring lines with same line number as end of last include.
+
+
+* Verilog::Language 2.311 2005-01-27
+
+***	Support parsing of signed numbers.  [Rudi Rughoonundon]
+
+**** 	Fix resolve_filename misfinding directories. [John Tseng]
+
+****    Fix Verilog::Getopt::get_parameters for NC-Verilog.
+
+
+* Verilog::Language 2.310 2005-01-24
+
+**	NEWS is now renamed Changes, to support CPAN indexing. [Offer Kaye]
+
+**	Support Verilog 2001 ansi-style port declarations. [Rudi Rughoonundon]
+
+**	Pins, nets, ports, and cells accessor methods now return lists
+	rather than internal hash references.  This matches earlier
+	documentation, and behavior of the pins_sorted, etc functions.
+
+***	SigParser::module callback no longer gets list of ports, instead
+	SigParser::port is called back on each port.
+
+***	Add Verilog::GetOpt GCC -U<define> switch for undefining.
+
+****	Support SUSE Linux and OS-X. [Jose Renau]
+
+
+* Verilog::Language 2.303 2004-11-18
+
+***	Add vpm --nopli for stripping $pli calls. [Mike Lopresti]
+
+
+* Verilog::Language 2.302 2004-11-10
+
+****	Support Verilog 2001 named instantiation parameters. [Thomas Ziller]
+
+
+* Verilog::Language 2.301 2004-10-26
+
+****	Fix pod documentation errors. [Offer Kaye]
+
+
+* Verilog::Language 2.300 2004-04-01
+
+**	Added vppp preprocessor command.
+
+**	Preprocessor is now Verilog 2001 and SystemVerilog 3.1 compliant.
+	Adds arguments to defines, and `include <> syntax.
+
+**	Added SystemVerilog 3.1 keywords to Verilog::Language
+
+**	Added vrename --keywords and recursion on directory arguments.
+
+***	Added to SigParser::module callback "$in_celldefine" 4th argument.
+	Netlist::File sets $module->is_libcell() either if the file is a
+	library or the module is within "`celldefine ... `endcelldefine".
+
+***	Added to Verilog::Netlist (metacomment=>{ firstWord=>val, ... })
+	argument.  For each comment that begins with at least two words,
+	Verilog::SigParser calls back attribute() if the first word has a
+	true value in %metacomment.
+
+***	Module::attrs_sorted() now returns a list of "category name[ =]..."
+	strings from metacomments between "module" and the first declaration.
+
+****	(Verilog::Preproc receives the list of metacomment keywords but
+	does not yet filter the comments for speed.)
+
+****	Fixed ` substitution inside define value strings.
+
+
+* Verilog::Language 2.232 2004-03-10
+
+***	Fix newline insertion in vpm $info messages.
+
+
+* Verilog::Language 2.231 2004-01-27
+
+****	Documentation fixes.
+
+
+* Verilog::Language 2.230 2003-10-02
+
+**	Vpm has been changed to use Verilog standard flags.
+	Vpm will no longer recurse all directories, instead it now accepts
+	+incdir+, -v or -f flags as would a regular simulator, and
+	preprocesses all files found.
+
+**	Added Netlist::verilog_text for writing netlists. [Phillip Prentice]
+
+***	Added Cell/Port/Pin::delete methods for editing netlists.
+
+***	Added Netlist::top_modules_sorted method.
+
+***	In Netlist, read in library files if cell not found. [John Potter]
+
+***	Fix SigParser dropping 1'b0/1'b1 pins. [John Potter]
+
+***	In vpm, support $error({"concatenate ","string"}); [Ray Strouble]
+
+****	In vpm, fix comments and line numbering in asserts. [Ray Strouble]
+
+****	Fix detection of wire assignments. [David Duxstad]
+
+
+* Verilog::Language 2.226 2003-08-19
+
+****	GCC 3.3 fixes
+
+
+* Verilog::Language 2.225 2003-08-12
+
+***	Have Getopt::parameter return unknown arguments from
+	inside -f files.  [David Duxstad]
+
+***	Change assert_amone/onehot to use faster equation
+	in place of case statement. [Greg Waters]
+
+****	Add tri/tri0/tri1 as wire declarative terms. [David Duxstad]
+
+****	Redhat 9 and GCC 3.2.2 fixes
+
+
+* Verilog::Language 2.224 2003-05-20
+
+**	Add order based pin/cell connections.  [by David Duxstad]
+
+
+* Verilog::Language 2.222 2003-03-06
+
+****	Support instantiations with multiple cell names. [Bruce Nepple]
+
+****	Support uppercase radix letters.  [Wilson Li]
+
+
+* Verilog::Language 2.221 2003-03-04
+
+****	Fix missing example.cpp file
+
+
+* Verilog::Language 2.220 2003-02-06
+
+***	Support primitives as if they were modules.  [Bruce Nepple]
+
+***	The link_read_nonfatal=>1 netlist option will prevent missing
+	modules from being errors during link.  [Bruce Nepple]
+
+***	Add Verilog::Parser support for `protected. [Scott Bleiweiss]
+
+****	Update documentation & Netlist example.  [Bruce Nepple]
+
+
+* Verilog::Language 2.220 2002-12-27
+
+****	Solaris perl 5.005_03 LD error fixed.  [Mark Moe]
+	Solaris note about FILE_OFFSET_BITS.  [Simon Curry]
+
+****	GCC 3.2 use std compile errors fixed. [Eugene Weber]
+
+
+* Verilog::Language 2.214 2002-10-21
+
+***	Pickup input msb & lsb's.  [Joel Earl]
+
+****	Fix inclusion of x's in $assert_onehot for verilator. [Ray Strouble]
+
+
+* Verilog::Language 2.213 2002-09-05
+
+****	Support Cygwin (Windows) installations.  [Richard Dje]
+
+
+* Verilog::Language 2.212 2002-08-30
+
+***	Fix pin concatenations to not create false pins. [Kenneth Jiang]
+	Concatenations are now just ignored; there is still no way to track
+	pin interconnects where different bus bits end up interconnected
+	differently.
+
+
+* Verilog::Language 2.211 2002-08-19
+
+***	If Verilog::Getopt list accessors are passed a reference,
+	set the entire list to the reference, rather than adding a element.
+
+
+* Verilog::Language 2.210 2002-08-08
+
+****	Cleanups to support GNU Bison 1.35
+
+****	Minor changes for SystemC support
+
+
+* Verilog::Language 2.200 2002-05-03
+
+***	Many fixes to vrename --crypt, including fixing `timescale,
+	comments, and replacement of strings.  [Greg Davis]
+
+****	Fixed vpm $asserts dropping extra newlines. [Greg Waters]
+
+****	Fixed `define substitution bug.
+
+
+* Verilog::Language 2.100 2002-03-11
+
+**	Installation now requires GCC/G++ and Flex.
+
+**	Added Verilog::Preproc, a Verilog 2001 Preprocessor.
+	Verilog::Netlist now uses this preprocessor by default.
+
+****	Fixed bug with vrename --crypt not working.  [Greg Davis]
+
+****	Fixed bug with vrename and \ quoted signals.  [Greg Davis]
+
+
+* Verilog::Language 2.010 2001-11-16
+
+***	Added netlist interconnectivity checks.
+
+
+* Verilog::Language 2.000 2001-09-17
+
+**	Added the Verilog::Netlist package.
+	This allows for simple scripts to extract pins, module
+	hierarchy, etc from interconnected Verilog files.
+
+***	Added Parser reset() method for clearing parse states
+	for new files.  [Joe Panec]
+
+
+* Verilog::Language 1.15 2001-10-25
+
+**	Added $assert_req_ack for checking simple handshakes.
+
+**	Added --nostop, and made --stop be the default.
+	This adds a $stop to $warn and $error, which is easier
+	for new users to understand as no pli.v is required.
+
+
+* Verilog::Language 1.14 2001-09-17
+
+***	Fixed bug when endmodule/endtask/endfunction have
+	no trailing ;.  [Darren Jones]
+
+***	Added Verilog 2001 keywords to Verilog::Language.
+
+
+* Verilog::Language 1.13 2001-05-17
+
+***	Added Verilog::Getopt::get_parameter() function.
+
+***	Added Verilog::Getopt::file_abs() function.
+
+***	Added missing keywords to Verilog::Language:
+	deassign disable extern highz0 highz1 large medium pull0
+	pull1 release scalared small strong0 strong1 weak0 weak1
+
+
+* Verilog::Language 1.12 2001-05-15
+
+**	Added new Verilog::Getopt, for standard option parsing.
+
+
+* Verilog::Language 1.11 2001-03-31
+
+***	Fixed \net### hang in Parser.  [Mark Lakata]
+
+
+* Verilog::Language 1.10 2001-03-15
+
+***	Fixed line number being incorrect in Parser.  [Alan Heinold]
+
+
+* Verilog::Language 1.9 2001-02-13
+
+**	Added Verilog::Language::is_compdirect.  [Darren Jones]
+
+
+* Verilog::Language 1.7 2000-11-02
+
+**	Added parametric module support to Parser.pm.  [Darren Jones]
+
+****	Fixed bug where // comments with no following text broke.
+	[Darren Jones]
+
+
+* Verilog::Language 1.6 2000-09-07
+
+**	Added the vpm preprocessor
+
+****	Fixed bug where missing end-quote would hang Verilog::Parser
+
+
+* Verilog::Language 1.5 2000-05-22
+
+**	Allowed non-numerics in bus subscripts
+	[Alan.Heinold, SUN]
+
+***	Fixed bug where lines with just a newline would boggle the linecount.
+
+
+* Verilog::Language 1.4 2000-01-21
+
+****	test.pl added
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2001-2017 by Wilson Snyder.  This program is free software;
+you can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

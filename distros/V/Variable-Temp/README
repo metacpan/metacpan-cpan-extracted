@@ -1,0 +1,110 @@
+NAME
+    Variable::Temp - Temporarily change the value of a variable.
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Variable::Temp 'temp';
+
+        my $x = 1;
+        say $x; # 1
+        {
+         temp $x = 2;
+         say $x; # 2
+        }
+        say $x; # 1
+
+DESCRIPTION
+    This module provides an utility routine that can be used to temporarily
+    change the value of a scalar, array or hash variable, until the end of
+    the current scope is reached where the original value of the variable is
+    restored. It is similar to "local", except that it can be applied onto
+    lexicals as well as globals, and that it replaces values by copying the
+    new value into the container variable instead of by aliasing.
+
+FUNCTIONS
+  "temp"
+        temp $var;
+        temp $var = $value;
+
+        temp @var;
+        temp @var = \@value;
+
+        temp %var;
+        temp %var = \%value;
+
+    Temporarily replaces the value of the lexical or global variable $var by
+    $value (respectively @var by @value, %var by %value), or by "undef" if
+    $value is omitted (respectively empties @var and %var if the second
+    argument is omitted), until the end of the current scope. Any subsequent
+    assignments to this variable in the current (or any inferior) scope will
+    not affect the original value which will be restored into the variable
+    at scope end. Several "temp" calls can be made onto the same variable,
+    and the restore are processed in reverse order.
+
+    Note that destructors associated with the variable will not be called
+    when "temp" sets the temporary value, but only at the natural end of
+    life of the variable. They will trigger after any destructor associated
+    with the replacement value.
+
+    Due to a shortcoming in the handling of the "\$" prototype, which was
+    addressed in "perl" 5.14, the pseudo-statement "temp $var = $value" will
+    cause compilation errors on "perl" 5.12.x and below. If you want your
+    code to run on these versions of "perl", you are encouraged to use
+    "set_temp" instead.
+
+  "set_temp"
+        set_temp $var;
+        set_temp $var => $value;
+
+        set_temp @var;
+        set_temp @var => \@value;
+
+        set_temp %var;
+        set_temp %var => \%value;
+
+    A non-lvalue variant of "temp" that can be used with any version of
+    "perl".
+
+EXPORT
+    The functions "temp" and "set_temp" are only exported on request by
+    specifying their names in the module import list.
+
+DEPENDENCIES
+    perl 5.6.
+
+    Exporter (core since perl 5).
+
+    Scope::Upper.
+
+    Variable::Magic 0.51.
+
+SEE ALSO
+    Scope::Upper.
+
+    "local" in perlfunc.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
+
+BUGS
+    Please report any bugs or feature requests to "bug-variable-temp at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Variable-Temp>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Variable::Temp
+
+COPYRIGHT & LICENSE
+    Copyright 2015 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

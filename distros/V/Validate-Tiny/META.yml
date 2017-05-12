@@ -1,0 +1,26 @@
+---
+abstract: 'Minimalistic data validation'
+author:
+  - 'Stefan G. <minimal@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Validate-Tiny
+requires:
+  Carp: 0
+  Exporter: 0
+  List::MoreUtils: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/naturalist/Validate--Tiny
+  repository: https://github.com/naturalist/Validate--Tiny.git
+version: 1.6
+x_serialization_backend: 'YAML::Tiny version 1.51'

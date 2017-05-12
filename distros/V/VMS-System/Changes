@@ -1,0 +1,58 @@
+Revision history for Perl extension VMS::System (ex VMS::SysInfo)
+
+0.01  Tue Aug 26 16:46:40 1997
+    - Copied from VMS::ProcInfo.
+
+0.02  Fri Aug 29 09:09:14 1997
+    - Fixed a problem with the tied hash and object interface where they'd
+      always return info on the local node, but had the calling process'
+      PID (!) marked as the node name.
+    - Added support for getting system parameters with get_sys_parm
+      functions. They return info for the local node only, unfortunately.
+
+0.03  Thu Sep 04 09:09:14 1997
+    - Fixed a bug in the bit_test macro--bitwise and is &, not &&. D'oh!
+
+0.04  Tue Sep 16 10:14:20 1997
+    - Added a bunch more system parameters. All of the non-SPECIAL ones
+      from Appendix J of the System Manager's manual, actually.
+
+0.05  Tue Sep 16 16:00:01 1997
+    - Added in the SPECIAL parameters from Appendix J
+    - Added a bunch of #ifdefs to make it compatible with VMS 6.2
+
+0.06  Thu Sep 18 16:00:02 1997
+    - Added in a bunch of changes to get it to work on a VMS 5.5-2 machine.
+      It still doesn't, but its much closer. (More patches as soon as I can
+      get more time)
+
+1.00  Mon Sep 29 11:51:00 1997
+    - Tested it on an OpenVMS Alpha cluster system. Works just fine, so
+      it goes in release
+
+1.01  Fri Oct 17 11:20:00 1997
+    - Found a bone-headed error in the one_info method, which made tied
+      hashes and such broken. Dunno why it wasn't noticed in 1.00, but
+      there you go. 
+    - Some of the routines were using CODE: instead of PPCODE:.
+      5.004_01 didn't care, but 5.004_04 does. Fixed to Do The Right Thing.
+
+1.02  Mon Nov 10 16:50:00 1997
+    - Renamed from VMS::SysInfo to VMS::System
+
+1.03  Fri Nov 21 16:55:02 1997
+    - Merged the _parm_ and _info_ routines into just _info_ routines.
+    - Added the node_list function
+
+1.04  Tue Jan 20 16:20:05 1998
+    - Added the (undocumented) POWER_VECTOR, FAN_VECTOR, TEMPERATURE_VECTOR
+      and THERMAL_VECTOR items, along with a handle_strange function.
+
+1.05  Thu Apr 09 10:21:00 2009
+    - Changed C<#ifdef __ALPHA> to C<#ifndef __VAX> so we can run on OpenVMS
+      I64.
+    - Considered SS$_NOT_LOADED a success status in get_all_sys_info_items. An 
+      item that depends on an underlying component that is not available will
+      be empty but the other items are fine.
+    - Made AllPurposeHV mortal to minimize memory leaks.
+    - Modernized a few global variables (e.g., sv_yes -> PL_sv_yes).

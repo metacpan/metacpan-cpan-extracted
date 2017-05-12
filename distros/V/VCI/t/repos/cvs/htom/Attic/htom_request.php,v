@@ -1,0 +1,57 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \class HTOM_Request
+ * \brief Class represents a HTTP request.
+ */
+class HTOM_Request
+{
+  //! Get the value of the request parameter.
+  /* \param $name name of the request parameter.
+   * \return Function returns the value of HTTP request parameter (either passed int he GET or POST method).
+   */
+  public function GetArgument( $name )
+  {
+    $rc = NULL;
+    if (isset( $_REQUEST[$name] ))
+      $rc=$_REQUEST[$name];
+    return $rc;
+  }
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

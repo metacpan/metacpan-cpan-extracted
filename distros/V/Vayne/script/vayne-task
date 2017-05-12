@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use List::Util qw(all);
+use Getopt::Long;
+use Pod::Usage;
+use Vayne;
+use Vayne::Tracker;
+use Vayne::Callback;
+
+use Data::Printer;
+ 
+=head1 NAME
+
+vayne-task - spawn/query task.
+
+=head1 SYNOPSIS
+
+   $0 --add --name foo --expire seconds --strategy strategy --strategy_param param1  --strategy_param param2 --concurency 40 < workloads
+
+   $0 --query --taskid taskid --verbose
+   
+   $0 --block --taskid taskid
+
+=cut
+
+my %opt;
+ 
+GetOptions(\%opt, qw( add block name=s expire=i strategy=s strategy_param=s@ concurency=i query taskid=s verbose ) ) or pod2usage(2);
+
+if(all{ $opt{$_} }qw{add name expire strategy})
+{
+    print "add task..\n";
+    my $step = Vayne->task($opt{name});
+    my @workload = <>;chomp @workload;
+    my $taskid = Vayne::Tracker->add_task(
+        [ $opt{strategy}, $opt{strategy_param}],
+        {
+            name   => $opt{name},
+            step   => $step,
+            expire => $opt{expire},
+        },
+        \@workload,
+        $opt{concurency}
+    );
+    p $taskid;
+
+} elsif(all{ $opt{$_} }qw(query taskid)) {
+
+    my $tracker = Vayne::Tracker->new;
+    my $task =  $tracker->query_task($opt{taskid});
+    delete $task->{job} and delete $task->{opt} unless $opt{verbose};
+    p $task;
+
+} elsif(all{ $opt{$_} }qw(block taskid)) {
+    my $callback = Vayne::Callback->new;
+    my $ret = $callback->wait($opt{taskid});
+    p $ret;
+
+}else{
+
+    pod2usage(1);
+}

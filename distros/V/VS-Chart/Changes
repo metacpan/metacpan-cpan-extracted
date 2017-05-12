@@ -1,0 +1,39 @@
+Revision history for Perl extension VS::Chart.
+
+0.08  2008-09-22
+    - Removed 5-pixel-ish margin around rendered contents. If this is desired now set option C<margin> to 
+      the size of the margin.
+      
+0.07  2008-08-06
+    - Title is now rendered centered instead of slightly to the left
+    - Support for setting fonts on labels and title via (labels|title)_font_(face|size|slant|weight)
+    
+0.06  2008-08-03
+    - Fixed MANIFEST to not include the 0.04 dist
+    - Make sure v_offset is an integer when dealing with Date::Simple on the X axis [rt.cpan.org #38059]
+    
+0.05  2008-07-22
+    - Added support for passing a CODE reference in 'to' to render so one can render 
+      directly to a scalar or filehandle when rendering PNG charts. 
+      
+0.04  2008-03-29
+    - Added as_hex to VS::Chart::Color to make it easier to use from CSS.
+    - Don't croak if there's no data
+    - Added possibility to put a title centered over the chart using the attribute "title".
+    - Controlling the format of Y and X axis labels are now possible via [xy]_label_fmt attribute.
+    - Added baseline (baseline_color, baseline_dash) options to XY-graphs to render a 
+      horizontal baseline at a specific value
+    - Added missing module dependency for Module::Pluggable (cpan-testers by Slaven Rezic)
+      
+0.03  2008-03-17
+    - Fixed version dependency for Cairo since apparently set_dash(cr, offset, ...) wasn't available
+      in pre-1.040 versions. (cpan-testers by Taro Nishino)
+      
+0.02  2008-03-17
+    - Added line_dash option to chart and individual datasets.
+    - Fixed documentation typos
+    
+0.01  2007-11-17
+    - original version; created by h2xs 1.23 with options
+        -X -b 5.6.0 -n VS::Chart
+

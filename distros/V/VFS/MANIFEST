@@ -1,0 +1,16 @@
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/VFS.pm
+lib/VFS/File.pm
+lib/VFS/Filesystem.pm
+lib/VFS/Filesystem/CVS.pm
+lib/VFS/Filesystem/MySQL.pm
+lib/VFS/Filesystem/Postgres.pm
+lib/VFS/Filesystem/RCS.pm
+lib/VFS/Filesystem/SQL.pm
+lib/VFS/Filesystem/SVN.pm
+lib/VFS/Filesystem/Unix.pm
+lib/VFS/Filesystem/VCS.pm
+t/01_use.t

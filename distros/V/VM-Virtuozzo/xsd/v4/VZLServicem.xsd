@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/servicem" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/servicem" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="servicem" type="servicemType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Service Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="servicemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get"/>
+						<xs:element ref="set" maxOccurs="unbounded"/>
+						<xs:element ref="start" maxOccurs="unbounded"/>
+						<xs:element ref="stop" maxOccurs="unbounded"/>
+						<xs:element ref="restart" maxOccurs="unbounded"/>
+						<xs:element name="set_startup_type" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Set startup type ( disabled, manual, automatic )</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="name" type="xs:string"/>
+									<xs:element name="startup_type" type="xs:string"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="service" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="serviceType">
+		<xs:annotation>
+			<xs:documentation>Service structure, used in ServiceM.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Service name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="display_name" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Service display name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="level" type="xs:byte" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Service level.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="state" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="readonly" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The service settings cannot be changed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="xinetd" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Tag set if service is a xinetd service.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Specifies the description of the service. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current status of service (started, stpped, pending....)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="startup_type" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Logon type ( manual, automactic, disabled,...)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="logon_as" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Account name in the form of "DomainName\Username", which the service process will be logged on as when it runs. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dependent" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The list of services that depend on this service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="depended_on" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The list of services that this service depends on.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="service_actionType">
+		<xs:annotation>
+			<xs:documentation>Type of some of the ServiceM commands.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="service">
+				<xs:annotation>
+					<xs:documentation>Service settings.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType mixed="false">
+					<xs:complexContent mixed="false">
+						<xs:restriction base="serviceType">
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Service name.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="level" type="xs:byte" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Service level.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="xinetd" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Tag set if service is a xinetd service.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="get">
+		<xs:annotation>
+			<xs:documentation>Gets list of the services. Returns "service"s or Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Name of the service</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="state" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If present services states should be retrieved.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="level" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If present services level information should be retrieved.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="dependencies" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If present services dependencies should be retrieved.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set" type="service_actionType">
+		<xs:annotation>
+			<xs:documentation>Sets service levels for the specifed Container. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="start" type="service_actionType">
+		<xs:annotation>
+			<xs:documentation>Starts service. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="stop">
+		<xs:annotation>
+			<xs:documentation>Stops service. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="service_actionType">
+					<xs:sequence>
+						<xs:element name="force" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If presents the services depends on this service will be stopped.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_startup_type">
+		<xs:annotation>
+			<xs:documentation>Set startup type ( disabled, manual, automatic )</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string"/>
+				<xs:element name="startup_type" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="restart" type="service_actionType">
+		<xs:annotation>
+			<xs:documentation>Restarts service. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="service" type="serviceType">
+		<xs:annotation>
+			<xs:documentation>Service information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="getResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="service" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="setResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="startResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stopResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="restartResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_startup_typeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="servicem_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="timeouts">
+						<xs:annotation>
+							<xs:documentation>Timeouts values.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="operate" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"start", "stop", "restart" timeouts.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="status" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"get" timeout, when statuses fetching is required.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use Vayne::Worker;
+use Data::Printer;
+
+register 'dump' => sub {
+    my($workload, $step, $result, $status, $job) = @_;
+
+    #Job's workload
+    p $workload;
+
+    #Present step configuration contain params.
+    p $step;
+
+    #The whole job structure contains previous step's result/status;
+    #You can get other step's name you want from step's param;
+    p $job;
+
+    #Write back the result after process
+    $result->('dump ok');
+
+    #Write back the status after process
+    $status->(1);
+};
+Vayne::Worker->run;

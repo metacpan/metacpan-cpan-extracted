@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+hierarchy_project_members - list all sub projects of a given project
+
+=head1 SYNOPSIS
+
+hierarchy_project_members [options] top_proj_vers
+
+  top_proj_vers    project spec, either in the form "proj_vers"
+                   or as four part objectname
+
+  Common options:
+
+  -D PATH | --database PATH       database path
+  -H HOST | --host HOST           engine host
+  -U NAME | --user NAME           user name
+  -P STRING | --password STRING   user's password
+  --ui_database_dir PATH          path to copy database information to
+
+=head1 AUTHORS
+
+Roderich Schupp, argumentum GmbH <schupp@argumentum.de>
+
+=cut
+
+use VCS::CMSynergy 1.29 qw(:tied_objects :cached_attributes);
+use VCS::CMSynergy::Helper; 
+use Pod::Usage;
+use strict;
+
+my $ccm_options = VCS::CMSynergy::Helper::GetOptions or pod2usage(2);
+@ARGV == 1 or pod2usage(2);
+my ($top_proj_vers) = @ARGV;
+
+my $ccm = VCS::CMSynergy->new(
+    %$ccm_options,
+    PrintError => 0,
+    RaiseError => 1,
+);
+
+foreach my $member (
+    @{ $ccm->project_object($top_proj_vers)
+             ->hierarchy_project_members(depth => qw(status wa_path)) })
+{
+    print "$member <$member->{status}> $member->{wa_path}\n";
+}
+
+exit(0);

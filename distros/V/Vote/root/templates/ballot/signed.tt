@@ -1,0 +1,7 @@
+[% INCLUDE 'includes/poll.tt' %]
+
+<div id="vote_done">
+<p>[% mail | html %] a d&eacute;j&agrave; vot&eacute; le: [% signed_date | html %]</p>
+<p>Les résultats du vote seront disponible <a href="[% c.uri_for('/vote', voteid) %]">ici</a>.</p>
+</div>
+

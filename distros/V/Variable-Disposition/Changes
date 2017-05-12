@@ -1,0 +1,27 @@
+Revision history for Variable-Disposition
+
+0.004     2015-02-11 22:17:44+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Require Future.pm, there's some test failures on older versions of Future and
+	I don't feel like messing around with version checks, given that everything else
+	I use depends on Future.pm anyway - patches welcome if anyone feels differently.
+
+0.003     2015-02-09 02:51:40+00:00 Europe/London
+	No new features.
+
+	Bugs fixed:
+	* retain_future was returning undef for completed Futures
+
+0.002     2015-01-30 20:40:28+00:00 Europe/London
+	New features:
+	* retain - holds on to a variable until dispose/exit
+	* retain_future - holds on to a Future until it's ready
+
+	Documentation:
+	* Expanded description of some details of the dispose() function
+	including mention of the ($) prototype.
+
+0.001     2014-08-30 20:43:59+01:00 Europe/London
+	Initial CPAN release

@@ -1,0 +1,76 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \brief The HTOM_Link represents a hypertext link. 
+ */
+class HTOM_Link extends HTOM_Element
+{
+  //! Create a link object
+  /*! 
+   * \param info either the HTOM_Element object that wll be shown as a link (HTOM_Static, HTOM_Image), or orydinary HTML text.
+   * \param url This attribute specifies the location of a Web resource, thus defining a link between the current element (the source anchor) and the destination anchor defined by this attribute.
+   * \param attributes additional HTOM_Attribute object or an array of attributes
+   */
+  public function __construct($info,$url=NULL,$attributes=NULL)
+  {
+    $this->url = $url;
+    if ($info instanceof HTOM_Element) {
+      $this->info = $info;
+    } else if (is_string($info)) {
+      $this->info = new HTOM_Static($info);
+    }
+    $this->SetAttributes($attributes);
+    $this->Init();
+  }
+
+
+  //! Get the link html formated data.
+  public function Evaluate()
+  {
+    $rc="<a ".$this->Attributes();
+    if (isset($this->url))
+      $rc.=" href='".$this->url."'";
+    $rc.=">".$this->info->Evaluate()."</a>";
+    return $rc;
+  }
+  
+  private $info;
+  private $url;
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

@@ -1,0 +1,12 @@
+Revision history for Venn-Chart
+
+1.02    01/01/2011 00:00:00
+        POD documentation and code have been updated.
+        set method have an ambigous name and have been replaced by set_options name
+
+1.01    02/12/2010 10:09:14
+        POD documentation corrected ( synopsis, get_list_regions and get_colors_regions methods :  (dereferencing) ).
+
+1.00    19/09/2010 20:51:38
+        First version.
+

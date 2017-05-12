@@ -1,0 +1,8 @@
+v0.03, 22.07.2016
+	- Really remove dependency on Crypt::ECB (thanks Nick Morrott)
+
+v0.02, 13.03.2016
+	- Remove dependency on Crypt::ECB
+
+v0.01, 28.12.2011
+	- initial release

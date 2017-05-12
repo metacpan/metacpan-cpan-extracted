@@ -1,0 +1,8 @@
+Changes
+README
+Mail.pm
+Mail.xs
+Makefile.PL
+MANIFEST
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

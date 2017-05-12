@@ -1,0 +1,51 @@
+[% vote = c.model('Vote') %]
+
+[% thisvote = vote.vote_info(voteid) %]
+
+<div id="ballot" class="ballot">
+<form action="[% c.uri_for(voteid) %]" method="POST">
+<p><b>Vote: [% thisvote.label | html %]</b></p>
+<p>[% thisvote.description | html %]</p>
+<p>[% thisvote.choice_count %] choix possibles:</p>
+<hr>
+[% IF c.req.param('ballot') %]
+<p>Confirmez votre vote:</p>
+[% FOREACH ch = c.req.param('sbal') %]
+[% choices.$ch | html %]
+<input type="hidden" name="sbal" value="[% ch %]">
+<br>
+[% END %]
+[% FOREACH ch = c.req.param('fsbal') %]
+[% ch | html %]<br>
+<input type="hidden" name="fsbal" value="[% ch %]">
+[% END %]
+[% IF ! c.req.param('fsbal').size && ! c.req.param('sbal').size %]
+<i>Vote blanc</i><br>
+[% END %]
+<hr>
+<p class="warning">Après avoir valider, il vous sera impossible de modifier votre vote.</p>
+<p><input type="submit" name="confirm" value="Valider définitivement">
+<input type="submit" name="Modify" value="Modifier mon vote"></p>
+</form>
+
+[% ELSE %]
+
+[% IF vote_error %]<p class="alert">[% vote_error %]</p>[% END %]
+
+[% FOREACH choice = vote.vote_choices(voteid) %]
+[% key = vote.choice_info(choice).key %]
+<input type="checkbox" name="sbal" value="[% key %]"[% " checked" IF sbal.$key %]>
+[% vote.choice_info(choice).label | html %]<br>
+[% END %]
+
+[% count = 0 %]
+[% WHILE count < thisvote.free_choice %]
+<input type="text" name="fsbal" value="[% fsbal.$count %]"><br>
+[% count = count + 1 %]
+[% END %]
+<hr>
+<input type="submit" name="ballot" value="Voter &gt;&gt;">
+<p>Votre vote ne sera pris en compte qu'après confirmation</p>
+[% END %]
+</form>
+</div>

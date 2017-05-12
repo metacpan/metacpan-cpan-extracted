@@ -1,0 +1,29 @@
+# vim:fdm=expr:fdl=1:foldexpr=getline(v\:lnum)=~'^=='?'>1'\:getline(v\:lnum)[0]=~'[*x(]'?'>2'\:getline(v\:lnum)=~'^--'?'<2'\:'='
+
+* any recommended name for vim-packager script ?
+    i think vim-packager is not very nice for typing..
+* provide readme template.
+    
+* install dependency from distribution.
+    vimsan.org
+
+* plugin script template (for each type , syntax , ftplugin , plugin )
+    insert something like version guard, load guard , document ... etc
+
+* make document from parsing functions. vimdoc::sk script 
+    should be convertable. (to html or something)
+
+* install from remote repository, e.g. 
+    clone from remote git repostiory, parse vimmeta , and install.
+
+* extract markdown document from pod 
+* vimball support (makefile maker) 
+    $ make vimball
+* support scaning vimball install record. and install.
+* support unit testing (unit-test.vim)
+* uninstall package
+* fix installer copy method.
+* version bump script
+* change log helper
+* libpath property
+    XXX: should use . by default if vimlib direcotry and libpath are not found

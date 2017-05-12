@@ -1,0 +1,227 @@
+#! /bin/perl
+#############################################################################
+#
+#                 NOTE: This file under revision control using RCS
+#                       Any changes made without RCS will be lost
+#
+#              $Source: /usr/local/cvsroot/vbtk/VBTK/DynPod2Html.pm,v $
+#            $Revision: 1.9 $
+#                $Date: 2002/03/04 20:53:06 $
+#              $Author: bhenry $
+#              $Locker:  $
+#               $State: Exp $
+#
+#              Purpose: A common perl library used to dynamically generate
+#                       HTML from pod's in the perl library paths.
+#
+#       Copyright (C) 1996 - 2002  Brent Henry
+#
+#       This program is free software; you can redistribute it and/or
+#       modify it under the terms of version 2 of the GNU General Public
+#       License as published by the Free Software Foundation available at:
+#       http://www.gnu.org/copyleft/gpl.html
+#
+#       This program is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#       GNU General Public License for more details.
+#
+#############################################################################
+#
+#
+#       REVISION HISTORY:
+#
+#       $Log: DynPod2Html.pm,v $
+#       Revision 1.9  2002/03/04 20:53:06  bhenry
+#       *** empty log message ***
+#
+#       Revision 1.8  2002/03/04 16:49:09  bhenry
+#       Changed requirement back to perl 5.6.0
+#
+#       Revision 1.7  2002/03/02 00:53:54  bhenry
+#       Documentation updates
+#
+#       Revision 1.6  2002/02/20 19:25:12  bhenry
+#       Fixed bug causing loss of end of html page
+#
+#       Revision 1.5  2002/02/19 19:06:44  bhenry
+#       *** empty log message ***
+#
+#       Revision 1.4  2002/02/08 02:16:04  bhenry
+#       *** empty log message ***
+#
+#
+
+package VBTK::DynPod2Html;
+
+use 5.6.0;
+use strict;
+use warnings;
+# I like using undef as a value so I'm turning off the uninitialized warnings
+no warnings qw(uninitialized);
+
+use VBTK::Common qw(error log fatal);
+use Pod::Find qw(pod_where);
+use Pod::Html qw(pod2html);
+use POSIX qw(:sys_wait_h);
+use FileHandle;
+
+our $VERBOSE = $ENV{VERBOSE};
+our %POD_FILE_MAP;
+
+#-------------------------------------------------------------------------------
+# Function:     findPodFile
+# Description:  Find the pod file path for the specified package name.
+# Input Parms:  Package Name
+# Output Parms: Pod File
+#-------------------------------------------------------------------------------
+sub findPodFile
+{
+    my ($pkgName) = (@_);
+
+    # If the package name is passed with '/' in it, then re-format it.
+    $pkgName =~ s-^/|/$--g;
+    $pkgName =~ s-/-::-g;
+    $pkgName =~ s/\.html$//g;
+    
+    my($podFile);
+
+    unless ($podFile = $POD_FILE_MAP{$pkgName})
+    {
+        &log("Looking for pod file for '$pkgName'") if ($VERBOSE > 1);
+        $podFile = pod_where({ -inc => 1 }, $pkgName);
+        $podFile =~ s:\\:/:g;
+        $POD_FILE_MAP{$pkgName} = $podFile;
+    }
+
+    &error("Can't locate POD file for '$pkgName'") unless ($podFile);
+
+    if(wantarray) { ($podFile,$pkgName); }
+    else          { $podFile; }
+}
+
+#-------------------------------------------------------------------------------
+# Function:     genPodHtml
+# Description:  Generate the HTML from the POD for the specified package
+# Input Parms:  Package Name
+# Output Parms: POD HTML
+#-------------------------------------------------------------------------------
+sub genPodHtml
+{
+    my ($pkgName,$htmlRoot) = @_;
+    my ($podFile,$pid,@html);
+
+    ($podFile,$pkgName) = &findPodFile($pkgName);
+    return undef unless ($podFile);
+
+    &log("Generating HTML for '$pkgName' from '$podFile'") if ($VERBOSE > 1);
+
+    if($pid = open(CHILD_STDOUT, "-|"))    
+    {
+        &log("In parent, waiting for response from child") if ($VERBOSE > 3);
+        @html = <CHILD_STDOUT>;
+        close(CHILD_STDOUT);
+        waitpid $pid, 0;
+    }
+    elsif(defined $pid)
+    {
+        pod2html(
+            "--htmlroot=$htmlRoot",
+            "--header",
+            "--podpath=" . join(':',@INC),
+            "--libpods=VBTK",
+            "--norecurse",
+            "--infile=$podFile",
+        );
+
+        exit 0;
+    }
+    else
+    {
+        error("genPodHtml: Can't fork");
+    }
+
+    my $html = join('',@html);
+
+    if (wantarray) { ($html,$pkgName); }
+    else           { $html; }
+}
+
+1;
+__END__
+
+=head1 NAME
+
+VBTK::DynPod2Html - Dynamic Generation of HTML from any POD.
+
+=head1 SYNOPSIS
+
+    To come...
+
+=head1 DESCRIPTION
+
+This package allows the dynamic generation of HTML from any POD installed
+in the @INC paths.  It is used by the L<VBTK::Server|VBTK::Server> process
+to populate the help pages.
+
+=head1 METHODS
+
+=over 4
+
+=item genPodHtml(<package-name>,<document-root>)
+
+This method takes as input a Perl package name and outputs the HTML as 
+generated by the L<Pod::Html|Pod::Html> package.  The package name can be
+in the form 'Pkg::SubPkg...' or 'Pkg/SubPkg'.  It also strips off any '/'
+at the beginning or end of the package name, and removes '.html' from the
+end if found.  This allows you to set the 'document-root' to point to a 
+CGI program which calls this method, and then the links in the 
+output HTML will also work.   
+
+So for example, if you wrote a cgi named 'dynpod.cgi' and then inside 
+called 'genPodHtml' with the passed package name, and a document-root
+of 'dynpod.cgi?pkg=', then the links inside the HTML would also call 
+the CGI, passing the appropriate package name to the 'pkg' parm.
+
+=item findPodFile(<package-name>)
+
+This method searches the @INC paths, looking for the POD file matching the
+passed package-name.  It returns the full path to the file.  The first time
+it is called, it loads a mapping of all packages to POD's into a global
+package variable, and then refers to that from then on.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<VBTK|VBTK>
+
+=item L<VBTK::Parser|VBTK::Parser>
+
+=item L<VBTK::ClientObject|VBTK::ClientObject>
+
+=item L<VBTK::Server|VBTK::Server>
+
+=back
+
+=head1 AUTHOR
+
+Brent Henry, vbtoolkit@yahoo.com
+
+=head1 COPYRIGHT
+
+Copyright (C) 1996-2002 Brent Henry
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation available at:
+http://www.gnu.org/copyleft/gpl.html
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+=cut

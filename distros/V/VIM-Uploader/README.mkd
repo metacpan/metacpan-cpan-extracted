@@ -1,0 +1,71 @@
+VIM-Uploader
+============
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+USAGE
+=====
+
+    use VIM::Uploader;
+
+    my $uploader = VIM::Uploader->new();
+
+    $uploader->login( )
+
+or 
+
+    $uploader->login( 
+        user => 'xxx',
+        pass => 'xxx',
+    );
+
+
+    my $ok = $uploader->upload( 
+        script_id => 1234,
+        script_file => '/path/to/your/file',
+        vim_version => '7.0',               # valid values:  7.0 , 6.0 , 5.7
+        script_version => '0.2',            # your vim script version
+        version_comment => 'release note'   # your vim script release note.
+    );
+
+    print "DONE" if $ok;
+
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VIM::Uploader
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=VIM-Uploader
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/VIM-Uploader
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/VIM-Uploader
+
+    Search CPAN
+        http://search.cpan.org/dist/VIM-Uploader/
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2009 Cornelius
+
+This program is released under the following license: MIT
+

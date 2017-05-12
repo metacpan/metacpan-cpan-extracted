@@ -1,0 +1,1498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © 2009 VMware, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Except as explicitly provided herein, no express or implied licenses, under any VMware patents, copyrights, trademarks, or any other intellectual property rights, are granted or waived by implication, exhaustion, estoppel, or otherwise, on modified versions of the Software.
+-->
+<xs:schema xmlns="http://www.vmware.com/vcloud/v1.5" xmlns:cim="http://schemas.dmtf.org/wbem/wscim/1/common" xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1" xmlns:ovfenv="http://schemas.dmtf.org/ovf/environment/1" xmlns:rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" xmlns:vmw="http://www.vmware.com/vcloud/v1.5" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.vmware.com/vcloud/v1.5" version="1.0">
+
+    <xs:import namespace="http://schemas.dmtf.org/ovf/envelope/1" schemaLocation="http://schemas.dmtf.org/ovf/envelope/1/dsp8023_1.1.0.xsd"/>
+    <xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2.22.0/CIM_ResourceAllocationSettingData.xsd"/>
+    <xs:import namespace="http://schemas.dmtf.org/wbem/wscim/1/common" schemaLocation="http://schemas.dmtf.org/wbem/wscim/1/common.xsd"/>
+    <xs:import namespace="http://schemas.dmtf.org/ovf/environment/1" schemaLocation="http://schemas.dmtf.org/ovf/environment/1/dsp8027_1.1.0.xsd"/>
+
+    <xs:include schemaLocation="common.xsd"/>
+    <xs:include schemaLocation="vdc.xsd"/>
+    <xs:include schemaLocation="network.xsd"/>
+
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+            Schema for the vCloud VApp
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType abstract="true" name="AbstractVAppType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a base type for VAppType and VmType.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ResourceEntityType">
+                <xs:sequence>
+                    <xs:element name="VAppParent" type="ReferenceType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reserved. Unimplemented.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="ovf:Section">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Specific ovf:Section with additional information for the vApp.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="deployed" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="since">1.0</xs:documentation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Flag indicates if the vApp or VM is deployed.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="Vm" type="VmType"/>
+    <xs:complexType name="VmType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a VM.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="AbstractVAppType">
+                <xs:sequence>
+                    <xs:element name="VAppScopedLocalId" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                VM ID in scope of vApp.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="ovfenv:Environment">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                OVF environment section
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="needsCustomization" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Flag to signify that the VM needs customization.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VApp" type="VAppType"/>
+    <xs:complexType name="VAppType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a vApp.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="AbstractVAppType">
+                <xs:sequence>
+                    <xs:element name="Owner" type="OwnerType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                vApp owner.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="InMaintenanceMode" type="xs:boolean"  minOccurs="0" maxOccurs="1">
+                       <xs:annotation>
+                          <xs:documentation>
+                             True if this vApp is in maintenance mode. Prevents
+                             users from changing vApp metadata.
+                          </xs:documentation>
+                       </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Children" type="VAppChildrenType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Shows VM children of a vApp.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                 <xs:attribute name="ovfDescriptorUploaded" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Read-only indicator that the OVF descriptor has
+                            been uploaded.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="VAppChildrenType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp children.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="VApp">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reserved. Unimplemented.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="Vm">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Child VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="Item" type="ovf:RASD_Type"/>
+
+    <xs:element name="RasdItemsList" type="RasdItemsListType"/>
+    <xs:complexType name="RasdItemsListType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of RASD items.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ResourceType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="Item">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                A RASD item content.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="InstantiationParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of ovf:Section to configure for instantiating a VApp.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="ovf:Section">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                An ovf:Section to configure for instantiation.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="VAppNetworkConfigurationType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a VApp network configuration.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ResourceType">
+                <xs:sequence>
+                    <xs:element name="Description" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                A description for the network configuration.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="Configuration" type="NetworkConfigurationType">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Configuration itself.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="IsDeployed" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Read only element which indicates whether this network has been deployed or not.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+
+                <xs:attribute name="networkName" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            This attribute is the name of the vApp network in this vApp for
+                            which the configuration applies.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- vcloud specific ovf sections -->
+    <!--====================-->
+    <xs:element name="NetworkConfigSection" substitutionGroup="ovf:Section" type="NetworkConfigSectionType"/>
+    <xs:complexType name="NetworkConfigSectionType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents the network config section of a vApp.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ovf:Section_Type">
+                <xs:sequence>
+                    <xs:element name="Link" type="LinkType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Optional link to an entity or operation
+                                associated with this section.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="NetworkConfig" type="VAppNetworkConfigurationType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Specifies the configuration of the individual networks in this
+                                vApp. In addition to the configuration other state information is available here.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+                </xs:sequence>
+                <xs:attribute name="href" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Link to the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Type of the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="LeaseSettingsSection" substitutionGroup="ovf:Section" type="LeaseSettingsSectionType"/>
+    <xs:complexType name="LeaseSettingsSectionType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents the lease settings section for a vApp.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ovf:Section_Type">
+                <xs:sequence>
+                    <xs:element name="Link" type="LinkType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Optional link to an entity or operation
+                                associated with this section.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DeploymentLeaseInSeconds" type="xs:int" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Deployment lease in seconds.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="StorageLeaseInSeconds" type="xs:int" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Storage lease in seconds.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DeploymentLeaseExpiration" type="xs:dateTime" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Expiration lease of deployment.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="StorageLeaseExpiration" type="xs:dateTime" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Expiration lease of storage.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+                </xs:sequence>
+                <xs:attribute name="href" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Link to the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Type of the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="NetworkConnection" type="NetworkConnectionType"/>
+
+    <xs:complexType name="NetworkConnectionType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a network connection.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="NetworkConnectionIndex" type="xs:int" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Index of the NIC starting form 0 in a VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="IpAddress" type="IpAddressType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                IP address associated to this NIC.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="ExternalIpAddress" type="IpAddressType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                If the network that the NIC is connected to has NAT or port mapping,
+                                the external address is populated in this element
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="IsConnected" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                If the VM is undeployed, this field specifies whether the connection
+                                should start in in connected state. Otherwise, it specifies the
+                                current state of the connection. Furthermore, on using this structure
+                                to update the VM's network connections state, this parameter
+                                can be used to either connect or disconnect a connection.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="MACAddress" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                MAC address associated with the NIC.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="IpAddressAllocationMode" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                IP address allocation mode for this connection.
+                                One of:
+                                POOL (A static IP address is allocated
+                                automatically from a pool of addresses.),
+                                DHCP (The IP address is obtained from a DHCP
+                                service.),
+                                MANUAL (The IP address is assigned manually in
+                                the IpAddress element.),
+                                NONE (No IP addressing mode specified.)
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+
+                <xs:attribute name="network" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Name of the network to which this NIC is connected.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="needsCustomization" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Flag to signify if the NIC needs customization.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="NetworkConnectionSection" substitutionGroup="ovf:Section" type="NetworkConnectionSectionType"/>
+    <xs:complexType name="NetworkConnectionSectionType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a list of network cards existing in a VM.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ovf:Section_Type">
+                <xs:sequence>
+                    <xs:element name="PrimaryNetworkConnectionIndex" type="xs:int" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Index to set the primary network card used for a VM.
+                                On modify operation if this element is not specified
+                                the first NIC is set as primary one.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="NetworkConnection" type="NetworkConnectionType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Info for a network card in a VM.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Link" type="LinkType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Link an operation over the section.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+                </xs:sequence>
+
+                <xs:attribute name="href" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Link to the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Type of the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="RuntimeInfoSection" type="RuntimeInfoSectionType" substitutionGroup="ovf:Section"/>
+    <xs:complexType name="RuntimeInfoSectionType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation>Runtime information for a specific vm</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ovf:Section_Type">
+                <xs:sequence>
+                    <xs:element name="VMWareTools" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:attribute name="version" type="xs:string" use="required">
+                                <xs:annotation>
+                                    <xs:documentation source="modifiable">none</xs:documentation>
+                                    <xs:documentation xml:lang="en">
+                                        Version of the vmware tools
+                                    </xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="GuestCustomizationSection" substitutionGroup="ovf:Section" type="GuestCustomizationSectionType"/>
+    <xs:complexType name="GuestCustomizationSectionType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a guest customization settings.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ovf:Section_Type">
+                <xs:sequence>
+                    <xs:element name="Enabled" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Flag to enable or disable the guest customization section.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ChangeSid" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Change the sid if applicable.
+                                Used only for Windows OS.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VirtualMachineId" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Virtual machine ID to which this customization is applied.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="JoinDomainEnabled" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Flag to enable or disable joining to a domain.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UseOrgSettings" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Flag to use organization settings.
+                                Valid only if JoinDomainEnabled is set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DomainName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Domain name to join to.
+                                Valid only if JoinDomainEnabled is set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DomainUserName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Domain user name to join to.
+                                Valid only if JoinDomainEnabled is set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DomainUserPassword" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Domain user password to join to.
+                                Valid only if JoinDomainEnabled is set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="AdminPasswordEnabled" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Flag to enable or disable admin password use.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="AdminPasswordAuto" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Flag to set admin password to auto generation.
+                                Valid only if AdminPasswordEnabled is set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="AdminPassword" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Set the admin password explicitly.
+                                Valid only if AdminPasswordEnabled is set and AdminPasswordAuto is false.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ResetPasswordRequired" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Flag to require reseting of password.
+                                Valid only if AdminPasswordEnabled is set.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="CustomizationScript" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Script to run on guest customization. You could use xml escape
+                                sequence &amp;amp;#13; to make multiple lines script. The script
+                                could contain any UNICODE symbol by specifying its number in
+                                format &amp;amp;#xxxx; where xxxx is the number.
+
+                                The predefined symbols in the XML are:
+                                * &amp; &amp;amp;amp;
+                                * &lt; &amp;amp;lt;
+                                * &gt; &amp;amp;gt;
+                                * " &amp;amp;quot;
+                                * ' &amp;amp;apos;
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ComputerName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Computer name to use for guest customization.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="Link" type="LinkType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Link an operation over the section.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+                </xs:sequence>
+
+                <xs:attribute name="href" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Link to the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Type of the section.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="NetworkAssignment" type="NetworkAssignmentType"/>
+    <xs:complexType name="NetworkAssignmentType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents mapping between a VM and vApp network.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:attribute name="innerNetwork" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Name of the VM network to map from.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="containerNetwork" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Name of the vApp network to map to.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="AllEULAsAccepted" type="xs:boolean">
+       <xs:annotation>
+          <xs:documentation source="since">0.9</xs:documentation>
+          <xs:documentation source="modifiable">always</xs:documentation>
+          <xs:documentation xml:lang="en">
+             Used to confirm acceptance of all EULAs in a vApp template.
+             Instantiation fails if this element is missing, empty, or set to
+             false and one or more EulaSection elements are present.
+          </xs:documentation>
+       </xs:annotation>
+    </xs:element>
+
+    <xs:complexType name="VAppCreationParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp creation parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ParamsType">
+                <xs:sequence>
+                    <xs:element name="VAppParent" type="ReferenceType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                 Reserved. Unimplemented.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="InstantiationParams" type="InstantiationParamsType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Instantiation parameters of a VApp.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+
+                <xs:attribute name="deploy" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Flag to deploy the VApp after successful creation.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="powerOn" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Flag to deploy and power on the VApp after successful creation.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="SourcedCompositionItemParamType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a composition item.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="Source" type="ReferenceType">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a vApp, vApp template or VM to include in the composition.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="VAppScopedLocalId" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                If the source reference is to a VM, this value
+                                provides a unique identifier for the VM in
+                                the scope of the composed vApp.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="InstantiationParams" type="InstantiationParamsType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                If the source reference is a VM this can include
+                                any of the following OVF sections:
+                                VirtualHardwareSection,
+                                OperatingSystemSection,
+                                NetworkConnectionSection,
+                                GuestCustomizationSection.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="NetworkAssignment" type="NetworkAssignmentType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                This specifies how the network connections of child VM elements
+                                are mapped to vApp networks in the parent.
+                                This is valid only if the VM is specified directly as source.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="sourceDelete" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="since">1.0</xs:documentation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Delete the source item after composition is
+                            complete.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ComposeVAppParams" type="ComposeVAppParamsType"/>
+    <xs:complexType name="ComposeVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp composition parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VAppCreationParamsType">
+                <xs:sequence>
+                    <xs:element name="SourcedItem" type="SourcedCompositionItemParamType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Composition item. One of:
+                                vApp,
+                                vAppTemplate,
+                                Vm.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" ref="AllEULAsAccepted">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Used to confirm acceptance of all EULAs in a
+                                vApp template. Instantiation fails if this
+                                element is missing, empty, or set to false
+                                and one or more EulaSection elements are
+                                present.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="linkedClone" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Reserved. Unimplemented.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="RecomposeVAppParams" type="RecomposeVAppParamsType"/>
+    <xs:complexType name="RecomposeVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp re-composition parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ComposeVAppParamsType">
+                <xs:sequence>
+                    <xs:element name="CreateItem" type="VmType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                A VM to be added during composition.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DeleteItem" type="ReferenceType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a VM to be deleted during
+                                composition.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="InstantiateVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp instantiation parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VAppCreationParamsType">
+                <xs:sequence>
+                    <xs:element name="Source" type="ReferenceType">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                A reference to a source object such as a vApp
+                                or vApp template.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="IsSourceDelete" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Set to true to delete the source object after
+                                the operation completes.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="linkedClone" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Reserved. Unimplemented.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="InstantiateVAppTemplateParams" type="InstantiateVAppTemplateParamsType"/>
+    <xs:complexType name="InstantiateVAppTemplateParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp template instantiation parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="InstantiateVAppParamsType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" ref="AllEULAsAccepted">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Used to confirm acceptance of all EULAs in a
+                                vApp template. Instantiation fails if this
+                                element is missing, empty, or set to false
+                                and one or more EulaSection elements are
+                                present.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="InstantiateOvfParams" type="InstantiateOvfParamsType"/>
+    <xs:complexType name="InstantiateOvfParamsType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Represents vApp instantiation from OVF parameters
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VAppCreationParamsType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" ref="AllEULAsAccepted"/>
+                </xs:sequence>
+                <xs:attribute name="transferFormat" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="CloneVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents parameters for copying a vApp and optionally deleting the source.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="InstantiateVAppParamsType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="CloneVAppParams" type="CloneVAppParamsType"/>
+
+    <xs:element name="DeployVAppParams" type="DeployVAppParamsType"/>
+    <xs:complexType name="DeployVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp/VM deployment parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:attribute name="powerOn" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation>
+                            Used to specify whether to power on vapp on deployment,
+                            if not set default value is true.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="deploymentLeaseSeconds" type="xs:int" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation>
+                            Lease in seconds for deployment.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="forceCustomization" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Used to specify whether to force customization on deployment,
+                            if not set default value is false.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="UndeployVAppParams" type="UndeployVAppParamsType"/>
+    <xs:complexType name="UndeployVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents vApp/VM undeployment parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="UndeployPowerAction" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.5</xs:documentation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation>
+                                The specified action is applied to all VMs in
+                                the vApp. All values other than 'default'
+                                ignore actions, order, and delay specified in
+                                the StartupSection. One of:
+                                powerOff (Power off the VMs. This is the default
+                                action if this attribute is missing or empty),
+                                suspend (Suspend the VMs),
+                                shutdown (Shut down the VMs),
+                                force (Attempt to power off the VMs. Failures
+                                in undeploying the VM or associated networks
+                                are ignored. All references to the vApp and its
+                                VMs are removed from the database),
+                                default (Use the actions, order, and delay
+                                specified in the StartupSection).
+                           </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="MediaInsertOrEjectParams" type="MediaInsertOrEjectParamsType"/>
+    <xs:complexType name="MediaInsertOrEjectParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents parameters for inserting/ejecting media to VM.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="Media" type="ReferenceType">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Reference to a media for inserting/ejecting.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="CaptureVAppParams" type="CaptureVAppParamsType"/>
+    <xs:complexType name="CaptureVAppParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents the parameters for capturing a vApp to a vApp template.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ParamsType">
+                <xs:sequence>
+                    <xs:element name="Source" type="ReferenceType">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Contains the reference to a vApp to capture.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element ref="ovf:Section" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                An ovf:Section to configure the captured vAppTemplate.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VmPendingQuestion" type="VmPendingQuestionType"/>
+    <xs:complexType name="VmPendingQuestionType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a question which vSphere issued for a VM in a stuck
+                state(WAITING_FOR_INPUT).
+                It has a question element, a question ID element, and a list
+                of choices with at least one element.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ResourceType">
+                <xs:sequence>
+                    <xs:element name="Question" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Question text.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="QuestionId" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Question ID used to map answer choice to.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Choices" type="VmQuestionAnswerChoiceType" minOccurs="1" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Choices of answers to the question.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="VmQuestionAnswer" type="VmQuestionAnswerType"/>
+    <xs:complexType name="VmQuestionAnswerType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a VM answer to a question when the VM is in a stuck
+                (WAITING_FOR_INPUT) state.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence>
+            <xs:element name="ChoiceId" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Choice ID of the answer to the question.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="QuestionId" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Question ID of the question.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="VmQuestionAnswerChoiceType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a pair of ID and text of an answer choice of a VM question.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence>
+            <xs:element name="Id" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Choice ID.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Text" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">none</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Answer text.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="RelocateParams" type="RelocateParamsType" />
+    <xs:complexType name="RelocateParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">1.5</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Parameters to be used for vm relocation.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence>
+            <xs:element name="Datastore" type="ReferenceType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Reference to destination datastore.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="SerialPortConfigType">
+		<xs:complexType>
+	        <xs:annotation>
+	            <xs:documentation source="since">1.5</xs:documentation>
+	            <xs:documentation xml:lang="en">
+	                Internal use only.
+	            </xs:documentation>
+	        </xs:annotation>
+
+	        <xs:complexContent>
+	            <xs:extension base="VCloudExtensibleType">
+	                <xs:sequence>
+	                    <xs:element name="Status" type="xs:string" minOccurs="0" maxOccurs="1">
+	                        <xs:annotation>
+	                            <xs:documentation source="modifiable">none</xs:documentation>
+	                            <xs:documentation xml:lang="en">
+	                                Indicates the current status of the connectable device.
+	                                Valid only while the virtual machine is running.
+	                                The set of possible values:
+	                                ok                 The device is working correctly.
+	                                recoverableError   The device has reported a recoverable error.
+	                                                   For example, attempting to connect to network
+	                                                   device that is being used by another virtual
+	                                                   machine or some other program would result
+	                                                   in this status.
+	                                unrecoverableError The device cannot be used. For example,
+	                                                   attempting to connect to a network device that
+	                                                   does not exist would result in this status.
+	                                untried            The device status is unknown, or it has not
+	                                                   been requested to connect when the VM is
+	                                                   powered on.
+	                            </xs:documentation>
+	                        </xs:annotation>
+	                    </xs:element>
+
+	                    <xs:element name="StartConnected" type="xs:boolean" minOccurs="0" maxOccurs="1">
+	                        <xs:annotation>
+	                            <xs:documentation source="modifiable">always</xs:documentation>
+	                            <xs:documentation xml:lang="en">
+	                                Flag to specify whether or not to connect the device when the
+	                                virtual machine starts.
+	                            </xs:documentation>
+	                        </xs:annotation>
+	                    </xs:element>
+
+	                    <xs:element name="AllowGuestControl" type="xs:boolean" minOccurs="1" maxOccurs="1">
+	                        <xs:annotation>
+	                            <xs:documentation source="modifiable">always</xs:documentation>
+	                            <xs:documentation xml:lang="en">
+	                                Flag to allow the guest to control whether the connectable
+	                                device is connected.
+	                            </xs:documentation>
+	                        </xs:annotation>
+	                    </xs:element>
+
+	                    <xs:element name="Direction" type="xs:string" minOccurs="1" maxOccurs="1">
+	                        <xs:annotation>
+	                            <xs:documentation source="modifiable">always</xs:documentation>
+	                            <xs:documentation xml:lang="en">
+	                                The direction of the connection.
+	                                Possible values are "client" and "server".  "client" indicates
+	                                that the virtual machine can initiate a connection with a
+	                                system on the network using the specified serviceURI.  "server"
+	                                indicates that the virtual machine can listen for a connection
+	                                on the specified serviceURI.
+	                            </xs:documentation>
+	                        </xs:annotation>
+	                    </xs:element>
+
+	                    <xs:element name="ServiceUri" type="xs:string" minOccurs="1" maxOccurs="1">
+	                        <xs:annotation>
+	                            <xs:documentation source="modifiable">always</xs:documentation>
+	                            <xs:documentation xml:lang="en">
+	                                Identifies the local host or a system on the network,
+	                                depending on the value of direction.
+
+	                                If you use the virtual machine as a server, the URI identifies
+	                                the host on which the virtual machine runs. In this case, the
+	                                host name part of the URI should be empty, or it should specify
+	                                the address of the local host.
+	                                If you use the virtual machine as a client, the URI identifies
+	                                the remote system on the network.
+	                            </xs:documentation>
+	                        </xs:annotation>
+	                    </xs:element>
+
+	                    <xs:element name="YieldOnPoll" type="xs:boolean" minOccurs="1" maxOccurs="1">
+	                        <xs:annotation>
+	                            <xs:documentation source="modifiable">always</xs:documentation>
+	                            <xs:documentation xml:lang="en">
+	                                Setting yieldOnPoll to true causes the virtual machine to
+	                                provide processor time information only when the virtual
+	                                machine's sole task is polling the virtual serial port.
+	                            </xs:documentation>
+	                        </xs:annotation>
+	                    </xs:element>
+	                </xs:sequence>
+	            </xs:extension>
+	        </xs:complexContent>
+	    </xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                VS-RuleEngine
+version:             0.09
+abstract:            Generic rule based processing engine
+license:             mit
+author:              
+    - Claes Jakobsson <claesjac@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    List::Util:                    0
+    Object::Tiny:                  0
+    Scalar::Util:                  0
+    Test::AbstractMethod:          0
+    Test::Exception:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

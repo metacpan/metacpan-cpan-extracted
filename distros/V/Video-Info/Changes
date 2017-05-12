@@ -1,0 +1,67 @@
+Revision history for Perl extension Video::Info.
+
+0.993 Repair of some initialization with the MPEG and Quicktime parsers.
+
+      All individual parsers except quicktime now seem to be properly
+      instantiable via Video::Info::new() by detecting filetype with
+      divine().
+
+      Now detecting new ASF GUIDs (Dustin Rice)
+
+0.992 Revised the README to inform users that there are no longer 
+      RIFF, ASF, or MPEG Info dependencies.  Thanks to Anna Gendler for
+      catching this one.
+
+      Reinstating Benjamin Ginter's correct email address in documentation
+      and copyright files.
+
+0.991 Unanticipated problems with the Class::MakeMethods init()
+      behavior, had to make some small fixes.  Also had to fix problems
+      related to removing dashes (-) from parameters.  Dashes are going to
+      be deprecated soon.
+
+0.99  Skipping waaaaay up!  Major changes this release.  Quicktime
+      support has been added via OpenQuicktime.  This means new depen-
+      dencies on Inline::C and the OpenQuicktime C library itself.
+      Apologies to non-linux users... someone code me a pure-perl
+      module that follows the "FOO.pm" and "FOO.t" format, and I'll
+      add it.
+
+      Once I'm sure all the problems are worked out, I'll bump the
+      revision to 1.00.
+
+      Another major change is the license.  I've moved the modules
+      to the Aladding Free Public License, which is very explicit
+      about prohibiting commercial use.  Personal users, treat it
+      like a GPL.  Commercial users, contact me <allenday@ucla.edu>
+      for a license.
+
+      Thanks to William Scott Hoge and Steven Lembark for their help
+      with the Quicktime format.
+
+0.08  Added documentation missing for some methods
+      Added minutes() method
+      Added MMSS() method for Minutes:Seconds format
+      Internal changes for how acodec() and acodecraw() are processed
+
+0.07  ASF Mapping was not correct.  Fixed.
+      Added new audio codecs.
+      Added preliminary support for ID3 tagged MP3
+
+0.06  Minor fix to the MANIFEST
+
+0.05  Added Magic for determining filetypes by first 4 bytes.  Largely
+      derived from magic(1)
+
+      Video::Info seems to be working as a factory class for RIFF::Info
+      and ASF::Info objects.
+
+      Audio codec hex->name mapping moved into Magic.pm from RIFF::Info
+
+      Added methods for ASF author/rating/copyright/etc info.  May also
+      apply to MPEG video, and certainly MP2/3.
+
+0.01  Sun Jan 20 17:38:41 2002
+	- original version; created by h2xs 1.21 with options
+		-AX Video::Info
+

@@ -1,0 +1,147 @@
+NAME
+    VS::RuleEngine::Loader::XML - Load VS::RuleEngine engine declarations in
+    XML
+
+SYNOPSIS
+      use VS::RuleEngine::Loader::XML;
+      
+  my $engine = VS::RuleEngine::Loader::XML->load_file("my_engine.xml");
+      $engine->run();
+      
+  my $other_engine = VS::RuleEngine::Loader::XML->load_string($xml);
+      $other_engine->run();
+
+DESCRIPTION
+    This module provides a mean to load VS::RuleEngine engine declarations
+    from XML.
+
+INTERFACE
+  CLASS METHODS
+    load_file ( PATH )
+        Loads the engine declaration from *PATH*.
+
+    load_string ( XML )
+        Loads the engine declaration from *XML*.
+
+XML Document structure
+    The document root element must be <engine>. Valid children are:
+
+    *   <action> - Declares an action.
+
+    *   <defaults> - Defines a default argument set
+
+    *   <input> - Declares an input.
+
+    *   <output> - Declares an output.
+
+    *   <rule> - Declares a rule.
+
+    *   <ruleset> - Groups a set of rules under a common name.
+
+    *   <run> - Connects a set of rules to an action.
+
+  Action, Input, Output and Rule elements
+    The elements <action>, <input>, <output> and <rule> all have the
+    following mandatory attributes:
+
+    name
+        The name of the entity to define in the engine.
+
+    instanceOf
+        The class that implements the entity and that'll be instansiated
+        when the engine is runned.
+
+    defaults
+        The default arguments to the entity as defined by a previously
+        declared <defaults>. Separate multiple defaults with comma and/or
+        whitespace.
+
+    If the class defined by *instanceOf* implements the method
+    "process_xml_loader_args" it will be called as a class method with the
+    "XML::LibXML::Element"-element as only argument. This method must return
+    a list of arguments that will be passed to the constructor for the class
+    when the entity is instansiated.
+
+    If no "process_xml_loader_args" method is available the loader will
+    interpret all children as a hash where the elements name is the key and
+    its text content its value. If a child is an empty element, that is has
+    no children (as in "<foo/>") its value will be undef. This hash will be
+    passed to the constructor as a hash reference.
+
+  Defaults
+    By using the tag <defaults> t is possible to declare common arguments
+    that can be reused by multiple entities. Its children will be
+    interpreted as key/value pairs. The required attribute 'name' defines
+    the name for the defaults.
+
+  Rulesets
+    By using the tag <ruleset> it is possible to give a set of rules a
+    shared name that can later be used when binding together rules and
+    actions.
+
+    The attribute *name* is always expected and is used to give the ruleset
+    its name which can be referenced later on by other rulesets or
+    rule<->action mappings.
+
+    To specify what rules to include it expects <rule>name of rule</rule
+    and/or <ruleset>name of ruleset</ruleset> elements as children. Any
+    other element will result in an error.
+
+    In addition to specifying specific rules or contens of other rulesets it
+    is also possible to include the rules that matches the criteria
+    specified by the attributes:
+
+    rulesMatchingName
+        Include all rules that matches the name by the given Perl5 regular
+        expression.
+
+    rulesOfClass
+        Include all rules which inherits from the given class.
+
+    Note, if both attributes above are present it does not create a ruleset
+    with the rule that matches both (i.e a union).
+
+  Connecting rules and actions
+    To connect an action to a rule use the <run> element. It expects the
+    attribute *action* which must be the name of an already defined action.
+    Which rules to invoke the action on is specified with children of type
+    <rule>name of rule</rule and/or <ruleset>name of ruleset</ruleset>. Any
+    other element will result in an error.
+
+SEE ALSO
+    VS::RuleEngine
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-vs-ruleengine-loader-xml@rt.cpan.org", or through the web interface
+    at <http://rt.cpan.org>.
+
+AUTHOR
+    Claes Jakobsson "<claesjac@cpan.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2007 - 2008, Versed Solutions "<info@versed.se>". All
+    rights reserved.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

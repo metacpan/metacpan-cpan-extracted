@@ -1,0 +1,42 @@
+Variable-Lazy
+
+This module implements lazy variables. It's different from other similar modules in that it works *completely* transparant: there is no way to see from the outside that the variable was lazy, and there is no speed penalty once the variable has been evaluated.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Variable::Lazy
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Variable-Lazy
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Variable-Lazy
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Variable-Lazy
+
+    Search CPAN
+        http://search.cpan.org/dist/Variable-Lazy
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

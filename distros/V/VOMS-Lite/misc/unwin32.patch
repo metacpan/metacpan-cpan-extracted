@@ -1,0 +1,45 @@
+diff -rupN VOMS-Lite-0.16-/lib/VOMS/Lite/RSAKey.pm VOMS-Lite-0.16/lib/VOMS/Lite/RSAKey.pm
+--- VOMS-Lite-0.16-/lib/VOMS/Lite/RSAKey.pm	2012-02-24 14:28:16.000000000 +0000
++++ VOMS-Lite-0.16/lib/VOMS/Lite/RSAKey.pm	2012-05-24 05:30:32.269348393 +0100
+@@ -27,23 +27,24 @@ elsif ( -l $urdev && -r $urdev ) {
+   if ( -c $link && -r $link ) { $DefaultRandom=$link; }
+ }
+ else { # If no /dev/random perhaps we are in win32
+-  eval ' 
+-    use WIN32::API;
+-    sub WinRandom {
+-      my $CryptCtx=new Win32::API "advapi32","CryptAcquireContextA","PNNNN","N" or die "Cannot Create Crypt CTX";
+-      my $Generator=new Win32::API "advapi32", "CryptGenRandom","NNP","N"||die "Cannot Access Random Generator";
+-      my $bytes=shift;
+-      my $rnd = 0x00 x $bytes;       #i.e. char rnd[$bytes];
+-      my $CSPHandle = 0x00 x 4;  #i.e. void* CSPHandle;
+-      my ($DEFAULTCONTAINER,$DEFAULTPROVIDER,$PROV_RSA_FULL,$CRYPT_VERIFYCONTEXT)=(0,0,1,0xF0000000);
+-      $CryptCtx->Call($CSPHandle,$DEFAULTCONTAINER,$DEFAULTPROVIDER,$PROV_RSA_FULL,$CRYPT_VERIFYCONTEXT);
+-      my $Addr=unpack("L",$CSPHandle);
+-      $Generator->Call($Addr,$bytes,$rnd);
+-      return $rnd;
+-    }
+-    $DefaultRandom=\\&WinRandom;
+-  ';
+-  if ( $@ ) { die "No random source at either $urdev via the filesystem or CryptGenRandom via WIN32::API";}
++#  eval ' 
++#    use WIN32::API;
++#    sub WinRandom {
++#      my $CryptCtx=new Win32::API "advapi32","CryptAcquireContextA","PNNNN","N" or die "Cannot Create Crypt CTX";
++#      my $Generator=new Win32::API "advapi32", "CryptGenRandom","NNP","N"||die "Cannot Access Random Generator";
++#      my $bytes=shift;
++#      my $rnd = 0x00 x $bytes;       #i.e. char rnd[$bytes];
++#      my $CSPHandle = 0x00 x 4;  #i.e. void* CSPHandle;
++#      my ($DEFAULTCONTAINER,$DEFAULTPROVIDER,$PROV_RSA_FULL,$CRYPT_VERIFYCONTEXT)=(0,0,1,0xF0000000);
++#      $CryptCtx->Call($CSPHandle,$DEFAULTCONTAINER,$DEFAULTPROVIDER,$PROV_RSA_FULL,$CRYPT_VERIFYCONTEXT);
++#      my $Addr=unpack("L",$CSPHandle);
++#      $Generator->Call($Addr,$bytes,$rnd);
++#      return $rnd;
++#    }
++#    $DefaultRandom=\\&WinRandom;
++#  ';
++#  if ( $@ ) { die "No random source at either $urdev via the filesystem or CryptGenRandom via WIN32::API";}
++  die "No Suitable random source";
+ }
+ 
+ sub Random {

@@ -1,0 +1,9 @@
+foo.tar.gz
+lib/Verby/Action/Untar.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/verby_action_untar.t
+t/verby_action_untar.t.log
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+BEGIN { eval "use Time::HiRes 'time'" }
+
+$grab = new Video::Capture::V4l;
+
+my $channel = $grab->channel (0);
+my $tuner = $grab->tuner (0);
+$tuner->mode(MODE_PAL); $tuner->set;
+$channel->norm(MODE_PAL); $channel->set;
+my $fps = 25; # glorious PAL
+
+$grab->picture->brightness(32768);
+$grab->picture->contrast(40000);
+$grab->picture->hue(32768);
+$grab->picture->colour(32768);
+$grab->picture->set;
+
+#$RTL2 = 591250;
+#$RTL2 = 855250;
+$RTL2 = 154250;
+print $grab->freq ($RTL2),"\n";
+
+$|=1;
+
+my($w,$h)=(128,128);
+
+my $count = 0;
+
+open DB,">db" or die;
+select DB; $|=1; select STDOUT;
+
+print "press enter to start> "; <STDIN>;
+my $frame=0;
+my $fr=$grab->capture ($frame,$w,$h);
+
+print DB pack("N*",$w>>3,$h>>3);
+
+for(;;) {
+   my $nfr = $grab->capture (1-$frame,$w,$h);
+   $grab->sync($frame) or die "unable to sync";
+
+   my $stamp = time;
+   if ($start && $start!=$stamp) {
+      $stamp = int(($stamp-$start)*$fps+0.5);
+      print(($stamp-$count)," frames lost\n") if $stamp > $count;
+      $count=$stamp;
+   } else {
+      $start=$stamp;
+      $stamp=$count;
+   }
+
+   # width MUST be divisible by 4
+   Video::Capture::V4l::reduce2($fr,$w>>0);
+   Video::Capture::V4l::reduce2($fr,$w>>1);
+   Video::Capture::V4l::reduce2($fr,$w>>2);
+   Video::Capture::V4l::normalize($fr);
+
+   #${$img->get_dataref}=$fr; $img->upd_data();
+   #wpnm $img,sprintf('frame/%03d',$count),'PPM',1;
+
+   print " $count\r";
+   $count++;
+
+   print DB pack("i",$stamp),$fr;
+
+   $frame = 1-$frame;
+   $fr = $nfr;
+}
+

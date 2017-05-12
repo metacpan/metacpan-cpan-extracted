@@ -1,0 +1,37 @@
+Video::Info version 0.99
+=======-================
+
+Suite of modules to probe video files for various attributes.
+
+Previous versions of Video::Info depended on external modules, such as
+RIFF::Info and ASF::Info.  This is no longer the case, you don't need to
+install them.  All the functionality is now included with the Video::Info
+distribution.
+
+To contribute, use Video::Info::FOO as a template to write
+a module, and email it to the Allen Day <allenday@ucla.edu>.
+Also see t/FOO.t as an example test script to verify the
+sanity of your code.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+DEPENDENCIES
+
+   Video::OpenQuicktime
+   Class::MakeMethods::Emulator
+
+COPYRIGHT AND LICENCE
+
+Released under the Aladdin Free Public License,
+See the LICENSE file for details.
+
+Copyright (C) 2002 
+Allen Day <allenday@ucla.edu>
+Benjamin Ginter <bginter@asicommunications.com>

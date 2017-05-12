@@ -1,0 +1,32 @@
+README for VMS::Priv
+
+Copyright (c) 1997 Dan Sugalski and Linn-Benton Community College
+Portions (c) 1997 Charles Bailey
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets you add, remove, set and get privileges from running VMS
+processes. Like all other perl modules, you need to
+
+perl Makefile.pl
+mms
+mms test
+
+to build and test the extension. If it tests OK, then
+
+mms install
+
+to install it.
+
+While this extension messes around with privileges, NEITHER IT *NOR PERL*
+SHOULD BE INSTALLed WITH *ANY* PRIVILEGES! Treat it like a normal perl
+extension. Installing the module (or perl) with privs might open up
+security holes, so don't do that. Installing it normally will make sure
+that normal VMS process security is in force. You can still get into
+trouble, but at least you need the privs in the first place to do it.
+
+What's new in 1.31?
+
+1.31 is a bugfix release. The tied hash interface had a bug in it, as did
+the tests. (Whoops) Patches provided by Charles Lane. (Thanks, Charles!)

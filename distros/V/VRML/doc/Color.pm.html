@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Color.pm - color functions and X11 color names</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Color.pm - color functions and X11 color names</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use VRML::Color;</pre>
+<pre>
+    my $color = rgb_color('red');</pre>
+<pre>
+      or with the same result</pre>
+<pre>
+    my $color = rgb_color('FF0000');</pre>
+<pre>
+      or with the same result</pre>
+<pre>
+    my $color = rgb_color('255 0 0');</pre>
+<pre>
+      naturally works</pre>
+<pre>
+    my $color = rgb_color('1 0 0');</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><em>X11 colornames are:</em></p>
+<pre>
+        aliceblue
+        antiquewhite
+        aqua
+        aquamarine
+        azure
+        beige
+        bisque
+        black
+        blanchedalmond
+        blue
+        blueviolet
+        brown
+        burlywood
+        cadetblue
+        chartreuse
+        chocolate
+        coral
+        cornflowerblue
+        cornsilk
+        crimson
+        cyan
+        darkblue
+        darkcyan
+        darkgoldenrod
+        darkgray
+        darkgreen
+        darkkhaki
+        darkmagenta
+        darkolivegreen
+        darkorange
+        darkorchid
+        darkred
+        darksalmon
+        darkseagreen
+        darkslateblue
+        darkslategray
+        darkturquoise
+        darkviolet
+        deeppink
+        deepskyblue
+        dimgray
+        dodgerblue
+        firebrick
+        floralwhite
+        forestgreen
+        fuchsia
+        gainsboro
+        ghostwhite
+        gold
+        goldenrod
+        gray
+        green
+        greenyellow
+        honeydew
+        hotpink
+        indianred
+        indigo
+        ivory
+        khaki
+        lavender
+        lavenderblush
+        lawngreen
+        lemonchiffon
+        lightblue
+        lightcoral
+        lightcyan
+        lightgoldenrodyellow
+        lightgreen
+        lightgrey
+        lightpink
+        lightsalmon
+        lightseagreen
+        lightskyblue
+        lightslategray
+        lightsteelblue
+        lightyellow
+        lime
+        limegreen
+        linen
+        magenta
+        maroon
+        mediumaquamarine
+        mediumblue
+        mediumorchid
+        mediumpurple
+        mediumseagreen
+        mediumslateblue
+        mediumspringgreen
+        mediumturquoise
+        mediumvioletred
+        midnightblue
+        mintcream
+        mistyrose
+        moccasin
+        navajowhite
+        navy
+        oldlace
+        olive
+        olivedrab
+        orange
+        orangered
+        orchid
+        palegoldenrod
+        palegreen
+        paleturquoise
+        palevioletred
+        papayawhip
+        peachpuff
+        peru
+        pink
+        plum
+        powderblue
+        purple
+        red
+        rosybrown
+        royalblue
+        saddlebrown
+        salmon
+        sandybrown
+        seagreen
+        seashell
+        sienna
+        silver
+        skyblue
+        slateblue
+        slategray
+        snow
+        springgreen
+        steelblue
+        tan
+        teal
+        thistle
+        tomato
+        turquoise
+        violet
+        wheat
+        white
+        whitesmoke
+        yellow
+        yellowgreen</pre>
+<p>You can also use</p>
+<pre>
+        red_40 = '0.4 0 0'
+        yellow%30 = '0.3 0.3 0'
+        gray%30 = '0.7 0.7 0.7' !!!</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>X11-green is 0x008000. In VRML it should be 0x00FF00.
+This module will set 'green' to '0 1 0' instead of '0 0.5 0'.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="http://www.gfz-potsdam.de/~palm/vrmlperl/">http://www.gfz-potsdam.de/~palm/vrmlperl/</a> for a description of <em>VRML-modules</em> and how to obtain it.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Hartmut Palm <em>&lt;<a href="mailto:palm@gfz-potsdam.de">palm@gfz-potsdam.de</a>&gt;</em></p>
+<p>Homepage <a href="http://www.gfz-potsdam.de/~palm/">http://www.gfz-potsdam.de/~palm/</a></p>
+
+</body>
+
+</html>

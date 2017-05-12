@@ -1,0 +1,102 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.42.03;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+
+/*! \brief The HTOM_Static abstracts the text that will be displayed in the document*/
+class HTOM_Static extends HTOM_Element
+{
+  /*! Initialize HTOM_Static object
+
+\param text the text that will be displayed in the static object.
+\param attributes a instance of HTOM_Attribute or a array of HTOM_Attribute objects.
+  */
+  public function __construct($text="", $attributes=NULL )
+  {
+    $this->SetAttributes($attributes);
+    $this->text = $text;
+    $this->Init();
+  }
+
+  //! Replace the given string in the statis by the HTOM_Evaluable object.
+  public function SetReplacement( $regexp, HTOM_Evaluable $element )
+  {
+    $this->fields[$regexp]=$element;
+  }
+
+  //! Get the static html representation.
+  public function Evaluate()
+  {
+    $content = $this->text;
+    while (current($this->fields))
+    {
+      $content = preg_replace( key($this->fields), current($this->fields)->Evaluate(), $content );
+      next($this->fields);
+    }
+    return "<font".$this->Attributes().">".$content."</font>";
+  }
+
+  /*! Append a HTOM_Element object to the end of the static object content.
+\param $element any HTOM_Element object.
+   */
+  public function Append( HTOM_Element $element )
+  {
+    $this->text.=$element->Evaluate();
+  }
+  
+  private $text="";
+  private $style;
+  private $fields=array();
+}
+
+?>@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d34 1
+a34 1
+    return "<font".$this->ID()->Evaluate().$this->Attributes().">".$content."</font>";
+@
+

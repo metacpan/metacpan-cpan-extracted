@@ -1,0 +1,35 @@
+SYNOPSIS
+
+     use Version::Monotonic qw(
+         valid_version
+         inc_version
+     );
+     say valid_version("0.1");  # => 0
+     say valid_version("1.01"); # => 0
+     say valid_version("1.1");  # => 1
+    
+     say inc_version("1.9");    # => "1.10"
+     say inc_version("1.9", 1); # => "2.10"
+
+DESCRIPTION
+
+    This module provides utility routines related to monotonic versioning
+    (see link to the manifesto in "SEE ALSO").
+
+FUNCTIONS
+
+    None exported by default, but they are exportable.
+
+ valid_version($v) => bool
+
+    Check whether string $v contains a valid monotonic version number.
+
+ inc_version($v, $inc_compat) => str
+
+    Return version number $v incremented by one release. Die if $v is
+    invalid.
+
+SEE ALSO
+
+    http://blog.appliedcompscilab.com/monotonic_versioning_manifesto/
+

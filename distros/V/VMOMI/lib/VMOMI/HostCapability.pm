@@ -1,0 +1,123 @@
+package VMOMI::HostCapability;
+use parent 'VMOMI::DynamicData';
+
+use strict;
+use warnings;
+
+our @class_ancestors = ( 
+    'DynamicData',
+);
+
+our @class_members = ( 
+    ['recursiveResourcePoolsSupported', 'boolean', 0, ],
+    ['cpuMemoryResourceConfigurationSupported', 'boolean', 0, ],
+    ['rebootSupported', 'boolean', 0, ],
+    ['shutdownSupported', 'boolean', 0, ],
+    ['vmotionSupported', 'boolean', 0, ],
+    ['standbySupported', 'boolean', 0, ],
+    ['ipmiSupported', 'boolean', 0, 1],
+    ['maxSupportedVMs', undef, 0, 1],
+    ['maxRunningVMs', undef, 0, 1],
+    ['maxSupportedVcpus', undef, 0, 1],
+    ['maxRegisteredVMs', undef, 0, 1],
+    ['datastorePrincipalSupported', 'boolean', 0, ],
+    ['sanSupported', 'boolean', 0, ],
+    ['nfsSupported', 'boolean', 0, ],
+    ['iscsiSupported', 'boolean', 0, ],
+    ['vlanTaggingSupported', 'boolean', 0, ],
+    ['nicTeamingSupported', 'boolean', 0, ],
+    ['highGuestMemSupported', 'boolean', 0, ],
+    ['maintenanceModeSupported', 'boolean', 0, ],
+    ['suspendedRelocateSupported', 'boolean', 0, ],
+    ['restrictedSnapshotRelocateSupported', 'boolean', 0, ],
+    ['perVmSwapFiles', 'boolean', 0, ],
+    ['localSwapDatastoreSupported', 'boolean', 0, ],
+    ['unsharedSwapVMotionSupported', 'boolean', 0, ],
+    ['backgroundSnapshotsSupported', 'boolean', 0, ],
+    ['preAssignedPCIUnitNumbersSupported', 'boolean', 0, ],
+    ['screenshotSupported', 'boolean', 0, ],
+    ['scaledScreenshotSupported', 'boolean', 0, ],
+    ['storageVMotionSupported', 'boolean', 0, 1],
+    ['vmotionWithStorageVMotionSupported', 'boolean', 0, 1],
+    ['vmotionAcrossNetworkSupported', 'boolean', 0, 1],
+    ['maxNumDisksSVMotion', undef, 0, 1],
+    ['hbrNicSelectionSupported', 'boolean', 0, 1],
+    ['vrNfcNicSelectionSupported', 'boolean', 0, 1],
+    ['recordReplaySupported', 'boolean', 0, 1],
+    ['ftSupported', 'boolean', 0, 1],
+    ['replayUnsupportedReason', undef, 0, 1],
+    ['replayCompatibilityIssues', undef, 1, 1],
+    ['smpFtSupported', 'boolean', 0, 1],
+    ['ftCompatibilityIssues', undef, 1, 1],
+    ['smpFtCompatibilityIssues', undef, 1, 1],
+    ['maxVcpusPerFtVm', undef, 0, 1],
+    ['loginBySSLThumbprintSupported', 'boolean', 0, 1],
+    ['cloneFromSnapshotSupported', 'boolean', 0, 1],
+    ['deltaDiskBackingsSupported', 'boolean', 0, 1],
+    ['perVMNetworkTrafficShapingSupported', 'boolean', 0, 1],
+    ['tpmSupported', 'boolean', 0, 1],
+    ['supportedCpuFeature', 'HostCpuIdInfo', 1, 1],
+    ['virtualExecUsageSupported', 'boolean', 0, 1],
+    ['storageIORMSupported', 'boolean', 0, 1],
+    ['vmDirectPathGen2Supported', 'boolean', 0, 1],
+    ['vmDirectPathGen2UnsupportedReason', undef, 1, 1],
+    ['vmDirectPathGen2UnsupportedReasonExtended', undef, 0, 1],
+    ['supportedVmfsMajorVersion', undef, 1, 1],
+    ['vStorageCapable', 'boolean', 0, 1],
+    ['snapshotRelayoutSupported', 'boolean', 0, 1],
+    ['firewallIpRulesSupported', 'boolean', 0, 1],
+    ['servicePackageInfoSupported', 'boolean', 0, 1],
+    ['maxHostRunningVms', undef, 0, 1],
+    ['maxHostSupportedVcpus', undef, 0, 1],
+    ['vmfsDatastoreMountCapable', 'boolean', 0, 1],
+    ['eightPlusHostVmfsSharedAccessSupported', 'boolean', 0, 1],
+    ['nestedHVSupported', 'boolean', 0, 1],
+    ['vPMCSupported', 'boolean', 0, 1],
+    ['interVMCommunicationThroughVMCISupported', 'boolean', 0, 1],
+    ['scheduledHardwareUpgradeSupported', 'boolean', 0, 1],
+    ['featureCapabilitiesSupported', 'boolean', 0, 1],
+    ['latencySensitivitySupported', 'boolean', 0, 1],
+    ['storagePolicySupported', 'boolean', 0, 1],
+    ['accel3dSupported', 'boolean', 0, 1],
+    ['reliableMemoryAware', 'boolean', 0, 1],
+    ['multipleNetworkStackInstanceSupported', 'boolean', 0, 1],
+    ['messageBusProxySupported', 'boolean', 0, 1],
+    ['vsanSupported', 'boolean', 0, 1],
+    ['vFlashSupported', 'boolean', 0, 1],
+    ['hostAccessManagerSupported', 'boolean', 0, 1],
+    ['provisioningNicSelectionSupported', 'boolean', 0, 1],
+    ['nfs41Supported', 'boolean', 0, 1],
+    ['nfs41Krb5iSupported', 'boolean', 0, 1],
+    ['turnDiskLocatorLedSupported', 'boolean', 0, 1],
+    ['virtualVolumeDatastoreSupported', 'boolean', 0, 1],
+    ['markAsSsdSupported', 'boolean', 0, 1],
+    ['markAsLocalSupported', 'boolean', 0, 1],
+    ['smartCardAuthenticationSupported', 'boolean', 0, 1],
+    ['cryptoSupported', 'boolean', 0, 1],
+    ['oneKVolumeAPIsSupported', 'boolean', 0, 1],
+    ['gatewayOnNicSupported', 'boolean', 0, 1],
+    ['upitSupported', 'boolean', 0, 1],
+    ['cpuHwMmuSupported', 'boolean', 0, 1],
+    ['encryptedVMotionSupported', 'boolean', 0, 1],
+    ['encryptionChangeOnAddRemoveSupported', 'boolean', 0, 1],
+    ['encryptionHotOperationSupported', 'boolean', 0, 1],
+    ['encryptionWithSnapshotsSupported', 'boolean', 0, 1],
+    ['encryptionFaultToleranceSupported', 'boolean', 0, 1],
+    ['encryptionMemorySaveSupported', 'boolean', 0, 1],
+    ['encryptionRDMSupported', 'boolean', 0, 1],
+    ['encryptionVFlashSupported', 'boolean', 0, 1],
+    ['encryptionCBRCSupported', 'boolean', 0, 1],
+    ['encryptionHBRSupported', 'boolean', 0, 1],
+);
+
+sub get_class_ancestors {
+    return @class_ancestors;
+}
+
+sub get_class_members {
+    my $class = shift;
+    my @super_members = $class->SUPER::get_class_members();
+    return (@super_members, @class_members);
+}
+
+1;

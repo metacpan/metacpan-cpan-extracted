@@ -1,0 +1,274 @@
+#!/usr/bin/perl
+
+#
+# capture a steady stream of video frames, compress it and split it into
+# multiple files, for long recording sessions
+#
+# configure it below
+#
+
+use Socket;
+use Fcntl;
+
+use Video::Capture::V4l;
+use Video::RTjpeg;
+use Time::HiRes 'time';
+
+use File::Sync 'sync';
+
+use IPC::SysV;
+use POSIX qw(nice WNOHANG);
+use IO::Select;
+
+BEGIN { require "linux-dsp-ioctl.ph" }
+
+$|=1;
+
+my $outprefix = "/tmp/vstream";
+
+my $initial_fadein = 40; # initial settle time
+my $consec = 25; # push this many frames to each encoder
+my $syncfreq = 0.2; # pause this time between syncs
+my $vencoders = 8; # number of encoder processes
+my(@venc,@enc);
+
+#my ($w, $h, $vformat) = (704, 528, PALETTE_YUV420P);
+
+my ($cw, $ch, $vformat) = (576, 432, PALETTE_YUV420P);
+my ($cl, $cr, $ct, $cb) = (16,16, 16,16);
+
+#my ($cw, $ch, $vformat) = (320, 240, PALETTE_YUV420P);
+#my ($cl, $cr, $ct, $cb) = (0,0, 0,0);
+
+my $fps = 25;
+my $spf = 1/$fps;
+
+my ($x, $y, $w, $h) = ($cl, $ct, $cw-$cr-$cl, $ch-$cb-$ct);
+
+my ($rate, $channels, $aformat) = (44100, 2, &AFMT_S16_LE);
+my ($Q, $M) = (255, 0);
+my $fsize = $cw*$ch*2;
+
+my $buffers = int(32*1024*1024/$fsize);
+my $bufsize = $fsize * $buffers;
+
+my $shm = shmget IPC_PRIVATE, $bufsize, IPC_CREAT|0600;
+$shm or die "unable to allocate $bufsize shm segment";
+END { shmctl $shm, IPC_RMID, 0 }
+$SIG{INT} = sub { exit };
+
+my @buffers = (0..($buffers-1));
+
+my $select = IO::Select->new();
+my %cb;
+
+# audio setup
+
+sysopen DSP, "/dev/dsp", O_RDONLY
+   or sysopen DSP, "/dev/dsp", O_RDONLY
+   or die "unable to open /dev/dsp for reading: $!";
+
+ioctl DSP, SNDCTL_DSP_SETFRAGMENT, pack "i", 0x7fff000e or die "SNDCTL_DSP_SETFRAGMENT: $!";
+ioctl DSP, SNDCTL_DSP_SETFMT, pack "i", $aformat or die "SNDCTL_DSP_SETFMT: $!";
+ioctl DSP, SNDCTL_DSP_CHANNELS, pack "i", $channels or die "SNDCTL_DSP_CHANNELS: $!";
+ioctl DSP, SNDCTL_DSP_SPEED, pack "i", $rate or die "SNDCTL_DSP_SPEED: $!";
+
+open AUDIO, ">$outprefix.a" or die;
+
+# video setup
+
+$grab = new Video::Capture::V4l
+   or die "Unable to open Videodevice: $!";
+
+my $channel = $grab->channel (0);
+my $tuner = $grab->tuner (0);
+$tuner->mode(MODE_PAL);
+$channel->norm(MODE_PAL);
+$tuner->mode(8);
+$tuner->set;
+$channel->set;
+
+#$CHANNEL69 = 855250;
+#print $grab->freq ($CHANNEL69),"\n";
+
+sub new_vencoder {
+   my $number = @enc;
+   my $encp = do { local *ENCODER_WRITER };
+   my $encc = do { local *ENCODER_READER };
+   socketpair $encc, $encp, AF_UNIX, SOCK_STREAM, PF_UNSPEC;
+   $select->add($encp);
+   $cb[fileno $encp] = sub {
+      my $buf;
+      4 == sysread $encp, $buf, 4 or die "unable to read bufferid";
+      $buf = unpack "N", $buf;
+      push @buffers, $buf;
+   };
+   if (0 == fork) {
+      open DATA, ">$outprefix.v$number" or die "$!";
+
+      my $tables = Video::RTjpeg::init_compress($cw,$ch,$Q);
+      Video::RTjpeg::init_mcompress();
+
+      syswrite DATA, pack "N", length($tables);
+      syswrite DATA, $tables;
+
+      my $buf;
+      my $count = $number * 313;
+      for(;;) {
+         8 == read $encc, $buf, 8 or die "incomplete frame time read: $!";
+         my ($buffer, $time) = unpack "NN", $buf;
+         last if $buffer >= $buffers;
+         shmread $shm, $buf, $buffer*$fsize, $fsize;
+         syswrite $encc, (pack "N", $buffer);
+         my $fr = Video::RTjpeg::mcompress($buf,$M,$M>>1, $x, $y, $w, $h);
+         #my $fr = Video::RTjpeg::compress($buf);
+         syswrite DATA, pack "NN", $time, length $fr;
+         syswrite DATA, $fr;
+
+         #Video::RTjpeg::fdatasync fileno DATA if ($count++ & 63) == 0;
+         print "+";
+      }
+      print "X";
+      exit;
+   }
+   push @enc, $encp;
+}
+
+new_vencoder for 1..$vencoders;
+
+@venc = map (($_)x$consec, @enc);
+
+my $frame = 0;
+my $frames = 0;
+my $dropped = 0;
+
+sub put_vframe {
+   my $buffer = pop @buffers;
+   my $enc = pop @venc;
+   unshift @venc, $enc;
+   if (defined $buffer) {
+      print "-";
+      shmwrite $shm, ${$_[1]}, $buffer*$fsize, $fsize;
+      syswrite $enc, (pack "NN", $buffer, $_[0]);
+   } else {
+      print "o";
+      $dropped++;
+   }
+}
+
+my $syncpid = fork;
+if ($syncpid==0)  {
+   for(;;) {
+      select undef, undef, undef, $syncfreq;
+      print "S";
+      sync;
+   }
+   Video::RTjpeg::_exit;
+};
+
+system "rtprio -p $$";
+
+my $fr = \$grab->capture ($frame, $cw, $ch, $vformat);
+for(1..$initial_fadein) {
+   my $nfr = \$grab->capture (1-$frame, $cw, $ch, $vformat);
+   $grab->sync($frame) or die "unable to sync";
+   $frame = 1-$frame;
+   $fr = $nfr;
+}
+
+my $start = time;
+my $nframe;
+
+$fr = \$grab->capture ($frame, $cw, $ch, $vformat);
+
+my $audpid = fork;
+if ($audpid==0)  {
+   my $count = 0;
+   my $in = ""; vec($in, fileno DSP, 1) = 1;
+   fcntl DSP, F_SETFL, O_NONBLOCK;
+   ioctl DSP, SNDCTL_DSP_SETTRIGGER, pack  "i", 0;
+   ioctl DSP, SNDCTL_DSP_SETTRIGGER, pack  "i", PCM_ENABLE_INPUT;
+   for(;;) {
+      my $buf;
+      select my $xin = $in, undef, undef, $spf*2;
+      print ".";
+      if (0 < sysread DSP, $buf, 128*1024) {
+         #print length $buf;
+         syswrite AUDIO, $buf;
+      }
+   }
+   Video::RTjpeg::_exit;
+};
+
+my $do_capture = 1;
+$select->add(*STDIN);
+$cb[fileno STDIN] = sub {
+   $do_capture = 0;
+};
+
+while($do_capture) {
+   printf "\n%02d:%02d +%2d %2ds %dd > ",
+          int($nframe*$spf/60), int($nframe*$spf)%60,
+          scalar@buffers, $frames-$nframe, $dropped
+      if $frames % $fps == 0;
+
+   my $nfr = \$grab->capture (1-$frame, $cw, $ch, $vformat);
+   $grab->sync($frame) or die "unable to sync";
+
+   my $now = time;
+   $nframe = int (($now-$start) / $spf + 0.5);
+   $start = $now - $nframe * $spf;
+
+   put_vframe($nframe, $fr);
+
+   for ($select->can_read(0)) {
+      $cb[fileno $_]->();
+   }
+
+   $frame = 1-$frame;
+   $frames++;
+   $fr = $nfr;
+}
+
+open CTRL, ">$outprefix" or die;
+print CTRL <<EOF;
+\$outprefix = "$outprefix";
+
+\$fps = $fps;
+\$spf = $spf;
+
+\$frames = $frames;
+\$nframe = $nframe;
+\$dropped = $dropped;
+\$vencoders = $vencoders;
+\$rate = $rate;
+\$channels = $channels;
+\$aformat = $aformat;
+\$w = $w;
+\$h = $h;
+
+\$buffers = $buffers;
+\$fsize = $fsize;
+
+1;
+EOF
+close CTRL;
+
+$select->remove(*STDIN);
+
+close DSP;
+close AUDIO;
+kill 'TERM', $syncpid;
+kill 'TERM', $audpid;
+
+for (@enc) {
+   syswrite $_, (pack "NN", -1, -1);
+   $select->remove($_);
+}
+
+for(;;) {
+   for ($select->can_read(0)) {
+      $cb[fileno $_]->();
+   }
+}
+

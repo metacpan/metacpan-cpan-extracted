@@ -1,0 +1,49 @@
+<!--#perl
+  my $name =$_parms->{name};
+
+  my $vbObj = &VBTK::Objects::FindObjByName($name);
+
+  # Setup global variables
+  my $SUCCESS="Success";
+  my $WARNING="Warning";
+  my $TIMEOUT="Timeout";
+  my $FAILED="Failed";
+  my $EXPIRED="Expired";
+  my $RUNNING="Running";
+  my %STATUS_GIFS =    ($SUCCESS => 'images/green.gif',
+                        $EXPIRED => 'images/purple.gif',
+                        $WARNING => 'images/yellow.gif',
+                        $FAILED  => 'images/red.gif',
+                        $TIMEOUT => 'images/red.gif',
+                        $RUNNING => 'images/blue.gif');
+  my %STATUS_BGCOLOR = ($SUCCESS => '#008F00',
+                        $EXPIRED => '#8F008F',
+                        $WARNING => '#FFFF66',
+                        $FAILED  => '#8F0000',
+                        $TIMEOUT => '#8F0000',
+                        $RUNNING => '#008F00');
+  my %STATUS_FGCOLOR = ($SUCCESS => '#00FF00',
+                        $EXPIRED => '#000000',
+                        $WARNING => '#FF6633',
+                        $FAILED  => '#FF0000',
+                        $TIMEOUT => '#FF0000',
+                        $RUNNING => '#0000FF');
+
+  my $matrixUrl="matrix.phtml";
+  my $statusUrl="status.phtml";
+  my $detailUrl="details.phtml";
+  my $historyUrl="history.phtml";
+  my $graphsUrl="graphs.phtml";
+  my $logsUrl="adminLogs.phtml";
+  my $genGraphUrl="generateGraph.phtml";
+  my $setBaselineUrl="setBaseline.phtml";
+
+  # Setup variables based on values set in the vbserver config file.  
+  my @remoteServers = &VBTK::Server::getShowRemoteServerMatrixList();
+  my $company       = &VBTK::Server::getCompanyName();
+  my $vbtkAdmin     = &VBTK::Server::getAdminEmail();
+  
+  # Setup variable used later on
+  my ($hdrLinkSize,$bodySettings,$title,$refresh);
+ 
+-->  

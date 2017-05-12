@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+B<list-hier> - List hierarchical instance names
+
+=head1 SYNOPSIS
+
+list-hier file
+
+=head1 DESCRIPTION
+
+Display a list of all hierarchical instance names found in the VCD
+file to STDOUT.
+
+Example: list-hier file.vcd
+
+=cut
+
+use warnings;
+use strict;
+use Verilog::VCD qw(parse_vcd);
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+
+my $file = shift;
+
+print "List of all hierarchical instance names\n";
+print "and the number of signals at each level of the hierarchy\n";
+
+my %hier;
+my $vcd = parse_vcd($file, {only_sigs => 1});
+for my $code (keys %{ $vcd }) {
+    my @nets = @{ $vcd->{$code}->{nets} };
+    $hier{$_->{hier}}++ for @nets;
+    #print "$_->{hier}\n" for @nets;
+}
+print Dumper(\%hier);
+

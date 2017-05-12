@@ -1,0 +1,65 @@
+Revision history for VCS-Lite
+=============================
+
+0.12    2015-01-21
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+
+0.11    2014-03-25
+        - added new git repo links.
+        - META file updates.
+
+0.10    2013-01-20
+        - change file dates changed to meet W3CDTF standards.
+        - License updated to Artistic License v2.0.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - added LICENSE & META.json files.
+        - updated test suite.
+        - updated README file.
+        - added VCS::Lite::Delta to META files.
+
+0.09    2009-08-17
+        - new maintainer, Barbie, due to the untimely death of Ivor Williams.
+        - updated documentation
+        - added more tests
+
+0.08    2006-02-22
+        - Rationalise end of line termination. Allow passing in a hashref for 
+          $sep implement chomp mode.
+        - Add support for diff and patch of files with an unterminated last 
+          line.
+    
+0.07    2003-04-03
+        - Fix script errors in vldiff.pl and vlpatch.pl
+        - Lose the .pl in the script names.
+        - Add apply method to VCS::Lite, which provides an anternative
+          interface to merging.
+
+0.06    2004-12-29T10:05:12
+        - Change underlying object type to be a hash. 
+        - Implement windowing of diffs.
+        - Distribute vldiff,vlpatch and vlmerge as exe_files.
+     
+0.05    2003-12-14T15:00:16
+        - Resolve bugs reported on RT by removing merge method in 
+          VCS::Lite::Delta and references to it. Remove merge.t, keep 
+          merge1.t this eliminates the todo tests.
+        - Provide and document API calls VCS::Lite->id, VCS::Lite::Delta->id
+          and VCS::Lite::Delta->hunks.
+
+0.04    2003-04-20T08:54:27
+        - Redesign of API - split of module into VCS::Lite and VCS::Lite::Delta
+        - vldiff.pl, vlpatch.pl and vlmerge.pl scripts included in kit
+        - udiff (diff -u) capability added
+        - merge using new api incomplete (old merge still available)
+
+0.03    0000-00-00
+        - Patched version supplied by Reuben Thomas
+
+0.02    2002-12-18T16:05:23
+        - Original manifest was incomplete. This was uploaded to PAUSE
+
+0.01    2002-12-16T14:03:18
+        - original version; created by h2xs 1.21 with options
+            -AX -n VCS::Lite

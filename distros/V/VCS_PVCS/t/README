@@ -1,0 +1,4 @@
+
+Test suite for VCS::PVCS.  These files MUST be executed in the
+order specified by their names, or the tests will break down.
+

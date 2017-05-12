@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+# PODNAME: ptagdir
+# ABSTRACT: print the directory in which a tag was found
+use warnings;
+use strict;
+my $wanted_tag = shift;
+my $ptags_file = shift || $ENV{PTAGSFILE};
+open my $fh, '<', $ptags_file or die "can't open $ptags_file: $!\n";
+while (<$fh>) {
+    next unless index($_, $wanted_tag) == 0;
+    my $dir = (split)[1];
+    if ($dir =~ m!(.*/)!) {
+        print "$1\n";
+        last;
+    } else {
+        die "can't determine dir from [$dir]\n";
+    }
+}
+close $fh or die "can't close $ptags_file: $!\n";
+
+__END__
+=pod
+
+=head1 NAME
+
+ptagdir - print the directory in which a tag was found
+
+=head1 VERSION
+
+version 1.110690
+
+=head1 INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=Vim-Tag>.
+
+=head1 AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<http://search.cpan.org/dist/Vim-Tag/>.
+
+The development version lives at L<http://github.com/hanekomu/Vim-Tag>
+and may be cloned from L<git://github.com/hanekomu/Vim-Tag.git>.
+Instead of sending patches, please fork this project using the standard
+git and github infrastructure.
+
+=head1 AUTHOR
+
+Marcel Gruenauer <marcel@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2008 by Marcel Gruenauer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

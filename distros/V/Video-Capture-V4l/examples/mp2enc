@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+use Video::RTjpeg;
+
+$|=1;
+$SIG{PIPE} = 'IGNORE';
+
+$stream = "/tmp/vstream";
+require $stream;
+
+my $mode = $channels > 1 ? "s" : "i";
+my $br = 192;
+
+$audioencode = "/root/cvt/mpeg_movie-1.6.0/audio_in/encode";
+$ENV{MPEGTABLES} = "/root/cvt/mpeg_movie-1.6.0/audio_in/tables";
+
+system "dd", "if=$outprefix.a", "of=$outprefix.pcm", "conv=swab";
+
+open ENC, "| $audioencode" or die;
+print ENC <<EOF;
+$outprefix.pcm
+$outprefix.mp2
+$rate
+2
+$mode
+1
+$br
+n
+n
+n
+n
+n
+n
+EOF
+close ENC;
+
+exit;
+unlink "$outprefix.pcm";
+

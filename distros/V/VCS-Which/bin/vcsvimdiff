@@ -1,0 +1,436 @@
+#!/usr/bin/perl
+
+# Created on: 2008-01-16 08:05:58
+# Create by:  ivanw
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use List::Util qw/max min/;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use VCS::Which;
+use IO::Prompt qw/prompt/;
+use Path::Tiny;
+use File::Copy qw/copy/;
+
+our $VERSION = version->new('0.6.4');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    revision => '',
+    diff     => 'vimdiff',
+    verbose  => 0,
+    man      => 0,
+    help     => 0,
+    VERSION  => 0,
+);
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'add|A',
+        'all|a',
+        'revision|r=s',
+        'replay|R',
+        'merge|M',
+        'change|c=i',
+        'changed|changed-only|C',
+        'max|m=i',
+        'prev|previous|p',
+        'three|3',
+        'diff|d=s',
+        'diff_option|diff-option|o=s@',
+        'test|t!',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # sort out the revision names
+    my ( $rev_old, $rev_new ) = ('', '');
+    if ( $option{'revision'} ) {
+        ( $rev_old, $rev_new )
+            = $option{'revision'} =~ /:/xms ? ( split /:/xms, $option{'revision'} )
+            :                                 ( $option{'revision'} );
+    }
+
+    if ( $option{'change'} ) {
+        ( $rev_old, $rev_new ) =
+            $option{'change'} > 0 ? ( $option{'change'} - 1, $option{'change'} )
+            :                       ( $option{'change'}, $option{'change'} - 1 );
+        $option{'revision'} = "$rev_old\:$rev_new";
+    }
+
+    my $temp_dir = $ENV{TEMP} || '/tmp';
+    if ( ! @ARGV ) {
+        @ARGV = qw{.};
+    }
+
+    while ( my $file = shift @ARGV ) {
+
+        # create a new VCS::Which object for the file of interest
+        my $vcs = VCS::Which->new(dir => $file);
+
+        if (-d $file) {
+            unshift @ARGV, find_files($file, $vcs);
+            warn Dumper \@ARGV;
+            next;
+        }
+
+        # create the temporary file object name
+        my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
+        my $command
+            = $option{replay} ? 'replay'
+            : $option{merge}  ? 'merge'
+            : $rev_new        ? 'rev_new'
+            : $rev_old        ? 'rev_old'
+            :                   'rev_default';
+
+        main->$command($file, $vcs, $rev_old, $rev_new, $temp_dir);
+    }
+
+    return;
+}
+
+sub replay {
+    my (undef, $file, $vcs, $rev_old, $rev_new, $temp_dir) = @_;
+
+    # create the temporary file object name
+    my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
+
+    my $warned   = 0;
+    my $versions = $vcs->log( $file );
+    if ( $option{verbose} > 2 ) {
+        my $i = 0;
+        my $j = -2;
+        print map {$i++ . "\t" . $j-- . "\t$versions->{$_}{rev}\n"} sort keys %$versions;
+    }
+    my $last;
+    die "Could not find any versions for $file!\n" if !%$versions;
+
+    while ( %$versions ) {
+        if ( ( $option{prev} || $option{three} ) && $rev_old ) {
+            unlink $last if $last && -e $last;
+            $last = "$tmp.$rev_old";
+        }
+        else {
+            unlink "$tmp.$rev_old" if -e "$tmp.$rev_old";
+        }
+
+        my $rev_no = max keys %$versions;
+        my $rev    = delete $versions->{$rev_no};
+        $rev_old = $rev->{rev};
+
+        my @files
+            = $option{three} && $last ? ( $file, $last, "$tmp.$rev_old" )
+            : $option{prev} && $last  ? ( $last, "$tmp.$rev_old" )
+            :                           ( $file, "$tmp.$rev_old" );
+
+        my $diff = "$option{diff} " . join ' ', @files;
+
+        # write the revisioned file to disk
+        write_file( "$tmp.$rev_old", scalar $vcs->cat($file, $rev_old) );
+
+        if ($option{test} || $option{verbose}) {
+            print "$diff\n" if $option{verbose} > 1;
+            my $other = { %$rev };
+
+            if ( @files == 2 ) {
+                my $diff = "diff -wuN " . join ' ', @files;
+                my @diff = `$diff`;
+                $other->{'Lines added'}   = grep {/^([+] [^+] )/gxms} @diff;
+                $other->{'Lines removed'} = grep {/^([-] [^-] )/gxms} @diff;
+            }
+
+            local $Data::Dumper::Indent = 1;
+            local $Data::Dumper::Sortkeys = 1;
+            print Data::Dumper->Dump([$other], ["*$rev_no"]);
+
+            next if @files == 2 && $other->{'Lines added'} == 0 && $other->{'Lines removed'} == 0;
+        }
+
+        print "y = yes continue (Default), n = not stop processing, s = skip this revision\n" if !$warned++;
+        my $ans = prompt(
+            "Next revision $rev_old: Continue? [yns] ",
+            '-tty',
+            '-1',
+            -d => 'y',
+        );
+        print "\n\n";
+        $ans = lc $ans;
+        last if $ans eq 'n' || $ans eq 'q';
+        next if $ans eq 's';
+
+        # run the diff if not testing
+        diff(@files) if !$option{test};
+    }
+    unlink "$tmp.$rev_old" if -e "$tmp.$rev_old";
+    unlink $last           if $last && -e $last;
+
+    return;
+}
+
+sub merge {
+    my (undef, $file, $vcs, $rev_old, $rev_new, $temp_dir) = @_;
+
+    # create the temporary file object name
+    my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
+
+    $file = path($file);
+
+    # copy the current file out of the way
+    copy $file, "$temp_dir/" . $file->basename . ".merge";
+
+    # get current branches "ours" version
+    $vcs->checkout($file, qw/--ours/);
+    # copy to "ours"
+    copy $file, "$temp_dir/" . $file->basename . ".ours";
+
+    # get current branches "theirs" version
+    $vcs->checkout($file, qw/--theirs/);
+    # copy to "theirs"
+    copy $file, "$temp_dir/" . $file->basename . ".theirs";
+
+    # return the file
+    copy "$temp_dir/" . $file->basename . ".merge", $file;
+
+    diff( "$temp_dir/" . $file->basename . ".ours", $file, "$temp_dir/" . $file->basename . ".theirs" );
+
+    if ($option{add}) {
+        system 'git', 'diff', $file;
+        my $ans = lc prompt(
+            "Add '$file'? [yY] ",
+            '-tty',
+            '-one_char',
+            '-yes',
+        );
+        print "\n\n";
+
+        if ( $ans eq 'y' ) {
+            system 'git', 'add', $file;
+        }
+    }
+
+    return;
+}
+
+sub rev_new {
+    my (undef, $file, $vcs, $rev_old, $rev_new, $temp_dir) = @_;
+
+    # create the temporary file object name
+    my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
+
+    write_file( "$tmp.$rev_new", scalar $vcs->cat($file, $rev_new) );
+    write_file( "$tmp.$rev_old", scalar $vcs->cat($file, $rev_old) );
+    if ($option{test} || $option{verbose}) {
+        print "$option{diff} $tmp.$rev_new $tmp.$rev_old\n";
+    }
+    if (!$option{test}) {
+        diff( "$tmp.$rev_new", "$tmp.$rev_old" );
+    }
+
+    return;
+}
+
+sub rev_old {
+    my (undef, $file, $vcs, $rev_old, $rev_new, $temp_dir) = @_;
+
+    # create the temporary file object name
+    my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
+
+    write_file( "$tmp.$rev_old", scalar $vcs->cat($file, $rev_old) );
+    if ($option{test} || $option{verbose}) {
+        print "$option{diff} $file $tmp.$rev_old\n";
+    }
+    if (!$option{test}) {
+        diff( $file, "$tmp.$rev_old" );
+    }
+
+    return;
+}
+
+sub rev_default {
+    my (undef, $file, $vcs, $rev_old, $rev_new, $temp_dir) = @_;
+
+    # create the temporary file object name
+    my $tmp = "$temp_dir/$$.$name." . path($file)->basename;
+
+    my $log = $vcs->log($file);
+    my ($ver) = max keys %$log;
+    my $rev = $log->{$ver}{rev} ? ".$log->{$ver}{rev}" : '';
+
+    my $content;
+    my $i = -1;
+    while ( !$content && $i++ < 10 ) {
+        $content = $vcs->cat($file, $i ? ":$i" : '');
+    }
+    write_file( "$tmp$rev", $content );
+
+    if ($option{test} || $option{verbose}) {
+        print "$option{diff} $file $tmp$rev\n";
+    }
+    if (!$option{test}) {
+        diff( $file, "$tmp$rev" );
+    }
+
+    return;
+}
+
+sub write_file {
+    my ($file, @contents) = @_;
+    $file = path($file);
+    $file->parent->mkpath;
+    my $fh = $file->openw;
+    print {$fh} @contents;
+    close $fh;
+}
+
+sub diff {
+    my (@files) = @_;
+
+    if ( $option{changed} && @files == 2 ) {
+        return unless `diff '$files[0]' '$files[1]'`;
+    }
+
+    system $option{diff}, @{ $option{diff_option} || [] }, @files;
+}
+
+sub find_files {
+    my ($dir, $vcs) = @_;
+
+    if ($option{all}) {
+        my @files = path($dir)->children;
+        my @found;
+        while (my $file = shift @files) {
+            if (-d $file) {
+                push @files, $file->children;
+                next;
+            }
+            next if ! $vcs->log($file);
+
+            push @found, "$file";
+        }
+        return @found;
+    }
+
+    # Now show only files that have changes
+    my $status = $vcs->status($dir);
+
+    return (
+        map { path($dir, $_) }
+        map {@{ $status->{$_} || [] }}
+        qw/both modified committed/
+    );
+}
+
+__DATA__
+
+=head1 NAME
+
+vcsvimdiff - Uses vimdiff to compare a file with it unmodified version or historic versions from git, subversion, bazaar or cvs.
+
+=head1 VERSION
+
+This documentation refers to vcsvimdiff version 0.6.4.
+
+=head1 SYNOPSIS
+
+   vcsvimdiff [option] [file_or_dir ...]
+
+ OPTIONS:
+  file_or_dir   The file to show differences with in vimdiff. If this is a
+                directory only files that have changed will be shown by
+                defailt, --all option changes that. If not specified the
+                current directory is used.
+
+  -r --revision=rev1[:rev2]
+                Specify the revision(s) to compare with. HEAD is used if only
+                one revision specified.
+  -a --all      If the file_or_dir is a directory this will run vcsvimdiff for
+                each file git has a log for.
+  -c --change=int
+                Specify changes from a specific revision (see vcs help diff)
+  -R --replay   Replay the revision history of "file", --verbose shows the
+                details of each change before going into vimdiff
+  -m --max=int  Maximum number of revisions to replay
+  -3 --three    Three way diff for --replay, showing the file on disk, the
+                revision one newer than the current revision and the current
+                revision.
+  -M --merge    Assume in a git merge and show "ours" and "theirs" versions
+                along git's conflicted version
+  -p --previous
+                If set diff are between the revision currently being used and
+                the either the last looked revision or the file on disk
+  -C --changed-only
+                Don't run vimdiff unless the files actually differ
+  -t --test     Turn on testing (vimdiff wont actually be run)
+     --no-test  Trurn off testing
+  -d --diff=str Allows you to specify a diffing program (Default vimdiff)
+  -o --diff-option[=]str
+                Pass extra options of diff command (eg --diff-option=-R)
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for vcsvimdiff
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW, 2077)
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

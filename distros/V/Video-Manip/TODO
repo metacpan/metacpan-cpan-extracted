@@ -1,0 +1,8 @@
+
+be able to store/retrieve events in/from db, seamlessly
+    when storing envelopes, compare on md5 hash 
+
+render output to templates
+
+FindEvent::LowLevel
+

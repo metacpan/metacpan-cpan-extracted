@@ -1,0 +1,13 @@
+Revision history for Variable-OnDestruct
+
+0.03    2010-10-30
+        Added support for subs and globs
+        Removed usage of Dynaloader, removed inheritance from Exporter
+
+0.02    2009-02-14
+        Changed name from Devel::OnDestruct to Variable::OnDestruct
+        Tweaked implementation
+        Improved documentation
+
+0.01    2009-02-06
+        First version, released on an unsuspecting world.

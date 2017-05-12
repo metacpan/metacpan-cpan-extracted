@@ -1,0 +1,31 @@
+<!--#perl
+  # If we can't find the named object on the local server, then try to find it on
+  # one of the remote servers.  If we find it there, then just return the retrieved
+  # HTML.
+  if((defined $name)&&(! defined $vbObj))
+  {
+    my $relayedFlg = $_parms->{relayedFlg};
+
+    # Only look for the object on remote servers if this request hasn't already been 
+    # relayed once.  This is to avoid infinite loops.
+    if(! defined $relayedFlg)
+    {
+      my $queryStr= $_req->url->equery;
+      my $reqUrl = $_req->url->path;
+
+      foreach my $remoteServer (@remoteServers)
+      {
+        my $remoteHtml .= &VBTK::Client::getUrl("$remoteServer$reqUrl?$queryStr&relayedFlg=1");
+        return $remoteHtml if ($remoteHtml);
+      }
+
+      # If we can't find it anywhere, then just return an error message.
+      return $_html . "<h3>Error: Can't find object name '$name'</h3>\n";
+    }
+    else
+    {
+      return undef;
+    }
+  }
+-->
+

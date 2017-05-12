@@ -1,0 +1,55 @@
+NAME
+    Vcdiff::Xdelta3 - Xdelta3 backend for Vcdiff
+
+SYNOPSIS
+        use Vcdiff::Xdelta3;
+
+        my $delta = Vcdiff::Xdelta3::diff($source, $target);
+
+        my $target2 = Vcdiff::Xdelta3::patch($source, $delta);
+
+        ## $target2 eq $target
+
+    This module is a backend to the Vcdiff module and isn't usually used
+    directly.
+
+DESCRIPTION
+    Xdelta3 is a delta encoding library by Joshua MacDonald. The Xdelta3
+    source code is embedded into this module and built as a shared object.
+    The "xdelta3" command-line binary is not built.
+
+PROS
+    *   Doesn't have arbitrary size limitations on source, target, or delta
+        files.
+
+    *   Has a really neat feature that lets you merge VCDIFF deltas into a
+        single delta. Unfortunately this module doesn't expose that yet.
+
+CONS
+    *   GPL licensed
+
+    *   Build system is really weird. I didn't bother figuring out how to
+        run Xdelta3's test-suite when installing the CPAN module which is
+        unfortunate. Note that installing this module does still run the
+        shared test-suite in Vcdiff.
+
+SEE ALSO
+    <Vcdiff-Xdelta3 github repo>
+
+    Vcdiff
+
+    <Official Xdelta3 website>
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2013 Doug Hoyte.
+
+    This module includes xdelta3 which is copyright Joshua P. MacDonald.
+    xdelta3 is licensed under the GNU GPL 2 which can be found in the
+    inc/COPYING file of this distribution.
+
+    Because of xdelta3's license, this module is licensed under the GNU GPL
+    2.
+

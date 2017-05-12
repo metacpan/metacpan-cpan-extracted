@@ -1,0 +1,15 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-05-09T04:31:05.725689Z
+K 7
+svn:log
+V 213
+Restructured SVN repository to accommodate trunk and branch lines (gimme a break, I'm new to administrating an rcs repository).
+
+Added protocol class to support GameSpy protocol (not to be confused with GameSpy2).
+END

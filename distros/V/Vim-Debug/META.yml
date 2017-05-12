@@ -1,0 +1,74 @@
+---
+abstract: 'Integrate the Perl debugger with Vim'
+author:
+  - 'Eric Johnson <kablamo at iijo dot nospamthanks dot org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Net::Telnet: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vim-Debug
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Vim::Debug:
+    file: lib/Vim/Debug.pm
+    version: 0.904
+  Vim::Debug::Daemon:
+    file: lib/Vim/Debug/Daemon.pm
+    version: 0.904
+  Vim::Debug::Manual:
+    file: lib/Vim/Debug/Manual.pm
+    version: 0.904
+  Vim::Debug::Perl:
+    file: lib/Vim/Debug/Perl.pm
+    version: 0.904
+  Vim::Debug::Protocol:
+    file: lib/Vim/Debug/Protocol.pm
+    version: 0.904
+requires:
+  Carp: 0
+  Dir::Self: 0
+  File::Basename: 0
+  File::Copy::Recursive: 0
+  File::Path: 0
+  Getopt::Long: 0
+  IO::Pty: 0
+  IPC::Run: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util: 0
+  MooseX::ClassAttribute: 0
+  POE: 0
+  POE::Component::Server::TCP: 0
+  Try::Tiny: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/kablamo/VimDebug/issues
+  homepage: https://metacpan.org/release/Vim-Debug
+  repository: git://github.com/kablamo/VimDebug.git
+version: 0.904
+x_contributors:
+  - 'Eric Johnson <eric.git@iijo.org>'
+  - 'Eric Johnson <github@iijo.org>'
+  - 'Gregg Jensen <g_jensen@swbell.net>'
+  - 'Luc St-Louis <lucs@pobox.com>'

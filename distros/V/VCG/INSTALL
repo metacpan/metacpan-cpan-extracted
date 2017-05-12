@@ -1,0 +1,19 @@
+INSTALL
+-------
+
+You will need to install VCG to use the graphical output from this module.
+However to generate VCG notation files you do not need to install VCG itself.
+
+To install VCG.pm you will need IPC::Run
+
+# perl -MCPAN -e 'install IPC::Run'
+
+% perl Makefile.PL
+% make
+% make test
+% su
+# make install
+
+
+any problems email vcg.pm@droogs.org
+

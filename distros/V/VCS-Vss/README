@@ -1,0 +1,39 @@
+VCS/VSS version 0.10
+====================
+
+VCS::Vss requires Win32::OLE to run, so it probably will only 
+ever work on Win32 platforms.
+
+An environment variable named VSSROOT should be set that indicates 
+the directory in which your srcsafe.ini file resides.
+
+It is a good idea to set your VSSROOT environment variable prior 
+to using the module, although you can specify the location of the 
+srcsafe.ini file in the actual URL passed into the constructors 
+for VCS::VSS objects.  See the pod for  VCS::Vss for more details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Win32::OLE
+	VCS
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 James Tillman <jtillman@bigfoot.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

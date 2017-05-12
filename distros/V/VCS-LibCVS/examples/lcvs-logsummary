@@ -1,0 +1,504 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2004,2005 Alexander Taler (dissent@0--0.org)
+#
+# All rights reserved. This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+
+###############################################################################
+### Summarize log messages between two tags
+###############################################################################
+
+use strict;
+use Carp;
+use Getopt::Long;
+use File::Spec;
+
+use VCS::LibCVS;
+
+#$VCS::LibCVS::Client::DebugLevel = VCS::LibCVS::Client::DEBUG_PROTOCOL;
+
+###############################################################################
+### Command line arguments processing
+###############################################################################
+
+my ($prog_name) = ($0 =~ /.*[\\\/](.*)/);
+
+my ($opt_help, $opt_version, $opt_nonrecursive, $opt_cvsroot);
+
+my (@opt_tags);
+
+if (! GetOptions("help|h" => \$opt_help,
+                 "version|v" => \$opt_version,
+                 "local|l" => \$opt_nonrecursive,
+                 "cvsroot|d=s" => \$opt_cvsroot,
+                 "tag|t=s" => \@opt_tags,
+                )) {
+  $opt_help = 1;
+}
+
+# More than 2 tags may not be specified
+if (@opt_tags > 2) {
+  $opt_help = 1;
+}
+
+if (@ARGV == 0) {
+  $opt_help = 1;
+}
+
+if ($opt_version) {
+  print '$Header: /cvsroot/libcvs-perl/libcvs-perl/examples/lcvs-logsummary,v 1.15 2005/10/10 12:52:12 dissent Exp $ ', "\n";
+  print "VCS::LibCVS::VERSION = $VCS::LibCVS::VERSION\n";
+  exit;
+}
+
+if ($opt_help) {
+  print
+"Summarize log messages between two tags
+
+  $prog_name [--version] [--help|-h]
+  $prog_name [options] [-t tag1 [-t tag2]] [<file or dir names . . .>]
+
+Generate a chronological listing of all of the log messages between the given
+tags, for all of the specified files.  If two identical log messages are found
+for revisions on different files, that were committed by the same user, at
+the same time, they are merged into one entry.
+
+Files and directories are specified by a relative path from the root of the
+repository.  Local filesystem paths are not accepted.
+
+If only one tag is specified, then all ancestor revisions are used.  If no tags
+are specified, then the HEAD revision and all ancestors are used.  If two tags
+are specified, then the first one must be an ancestor of the second.  In the
+one tag case, it might seem more natural to assume that the other tag is HEAD,
+but that behaviour can be easily specified, whereas the implemented behaviour
+cannot.
+
+It is required that each tag be on the same branch for all files being
+summarized.  Files encountered with the tags not in the expected place will not
+be summarized, and will generate warnings on stderr.
+
+The Right Thing (TM) will be attempted when a file is encountered that is
+missing one or both tags.  A tag will generally be missing because the file was
+dead or not yet born at the time of the tagging.  Even worse, the file may have
+been ressurected after the tagging.  Approximate times of the tags, as well as
+a map of the branches between the tags is created to help handle these cases.
+
+If a file is missing the ancestor tag, then branches down from the descendant
+are traversed until either the origin (1.1) is reached, the base of the branch
+of the ancestor tag is reached or the commits are earlier than the time of the
+ancestor tag.
+
+If a file is missing the descendant tag, then the mapped branches are followed
+from the ancestor tag until either a branch tip is reached or the commits are
+occurring after the time of the descendant tag.
+
+If a file is missing both the ancestor and descendant tags, then starting with
+the ancestor branch, a branch in the map is searched for, and if it's found,
+the first revision after the time of the ancestor tag is treated as the
+ancestor revision, and processing continues as for the descendant tag missing.
+
+Options:
+
+  -l --local        Do not recurse into subdirectories
+  -d --cvsroot=...  If not specified, it will look in the cwd.
+  -h --help         Print out this help and exit
+  -t --tag=...      The tags to use
+  -v --version      Print out the version and exit
+
+";
+  exit;
+}
+
+###############################################################################
+### Internal helper routines
+###############################################################################
+
+# Although the command line args are only traversed once, this routine may be
+# more widely applicable, so it is preserved here as an example.  It is called
+# with a single argument which is a callback.  It will call the callback with a
+# RepositoryFile object for each file to be traversed.  If the callback returns
+# false, this routine will return immediately, terminating the traversal.
+
+sub traverse_args {
+  my ($repo, $routine) = @_;
+
+  foreach my $arg (@ARGV) {
+    # Find the named object
+    my $f_or_d = VCS::LibCVS::RepositoryFileOrDirectory->find($repo, $arg);
+
+    if ($f_or_d->isa("VCS::LibCVS::RepositoryFile")) {
+
+      &$routine($f_or_d) || return;
+
+    } else {
+      foreach my $file ( @{$f_or_d->get_files({Recursive => ! $opt_nonrecursive})} ) {
+        &$routine($file) || return;
+      }
+    }
+  }
+}
+
+# Print a message to stderr.  Probably will want to make this configurable.
+sub mlog {
+  print STDERR (shift() . "\n");
+}
+
+###############################################################################
+### Internal data structures
+###############################################################################
+
+# The repository.
+my $repo;
+if ($opt_cvsroot) {
+  $repo = VCS::LibCVS::Repository->new($opt_cvsroot);
+} else {
+  my $cwd = VCS::LibCVS::WorkingDirectory->new(".");
+  $repo = $cwd->get_repository();
+}
+
+# $tagd is the descendant and $taga is the ancestor.  They are provided in
+# order in the command line options.  If no ancestor tag is being used $taga
+# will remain undefined.
+my ($tagd, $taga);
+
+# $time_d_min, $time_d_max, $time_a_min, and $time_a_max are approximations of
+# the times that the tags were applied, in seconds since the epoch.  The tag
+# occurred between the min and max times.  They are used to determine if a file
+# is missing a tag because it was dead at the time.
+my $time_d_min = 0;
+my $time_d_max = time + 100000;
+my $time_a_min = 0;
+my $time_a_max = time + 100000;
+
+# @branches is a list of VCS::LibCVS::Branch objects starting with the name of
+# the branch for the descendant tag, and ending with the name of the branch of
+# the ancestor tag.  It is assumed that branches are structured the same way
+# on all files.
+my @branches;
+
+
+# $taga and $tagd are determined now.
+
+if (@opt_tags == 0) {
+  mlog "No tags specified, using greatest ancestor and HEAD.";
+  $tagd = "HEAD";
+} elsif (@opt_tags == 1) {
+  mlog "One tag specified, using greatest ancestor for the other one.";
+  $tagd = $opt_tags[0];
+} else {
+  mlog "Two tags specified.";
+  $taga = $opt_tags[0];
+  $tagd = $opt_tags[1];
+}
+
+# %log_summary is a hash whose keys are the content of the log message, and
+# whose values are references to lists of log summary entries.  Each log
+# summary entry is a reference to a list containing the committer name, the
+# time of the commit (in seconds since the epoch), and any number of
+# filename & revision number pairs.
+
+# eg:
+# %log_summary = { "Add a module" =>
+#                      [ [ "admin", "1081671956",
+#                          "/CVSROOT/modules", "1.5" ],
+#                        [ "admin", "1081731856",
+#                          "/CVSROOT/modules", "1.6" ],
+#                        [ "coder", "1081801965",
+#                          "/CVSROOT/modules", "1.7" ] ]
+#                  "Reskew the snaffle to be in whack with the transom" =>
+#                      [ [ "coder", "1081731956",
+#                          "/lib/woozle/snaffle.c", "1.8.2.19",
+#                          "/lib/woozle/transom.c", "1.5.2.27" ] ] };
+
+my %log_summary;
+
+# Add a log message to the log_summary.  One arg: a FileRevision.
+sub add_entry {
+  my $frev = shift;
+
+  my $msg  = $frev->get_log_message();
+  my $cmtr = $frev->get_committer();
+  my $time = $frev->get_time();
+  my $name = $frev->get_file()->get_name();
+  my $revn = $frev->get_revision_number()->as_string();
+
+  # If the message isn't a key in the hash, add it.
+  if (!defined $log_summary{$msg}) {
+    $log_summary{$msg} = [ [ $cmtr, $time, $name, $revn ] ];
+    return;
+  }
+
+  # Otherwise, there are entries with this same message, so search for one that
+  # matches user and time, and add this log message to it.
+  foreach my $entry (@{ $log_summary{$msg} }) {
+    my ($m_cmtr, $m_time) = @$entry;
+    if (($cmtr eq $m_cmtr) && (abs ( $time - $m_time ) < 300)) {
+      push (@$entry, $name, $revn);
+      return;
+    }
+  }
+
+  # Otherwise, this doesn't match any entry in the list so append it as a new
+  # one.
+  push @{$log_summary{$msg}}, [ $cmtr, $time, $name, $revn ];
+  return;
+}
+
+
+###############################################################################
+### File traversal and internal data structure population.
+###############################################################################
+
+# Some files may be missing tags because they were dead or not yet born when
+# the tags were applied.  These files can be procesed once the @branches and
+# $time* internal structures have been populated.  So, their processing is
+# deferred until all of the files with both tags have been processed.  Deferred
+# RepositoryFile objects are stored in this list.
+my @deferred_files;
+
+### Pass 1, process files with all tags.
+
+# Passed to traverse_args
+sub process_files_all_tags {
+  my $file = shift;
+
+  # If the tags aren't there, defer this file
+  if ((!$file->has_tag($tagd)) || (defined $taga && !$file->has_tag($taga))) {
+    push(@deferred_files, $file);
+    return 1;
+  }
+
+  # The FileRevision objects for each tag.
+  my $rev_d = $file->get_revision($tagd);
+  my $rev_a = (defined $taga) ? $file->get_revision($taga) : undef;
+
+  # Validate that the tags are in the correct order.
+  if (defined $taga) {
+    my $cmp = $rev_a->compare($rev_d);
+    if ($cmp == VCS::LibCVS::Datum::RevisionNumber::COMPARE_EQUAL) {
+      # They're the same revision, so there's nothing to do
+      return 1;
+    } elsif ($cmp == VCS::LibCVS::Datum::RevisionNumber::COMPARE_ANCESTOR) {
+      mlog "***Skipping " . $file->get_name() . " with switched tags.";
+      return 1;
+    } elsif ($cmp == VCS::LibCVS::Datum::RevisionNumber::COMPARE_INCOMPARABLE) {
+      mlog "***Skipping " . $file->get_name() . " with incomparable tags.";
+      return 1;
+    }
+  }
+
+  # Update the time approximations for the tags.
+  my $rev_d_time = $rev_d->get_time();
+  $time_d_min = (($time_d_min < $rev_d_time) ? $rev_d_time : $time_d_min);
+  if (defined $rev_d->get_successor()) {
+    my $succ_d_time = $rev_d->get_successor()->get_time();
+    $time_d_max = (($time_d_max > $succ_d_time) ? $succ_d_time : $time_d_max);
+  }
+  if (defined $rev_a) {
+    my $rev_a_time = $rev_a->get_time();
+    $time_a_min = (($time_a_min < $rev_a_time) ? $rev_a_time : $time_a_min);
+    if (defined $rev_a->get_successor()) {
+      my $succ_a_time = $rev_a->get_successor()->get_time();
+      $time_a_max = (($time_a_max > $succ_a_time) ? $succ_a_time : $time_a_max);
+    }
+  }
+
+  mlog "Processing file: " . $file->get_name();
+
+  # Starting with the descendant revision, process the log messages of all its
+  # ancestors until the ancestor is reached, or it's undef if we're processing
+  # all ancestors.  $b_loc keeps track of the current revision's branch's
+  # location in the @branches list.
+  my $b_loc = 0;
+
+  while ((defined $rev_d) && ! ((defined $rev_a) && ($rev_a->equals($rev_d)))) {
+
+    $b_loc = find_or_insert_branch($b_loc, $rev_d->get_file_branch());
+
+    # Record this log message.
+    add_entry($rev_d);
+
+    $rev_d = $rev_d->get_predecessor();
+  }
+
+  # Although the commit log message is not included for $rev_a, its branch
+  # should be included in the list.
+  if (defined $rev_d) {
+    find_or_insert_branch($b_loc, $rev_d->get_file_branch());
+  }
+
+  return 1;
+}
+
+# If it's there, Find the given branch in @branches, otherwise insert it in the
+# correct place.  The first argument is a location in @branches where the
+# search for the correct location should start.  The second argument is a
+# FileBranch.  The index of where the branch was found or inserted is returned.
+
+sub find_or_insert_branch() {
+  my $i = shift;
+  my $fb = shift;
+
+  for (; $i <= @branches; $i++) {
+    # If the end of the list has been reached, or if the branch in the list
+    # precedes $fb, insert $fb.
+    if ((! defined $branches[$i]) ||
+        ($fb->get_file()->get_branch($branches[$i])->precedes($fb))) {
+      splice(@branches, $i, 0, $fb->get_branch());
+      return $i;
+    }
+    # If $fb equals the branch in the list, stop, but don't insert it.
+    if ($fb->get_branch()->equals($branches[$i])) {
+      return $i;
+    }
+  }
+}
+
+traverse_args($repo, \&process_files_all_tags);
+
+# If @branches is empty, then nothing was traversed, and we can't continue
+# since we have no idea of which branches to look for.  This will happen if no
+# file has both tags.
+if (! @branches) {
+  mlog "***Error.  No file with both tags was found, exiting.";
+  exit 1;
+}
+
+# Pass 2.  Handle the files that were deferred because they were missing tags.
+
+foreach my $file (@deferred_files) {
+  # For user feedback
+  my $sk_msg = "***Skipping " . $file->get_name() . " : ";
+
+  # For each file, get file revisions for the descendant, and the ancestor if
+  # appropriate.  With that information normal processing can be applied.
+  my ($rev_d, $rev_a);
+
+  # If the descendant tag is there, use it.
+  if ($file->has_tag($tagd)) {
+    $rev_d = $file->get_revision($tagd);
+
+  } else {
+    # The descendant tag is missing, so find the revision on the appropriate
+    # branch at the appropriate time.  If it's dead, then assume that's why it
+    # wasn't tagged, and accept it as the descendant revision.  If it's not
+    # dead, then the tag is missing intentioanlly, so skip the file.
+
+    my $branch = $file->get_branch($branches[0]);
+    if (! defined $branch) {
+      mlog "$sk_msg Missing descendant branch: " . $branches[0]->get_name();
+      next;
+    }
+    $rev_d = $branch->get_revision($time_d_min);
+    if (! defined $rev_d) {
+      my $nm = $file->get_name();
+      mlog "$sk_msg No descendant revision.";
+      next;
+    }
+    if (! $rev_d->is_dead() ) {
+      mlog "$sk_msg Untagged descendant revision not dead.";
+      next;
+    }
+  }
+
+  mlog "Processing deferred file: " . $file->get_name();
+
+  # Find a tagged ancestor revision.  If there's no tagged ancestor revision,
+  # then all ancestor revisions to the descendant after the approximate time
+  # will be processed.  The reason not to skip any of these files is that they
+  # are in the tagged ancestor set, so their history must be important to it.
+
+  if ((defined $taga) && ($file->has_tag($taga))) {
+    $rev_a = $file->get_revision($taga);
+  }
+
+  # Traverse the revisions from descendant.
+
+  while (defined $rev_d) {
+    # If an ancestor tag is specified, stop when we reach that revision, or the
+    # approximate time of the tag.
+    if ((defined $taga)
+        && (   (( defined $rev_a) && ($rev_d->equals($rev_a)))
+            || ((!defined $rev_a) && ($rev_d->get_time() < $time_a_min)))) {
+      last;
+    }
+
+    # Record this log message.
+    add_entry($rev_d);
+
+    $rev_d = $rev_d->get_predecessor();
+  }
+
+}
+
+###############################################################################
+### Generate output
+###############################################################################
+
+# Transform the %log_summary into a list of commit batches, ordered by time.
+# The format is the same as that of %log_summary, with the exception that the
+# log message has been added.
+
+my @log_summary;
+
+# eg:
+# @log_summary = (
+#  [ "Add a module", "admin", "1081671956",
+#    "/CVSROOT/modules", "1.5" ],
+#  [ "Add a module", "admin", "1081731856",
+#    "/CVSROOT/modules", "1.6" ],
+#  [ "Reskew the snaffle to be in whack with the transom","coder","1081731956",
+#    "/lib/woozle/snaffle.c", "1.8.2.19",
+#    "/lib/woozle/transom.c", "1.5.2.27" ],
+#  [ "Add a module", "coder", "1081801965",
+#    "/CVSROOT/modules", "1.7" ] );
+
+
+foreach my $msg (keys %log_summary) {
+  foreach my $batch ( @{ $log_summary{$msg} } ) {
+    # prepend the message to the batch.
+    unshift @$batch, $msg;
+
+    # insertion sort
+    my $i = 0;
+    for ( ; $i < @log_summary ; $i++ ) {
+      last if ($log_summary[$i]->[2] < $batch->[2]);
+    }
+    splice(@log_summary, $i, 0, $batch);
+  }
+}
+
+# Finally, generate the formatted output.
+
+foreach my $batch (@log_summary) {
+  my $message = shift(@$batch);
+  my $committer = shift(@$batch);
+  my $time = shift(@$batch);
+
+  # Print time as just a date
+  my ($sc,$mi,$hr,$dy,$mo,$yr,$wd,$yd,$ds) = localtime($time);
+  $yr += 1900;
+  $mo += 1; $mo = "0" . $mo if ($mo < 10);
+  $dy = "0" . $dy if ($dy < 10);
+  print "$yr-$mo-$dy  ";
+
+  # Output the committer on the same line as the date.  It would be nice to be
+  # able to include their name and email address.
+  print "$committer\n\n";
+
+  # For each file, print out its name and revision number.
+  while (@$batch) {
+    my $file = shift(@$batch);
+    my $rev = shift(@$batch);
+    print "\t* $file [$rev]\n";
+  }
+
+  # Print out the message, but indented by \t, and terminated with exactly two
+  # new lines.
+  $message =~ s/(^|\n)/\n\t/g;
+  chomp $message;
+  print "$message\n\n";
+
+
+}

@@ -1,0 +1,65 @@
+NAME
+    Vero::API - Perl interface to the Vero API.
+
+SYNOPSIS
+        use Vero::API;
+
+        my $vero = Vero::API->new( token => 'your-secret-auth-token' );
+
+        $vero->identify_user(
+            id      => 'BR0001',
+            email   => 'zezinho@example.com',
+            name    => 'Jose da Silva',
+            country => 'br',
+        );
+
+        $vero->track_event(
+            'favorited-item',
+            id      => 'BR0001',
+            item_id => 'bicicleta laranja',
+        );
+
+DESCRIPTION
+    A quick and simple perl interface to Vero <https://www.getvero.com> API.
+
+    "Vero::API" uses Mojo::UserAgent for talking to the Vero API using
+    Mojo::JSON.
+
+    Response is parsed back from JSON and returned as perl data structure.
+
+METHODS
+    "new(token => 'your-auth-token')"
+        Constructs a new "Vero::API" object storing your "token".
+
+    "token"
+        Returns the stored token.
+
+    "identify_user(id => 'clientid', email => 'client@example.com',
+    %extra_info)"
+        Calls the API to register/update a user record.
+
+    "track_event($event_name, [id => $clientid,] [email => $email],
+    %extra_info)"
+        Calls the API to register an event for that user.
+
+        You can pass either one of id, email or both. Extra info passed in
+        as a hash will be available to use on email templates triggered by
+        that event.
+
+        Example:
+
+            $vero->track_event('bought-item', id => 'BR0001', item => 'Clock', price => '1.00');
+
+STATUS
+SEE ALSO
+    verocli
+
+AUTHOR
+    Carlos Lima <carlos@cpan.org>
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2013, Carlos Lima <carlos@cpan.org>.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

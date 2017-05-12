@@ -1,0 +1,8 @@
+10_
+10__0
+
+// leading underscore character is not legal for data (binary and hex)
+_1
+
+00
+1010

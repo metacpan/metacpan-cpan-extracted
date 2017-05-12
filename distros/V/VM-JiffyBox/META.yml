@@ -1,0 +1,28 @@
+---
+abstract: 'OO-API for JiffyBox Virtual Machine'
+author:
+  - 'Tim Schwarz, Boris Däppen <bdaeppen.perl@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VM-JiffyBox
+requires:
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/borisdaeppen/VM-JiffyBox
+  repository: git://github.com/borisdaeppen/VM-JiffyBox.git
+version: '0.032'

@@ -1,0 +1,16 @@
+Revision history for Variable-Lazy
+
+0.03    2010-07-05
+        Various refactorings
+        Added documentation
+        Made unit tests more robust
+        Use small make compatibility
+
+0.02    2009-06-16
+        Don't add semicolon after lazy
+        Use passthrough make compatibility
+        Add license
+
+0.01    2009-06-15
+        First version, released to an unsuspecting world
+

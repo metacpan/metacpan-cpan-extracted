@@ -1,0 +1,94 @@
+NAME
+    Version::Next - increment module version numbers simply and correctly
+
+VERSION
+    version 1.000
+
+SYNOPSIS
+      use Version::Next qw/next_version/;
+
+      my $new_version = next_version( $old_version );
+
+DESCRIPTION
+    This module provides a simple, correct way to increment a Perl module
+    version number. It does not attempt to guess what the original version
+    number author intended, it simply increments in the smallest possible
+    fashion. Decimals are incremented like an odometer. Dotted decimals are
+    incremented piecewise and presented in a standardized way.
+
+    If more complex version manipulation is necessary, you may wish to
+    consider Perl::Version.
+
+USAGE
+    This module uses Sub::Exporter for optional exporting. Nothing is
+    exported by default.
+
+  "next_version"
+      my $new_version = next_version( $old_version );
+
+    Given a string, this function make the smallest logical increment and
+    returns it. The input string must be a "lax" version numbers as defined
+    by the version module. The string "undef" is treated as 0 and
+    incremented to 1. Leading or trailing periods have a 0 (or "v0")
+    prepended or appended as appropriate. For legacy reasons, given no
+    argument or a literal "undef" (not the string "undef"), the function
+    returns 0.
+
+    Decimal versions are incremented like an odometer, preserving the
+    original number of decimal places. If an underscore is present
+    (indicating an "alpha" version), its relative position is preserved.
+    Examples:
+
+      0.001    ->   0.002
+      0.999    ->   1.000
+      0.1229   ->   0.1230
+      0.12_34  ->   0.12_35
+      0.12_99  ->   0.13_00
+
+    Dotted-decimal versions have the least significant element incremented
+    by one. If the result exceeds 999, the element resets to 0 and the next
+    most significant element is incremented, and so on. Any leading zero
+    padding is removed. Examples:
+
+     v1.2.3     ->  v1.2.4
+     v1.2.999   ->  v1.3.0
+     v1.999.999 ->  v2.0.0
+
+    NOTE: Due to changes in the interpretation of dotted-decimal version
+    numbers with alpha elements in version 0.9913 and later, the notion of
+    the 'next' dotted-decimal alpha is ill-defined. Version::Next no longer
+    supports dotted-decimals with alpha elements and a fatal exception will
+    be thrown if one is provided to "next_version".
+
+SEE ALSO
+    *   version
+
+    *   Perl::Version
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Version-Next/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Version-Next>
+
+      git clone https://github.com/dagolden/Version-Next.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Grzegorz Rożniecki <xaerxess@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

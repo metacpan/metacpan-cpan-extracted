@@ -1,0 +1,68 @@
+
+# sample meta file
+
+=name       new_plugin
+
+    # name of your plugin , valid characters are [a-zA-Z0-9._-]
+
+=author     Cornelius (cornelius.howl@gmail.com)
+
+    # author name
+
+=type           syntax|plugin|autoload|ftplugin|doc|compiler|indent
+
+    # type
+
+=version_from  vimlib/plugin/new_plugin.vim  
+
+    # extract version infomation from this file
+
+=vim_version >= 7.0
+
+    # is compatible with vim 7.0 or later
+
+=vim_version 7.2
+    
+    # is compatible with vim 7.2 or later
+
+=dependency
+
+    autocomplpop.vim > 0.3
+        # check autocomplpop for version 0.3 from installed record , then try to parse installed file (version from)
+        # and retrieve package from vim script archive network (not ready yet)
+        #
+        # comments are allowed
+    
+    something.vim    >= 0.3
+    rainbow.vim      >= 1.2
+
+# for required plugins that don't have package on vim script archive network website 
+# we intent to download them by urls
+
+    autocomplpop.vim
+        | autoload/acp.vim | [url]
+        | plugin/acp.vim   | [url2]
+
+        # check for file $runtimepath/autoload/acp.vim , if it's not exist.
+        # then get the file from url and put it into "$vimruntime/autoload"
+        # directory
+        #   for plugins which can't detect version.
+        #
+        #      | $(VIM_BASEDIR)/autoload/libperl.vim | http://github.com/c9s/libperl.vim/raw/master/autoload/libperl.vim
+        #      XXX: we should support this.
+    
+    libperl.vim > 0.2 | http://path/to/package/package.tar.gz
+
+        # check for libperl.vim version
+        # if require newer version
+        # we download the package elsewhere and install it.
+
+=script
+
+    bin/parser
+    bin/template_generator
+
+    # these files should be installed to ~/.vim/bin/
+
+=repository git://....../
+

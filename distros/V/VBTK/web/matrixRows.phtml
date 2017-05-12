@@ -1,0 +1,78 @@
+<!--#perl
+  my @matrixList=$vbObj->getMatrixList if ($vbObj);
+  foreach my $matrix (@matrixList) 
+  {
+    my $totColCount = $matrix->getGrandChildCount + 2;
+    my $bgColor=$STATUS_BGCOLOR{$matrix->getStatus}; 
+-->
+    <!-- Build row for matrix title -->
+    <table width=620 border="0" cellspacing="0" cellpadding="0">
+      <TR>
+        <TH COLSPAN="$totColCount" BGCOLOR="$bgColor">
+          <!--#perl 
+            my @segments = $matrix->getNameSegments;
+            foreach my $pos (0..$#segments) 
+            { 
+              my $segName = $segments[$pos];
+              my $fullName = join('.',@segments[0..$pos]);
+           -->
+            <A HREF="$matrixUrl?name=$fullName">$segName</A>.
+          <!--#perl } -->
+        </TH>
+      </TR>
+
+    <!-- Build row for colum headers -->
+    <TR>
+      <TH></TH><TD></TD>
+      <!--#perl foreach my $col ($matrix->getGrandChildNames) { -->
+        <TH>$col</TH>
+      <!--#perl } -->
+    </TR>
+
+    <!-- Build one row for each grouping of objecs with the same two name segments -->
+    <!--#perl 
+      foreach my $child ($matrix->getChildObjects) 
+      { 
+        my $fullName = $child->getFullName;
+        my $segName = $child->getSegName;
+        my $status = $child->getStatus;
+        my $statusGif = $STATUS_GIFS{$status};
+        my $rowUrl = ($child->isGroup) ? $matrixUrl : $statusUrl;
+     -->
+        <TR>
+          <!-- Put a title in the 1st column -->
+          <TH>
+            <A HREF="$rowUrl?name=$fullName">$segName</A>
+          </TH>
+      
+          <!-- If the child is not a group, then put it's status GIF in the 2nd column -->
+          <TD ALIGN=CENTER>
+          <!--#perl if (! $child->isGroup) { -->
+            <A HREF="$statusUrl?name=$fullName">
+              <IMG SRC="$statusGif" ALT="$status" HEIGHT=12 WIDTH=12 BORDER=0></A>
+          <!--#perl } -->
+          </TD>
+      
+          <!-- Now step through each of the columns, looking for grand-children -->
+          <!--#perl foreach my $col ($matrix->getGrandChildNames) { -->
+            <!--#perl my $grandChild=$child->getChild($col); -->
+            <TD ALIGN=CENTER>
+              <!--#perl 
+                if ($grandChild) 
+                {
+                  my $fullName = $grandChild->getFullName;
+                  my $segName = $grandChild->getSegName;
+                  my $status = $grandChild->getStatus;
+                  my $statusGif = $STATUS_GIFS{$status};
+                  my $cellUrl = ($grandChild->isGroup) ? $matrixUrl : $statusUrl;
+              -->
+                  <A HREF="$cellUrl?name=$fullName">
+                    <IMG SRC="$statusGif" ALT="$status" HEIGHT=12 WIDTH=12 BORDER=0></A>
+              <!--#perl } -->
+            </TD>
+          <!--#perl } -->
+        </TR>
+    <!--#perl } -->
+    </table>
+<!--#perl } -->
+        

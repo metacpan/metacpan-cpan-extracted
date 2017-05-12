@@ -1,0 +1,4 @@
+<div id="poll_running">
+<p>Le vote est actuellement en cours</p>
+<p>Vous pouvez: <a href="[% c.uri_for('/ballot', voteid) %]">Voter ici</a></li></p>
+</div>

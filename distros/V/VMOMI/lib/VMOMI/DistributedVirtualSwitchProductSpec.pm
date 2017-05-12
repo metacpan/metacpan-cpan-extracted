@@ -1,0 +1,31 @@
+package VMOMI::DistributedVirtualSwitchProductSpec;
+use parent 'VMOMI::DynamicData';
+
+use strict;
+use warnings;
+
+our @class_ancestors = ( 
+    'DynamicData',
+);
+
+our @class_members = ( 
+    ['name', undef, 0, 1],
+    ['vendor', undef, 0, 1],
+    ['version', undef, 0, 1],
+    ['build', undef, 0, 1],
+    ['forwardingClass', undef, 0, 1],
+    ['bundleId', undef, 0, 1],
+    ['bundleUrl', undef, 0, 1],
+);
+
+sub get_class_ancestors {
+    return @class_ancestors;
+}
+
+sub get_class_members {
+    my $class = shift;
+    my @super_members = $class->SUPER::get_class_members();
+    return (@super_members, @class_members);
+}
+
+1;

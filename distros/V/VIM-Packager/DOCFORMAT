@@ -1,0 +1,83 @@
+
+VIMSCRIPT DOCUMENT FORMAT
+=========================
+
+BASIC REQUIREMENT
+-----------------
+
+    "=NAME your name
+    "
+    "=AUTHOR Cornelius
+    "
+    "=AUTHORS
+    "   Kana
+    "   Cornelius 
+    "
+    "=VERSION 0.2
+    "
+    "=DESCRIPTION
+    "
+    "   stories....
+    "   more ...
+    "
+    "=LICENSE MIT
+    "
+    "=REPOSITORY http://github.com/c9s/p5-vim-packager
+    "
+    "=REVISION r4356
+    "
+    "=REVISION da743bd63d7afa1cc8e054615c0208c1a871b0e2
+
+VARIABLE DOC FORMAT
+----------------------
+
+    "=[scope]:Var
+
+    "=g:Var
+    "
+    "  g:somehting
+    "       variable description
+    "  g:options   
+    "       variable description
+    "       line2
+    "  g:options
+    "
+    "==
+
+    "=s:Var 
+    "
+    "  s:somehting
+    "       variable description
+    "  s:options   
+    "       variable description
+    "       line2
+    "  s:options
+    "
+    "==
+
+FUNCTION DOC FORMAT
+-------------------
+
+    "=FUNC
+    "=FUNCTION
+    " function_name :
+    "   list@hash :
+    "       description
+    "
+    "   name@string :
+    "       description
+    "   
+    "   @return: 
+    "==
+
+COMMANDS DOC FORMAT
+--------------------
+
+    " COMMANDS:
+    "   
+    "    :ReloadCPAN
+    "         description
+    "
+    "    :AutoComplPopEnable
+    "
+    "

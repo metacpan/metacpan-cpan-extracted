@@ -1,0 +1,86 @@
+Module:bug278  Kwd:module  File:verilog/pinorder.v
+  Port:iow  Dir:inout  DataT:  Array:
+  Port:iw  Dir:in  DataT:  Array:
+  Port:ow  Dir:out  DataT:  Array:
+  Net:iow    DeclT:port  NetT:wire  DataT:  Array:
+  Net:iw  O  DeclT:port  NetT:wire  DataT:  Array:
+  Net:ow  I  DeclT:port  NetT:wire  DataT:  Array:
+Module:foo  Kwd:module  File:verilog/pinorder.v
+  Port:abcconst  Dir:in  DataT:[2:0]  Array:
+  Port:def  Dir:in  DataT:[31:0]  Array:
+  Port:noconnect  Dir:in  DataT:signed [3:0]  Array:
+  Port:x  Dir:in  DataT:  Array:
+  Port:y  Dir:in  DataT:  Array:
+  Net:abcconst  O  DeclT:port  NetT:  DataT:[2:0]  Array:  2:0
+  Net:def  O  DeclT:port  NetT:  DataT:[31:0]  Array:  31:0
+  Net:noconnect  O  DeclT:port  NetT:  DataT:signed [3:0]  Array:  3:0
+  Net:x  O  DeclT:port  NetT:  DataT:  Array:
+  Net:y  O  DeclT:port  NetT:  DataT:  Array:
+Module:foo2  Kwd:module  File:verilog/pinorder.v
+  Port:x  Dir:out  DataT:  Array:
+  Port:y  Dir:in  DataT:  Array:
+  Port:z  Dir:in  DataT:  Array:
+  Net:x  I  DeclT:port  NetT:  DataT:reg  Array:
+  Net:y  O  DeclT:port  NetT:  DataT:  Array:
+  Net:z  O  DeclT:port  NetT:  DataT:  Array:
+Module:pinorder4  Kwd:module  File:verilog/pinorder.v
+  Net:IPCD_const  I  DeclT:net  NetT:wire  DataT:[31:0]  Array:  31:0  Value:32'h1
+  Net:a_i  I  DeclT:net  NetT:wire  DataT:[7:0]  Array:  7:0
+  Net:b_i  IO  DeclT:net  NetT:wire  DataT:  Array:
+  Net:d_o  I  DeclT:net  NetT:wire  DataT:  Array:
+  Cell:foo1  is-a:foo
+            Module:foo  Kwd:module  File:verilog/pinorder.v
+    Pin:abcconst  Net:3'h0
+              Port:abcconst  Dir:in  DataT:[2:0]  Array:
+    Pin:def  Net:IPCD_const
+              Port:def  Dir:in  DataT:[31:0]  Array:
+              Net:IPCD_const  I  DeclT:net  NetT:wire  DataT:[31:0]  Array:  31:0  Value:32'h1
+    Pin:noconnect  Net:
+              Port:noconnect  Dir:in  DataT:signed [3:0]  Array:
+    Pin:x  Net:a_i
+              Port:x  Dir:in  DataT:  Array:
+              Net:a_i  I  DeclT:net  NetT:wire  DataT:[7:0]  Array:  7:0
+    Pin:y  Net:b_i
+              Port:y  Dir:in  DataT:  Array:
+              Net:b_i  IO  DeclT:net  NetT:wire  DataT:  Array:
+  Cell:foo2  is-a:foo2
+            Module:foo2  Kwd:module  File:verilog/pinorder.v
+    Pin:x  Net:b_i
+              Port:x  Dir:out  DataT:  Array:
+              Net:b_i  IO  DeclT:net  NetT:wire  DataT:  Array:
+    Pin:y  Net:d_o
+              Port:y  Dir:in  DataT:  Array:
+              Net:d_o  I  DeclT:net  NetT:wire  DataT:  Array:
+    Pin:z  Net:a_i[0]
+              Port:z  Dir:in  DataT:  Array:
+  Cell:foo3  is-a:foo
+            Module:foo  Kwd:module  File:verilog/pinorder.v
+    Pin:abcconst  Net:3'h0
+              Port:abcconst  Dir:in  DataT:[2:0]  Array:
+    Pin:def  Net:IPCD_const
+              Port:def  Dir:in  DataT:[31:0]  Array:
+              Net:IPCD_const  I  DeclT:net  NetT:wire  DataT:[31:0]  Array:  31:0  Value:32'h1
+    Pin:x  Net:a_i
+              Port:x  Dir:in  DataT:  Array:
+              Net:a_i  I  DeclT:net  NetT:wire  DataT:[7:0]  Array:  7:0
+    Pin:y  Net:b_i
+              Port:y  Dir:in  DataT:  Array:
+              Net:b_i  IO  DeclT:net  NetT:wire  DataT:  Array:
+  ContAssign:assign  lhs:a_i  rhs:0
+  ContAssign:assign  lhs:b_i  rhs:0
+#### Commentary:
+verilog/pinorder.v:0049: iow   cmt=""
+verilog/pinorder.v:0050: iw   cmt=""
+verilog/pinorder.v:0048: ow   cmt=""
+verilog/pinorder.v:0041: abcconst   cmt=""
+verilog/pinorder.v:0043: def   cmt=""
+verilog/pinorder.v:0042: noconnect   cmt=""
+verilog/pinorder.v:0040: x   cmt=""
+verilog/pinorder.v:0039: y   cmt=""
+verilog/pinorder.v:0030: x   cmt=""
+verilog/pinorder.v:0029: y   cmt=""
+verilog/pinorder.v:0028: z   cmt=""
+verilog/pinorder.v:0010: IPCD_const   cmt=""
+verilog/pinorder.v:0009: a_i   cmt=""
+verilog/pinorder.v:0007: b_i   cmt=""
+verilog/pinorder.v:0008: d_o   cmt=""

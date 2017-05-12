@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+=head1 DESCRIPTION
+
+Parse a VCD file and write time-value pairs to output files.  An input VCD
+file name and an output directory must be specified.  If the output
+directory does not exist, it will be created; if it does exist, any
+existing files may be clobbered.  If there are any problems creating or
+writing to the output files, the function will C<croak>.  One file will be
+created for each signal.  Files will be named F<tv1.txt>, F<tv2.txt>,  etc.
+
+=cut
+
+use warnings;
+use strict;
+use Carp qw(croak);
+use Verilog::VCD qw(:all);
+
+my $file   = shift;
+my $outdir = shift;
+
+my $vcd   = parse_vcd($file);
+my $units = get_timescale();
+
+unless ($outdir) {
+    croak("No output directory was specified.  Use the outdir option.");
+}
+unless (-d $outdir) {
+    mkdir $outdir or croak("Can not create directory $outdir: $!");
+}
+
+my $i = 1;
+for my $code (keys %{ $vcd }) {
+    # just use 1st net name
+    my $name = "$vcd->{$code}{nets}[0]{hier}.$vcd->{$code}{nets}[0]{name}";
+    my $file = "$outdir/tv$i.txt";
+    open my $fh, '>', $file or croak("Can not open TV file $file: $!");
+    print $fh "# $name\n";
+    print $fh "# $units\n";
+    for my $aref (@{ $vcd->{$code}{tv} }) {
+        print $fh "@{ $aref }\n";
+    }
+    close $fh;
+    $i++;
+}
+

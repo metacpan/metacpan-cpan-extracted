@@ -1,0 +1,95 @@
+#
+# Copyright (C) 2006-2007 Tom Zoerner.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# For a copy of the GPL refer to <http://www.gnu.org/licenses/>
+#
+# $Id: typemap,v 1.2 2007/12/02 18:43:08 tom Exp tom $
+#
+
+TYPEMAP
+
+# basic C types
+vbi_bool		T_BOOL
+vbi_pgno		T_IV
+vbi_subno		T_IV
+vbi_nuid		T_UV
+vbi_page_type		T_ENUM
+vbi_pixfmt		T_IV
+const char *		T_PV
+int64_t                 T_IV
+VBI_CHN_PRIO		T_IV
+VBI_CAPTURE_FD_FLAGS	T_IV
+vbi_service_set		T_UV
+vbi_videostd_set	T_UV
+
+# objects
+# (for some reason the INPUT/OUTPUT definitions are not found if the type name has more than 2 chars)
+VbiProxyObj *		PO
+VbiCaptureObj *		PO
+VbiVtObj *		PO
+VbiRawDecObj *		PO
+VbiExportObj *		PO
+VbiSearchObj *		PO
+VbiPageObj *		PO
+VbiDvb_MuxObj *		PO
+VbiDvb_DemuxObj *	PO
+VbiIdl_DemuxObj *	PO
+VbiPfc_DemuxObj *	PO
+VbiXds_DemuxObj *	PO
+
+# plain pointer
+VbiRawBuffer *		T_PTROBJ
+VbiSlicedBuffer *	T_PTROBJ
+
+zvbi_xs_srv_or_null	SV
+
+#############################################################################
+INPUT
+
+PV
+        if (SvOK($arg)) {
+            $var = $arg;
+        }
+        else
+            Perl_croak(aTHX_ \"$var is not a scalar\")
+
+PO
+        if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/Vbi(.*)Obj.*/Video::ZVBI::\L$1/;\$ntt}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"$var is not of type ${ntype}\")
+
+SV
+        if (SvOK($arg)) {
+                ${var}.l_services = SvIV($arg);
+                ${var}.p_services = &${var}.l_services;
+        } else {
+                ${var}.p_services = NULL;
+        }
+
+#############################################################################
+OUTPUT
+
+PV
+        $arg = $var;
+
+PO
+        sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/Vbi(.*)(Obj|Ref).*/Video::ZVBI::\L$1/;\$ntt}\", (void*)$var);
+
+SV
+        if (${var}.p_services != NULL) {
+                SvIV_set($arg, ${var}.l_services);
+        }
+

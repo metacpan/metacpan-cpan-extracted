@@ -1,0 +1,131 @@
+Revision history for Perl extension VMS::Queue
+
+0.01  Mon Dec 01 13:32:04 1997
+	- Copied over from VMS::Process.
+    - Implemented the xxx_list, xxx_info, and xxx_properties routines.
+      xxx_list doesn't take a property hash yet, though.
+
+0.02  Wed Dec 10 09:22:05 1997
+    - Fixed basic.t. (Was VMS::Process' tests--chopped out everything but
+      test 1)
+    - Added xxx_bitmap_decode functions.
+    - Took quicktest.pl out of MANIFEST. MakeMaker'll whine on a distclean,
+      but at least quicktest.pl won't get installed now.
+
+0.03  Mon Dec 15 12:34:12 1997
+    - Added delete_entry, delete_queue, delete_form, delete_manager, and
+      delete_characteristic functions
+    - modified the xxx_properties function. The value for each key is now a
+      hash, with four keys, INPUT_INFO, OUTPUT_INFO, INPUT_ACTION, and
+      OUTPUT_ACTION. The values for these keys will be true or false,
+      depending on whether the property is an input or output property for
+      the action or info functions. A property can be multiple things.
+    - Added stop_queue, start_queue, reset_queue, and pause_queue
+      functions.
+    - Added start_manager and stop_manager functions.
+    - Added hold_entry and release_entry functions.
+
+0.05  Mon Dec 23 15:25:03 1997
+    - Added docs for the file_list, file_properties, and file_bitmap_decode
+      functions.
+    - Added in code for the file_properties and file_bitmap_decode functions.
+
+0.06  Wed Dec 31 15:54:34 1997
+    - Added all the functions to the EXPORT_OK list.
+
+0.07  Wed Jan 07 09:47:06 1998
+    - Made a change to generic_getqui_call to take two additional parameters--
+      the number of 'reserved' slots at the beginning of the item list, and
+      a second 'okay' JBC status. (Added for file_info, which needs to work
+      in wildcard mode)
+    - Added return JBC status and context parameter to gneric_getqui_call.
+      Amazingly, it all still works.
+    - Added the file_list function
+    - Fixed generic_getqui_call--it leaked memory like a sieve.
+    - generic_getqui_call's array indexing was totally whacked. It never
+      showed up before because everything always called it with an offset
+      of one, which just happened to work.
+
+0.08  Wed Jan 28 15:40:04 1998
+    - Added code for the submit function, and at least some of the SNDJBC
+      item codes. As of 2/12/98, it works.
+
+0.09  Fri Feb 13 11:56:03 1998
+    - Created the build_itemlist and tear_down_itemlist functions to create
+      or destroy itemlists.
+    - Added in a whole boatload of item codes for SNDJBC, as well as code
+      to handle time and longword items to build_itemlist
+
+0.10  Fri Feb 27 11:21:04 1998
+    - Added more item codes for SNDJBC
+    - Added in code for all the create_xxx and modify_xxx functions.
+      They're all the same code with minor differences, so they've been
+      rolled into one ALIAS:ed XSUB. Cool.
+
+0.10  Wed Apr 01 19:30:00 1998
+    - Added yet more item codes for SNDJBC
+
+0.11  Wed Apr 01 19:45:00 1998
+    - Switched over to ALIAS for the xxx_bitmap_decode functions. More code
+      trimmed away...
+    - Switched the xxx_properties functions to an ALIAS. Snip, snip...
+    - Added the last of the sndjbc items. Whew...
+
+0.11  Thu Apr 02 14:44:13 1998
+    - More ALIAS merging.
+
+0.11  Mon May 18 15:53:43 1998
+    - Fixed up the queue properties list
+    - Added in code to specify properties for the queues you want. (Mainly
+      name, but hey, who am I to limit things?)
+
+0.11  Wed May 20 16:48:94 1998
+    - Added code to turn a hash of flag names to an integer (The reverse of
+      the decode_bitmap function)
+
+0.12  Thu May 21 9:55:04 1998
+    - Added code to specify properties for entries
+    - Bumped version number
+    - Addede code to specify properties for forms, characteristics, and
+      managers.
+
+0.50  Thu May 21 10:45:43 1998
+    - Things seem functionally complete, though the docs are badly lacking.
+      Bumping the version number and making a distribution.
+
+0.51  Mon Oct 26 11:56:21 1998
+    - Symbiont queues were being skipped. Now they're not.
+    - Array offsets were getting scrambled a bit, and the queue_info function
+      was using the wrong length for string returns.
+
+0.52  Fri Nov 13 12:25:03 1998
+    - Added in some more code to avoid skipping queues. Now there's a
+      generic "I'm a queue" flag that all queues get, so we return some
+      info even for queues whose type we don't recognize.
+
+0.53  Fri Nov 20 9:33:03 1998
+    - Took out some debugging code that'd been left in.
+
+0.54  Tue Dec 15 15:54:03 1998
+    - Fixed bugs in build_itemlist that kept it from actually working right
+    - Added queue to list of valid things you can get SCSNODE_NAME for
+
+0.55  Thu Aug 25 11:12:21 2000
+    - Fixed old e-mail addresses
+    - Fixed to build with 5.6.0
+    - Makefile.PL fixup
+    - Fixed sprintf format (courtesy of Ed James)
+    - Logfile spec too short (fix courtesy of Ed James)
+    - I think I fixed a bug where entries that couldn't print because of
+      block limits still show. I think...
+
+0.56 Thu Nov 16 12:10:32 2000
+    - Finally got around to installing the wildcard and null time->undef
+      patches from Tom Pfau
+
+0.57 Wed May 30 17:12:22 2001
+    - Some of the _list functions leaked contexts. Fixed.
+
+0.58 Sun Aug 20 16:50:00 2006
+    - Plug memory leaks courtesy of Thomas Pfau
+    - Handoff from Dan to Craig Berry for maintenance

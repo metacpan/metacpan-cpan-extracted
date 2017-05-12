@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/computerm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/computerm" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="computerm" type="computermType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Hardware Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="computermType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_disk" minOccurs="0"/>
+						<xs:element ref="get_system" minOccurs="0"/>
+						<xs:element ref="get_network" minOccurs="0"/>
+						<xs:element ref="reboot" minOccurs="0"/>
+						<xs:element ref="get_date" minOccurs="0"/>
+						<xs:element ref="set_date" minOccurs="0"/>
+						<xs:element ref="get_zones_info" minOccurs="0"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="disk" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="system" minOccurs="0"/>
+						<xs:element ref="network" minOccurs="0"/>
+						<xs:element ref="date" minOccurs="0"/>
+						<xs:element ref="time_zone" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ssh_key_type">
+		<xs:annotation>
+			<xs:documentation>Type of ssh key</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="diskType">
+		<xs:annotation>
+			<xs:documentation>Hardware Disk characteristics.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="partition" type="partitionType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Partition information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="partitionType">
+		<xs:annotation>
+			<xs:documentation>Disk partition structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Partition name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mount_point" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Partition mount point.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fs_type" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Filesystem type.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="block_size" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Block size.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="blocks" type="vzlt:usageType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Partition disk space.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="inodes" type="vzlt:usageType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Partition disk inodes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="option" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The options used while mounting the filesystem.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="systemType">
+		<xs:sequence>
+			<xs:element name="architecture" type="xs:string"/>
+			<xs:element name="os" type="vzlt:osType"/>
+			<xs:element name="cpu" type="vzlt:cpuType"/>
+			<xs:element name="memory" type="vzlt:resourceType"/>
+			<xs:element name="swap" type="vzlt:resourceType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="get_disk">
+		<xs:annotation>
+			<xs:documentation>Gets disk information. Returns "disk" or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_system">
+		<xs:annotation>
+			<xs:documentation>Gets Hardware Node system information. Returns "system" or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_network">
+		<xs:annotation>
+			<xs:documentation>Gets Hardware Node network information. Returns "network" or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="reboot">
+		<xs:annotation>
+			<xs:documentation>Reboots the machine. Returns nothing.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="shutdown" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>if exists shuts the OS down</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="disk" type="diskType">
+		<xs:annotation>
+			<xs:documentation>Disk information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="system" type="systemType">
+		<xs:annotation>
+			<xs:documentation>System information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="network">
+		<xs:annotation>
+			<xs:documentation>Network information.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="nameserver" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="hostname" type="xs:string"/>
+				<xs:element name="default_gateway" type="xs:string"/>
+				<xs:element name="interface" type="vzlt:interfaceType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="date">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="time" type="vzlt:datetime_type" minOccurs="0"/>
+				<xs:element name="time_zone" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_date">
+		<xs:annotation>
+			<xs:documentation>Sets current local date and time in the Environment. Optionally only time_zone or the date can be set. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="date"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_date">
+		<xs:annotation>
+			<xs:documentation>Gets current local date and time in the Environment. Returns "date" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="time_zone">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string"/>
+				<xs:element name="display_name" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_diskResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="disk" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_systemResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="system"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_networkResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="network"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="rebootResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="computerm_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="timeouts">
+						<xs:annotation>
+							<xs:documentation>Timeouts values.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="vznet" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"set_vznet" timeout.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="log" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"get_log" timeout.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="migrate_key" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"get_ssh_key" timeout.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="migrate" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"migrate" timeout.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get_dateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="date"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_dateResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_zones_infoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="time_zone" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_zones_info">
+		<xs:annotation>
+			<xs:documentation>Gets information about known time zones. Returns list of "time_zone" or error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

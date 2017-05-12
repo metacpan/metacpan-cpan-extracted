@@ -1,0 +1,12 @@
+CHANGES
+CMS.xs
+cms$routines.h
+LICENSE
+Makefile.PL
+MANIFEST
+README
+typemap
+t/VMS-CMS.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/VMS/CMS.pm

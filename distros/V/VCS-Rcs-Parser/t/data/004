@@ -1,0 +1,81 @@
+head	1.3;
+access;
+symbols
+	rel-0-1:1.1.1.1 ziya:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2001.09.27.18.26.28;	author ziya;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.09.11.13.00.30;	author ziya;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@added some new files to MANIFEST, Copyright to Yapp Grammar.
+@
+text
+@Changes
+MANIFEST
+Makefile.PL
+test.pl
+YappRcsParser.yp
+lib/Rcs/Deltatext.pm
+lib/Rcs/Parser.pm
+lib/Rcs/YappRcsParser.pm
+examples/t.pl
+examples/test_rcs.bash
+examples/test.sh             
+examples/test_co_db.sh       
+examples/test_co_db_grep.sh
+examples/test_co_db.pl       
+examples/test_co_db_grep.pl  
+@
+
+
+1.2
+log
+@Examples added.
+@
+text
+@d11 5
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d9 2
+@
+
+
+1.1.1.1
+log
+@Initial release.
+@
+text
+@@

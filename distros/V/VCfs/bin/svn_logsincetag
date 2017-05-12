@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use VCfs;
+
+my $dir = '.';
+my $v = VCfs->new($dir);
+
+my $tag = shift(@ARGV);
+my $what = shift(@ARGV) || '';
+$what =~ s#^/*#/#;
+
+my @rev = $v->get_log($v->tag_dir . '/' . $tag,
+args => ['--stop-on-copy', '--verbose', '--quiet']);
+
+my @check = grep({m/^   \w \//} @rev);
+@check or die "no taggings found!";
+
+if(my @eek = grep({m#$tag/trunk#} @check)) {
+  die join("\n  ", "lots of scary stuff in here:", @eek);
+}
+
+my %revs;
+foreach my $row (@check) {
+  $row =~ m/\(from .*:(\d+)\)$/ or die "eek: $row\n";
+  $revs{$1} = 1;
+}
+my @revs = keys %revs;
+warn "lots of cited revisions :-/ (@revs)\n" if(@revs > 1);
+die "oh now what?!" unless(@revs);
+
+my ($rev) = sort({$b <=> $a} @revs);
+$rev += 1;
+
+my %info = $v->get_info;
+my $url = $info{url};
+
+print join "\n", $v->get_log($url . $what,
+  args => ['-r' => "$rev:HEAD", @ARGV]);
+
+# vim:ts=2:sw=2:et:sta

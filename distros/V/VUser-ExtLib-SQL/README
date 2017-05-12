@@ -1,0 +1,2 @@
+VUser::ExtLib::SQL provides common functions for working with SQL databases including
+macro substitution in SQL statements. See perldoc VUser::ExtLib::SQL for more details.

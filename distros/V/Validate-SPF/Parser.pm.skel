@@ -1,0 +1,222 @@
+package <<$package>>;
+
+# ABSTRACT: SPF v1 parser implementation
+
+####################################################################
+#
+#    This file was generated using Parse::Yapp version <<$version>>.
+#
+#        Don't edit this file, use source file instead.
+#
+#             ANY CHANGE MADE HERE WILL BE LOST !
+#
+####################################################################
+
+use strict;
+use warnings;
+
+# VERSION
+# AUTHORITY
+
+use vars qw ( @ISA );
+
+@ISA = qw( Parse::Yapp::Driver );
+
+<<$driver>>
+
+<<$head>>
+
+=head1 SYNOPSIS
+
+    use <<$package>>;
+
+    $parser = <<$package>>->new;
+    $ast = $parser->parse( 'v=spf1 a include:_spf.example.com ~all' );
+
+    unless ( $ast ) {
+        # fail
+        print "Error: " . $parser->error->{code} . ": " . $parser->error->{text} . "\n";
+    }
+    else {
+        # ok
+        ...
+    }
+
+=method new
+
+Creates an instance of SPF parser.
+
+    my $parser = <<$package>>->new;
+
+=cut
+
+sub new {
+    my( $class ) = shift;
+
+    ref( $class ) and $class = ref( $class );
+
+    my $self =
+        $class->SUPER::new(
+            yyversion   => '<<$version>>',
+            yystates    => <<$states>>,
+            yyrules     => <<$rules>>,
+            @_
+        );
+
+    bless $self, $class;
+}
+
+=method parse
+
+Builds an abstract syntax tree (AST) for given text representation of SPF.
+
+    my $ast = $parser->parse( 'v=spf1 ~all' );
+
+Returns an C<undef> if error occured. See L</error> for details.
+
+=method raise_error
+
+Raises a parser error.
+
+    $parser->raise_error( $error_code, $context, @extra );
+    $parser->raise_error( 'E_FOO', 'context line', qw( bar baz ) );
+
+Arguments are:
+
+=over 4
+
+=item B<$error_code>
+
+Error code. If code does not exist in error table it will be replaced with L</E_DEFAULT>.
+
+=item B<$context>
+
+Context line.
+
+=item B<@extra>
+
+Extra parameters for error text.
+
+=back
+
+=method error
+
+Returns last error occured as HashRef.
+
+    $parser->error;
+
+Here is an example
+
+    {
+       code    => "E_DEFAULT",
+       text    => "Just error",
+       context => "",
+    }
+
+=for Pod::Coverage _error _lexer _build_error _ver_generic _mod_generic
+
+=for Pod::Coverage _mech_generic _mech_domain _mech_domain_bitmask _mech_ipaddr_bitmask
+
+=head1 ERROR HANDLING
+
+The following errors might be returned.
+
+=head2 E_SYNTAX
+
+Syntax error. The marker pointed to errored token in context line. E.g.:
+
+    {
+        code    => "E_SYNTAX",
+        context => "v=spf1 <*>exclude:foo.example.com  mx ~all",
+        text    => "Syntax error near token 'exclude'",
+    }
+
+=head2 E_INVALID_VERSION
+
+Returned in cases of version token does not equal C<spf1>.
+
+    {
+        code    => "E_INVALID_VERSION",
+        text    => "Invalid SPF version",
+        context => "v=spf2",
+    }
+
+=head2 E_IPADDR_EXPECTED
+
+Returned in cases of C<ip4> or C<ip6> token has been used without ip or network address.
+
+    {
+        code    => "E_IPADDR_EXPECTED",
+        text    => "Expected ip or network address",
+        context => "ip4",
+    }
+
+=head2 E_DOMAIN_EXPECTED
+
+Returned in cases of C<exists> or C<include> token has been used without domain name.
+
+    {
+        code    => "E_DOMAIN_EXPECTED",
+        text    => "Expected domain name",
+        context => "exists",
+    }
+
+=head2 E_UNEXPECTED_BITMASK
+
+Returned in cases of C<ptr> or C<all> token has been used with bitmask.
+
+    {
+        code    => "E_UNEXPECTED_BITMASK",
+        text    => "Unexpected bitmask",
+        context => "?ptr:foo.net/18",
+    }
+
+=head2 E_UNEXPECTED_IPADDR
+
+Returned in cases of C<ptr> or C<all> token has been used with ip or network address.
+
+    {
+        code    => "E_UNEXPECTED_IPADDR",
+        text    => "Unexpected ip address",
+        context => "-ptr:127.0.0.1",
+    }
+
+=head2 E_UNEXPECTED_DOMAIN
+
+Returned in cases of C<all> token has been used with domain name.
+
+    {
+        code    => "E_UNEXPECTED_DOMAIN",
+        text    => "Unexpected domain name",
+        context => "-all:quux.com",
+    }
+
+=head2 E_DEFAULT
+
+Default (last resort) error.
+
+    {
+       code    => "E_DEFAULT",
+       text    => "Just error",
+       context => "",
+    }
+
+=head1 BUILD PARSER
+
+In cases of C<Parser.yp> was modified you should re-build this module. Ensure you have L<Parse::Yapp>
+distribution installed.
+
+In root directory:
+
+    $ yapp -s -m Validate::SPF::Parser -o lib/Validate/SPF/Parser.pm -t Parser.pm.skel Parser.yp
+
+Ensure the C<lib/Validate/SPF/Parser.pm> saved without tab symbols and has unix line endings.
+
+=head1 SEE ALSO
+
+L<Parse::Yapp>
+
+=cut
+
+<<$tail>>
+1;

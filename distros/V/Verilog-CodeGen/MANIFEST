@@ -1,0 +1,15 @@
+Changes
+CodeGen.pm
+CodeGen/Gui.pm
+MANIFEST
+Makefile.PL
+README
+scripts/GUI/create_design.pl
+scripts/GUI/debug.pl
+scripts/GUI/inspect_code.pl
+scripts/GUI/rectangle_power_perl.gif
+scripts/GUI/send_stdout.pl
+scripts/GUI/test.pl
+scripts/GUI/update.pl
+scripts/gui.pl
+test.pl

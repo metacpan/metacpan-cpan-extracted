@@ -1,0 +1,113 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+/*! \brief This is a utility class that enables the scripts autoloading future.
+ *
+ * All JavaScript and PHP files used around the page could be loaded 
+ * automaticaly from the set of directories registered in the HTOM_Autoloader.
+ * \see HTOM_JSRegistry
+ */
+class HTOM_Autoloader
+{
+  //! \static Add path to the registry
+  /*! \param $path name of the direcoty.
+   * \param $classRegexp while searching for a PHP class, the autoloader will use this 
+   * regular expression in order to check if the class could be found in the specified direcotry.
+   */
+  public function AddPath( $path, $classRegexp="/.*/" )
+  {
+    array_push(self::$path,array("filter"=>$classRegexp,"path"=>$path));
+  }
+  
+  //! \static Get full name of the file that contains the class wit the specified class name.
+  /*! Function searches over all registered direcotories for a file name that is the
+   * lowercase class name wit the extension php.
+   */
+  public function GetClassFileName( $className )
+  {
+    $fileName = NULL;
+    $a=self::$path;
+    reset($a);
+    while ( current($a) && ($fileName==NULL) )
+      {
+        $o  = current($a);
+        if ( preg_match( $o["filter"], $className ) ) {
+          $f = $o["path"]."/".strtolower($className).".php";
+          if ( is_file( $f ) ) {
+            $fileName = $f;
+          }
+        }
+        next($a);
+      }
+    return $fileName;
+  }
+
+  //! \static Find a file in one of registered directories.
+  public function GetFileName( $filename )
+  {
+    $rc = NULL;
+    $a=self::$path;
+    reset($a);
+    while ( current($a) && ($rc==NULL) )
+      {
+        $o  = current($a);
+	$f = $o["path"]."/".$filename;
+	if ( is_file( $f ) ) {
+	  $rc = $f;
+	}
+        next($a);
+      }
+    return $rc;
+  }
+  
+  static private $path=array();
+}
+
+function __autoload($class_name) {
+  $a = HTOM_Autoloader::GetClassFileName( $class_name );
+  if ( isset($a) )
+    {
+      require_once $a;
+    } else {
+      echo "WARNING: could not find file for class ".$a."<br>";
+    }
+}
+
+?>
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

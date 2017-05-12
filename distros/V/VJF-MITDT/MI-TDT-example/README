@@ -1,0 +1,11 @@
+
+trios.ped is a linkage file with missing data.
+(colomns are : family, individual, father, mother, sex, phenotype, SNP1_1, SNP1_2, ...)
+
+Use MI-TDT to generate 10 imputed files trios.ped.01 to trios.ped.10:
+
+MI-TDT trios.ped
+
+Then you can analyse these files separately. An example of analysis
+with p-value recombination is given in the R script p-values.R
+

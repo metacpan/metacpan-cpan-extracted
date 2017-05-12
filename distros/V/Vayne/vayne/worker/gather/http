@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+use Vayne::Worker;
+use FurlX::Coro;
+use Data::Printer;
+use Storable qw(thaw freeze);
+
+register 'http' => sub {
+
+    my($workload, $step, $result, $status, $job) = @_;
+
+    unless($step->{param}->{url})
+    {
+        $status->(0);
+        return;
+    }
+
+    my( @workload, @result );
+    
+    if(
+        $step->{param}->{target}
+        and ref $step->{param}->{target} eq 'ARRAY'
+        and my @target = @{ $step->{param}->{target} }
+    ){
+
+        for(@target)
+        {
+            my $ref = eval{ thaw $job->{result}->{$_} };
+            push @workload, @$ref if ref $ref eq 'ARRAY';
+        }
+
+    }else{
+
+        push @workload, $workload;
+    }
+
+
+    my $ua  = FurlX::Coro->new();
+    for(@workload)
+    {
+
+        my $url = sprintf $step->{param}->{url}, $_;
+        my $res = $ua->get($url);
+
+        push @result, $res->{content} if $res->{code} eq '200';
+    }
+    
+    if(@result)
+    {
+        $status->(1);
+        $result->(freeze \@result);
+
+    }else{
+        $status->(0);
+    }
+    
+
+}, 100;
+Vayne::Worker->run;

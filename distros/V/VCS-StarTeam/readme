@@ -1,0 +1,247 @@
+NAME
+    `VCS::StarTeam' - Provide a simple interface to StarBase's StarTeam.
+
+SYNOPSIS
+            #!perl -w
+
+            use strict;
+  
+            use VCS::StarTeam;
+  
+            $obj = VCS::StarTeam->new( { 
+                    batchmode               => 0,
+                    compress                => 0,
+                    host                    => 'localhost',
+                    endpoint                => '1024',
+                    project                 => 'BigNewIdea',
+                    password                => 'MyPassword',
+                    path                    => 'Source/MyIdea',
+                    recurse                 => 0,
+                    stoponerror             => 0,
+                    username                => 'StarTeamUser',
+                    verbose                 => 1,
+                    view                    => 'MyMainView',
+            } );
+
+            #
+            # view the history of helloworld.c
+            #
+            $obj->hist( 'helloworld.c' );
+        
+            # OR
+        
+            $obj->history( 'helloworld.c' );
+        
+            # OR 
+        
+            $obj->log( 'helloworld.c' );
+                
+            #
+            # list all the C source files in the current folder
+            #
+            $obj->list( '*.c' );    
+
+            #
+            # force the checkout of helloworld.c and lock it
+            #
+            $obj->checkout( '-o', '-l', 'helloworld.c' );
+
+            # OR
+
+            $obj->co( '-o', '-l', 'helloworld.c' );
+
+            # OR
+
+            $obj->get( '-o', '-l', 'helloworld.c' );
+
+            #
+            # checkin and unlock helloworld.c
+            #
+            $obj->checkin( '-u', "-r \"Cool changes\"", 'helloworld.c' );
+
+            # OR
+
+            $obj->ci( '-u', "-r \"Cool changes\"", 'helloworld.c' );
+
+            # OR
+
+            $obj->put( '-u', "-r \"Cool changes\"", 'helloworld.c' );
+
+            #
+            # compare revision 1 & 2 of helloworld.c
+            #
+            $obj->diff( '-vn 2', '-vn 1', 'helloworld.c'  );
+        
+            # OR
+        
+            $obj->vdiff( '-vn 2', '-vn 1', 'helloworld.c'  );
+        
+            #
+            # N.B. the arguments may all be in one string, 
+            # or separated by quotes.
+            #
+            $obj->co( '-o', '-l', 'helloworld.c' );
+        
+            # OR
+            $obj->co( '-o -l helloworld.c' );                               
+        
+            #
+            # clean up
+            #
+            undef $obj;
+        
+DESCRIPTION
+    The `VCS::StarTeam' module provides an OO interface to StarTeam.
+
+INTERFACE
+  PUBLIC METHODS
+
+    `history'
+        Convenience routine calls private method `_hist'
+
+    `hist'
+        Convenience routine calls private method `_hist'
+
+    `log'
+        Convenience routine calls private method `_hist'
+
+    `list'
+        Equivalent to issuing the command `stcmd list...'. Pass options and
+        file names as parameters.
+
+    `checkout'
+        Convenience routine calls private method `_co'
+
+    `co'
+        Convenience routine calls private method `_co'
+
+    `get'
+        Convenience routine calls private method `_co'
+
+    `checkin'
+        Convenience routine calls private method `_ci'
+
+    `ci'
+        Convenience routine calls private method `_ci'
+
+    `put'
+        Convenience routine calls private method `_ci'
+
+    `diff'
+        Convenience routine calls private method `_diff'
+
+    `vdiff'
+        Convenience routine calls private method `_diff'
+
+  PRIVATE METHODS
+
+    `_hist'
+        Equivalent to issuing the command `stcmd hist *[hist options]*
+        *files*'. Pass options and file names as parameters.
+
+    `_ci'
+        Equivalent to issuing the command `stcmd ci *[ci options]* *files*'.
+        Pass options and file names as parameters.
+
+    `_co'
+        Equivalent to issuing the command `stcmd co *[co options]* *files*'.
+        Pass options and file names as parameters.
+
+    `_diff'
+        Equivalent to issuing the command `stcmd diff *[diff options]*
+        *files*'. Pass options and file names as parameters.
+
+    `_runOrCroak'
+        The standard way to run a system command and report on the result. I
+        "borrowed" and modified this routine from Ron Savage's
+        *<rpsavage@ozemail.com.au>* `VCS::CVS' module. It will honor the
+        'verbose' parameter.
+
+    `_getpparam'
+        Builds the '-p' argument string used in `stcmd' commands.
+
+  PROPERTIES
+
+    `batchmode'
+        Boolean used to toggle between interactive and batch modes. If you
+        do not set this parameter to non-zero (TRUE) you must confirm error
+        messages interactively. Default to 0 (interactive mode).
+
+    `compress'
+        Compresses all the data sent between the workstation and StarTeam
+        server and decompresses it when it arrives. Useful for slow
+        connections. Defaults to 0 (off).
+
+    `host'
+        StarTeam server hostname. If omitted, `host' defaults to
+        "localhost".
+
+    `endpoint'
+        StarTeam server endpoint (for example a port number or named pipe).
+        If omitted, `endpoint' defaults to "1024".
+
+    `project'
+        The StarTeam project name. You must always supply a project name.
+
+    `password'
+        StarTeam user's password. If omitted, the user will be prompted to
+        enter the password.
+
+    `path'
+        Folder hierarchy. This can be omitted if the file is in the view's
+        root folder. The folder hierarchy should never include the root
+        folder. For example, if the root folder of the view is `BigNewIdea'
+        and the hierarchy to your files is `BigNewIdea/SourceCode/Client',
+        use only `SourceCode/Client' as the folder hierarchy.
+
+    `recurse'
+        If non-zero (TRUE), applies the command to child folders. Defaults
+        to 0 (off).
+
+    `stoponerror'
+        Often used in batch mode (see property `batchmode' above). If
+        non-zero (TRUE) will halt execution of the command when the first
+        error is encountered. Defaults to 0 (off).
+
+    `username'
+        The StarTeam user name. If omitted, the current user's logon name is
+        used.
+
+    `verbose'
+        Boolean used to instruct the module to display or suppress progress
+        reporting. `verbose' defaults to 0 (suppress progress reporting).
+
+    `view'
+        The StarTeam project view. If omitted, the root, or default, view is
+        used.
+
+INSTALLATION
+    You install `VCS::StarTeam', as you would install any perl module
+    library, by running these commands:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+AUTHOR
+    `VCS::StarTeam' was written by Joe P. Hayes *<jhayes@juicesoftware.com>*
+    in 2001.
+
+LICENSE
+    The `VCS::StarTeam' module is Copyright (c) 2001 Joe P. Hayes. All
+    Rights Reserved.
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+
+SUPPORT / WARRANTY
+    The `VCS::StarTeam' module is free software.
+
+    IT COMES WITHOUT WARRANTY OF ANY KIND.
+
+    Commercial support for Perl can be arranged via The Perl Clinic. For
+    more details visit:
+
+      http://www.perlclinic.com
+

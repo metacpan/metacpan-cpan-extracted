@@ -1,0 +1,247 @@
+#! /usr/bin/perl -wT-
+# FCGI server to show the contents of a teletext database
+# This program is part of the Video::TeletextDB package
+
+# The presentation is very much inspired by the alevt program.
+use strict;
+use CGI::Fast qw(:standard);
+use POSIX qw(strftime);
+
+BEGIN {$^W = 0}	# Sigh...
+use Video::XawTV;
+BEGIN {$^W = 1}
+
+use Video::TeletextDB;
+
+my $time_format = "%F %T";
+
+$ENV{"PATH"}	= "/usr/bin:/bin";
+$ENV{"SHELL"}	= "/bin/false";
+$ENV{"IFS"}	= " \t\n";
+delete @ENV{qw(BASH_ENV CDPATH)};
+
+# Assume HOME can be trusted
+$ENV{HOME} =~ m!\A((?:/\w+)+)/?\z! || 
+    die "Home environment variable '$ENV{HOME}' has suspicious characters\n";
+my $home = $ENV{HOME} = $1;
+
+our $channel;
+my ($base, $q);
+
+my $tele_db = Video::TeletextDB->new;
+
+sub alnum_sort {
+    return map $_->[1], sort { $a->[0] cmp $b->[0]} map {
+        my $str = uc;
+        $str =~ s|(0*)(\d+)|pack("AN/A*N", "0", $2, length($1))|eg;
+        [$str, $_];
+    } @_;
+}
+
+sub do_channels {
+    my %have_channel;
+    @have_channel{$tele_db->channels} = ();
+    my (@channel_names, %channels);
+    eval {
+        my $xaw_tv = Video::XawTV->new("$home/.xawtv");
+        for my $channel ($xaw_tv->channels) {
+            next unless
+                defined $channel->{channel} &&
+                exists $have_channel{$channel->{channel}};
+            $channels{$channel->{name}} = $channel->{channel};
+            push @channel_names, $channel->{name};
+        }
+    };
+    delete @have_channel{values %channels};
+    for (alnum_sort keys %have_channel) {
+        my $name = "Channel $_";
+        my $i;
+        $name = sprintf("Channel %s (%d)", $_, $i++) while
+            exists $channels{$name};
+        $channels{$name} = $_;
+        push @channel_names, $name;
+    }
+    my @channels = map {
+        if (my $status = $tele_db->access(channel => $channels{$_})->cache_status) {
+            $status->{name} = $_;
+            $status->{start_time} =
+                strftime($time_format, localtime($status->{start_time}));
+            $status->{end_time}	  =
+                strftime($time_format, localtime($status->{end_time}));
+            $status;
+        } else {
+            ();
+        }
+    } @channel_names;
+
+    if (@channels) {
+        if (0) {
+            print(header,
+                  start_html(-style => { src => "$base/css$q"},
+                             -title => "Teletext channels"),
+                  table(Tr(td([qw(Channel Stores From To)])),
+                        map Tr(td(a({href => "$base/page/$_->{channel}$q" }, escapeHTML $_->{name})),
+                               td({-align => "right"}, escapeHTML $_->{stores}),
+                               td(escapeHTML $_->{start_time}),
+                               td(escapeHTML $_->{end_time})
+                               ), @channels),
+                  end_html);
+        } else {
+            print(header,
+                  start_html(-style => { src => "$base/css$q"},
+                             -title => "Teletext channels"),
+                  ul(map li(a({href => "$base/page/$_->{channel}$q" }, escapeHTML($_->{name}))), @channels),
+                  end_html);
+        }
+    } else {
+        print(header,
+              start_html(-style => { src => "$base/css$q"},
+                         -title => "Teletext channels"),
+              escapeHTML("No channels with data found. Maybe you should run a collector ?"),
+              end_html);
+    }
+}
+
+sub show_main_page {
+    my $main_page = shift;
+    $tele_db->channel($channel);
+    my $access = $tele_db->access;
+    my @sub_pages = $access->subpages($main_page) or die "No such page\n";
+    my @screens = map($access->fetch_page($main_page, $_),
+                      sort {$a <=> $b } @sub_pages);
+    print(header,
+          start_html(-style => { src => "$base/css$q"},
+                     -title => escapeHTML(sprintf("Teletext page %03x",
+                                                  $main_page))),
+          table(Tr(td({colspan => 3, align => "center"},
+                      a({href => "../../../channels$q", accesskey => "h" }, img {
+                          src => "/icons/folder.gif",
+                          border => 0}))),
+                Tr(td(a({href => "previous$q", accesskey => "p" }, img {
+                    src => "/icons/back.gif",
+                    border => 0})),
+                   td(a({href => "../100/$q", accesskey => "u" }, img {
+                       src => "/icons/up.gif",
+                       border => 0})),
+                   td(a({href => "next$q", accesskey => "n" }, img {
+                       src => "/icons/forward.gif",
+                       border => 0})))),
+          hr(),
+          join(" ", map $_->html(link_args => $q), @screens),
+          end_html);
+}
+
+sub show_sub_page {
+    my ($path, $main_page, $sub_page) = @_;
+    if ($path ne "") {
+        print redirect sprintf("%s/page/%s/%03x/%02x%s", url(-full=>1),
+                               $channel, $main_page, $sub_page, $q);
+        return;
+    }
+
+    $tele_db->channel($channel);
+    my $access = $tele_db->access;
+
+    my $screen = $access->fetch_page($main_page, $sub_page) || 
+        die "No such page\n";
+    my @raw_screens =
+        map($_->html(link_args => $q),
+            $access->fetch_page_versions($main_page, $sub_page)) if
+            param("versions");
+    print(header,
+          start_html(-style => { src => "$base/css$q"},
+                     -title => escapeHTML(sprintf("Teletext page %03x/%02x",
+                                                  $main_page, $sub_page))),
+          $screen->html(link_args => $q),
+          span(@raw_screens),
+          end_html);
+}
+
+sub do_page {
+    my $path = shift;
+    if ($path eq "" || $path eq "/") {
+        print redirect(url(-full=>1) . "/page/$channel/100/$q");
+        return;
+    }
+    $path =~ s!\A/([\da-fA-F]+)!! || die "Bad URL\n";
+    my $main_page = hex $1;
+
+    if ($path eq "/") {
+        show_main_page($main_page);
+        return;
+    }
+    if ($path =~ m!\A/next\b!) {
+        $tele_db->channel($channel);
+        my $access = $tele_db->access;
+        my $next_page = $access->next_page($main_page);
+        print redirect sprintf("%s/page/%s/%03x/%s",
+                               url(-full=>1), $channel, $next_page, $q);
+        return;
+    }
+    if ($path =~ m!\A/previous\b!) {
+        $tele_db->channel($channel);
+        my $access = $tele_db->access;
+        my $prev_page = $access->previous_page($main_page);
+        print redirect sprintf("%s/page/%s/%03x/%s",
+                               url(-full=>1), $channel, $prev_page, $q);
+        return;
+    }
+    if ($path =~ s!\A/([\da-fA-F]+)\b!!) {
+        show_sub_page($path, $main_page, hex $1);
+        return;
+    }
+    if ($path eq "") {
+        print redirect sprintf("%s/page/%s/%03x/%s",
+                               url(-full=>1), $channel, $main_page, $q);
+        return;
+    }
+    die "Bad URL\n";
+}
+
+sub process {
+    local $channel;
+    $base = url(-absolute=>1);
+    $q	  = query_string;
+    $q = "?$q" if $q ne "";
+    eval {
+        my $path = path_info;
+        # print STDERR "path=$path\n";
+
+        if ($path eq "" || $path eq "/") {
+            print redirect(url(-full=>1) . "/channels$q");
+            return;
+        }
+
+        if ($path =~ s!\A/channels\b!!) {
+            do_channels($path);
+            return;
+        }
+
+        if ($path =~ s!\A/page/([^./\\]+)!!) {
+            die "No channel named '$1'\n" unless $tele_db->has_channel($1);
+            $channel = $1;
+            do_page($path);
+            return;
+        }
+        if ($path eq "/css") {
+            print(header(-type => "text/css",
+                         -expires => '+3d'),
+                  Video::TeletextDB::Page->html_style);
+            return;
+        }
+        die "Bad URL\n";
+    };
+    if ($@) {
+        my $err = $@;
+        print(header(-status => 404),
+              start_html(-style => { src => "$base/css$q"},
+                         -title => escapeHTML("404 Not Found")),
+              pre(escapeHTML($err)),
+              hr);
+        print a({href => "$base/page/$channel/100/$q"}, "Channel Home"), br if
+            defined($channel);
+        print a({href => "$base/channels$q"}, "Channel List");
+    }
+}
+
+process() while CGI::Fast->new;

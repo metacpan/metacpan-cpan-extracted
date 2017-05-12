@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/licensem" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/licensem" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="licensem" type="licensemType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>License Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="licensemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="list"/>
+						<xs:element ref="install"/>
+						<xs:element ref="parse"/>
+						<xs:element ref="delete"/>
+						<xs:element ref="get_hwid"/>
+						<xs:element ref="update"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="hwid" maxOccurs="unbounded"/>
+						<xs:element ref="license" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="licenses" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="serial"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="list">
+		<xs:annotation>
+			<xs:documentation>Gets licenses from HW Node  by type, serial. Returns licenses or error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="serial" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>License type.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="install">
+		<xs:annotation>
+			<xs:documentation>Uploads new license(s). Returns list of licenses or error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="license" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Base64 encoded license body, product key or product activation code.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="options">
+					<xs:annotation>
+						<xs:documentation>Install options.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="transfer" type="xs:boolean" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Transfer key to other Hardware Node. It used only when "license" argument contain product activation code.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="parse">
+		<xs:annotation>
+			<xs:documentation>Parse license provided and get its info. Returns list of licenses or error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="body" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Base64 encoded license body</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>License type. One of HW, PIM, etc. If specified, the license must contain at least one section of the type given for operation to succeed</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="serial" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="delete">
+		<xs:annotation>
+			<xs:documentation>Delete license from HW Node. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>License type. One of HW, PIM, etc. If specified, the license must contain at least one section of the type given for operation to succeed</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="serial" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_hwid">
+		<xs:annotation>
+			<xs:documentation>Returns Hardware Node HWID(s) or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="update">
+		<xs:annotation>
+			<xs:documentation>Updates license. Returns updated license or error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="serial" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="hwid" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Hardware Node HWID.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="serial" type="xs:string"/>
+	<xs:element name="parameter" type="parameterType"/>
+	<xs:complexType name="license_eventType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:event_dataType">
+				<xs:sequence minOccurs="0">
+					<xs:element name="license" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="serial" type="xs:base64Binary"/>
+								<xs:element name="status" type="xs:base64Binary" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>License was deleted if status is absent.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="parameterType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="value" type="xs:base64Binary"/>
+			<xs:element name="used" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Number of consumed resources.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="license" type="licenseType">
+		<xs:annotation>
+			<xs:documentation>License information including current status</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="licenseType">
+		<xs:sequence>
+			<xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="licenses" type="licensesType"/>
+	<xs:complexType name="licensesType">
+		<xs:sequence>
+			<xs:element name="body" type="xs:string"/>
+			<xs:element ref="license" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="licenses" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="parseResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="license" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="installResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="license" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="license" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_hwidResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="hwid" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deleteResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="licensem_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:event_configurationType"/>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

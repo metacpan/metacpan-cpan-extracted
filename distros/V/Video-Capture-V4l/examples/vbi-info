@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+# dumps "interesting" data about tv channels
+
+use Video::Capture::V4l;
+use Video::Capture::VBI qw/:DEFAULT %VPS_CNI %VT_NI/;
+
+$vbi = new Video::Capture::V4l::VBI or die;
+
+# the next line is optional (it enables buffering)
+$vbi->backlog(25); # max. 1 second backlog (~900kB)
+
+$inp_fd = fileno STDIN;
+$vbi_fd = $vbi->fileno;
+
+print "VBI capturing started.\n\n";
+print <<EOF;
+You can enter the following commands, ended by <return>
+
+q   quit
+c   clear
+
+EOF
+
+sub init {
+   %fea = ();
+   print "\n";
+}
+
+sub fea {
+   $fea{$_[0]} = $_[1];
+}
+
+my($last_cni, $last_ni);
+
+for(;;) {
+   my $r="";
+   vec($r,$inp_fd,1)=1;
+   #vec($r,$vbi_fd,1)=1;
+   select $r,undef,undef,0.2;
+   while ($vbi->queued) {
+      $fields++;
+      my $vbi_alloc;
+      for (decode_field $vbi->field, VBI_VT|VBI_VPS|VBI_OTHER|VBI_EMPTY) {
+         if ($_->[0] == VBI_VPS) {
+            init if $last_cni != $_->[3]; $last_cni = $_->[3];
+            if (ord($_->[1]) > 127 or length $name_ >= 12) {
+               $name = $name_; $name_ = "";
+            }
+            $name_ .= $_->[1] & "\x7f";
+            fea('VPS',sprintf "%04x=%s|$name",$_->[3],$VPS_CNI{$_->[3] & 0x0fff});
+            $vps++;
+            $vbi_alloc .= "V";
+         } elsif ($_->[0] == VBI_VT) {
+            if ($_->[2] == 0) {
+               if ($_->[4] == 0x1df) {
+                  fea('EPG');
+               } else {
+                  fea('VT');
+               }
+            } elsif ($_->[2] == 30) {
+               if (($_->[3]>>1) == 0) {
+                  init if $last_ni != $_->[6]; $last_ni = $_->[6];
+                  fea("NI30/1",sprintf "%04x=%s", $_->[6], $VT_NI{$_->[6]}[0]);
+               } elsif (($_->[3]>>1) == 8) {
+                  fea('PDC');
+               } else {
+                  fea("30","$_->[3]");
+               }
+            } elsif ($_->[2] == 31) {
+               if ($_->[4] == 0x500) {
+                  fea("$_->[1]/IC");
+               } else {
+                  fea(sprintf "$_->[1]/31[%x]",$_->[4]);
+               }
+            }
+            $vt++;
+            $vbi_alloc .= "T";
+         } elsif ($_->[0] == VBI_OTHER) {
+            $vbi_alloc .= $_->[1] == 1 ? "c" : "O";
+         } elsif ($_->[0] == VBI_EMPTY) {
+            $vbi_alloc .= ".";
+         } else {
+            $others++;
+         }
+      }
+      fea("alloc","$vbi_alloc");
+   }
+   if (vec($r,$inp_fd,1)) {
+      $_ = <STDIN>;
+      if (/^q/) {
+         last;
+      } elsif (/^c/) {
+         init;
+      }
+   }
+   printf "%5d|F %5d|VPS %6d|VT %5d|O", $fields, $vps,$vt,$others;
+   while (my($k, $v) = each(%fea)) {
+      print " $k";
+      print "[$v]" if $v;
+   }
+   $|=1;
+   print " < \r";
+   $|=0;
+}
+

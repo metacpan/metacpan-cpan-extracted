@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/progress_event" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/progress_event" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:element name="progress" type="progress_eventType"/>
+	<xs:complexType name="progress_eventType">
+		<xs:sequence>
+			<xs:element name="message" type="vzlt:infoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Message with the progress information.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="percent" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Progress percentage.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="eid_list" type="vzlt:eid_listType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>List of Containers participated in the operation.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="op" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name of the operation</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Status of the operation: 1 - started, 2 - processing, 3 - success, 4 - error.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Initial packet ID. Returned in packets, created by DBM in response to "get_ops" command.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="time" type="vzlt:datetime_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used in log reporting. Returned in packets, created by DBM in response to "get_ops" command.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="parent_id" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>id of parent operation</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

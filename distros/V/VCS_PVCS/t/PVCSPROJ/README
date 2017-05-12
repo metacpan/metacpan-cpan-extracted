@@ -1,0 +1,8 @@
+These are part of the sample project distribution which 
+helps to test the VCS::PVCS package, instead of using your default
+locations.  The test scripts should have their ISLVRC
+set to the islrvc.txt in here.
+
+You may need to edit these files to get things to work.
+
+

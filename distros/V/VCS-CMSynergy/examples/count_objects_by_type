@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+count_objects_by_type - report number of objects versions grouped by type
+
+=head1 SYNOPSIS
+
+count_objects_by_type [ccm_options] [type...]
+
+  type		object type you are interested in;
+  		if no types are specfied, reports on all types
+                defined in the database
+
+  CCM Options:
+
+  -D PATH | --database PATH       database path
+  -H HOST | --host HOST           engine host
+  -U NAME | --user NAME           user name
+  -P STRING | --password STRING   user's password
+  --ui_database_dir PATH          path to copy database information to
+
+=cut
+
+use VCS::CMSynergy 1.27;
+use Getopt::Long qw(:config bundling);
+use Pod::Usage;
+use VCS::CMSynergy::Helper; 
+use strict;
+use warnings;
+
+# extract CCM start options first...
+my $ccm_opts = VCS::CMSynergy::Helper::GetOptions or pod2usage(2);
+# ...then script-specific options (currently none)
+GetOptions() or pod2usage(2);
+
+my $ccm = VCS::CMSynergy->new(
+    %$ccm_opts,
+    RaiseError	=> 1,
+    PrintError	=> 0);
+
+printf "%-20s %9s %9s\n", qw(TYPE OBJECTS VERSIONS); 
+foreach my $type (@ARGV ? @ARGV : sort $ccm->types)
+{
+    my %pedigree;
+    my $versions = 0;
+    foreach (@{ $ccm->query_object([ cvtype => $type ]) })
+    {
+	$pedigree{$_->name . ":" . $_->cvtype . ":" . $_->instance}++;
+	$versions++;
+    }
+    printf "%-20s %9d %9d\n", $type, scalar(keys %pedigree), $versions;
+}
+
+exit(0);
+
+

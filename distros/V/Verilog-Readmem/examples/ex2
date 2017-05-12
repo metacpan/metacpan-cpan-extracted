@@ -1,0 +1,30 @@
+
+use warnings;
+use strict;
+use diagnostics;
+use Data::Dumper;
+
+use Verilog::Readmem qw(parse_readmem);
+
+# Read memory file into Array-Of-Arrays data structure:
+my $mem_ref = parse_readmem(
+                {
+                    string      => 1,
+                    binary      => 1,
+                    filename    => 'ex2.bin'
+                }
+);
+
+my $num_blocks = scalar @{$mem_ref};
+print "num_blocks = $num_blocks\n";
+
+for my $i (0 .. ($num_blocks-1)) {
+    my ($addr, @data) = @{ $mem_ref->[$i] };
+    print "\nblock = $i\n";
+    print "addr = $addr\n";
+    print "num_data = ", scalar @data, "\n";
+    print "data = @data\n";
+}
+
+#print Dumper($mem_ref);
+ 

@@ -1,0 +1,33 @@
+README for VMS::Monitor
+
+Copyright 1998, Dan Sugalski <sugalskd@ous.edu>
+
+VMS::Monitor provides access to the same system data structures that the
+MONITOR utilitiy uses to provide its statistics, only in a much friendlier
+and convenient form than MONITOR's binary data files.
+
+Note that this module makes use of an undocumented systems service
+($GETSPI) and links against the MONITOR library. As such, it may need to be
+relinked if you upgrade VMS versions, and may at some point stop
+functioning if Dec changes the MONITOR interface (as they have at least
+once in the past)
+
+*DANGER, WILL ROBINSON! DANGER!*
+
+This module makes use of undocumented and unsupported system routines.
+Misuse of these routines *has* been known to cause system crashes in older
+(5.x and before) versions of VMS! There is absolutely no warrantee of any
+sort. You're on your own if something goes wrong. (I'd like to know so I
+can fix it, but I won't be held responsible if it happens)
+
+Build this module in the standard way:
+
+perl Makefile.PL
+MMS
+MMS TEST
+MMS INSTALL
+
+and you should be fine.
+
+A big tip 'o the hat to Dale and Sue at The Company Formerly Known As
+Digital for the bits that made this all possible. Thanks, guys.

@@ -1,0 +1,18 @@
+Voldemort - A perl client for Voldemort, the NoSQL server
+
+Voldemort is a perl client which communicates in any configured 
+message format, synchronously or asynchronously on connection.  Google's 
+Protocol Buffers are the only prepackaged one.  Client side routing is not 
+supported, though it may be trivial to implement Voldemort::Connection to do 
+so.
+
+To use Voldemort, Moose and Google Protocol Buffers are required.  To 
+install Voldemort, issue the following.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation is accessed via 'perldoc Voldemort'.
+

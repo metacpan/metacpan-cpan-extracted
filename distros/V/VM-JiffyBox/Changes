@@ -1,0 +1,86 @@
+Revision history for VM-JiffyBox
+ 
+0.032     2016-10-16 14:50:27+02:00 Europe/Zurich
+          add option planid for 'thaw' (RENEEB)
+
+0.031     2016-05-18 21:17:23+02:00 Europe/Zurich
+          added contributors to doc (RENEEB)
+          updated upstream info / repo (RENEEB)
+
+0.03      2016-05-18 18:37:20+02:00 Europe/Zurich (TRIAL RELEASE)
+          added get_vms() to VM::JiffyBox (RENEEB)
+          added thaw() and freeze() to VM::JiffyBox::Box (RENEEB)
+          minor typo fixes and such (RENEEB)
+
+0.027     2014-03-28 10:58:56+01:00 Europe/Zurich
+          added methods distributions, plans and plan_details (RENEEB)
+          deleted old note about backwards compatibility
+
+0.026     2013-10-15 11:22:19 Europe/Zurich
+          added keyword "perl programming language" to the docs
+
+0.025     2013-09-27 15:26:58 Europe/Zurich
+          added strict and warnings, since Moo doesn't provide them
+          both modules pass now Perl::Critic on gentle level
+
+0.024     2013-08-27 15:24:18 Europe/Zurich
+          replace "return 0" with "return", thx RENEEB for the hint
+
+0.0232    2013-08-20 18:37:45 Europe/Zurich
+          return zero in get_id_from_name() if detail-request failed
+
+0.022     2013-07-11 21:34:44 Europe/Berlin
+          add LWP::Protocol::https as prereq
+
+0.021     2013-07-02 16:09:31 Europe/Berlin
+          fix serious bug in create_vm()
+          get_id_from_name() returns 0 on failure
+          get_id_from_name() dies if required argument not set
+          fix copy & paste error in documentation
+
+0.02      2013-07-02 13:00:03 Europe/Berlin
+          BREAK BACKWARDS COMPATIBILITY:
+           - create_vm() has now named arguments according to API-names
+           - hypervisor must be given with new() for a box
+          more testing, now also checking for JSON
+          more documentation
+
+0.01      2013-06-24 14:01:56 Europe/Berlin
+          added example of getting IP to the docs
+          mentioned that this was made by an apprentice in the docs
+          delete unneeded use statement
+
+0.007     2013-06-23 14:57:45 Europe/Berlin
+          (TRIAL) Trying to fix loads of CPAN-Tester-Errors:
+           - use "values" in a ways that perl < 5.14 can deal with it
+           - remove unneeded ISA stuff
+           - die manually when needed argument for method is not given
+          get_id_from_name now also updates details_cache
+          documented all the features in POD
+
+0.006     2013-06-22 19:28:20 Europe/Berlin
+          (TRIAL) added a lot of methods (start, stop, create, etc)
+          http-useragent is now in hypervisor
+          added an example demonstrating usecase (create backup clone)
+          added caching functionality
+          always return 0 on failure
+          a lot of other small fixes
+
+0.005     2013-06-10 11:51:12 Europe/Berlin
+          (TRIAL) Updated author email
+          access setter correctly
+          test for build url for api (get_details)
+          fix backwards-compatibility issue with Moo regarding defaults
+
+0.004     2013-06-06 21:52:59 Europe/Berlin
+          (TRIAL) Dist::Zilla is used more heavily for building dist
+          basic skel of hypervisor implemented (JiffyBox)
+          get_details() is implemented (Box)
+          proper example script for showing usage
+
+0.002     2013-05-29 13:58:02 Europe/Berlin
+          (TRIAL) Integreate Dist::Zilla with most popular plugins
+
+0.001     2013-05-27 16:44:00 Europe/Berlin
+          (TRIAL) Release some skeleton, just to be visible on CPAN
+

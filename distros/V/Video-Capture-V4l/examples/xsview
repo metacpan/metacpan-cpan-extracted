@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use blib;
+use Video::Capture::V4l;
+use Video::RTjpeg;
+
+$outprefix = "/tmp/vstream";
+
+require $outprefix;
+
+$|=1;
+
+open DATA, "<$outprefix.v0" or die;
+
+read DATA, $buf, 4;
+my ($tlen) = unpack "N*", $buf;
+
+read DATA, $tables, $tlen;
+Video::RTjpeg::init_decompress($tables, $w, $h);
+
+while (read DATA, $buf, 8) {
+   my ($time, $size) = unpack "N*", $buf;
+   read DATA, $buf, $size;
+   $buf = Video::RTjpeg::decompress $buf;
+   $buf = Video::RTjpeg::yuvrgb $buf;
+   print ".$size";
+   #print ".",length($buf);
+   open DISPLAY, "| display -size ${w}x$h rgb:-" or die;
+   print DISPLAY $buf;
+   close DISPLAY;
+}

@@ -1,0 +1,19 @@
+0.106   2013-06-22
+  * Improve hack for finding correct open-vcdiff include path.
+  * Don't lseek() target/delta fds because this behaviour might
+    be surprising.
+  * Throw exceptions when closed or memory-mapped file handles
+    are passed in instead of regular files.
+
+0.105   2013-06-20
+  * Add Alien::OpenVcdiff to build and configure requirements
+  * Don't load Alien::OpenVcdiff at run-time
+    * Improves program start-up time because it doesn't have
+      to load Alien::Base stuff)
+
+0.102   2013-06-18
+  * Use new test infrastructure
+  * Improve docs
+
+0.100   2013-06-16
+  * Initial release

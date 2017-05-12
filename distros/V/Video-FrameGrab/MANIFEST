@@ -1,0 +1,17 @@
+Changes
+eg/video-framegrab
+FrameGrab.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+t/002Crop.t
+t/003CropDark.t
+t/canned/croptest-black.jpg
+t/canned/croptest-dark.jpg
+t/canned/croptest-white1.jpg
+t/canned/croptest-white2.jpg
+t/canned/croptest.jpg
+t/canned/plane.avi
+META.yml                                 Module meta-data (added by MakeMaker)

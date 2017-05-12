@@ -1,0 +1,91 @@
+=head1 NAME
+
+Validator::Checker::HOWTO - how to develop checkers for Validator::Var
+
+=head1 DESCRIPTION
+
+This HOWTO describes how to develop custom checkers for
+use with Validator::Var objects. Generally speaking there is no built-in and
+custom checkers, all of them are simply checkers.
+
+=head1 GO
+
+=head2 Writing checker
+
+As an example you can look at package Validator::Checker::MostWanted.
+As you can see - it's very simple.
+Now let's try to develop your own checkers.
+
+    package Your::Custom::Checker;
+
+    require Exporter;
+    our @ISA = qw(Exporter);
+    our @EXPORT_OK = qw( Your_Checker Your_Another_Checker );
+
+
+    sub Your_Checker {[
+        \&_your_checker,              # ref to checker subroutine
+        'Your_Checker',               # checker name
+        'corresponds to Your_Checker' # description
+    ]}
+    
+    sub Your_Another_Checker {[
+        \&_your_another_checker,
+        'Your_Another_Checker',
+        'corresponds to Your_Another_Checker'
+    ]};
+    
+    
+    # checker without arguments
+    #
+    sub _your_checker
+    {
+        my $var = shift;
+        my $bool;
+        
+        # checkers code
+        # ...
+        
+        return $bool;
+    }
+    
+    # checker with arguments
+    #
+    sub _your_another_checker
+    {
+        my ($var, @args) = @_;
+        my $bool;
+        
+        # checkers code
+        # ...
+        
+        return $bool;
+    }
+    
+    
+    1;
+
+=head2 Using checkers
+
+You can use your newly created checker in standard manner:
+
+    use Your::Custom::Checker qw( Your_Checker Your_Another_Checker );
+
+    my $foo = Validator::Var->new();
+    $foo->checker(Your_Checker);
+    unless ( $foo->is_valid( $var ) ) {
+        warn "variable does not passed Your_Chacker";
+    }
+
+    my $bar = Validator::Var->new();
+    $bar->checker(Your_Another_Checker, $arg0, $arg1, $arg2 );
+    unless ( $bar->is_valid( $var ) ) {
+        warn "variable does not passed Your_Another_Checker";
+    }
+
+
+=head1 AUTHOR
+
+Fedor Semenov, C<< <fedor.v.semenov at gmail.com> >>
+
+

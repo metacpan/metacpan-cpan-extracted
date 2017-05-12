@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+lib/Videosubs/WebVTT.pm
+META.yml
+META.json

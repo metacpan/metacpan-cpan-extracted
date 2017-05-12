@@ -1,0 +1,48 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP 
+
+
+//! This interface must be implemented by the state action handlers.
+interface HTOM_Action
+{
+  //! Methid alled on the event.
+  public function Action();
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

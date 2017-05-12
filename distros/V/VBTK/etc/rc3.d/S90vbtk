@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Set this to your location for VBHOME
+VBHOME=/usr/vbtk
+CMD=
+
+if [ $# -gt 0 ]
+then
+    CMD=$1
+    shift;
+fi
+
+VBC=$VBHOME/conf/vbc
+
+if [ "$CMD" = "start" ] || [ "$CMD" = "restart" ]
+then CMD=restart
+elif [ "$CMD" != "stop" ]
+then echo "Usage: $0 <start|stop> [prog1 [prog2 ...]]"
+     exit 1
+fi
+
+# Determine who is running this script
+user=`/bin/id | sed 's/[=()]/ /g;' | awk '{print $3}'`
+
+if [ "$user" = "root" ]
+then su vb -c "$VBC $CMD $*"
+elif [ "$user" = "vb" ]
+then $VBC $CMD $*
+else
+     echo "This script must be run as 'root' or 'vb'"
+     exit 1
+fi

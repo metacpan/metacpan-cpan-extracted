@@ -1,0 +1,17 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-05-20T18:42:08.572210Z
+K 7
+svn:log
+V 258
+Fixed some intermittent issues and did some cleanup on Battlefield protocols as well as the base class.
+
+Cleaned up the dump template a bit.
+
+Added templates for a compact server status html snippet for BattleField 2 and 2142, FEAR, and CounterStrike:Source.
+END

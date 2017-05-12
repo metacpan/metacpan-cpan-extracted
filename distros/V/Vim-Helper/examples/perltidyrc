@@ -1,0 +1,14 @@
+# perltidy config to format code in a "common" format
+# http://perltidy.sourceforge.net/perltidy.html#controlling_list_formatting
+-i=4   # size of indentation
+-nt    # no tabs
+-ci=4  # indentation of wrapped lines
+-l=0   # max line length before wrapping
+-nolq  # do not outdent overly long quotes
+-sbt=2 # no spacing for square brackets
+-bt=2  # no spacing for curly braces
+-cab=0 # forces break after each comma arrow item - hashes
+-boc   # this attempts to retain list break points
+-bbs   # places break before subroutines
+-nbbc  # do not insert blank lines before comments
+-isbc  # no blanks before comments

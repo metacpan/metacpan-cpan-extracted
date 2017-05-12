@@ -1,0 +1,82 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+//! Class represents a date input object.
+/*! The date input object is a text area that may be filled by the date.
+ * The element displays also a calendar buton that executes a calendar window that one 
+ * can use in order to specify a date.
+ * NOT TESTED.
+ */
+class HTOM_DateInput extends HTOM_Input
+{
+  //! Initialize date input area object.
+  /*! \param $id a name of the text area.
+   * \param $initialDate a initial date value or NULL in case if the date is not set.
+   */
+  public function __construct($id, $initialDate=NULL)
+  {
+    $this->id=$id;
+    $this->initalText=$initialDate;
+        HTOM_JSRegistry::RegisterScript("ts_picker/ts_picker.js");
+    $this->Init();
+  }
+  
+  public function Evaluate()
+  {
+    $table = new HTOM_Table();
+    $input = new HTOM_TextInput($this->id,$this->initalText);
+    $table->AddElement(0,0,$input, new HTOM_Style("width:150"));
+    
+    $link = new HTOM_Link("Open a calendar");
+    $showAction = new HTOM_JScript("show_calendar('document.getElementById({DIVID})', document.getElementById({DIVID}).value,'{NEXT}','{PREV}');");
+    $showAction->SetKeywordValue("DIVID",$input->ID()->GetValue());
+    $showAction->SetKeywordValue("PREV",HTOM_Autoloader::GetFileName("ts_picker/prev.gif"));
+    $showAction->SetKeywordValue("NEXT",HTOM_Autoloader::GetFileName("ts_picker/next.gif"));
+    $image = new HTOM_Image( HTOM_Autoloader::GetFileName("ts_picker/cal.gif" ) );
+    $imageRegion = new HTOM_Link( $image,null );
+    $imageRegion->SetJSAction("onclick",$showAction);
+    $table->AddElement(0,1,$imageRegion);
+    
+    return $table->Evaluate();
+  }
+  private  $initalText="";
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © 2009 VMware, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Except as explicitly provided herein, no express or implied licenses, under any VMware patents, copyrights, trademarks, or any other intellectual property rights, are granted or waived by implication, exhaustion, estoppel, or otherwise, on modified versions of the Software.
+-->
+<xs:schema xmlns="http://www.vmware.com/vcloud/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.vmware.com/vcloud/v1" version="1.0">
+
+    <xs:annotation>
+        <xs:documentation xml:lang="en">
+            Defines types common to most or all of the vCloud
+            request/response schemas.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType name="VCloudExtensionType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Cloud API extension type with any elements and any attributes.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xs:sequence>
+
+        <xs:attribute name="required" type="xs:boolean" default="true" use="optional">
+            <xs:annotation>
+                <xs:documentation source="modifiable">always</xs:documentation>
+                <xs:documentation xml:lang="en">
+                    Determines whether server should fail if extension is not understood.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+
+    <xs:complexType abstract="true" name="VCloudExtensibleType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                A base abstract type for all complex types that support extensions.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence>
+            <xs:element name="VCloudExtension" type="VCloudExtensionType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation source="modifiable">always</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        A vCloud extension.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+
+        <xs:anyAttribute namespace="##other" processContents="lax"/>
+    </xs:complexType>
+
+
+    <xs:element name="Error" type="ErrorType"/>
+    <xs:complexType name="ErrorType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                The standard error message type used in the vCloud REST API.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:attribute name="message" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            An one line, human-readable message describing the error that occurred.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="majorErrorCode" type="xs:int" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            The class of the error, it matches the HTTP status code meanings.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="minorErrorCode" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Specific API error code (for example - can indicate that vApp
+                            power on failed by some reason)
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+
+                <xs:attribute name="vendorSpecificErrorCode" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            A vendor/implementation specific error code that point to specific
+                            modules/parts of the code and can make problem diagnostics easier.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="stackTrace" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="since">1.0</xs:documentation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            The stack trace of the exception which when examined might make
+                            problem diagnostics easier.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="Link" type="LinkType"/>
+    <xs:complexType name="LinkType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Extends reference type by adding relation attribute.
+                Defines a hyper-link with a relationship, hyper-link reference,
+                and an optional media type.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ReferenceType">
+                <xs:attribute name="rel" type="RelationType" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Contains a relation which this link provided to a resource or operation.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="RelationType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                The possible values of the rel attribute.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="down">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        An item in this container.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="add">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Add something to this container.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="up">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The resource containing this resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="edit">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Edit/update this resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="remove">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Remove this resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="copy">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Copy the entity represented by this resource to a
+                        different location.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="move">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Move the entity represented by this resource to a
+                        different location.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="alternate">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        This resource with an alternative representation.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="task:cancel">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Cancels a task.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="deploy">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Deploys the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="undeploy">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Undeploys the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="discardState">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Discard the suspended state.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="power:powerOn">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Powers on the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="power:powerOff">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Powers off the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="power:reset">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Resets the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="power:reboot">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Reboots on the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="power:suspend">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Suspends the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="power:shutdown">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Shuts down the specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="screen:thumbnail">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Returns a thumbnail image representing the vApp.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="screen:acquireTicket">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Generates a ticket for accessing the console of the
+                        vApp.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="media:insertMedia">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Inserts media image to leaf vApp.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="media:ejectMedia">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Ejects media image from leaf vApp.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="upload:default">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Default file upload URI.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="upload:alternate">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Alternate file upload URI.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="download:default">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Default file download URI.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="download:alternate">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Alternate file download URI.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="ovf">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        OVF download link.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="ova">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        OVA download link.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="controlAccess">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Access control manipulation link.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="publish">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Control publishing settings for a catalog.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="extension">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        API extension link.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="collaboration:resume">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Resume collaboration
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="collaboration:abort">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Abort collaboration
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="enable">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Enable specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="disable">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Disable specified resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="catalogItem">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Link to a catalog item containing a resource.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="recompose">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        Recompose specified resource (applies mainly for VApps).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="register">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        General register action.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="unregister">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        General unregister action.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="repair">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        General repair action.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="reconnect">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        General reconnect action.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="upgrade">
+                <xs:annotation>
+                    <xs:documentation source="since">1.0</xs:documentation>
+                    <xs:documentation xml:lang="en">
+                        General upgrade action.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ResourceType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                The base type for all objects in the vCloud model.
+                Has an optional list of links and href and type attributes.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="Link" type="LinkType" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Contains link to an operation associated with specific relation type.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="href" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Contains the URI to the resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Contains the type of the resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                A basic type used to specify parameters.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="Description" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                A description as parameter.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            A name as parameter.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ReferenceType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Contains reference information to a resource.
+                A basic element that contains an href attribute and an optional
+                name and type attributes.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:attribute name="href" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Contains the URI to the resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="type" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Contains the type of the the resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="name" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">always</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Contains the name of the the resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ResourceReferenceType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a reference to a resource.
+                Reference that contains an href attribute, an optional name and
+                type attributes, and a resource status attribute.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ReferenceType">
+                <xs:attribute name="status" type="xs:int" use="optional">
+                    <xs:annotation>
+                        <xs:documentation source="modifiable">none</xs:documentation>
+                        <xs:documentation xml:lang="en">
+                            Status of a resource.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="CapacityType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a capacity of a given resource.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="Units" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Units of capacity.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Allocated" type="xs:long" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Allocated capacity value.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Limit" type="xs:long" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Limit capacity value.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="CapacityWithUsageType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents a capacity and usage of a given resource.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="CapacityType">
+                <xs:sequence>
+                    <xs:element name="Used" type="xs:long" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Capacity usage value.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Overhead" type="xs:long" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="since">1.0</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Overhead value of capacity.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="AccessSettingType">
+        <xs:annotation xml:lang="en">
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Determines accessibility of a resource.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="Subject" type="ReferenceType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The subject who has access to the resource.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="AccessLevel" type="AccessLevelType" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Access level.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="AccessLevelType">
+        <xs:annotation xml:lang="en">
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Access level enumeration.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="FullControl">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Full control access.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="Change">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Control access which could be changed.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ReadOnly">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Read only control access.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="AccessSettingsType">
+        <xs:annotation xml:lang="en">
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                A list of access settings for a resource.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="AccessSetting" type="AccessSettingType" minOccurs="1" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Access setting for a resource.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ControlAccessParams" type="ControlAccessParamsType"/>
+    <xs:complexType name="ControlAccessParamsType">
+        <xs:annotation>
+            <xs:documentation source="since">0.9</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Used to control access to resources.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="VCloudExtensibleType">
+                <xs:sequence>
+                    <xs:element name="IsSharedToEveryone" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                If true, this means that the resource is shared with everyone
+                                in the organization. Defaults to false. Sharing settings must
+                                be manipulated through the organization.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="EveryoneAccessLevel" type="AccessLevelType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                If IsSharedToEveryone is true, this element must be present and
+                                determines the access level.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                    <xs:element name="AccessSettings" type="AccessSettingsType" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation source="modifiable">always</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                The access settings to be applied if IsSharedToEveryone is false.
+                                Access settings must be manipulated through the organization.
+                                Fo modify and creat is required to set the access settings if IsSharedToEveryone
+                                is set to false. It will set specific access levels to different
+                                users. It could be skipped in case you want to deny access to all users.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="Owner" type="OwnerType"/>
+    <xs:complexType name="OwnerType">
+        <xs:annotation>
+            <xs:documentation source="since">1.0.1</xs:documentation>
+            <xs:documentation xml:lang="en">
+                Represents the owner of given entity.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexContent>
+            <xs:extension base="ResourceType">
+                <xs:sequence>
+                    <xs:element name="User" type="ReferenceType">
+                        <xs:annotation>
+                            <xs:documentation source="since">0.9</xs:documentation>
+                            <xs:documentation source="modifiable">none</xs:documentation>
+                            <xs:documentation xml:lang="en">
+                                Contain user reference.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

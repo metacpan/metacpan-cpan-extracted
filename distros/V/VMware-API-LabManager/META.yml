@@ -1,0 +1,33 @@
+---
+abstract: "VMware's Lab Manager public and private API"
+author:
+  - 'Phil Pollard <bennie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VMware-API-LabManager
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+provides:
+  VMware::API::LabManager:
+    file: lib/VMware/API/LabManager.pm
+    version: '2.11'
+requires:
+  Data::Dumper: '0'
+  Net::SSL: '0'
+  SOAP::Lite: '0.71'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=VMware-API-LabManager
+  repository: git://github.com/bennie/perl-VMware-API-LabManager.git
+version: '2.11'

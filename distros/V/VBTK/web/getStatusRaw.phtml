@@ -1,0 +1,9 @@
+<!--#perl 
+  my ($vbObj,$status);
+  $vbObj = &VBTK::Objects::FindObjByName($_parms->{name});
+  
+  $status = $vbObj->getStatus() if (defined $vbObj);
+  
+  $status = "Error" if (! defined $status);
+  
+-->$status

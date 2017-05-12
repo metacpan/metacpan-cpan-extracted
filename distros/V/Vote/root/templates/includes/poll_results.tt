@@ -1,0 +1,110 @@
+[% vote = c.model('Vote') %]
+
+<div id="results" class="box">
+[% IF vote.list_vote_ballot_needvalid(voteid).size %]
+<p>Resultats provisoires:</p>
+<p class="alert">Le gestionnaire doit vérifier la validité de certains bulletins</p>
+[% ELSE %]
+<p>Resultats:</p>
+[% END %]
+<p>Nombre de choix à retenir: [% vote.vote_info(voteid).choice_count %]</p>
+<p>Participations: [% vote.vote_signing_count(voteid) %] / [% vote.vote_voting_count(voteid) %]
+[% IF vote.vote_voting_count(voteid) %]
+([% vote.vote_signing_count(voteid) * 100 / vote.vote_voting_count(voteid) | format('%.2f') %])
+[% END %]</p>
+<p>Nombre de vote(s) exprimé(s): [% vote.vote_ballot_count_nonull(voteid) %]
+[% IF vote.vote_ballot_count(voteid) %]
+([% vote.vote_ballot_count_nonull(voteid) * 100 / vote.vote_ballot_count(voteid) | format('%.2f') %]%)
+[% END %]
+</p>
+
+[% IF vote.vote_ballot_count_nonull(voteid) %]
+[% FOREACH res = vote.vote_results_nonull(voteid) %]
+[% IF loop.first %]
+<p>Score:</p>
+<table border="1"><tr>
+<th>Légende:</th>
+<td class="majabs">Majorité Absolue</td>
+<td class="selected">Elus</td>
+<td class="notselected">Non élu</td>
+</tr></table><br>
+<table border="1">
+<tr><th>Score</th><th>Ligne N°</th><th>choix</th><th>Nb voix</th><th>%</th><th></th></tr>
+[% END %]
+
+[% IF res.count != loop.prev.count && loop.count > 0 %]
+    [% # If equality, we keep same color, even we are over resullts %]
+[% mycount = loop.count %]
+[% IF loop.count <= vote.vote_info(voteid).choice_count %]
+[% IF res.count >= vote.ballot_count_nonull(voteid) / 2 + 1 %]
+[% class = 'majabs' %]
+[% ELSE %]
+[% class = 'selected' %]
+[% END %]
+[% ELSE %]
+[% class = 'notselected' %]
+[% END %]
+[% END %]
+<tr class="[% class %]">
+<td>[% mycount %]</td>
+<td>[% loop.count %]</td>
+<td>[% res.value | html %]</td>
+<td>[% res.count %]</td>
+<td>[% res.count * 100 / vote.ballot_count_nonull(voteid) | format('%.2f') %]</td>
+<td><img src="[% c.uri_for('/static', 'images', 'green-v.png') %]" 
+height="10px" width="[% res.count * 400 / vote.ballot_count_nonull(voteid) | format('%d') %]px"></td>
+</tr>
+
+[% IF loop.last %]
+</table>
+[% END %]
+[% END %]
+[% ELSE %]
+<p class="alert">Aucun suffrage exprimé.</p>
+[% END %]
+</div>
+
+[% FOREACH id = vote.list_vote_ballot(voteid) %]
+[% IF loop.first %]
+<div id="ballot_list" class="box">
+<p>Liste des bulletins:</p>
+<table border="1">
+<tr><th>numéro</th><th>Id</th>
+<th>contenu (=> corrigé en)
+[% IF vote.vote_info(voteid).free_choice %]
+<br>(*: hors liste)
+[% END %]
+</th><th>remarque</th></tr>
+[% END %]
+<tr>
+<td>[% loop.count %]</td>
+<td>[% id | html %]</td>
+<td>
+[% items = vote.ballot_items(id) %]
+[% IF items.size %]
+[% FOREACH item = items %]
+[% "<ul>\n" IF loop.first %]
+<li>[% item.v | html %]
+[% ' *' IF NOT item.fromlist %]
+[% IF item.corrected %] (=&gt; [% item.corrected %])[% END %]</li>
+[% "</ul>\n" IF loop.last %]
+[% END %]
+[% ELSE %]
+<i>Vote blanc</i>
+[% END %]
+</td>
+<td>
+[% invalid = '#' _ vote.ballot_info(id).invalid %]
+[% IF invalid == '#1' %]
+<span class="alert">Invalidé</span>
+[% ELSIF invalid  == '#' %]
+<i>doit être validé</i>
+[% END %]
+</td>
+</tr>
+[% IF loop.last %]
+</table>
+</div>
+[% END %]
+[% END %]
+

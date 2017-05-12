@@ -1,0 +1,33 @@
+---
+abstract: 'Call a subroutine on destruction of a variable.'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Symbol: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build::Tiny: '0.036'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Variable-OnDestruct-Scoped
+provides:
+  Variable::OnDestruct::Scoped:
+    file: lib/Variable/OnDestruct/Scoped.pm
+    version: '0.001'
+requires:
+  Exporter: '5.57'
+  XSLoader: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Variable-OnDestruct-Scoped
+  repository: git://github.com/Leont/variable-ondestruct-scoped.git
+version: '0.001'

@@ -1,0 +1,69 @@
+libzvbi-perl (2.6) unstable; urgency=low
+
+  * Makefile.PL: Improved zvbi library path detection (again)
+  * ZVBI.pm: Spelling and format fixes in documentation
+  * ppport_zvbi.h: update to ppport.h version 3.19
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 02 Jan 2011 14:45:13 +0200
+
+libzvbi-perl (2.5) unstable; urgency=low
+
+  * Makefile.PL: Improved zvbi library path detection
+  * ZVBI.xs: Fixed compiler warnings with Perl 5.10
+  * ppport_zvbi.h: update to ppport.h version 3.13
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 03 May 2009 19:07:46 +0200
+
+libzvbi-perl (2.4) unstable; urgency=low
+
+  * ZVBI.xs: Fixed compiler warnings and XSUB usage bugs; improved backwards
+    compatibility by use of Devel::PPPort
+  * Makefile.PL: added work-around for libthreads dependency for FreeBSD.
+    Thanks to Slaven Rezic from the CPAN testers team for the hint.
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 05 Oct 2008 21:35:00 +0200
+
+libzvbi-perl (2.3) unstable; urgency=low
+
+  * Makefile.PL: use exit(0) instead of die when libzvbi is missing
+    to get an N/A test report instead of FAIL from CPAN testers
+  * ZVBI.xs: Added interface to new DVB multiplexer in zvbi-0.2.26;
+    extended compatibility down to libzvbi 0.2.4 for compilation
+    against external libzvbi.h; fixed lib version checks for
+    compilation without -DUSE_DL_SYM
+  * examples/search-ttx.pl: added work-around for bug in proxy-client
+    which prevented entering a search string
+  * examples/browse-ttx.pl: made backwards compatible: use XPM format
+    export only if available in the export module
+  * libzvbi_int.h: updated to libzvbi.h from release 0.2.26
+  * test.pl: added output of library version number
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 02 Dec 2007 22:00:00 +0200
+
+libzvbi-perl (2.2) unstable; urgency=low
+
+  * Makefile.PL: Abort if zvbi library is not found; added compile
+    options USE_DL_SYM and USE_LIBZVBI_INT for ZVBI.xs; require
+    Perl 5.7.1 because of UTF-8 support
+
+  * ZVBI.xs: Compile against copy of libzvbi.h to avoid dependency
+    on libzvbi-dev; load symbols of recent library versions dynamically
+    from shared library to make the module independent of the library
+    version; more syntax clean-ups
+
+  * Meta.yml: Added (name changed to upper case in 0.2.3)
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Fri, 23 Nov 2007 22:00:00 +0200
+
+libzvbi-perl (2.1) unstable; urgency=low
+
+  * ZVBI.xs: Compatibility fixes for older Perl versions;
+    Syntax fixes; Bugfix in search callback function array
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Mon, 19 Nov 2007 22:00:00 +0200
+
+libzvbi-perl (2.0) unstable; urgency=low
+
+  * : First official release (CPAN)
+
+ -- Tom Zoerner <tomzo@users.sourceforge.net>  Sun, 18 Nov 2007 22:00:00 +0200

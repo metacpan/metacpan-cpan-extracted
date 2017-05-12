@@ -1,0 +1,18 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                       #      3rd party file built by ModuleBuildTiny
+COPYING                        # Version-Dotted file built by GenerateFile
+Changes                        # Version-Dotted file added by Manifest::Read
+GPLv3                          # Version-Dotted file added by Manifest::Read
+MANIFEST                       #       metainfo file built by Manifest::Write
+META.json                      #       metainfo file built by MetaJSON
+META.yml                       #       metainfo file built by MetaYAML
+README                         # Version-Dotted file built by GenerateFile
+VERSION                        # Version-Dotted file added by Manifest::Read
+lib/Version/Dotted.pm          # Version-Dotted file added by Manifest::Read
+lib/Version/Dotted/Odd.pm      # Version-Dotted file added by Manifest::Read
+lib/Version/Dotted/Semantic.pm # Version-Dotted file added by Manifest::Read
+t/00-compile.t                 #      3rd party file built by Test::Compile
+t/01-version-dotted.t          # Version-Dotted file added by Manifest::Read
+t/02-version-dotted-odd.t      # Version-Dotted file added by Manifest::Read
+t/03-version-dotted-semantic.t # Version-Dotted file added by Manifest::Read
+t/lib/VersionTester.pm         # Version-Dotted file added by Manifest::Read

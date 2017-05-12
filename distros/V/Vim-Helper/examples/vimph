@@ -1,0 +1,32 @@
+use Vim::Helper qw/
+    TidyFilter
+    Test
+    LoadMod
+    Fennec
+/;
+
+Test {
+    from_mod => sub {
+        my ( $filename, $modname, @modparts ) = @_;
+        return 't/' . join( "-" => @modparts ) . ".t";
+    },
+    from_test => sub {
+        my ( $filename, $modname, @modparts ) = @_;
+        $filename =~ s{^t/}{};
+        $filename =~ s{^.*/t/}{};
+        $filename =~ s{\.t$}{};
+        my ( @parts ) = split '-', $filename;
+        return join( '/' => @parts ) . '.pm';
+    },
+};
+
+TidyFilter {
+    save_rc => 'examples/perltidyrc',
+    load_rc => 'examples/perltidyrc',
+};
+
+LoadMod {
+    search => [ "./lib", @INC ],
+};
+
+1;

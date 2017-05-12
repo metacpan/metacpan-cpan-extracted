@@ -1,0 +1,33 @@
+VMS-Time version 0.1
+====================
+
+This module provides access to the OpenVMS date and time system
+services $GETTIM, $BINTIM, and $ASCTIM.  It also provides routines to
+convert between VMS times and unix epoch times.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Thomas Pfau <tfpfau@gmail.com>
+
+This module is free software.  You can redistribute it and/or modify
+it under the terms of the Artistic License 2.0.
+
+This module is distributed in the hope that it will be useful but it
+is provided "as is"and without any express or implied warranties.
+
+

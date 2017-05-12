@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/networkm" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/networkm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="networkm" type="networkmType">
+		<xs:annotation>
+			<xs:documentation>Network Management</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="networkmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="add">
+							<xs:annotation>
+								<xs:documentation>Adds device. Returns newly created device as in "list" command.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="list">
+							<xs:annotation>
+								<xs:documentation>Lists devices. Returns list of devices, which correspondent to filter.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="set">
+							<xs:annotation>
+								<xs:documentation>Updates device parameters. Returns OK/Error</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="del">
+							<xs:annotation>
+								<xs:documentation>Removes device. Returns OK/Error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="net_device" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ip_routeType">
+		<xs:sequence>
+			<xs:element name="destination" type="vzlt:ip_addressType">
+				<xs:annotation>
+					<xs:documentation>Route destination</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="gateway" type="vzlt:ip_type">
+				<xs:annotation>
+					<xs:documentation>Gateway for route</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="net_vlanType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:net_deviceType">
+				<xs:sequence>
+					<xs:element name="vlan_id" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>VLAN ID</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="base_device_id" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Base device ID for VLAN interface</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="mac_address" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Read only. Vlan's mac address.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="net_bridgeType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:net_deviceType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="add">
+		<xs:annotation>
+			<xs:documentation>Adds device. Returns newly created device as in "list" command.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_device"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list">
+		<xs:annotation>
+			<xs:documentation>Lists devices. Returns list of devices, which correspondent to filter.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_device" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set">
+		<xs:annotation>
+			<xs:documentation>Updates device parameters. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_device"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del">
+		<xs:annotation>
+			<xs:documentation>Removes device. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_device"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="net_device" type="vzlt:net_deviceType"/>
+	<xs:element name="addResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_device"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_device" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="setResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="delResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,295 @@
+NAME
+    Valence - Perl interface to electron GUI tool-kit
+
+SYNOPSIS
+        use Valence;
+
+        my $valence = Valence->new;
+
+        my $electron = $valence->require('electron');
+
+        $electron->attr('app')->on(ready => sub {
+          my $main_window = $electron->attr('BrowserWindow')->new({
+                               width => 1000,
+                               height => 600,
+                               title => 'My App',
+                            });
+
+          $main_window->loadURL('data:text/html,Hello World!'); ## or file://, https://, etc
+        });
+
+        $valence->run; ## enter event loop
+
+DESCRIPTION
+    Electron <https://github.com/atom/electron> is chromium-based GUI
+    application framework. It allows you to create "native" applications in
+    HTML, CSS, and javascript. The Valence perl module is an RPC binding
+    that lets you use perl instead of javascript for the electron "main"
+    process. It bundles a javascript module valence.js
+    <https://github.com/hoytech/valence> which is responsible for proxying
+    messages between the browser render process(es) and your perl controller
+    process.
+
+    Since valence is a generic RPC framework, none of the electron methods
+    are hard-coded in the perl or javascript bridges. This means that all of
+    the electron docs <https://github.com/atom/electron/tree/master/docs>
+    are applicable and should be used as reference when developing with this
+    module.
+
+    NOTE: This module depends on Alien::Electron which will download and
+    install the electron distribution appropriate for your operating system.
+    On linux this depends on having the "X11" environment variable set. See
+    the Alien::Electron documention for more details.
+
+DESIGN
+  ASYNC PROGRAMMING
+    Like browser programming itself, programming the perl side of a Valence
+    application is done asynchronously. The Valence package depends on
+    AnyEvent for this purpose so you can use whichever event loop you
+    prefer. See the AnyEvent documentation for details on asynchronous
+    programming.
+
+    The "run" method of the Valence context object simply waits on a
+    condition variable that will never be signalled (well you can signal it
+    if you want to, it's in "$valence->{cv}") in order to enter the event
+    loop and "sleep forever". "run" is mostly there so you don't need to
+    type "use AnyEvent; AE::cv->recv" in simple scripts/examples.
+
+  METHODS
+    The "require" method initiates a "require" call in the electron main
+    process and immediately returns a "Valence::Object". Any methods that
+    are called on this object will initiate the corresponding method calls
+    in the electron main process and will also themselves return
+    "Valence::Object"s. The "new" method is slightly special in that it will
+    use the javascript "new" function, but it too returns "Valence::Object"s
+    corresponding to the newly constructed javascript objects:
+
+        my $main_window = $electron->attr('BrowserWindow')->new({ title => "My Title" });
+
+    "Valence::Object"s are essentially perl-side references to values inside
+    the electron main javascript process. If you destroy the last reference
+    to one of these objects, their corresponding values will be deleted in
+    the javascript process and eventually garbage collected.
+
+    As well as calling methods on "Valence::Object"s, you may also treat
+    them as "sub"s and pass in callbacks that receive the referenced values.
+    This is how you can access javascript values from the perl process. For
+    example:
+
+        $main_window->getPosition->(sub {
+          my $pos = shift;
+          print "POSITION: x = $pos->[0], y => $pos->[1]\n";
+        });
+
+  ATTRIBUTES
+    "Valence::Object" has a special "attr" method which looks up an object
+    attribute and returns a "Valence::Object" referring to the attribute
+    value. For example:
+
+        my $web_contents = $main_window->attr('webContents');
+        ## similar to this JS: var web_contents = main_window.webContents;
+
+    Eventually I may make attributes accessible via a hash reference
+    overload which would be a slightly nicer syntax.
+
+  CALLBACKS
+    Because interacting with an electron process via valence is done
+    asynchronously, callbacks are used nearly everywhere.
+
+    When a perl "sub" is found in the arguments passed to a method, it is
+    replaced with a stub that will be replaced with a javascript function
+    inside the electron main process. When this javascript function is
+    invoked, an asynchronous message will be sent to the perl process which
+    will trigger the execution of your original "sub".
+
+    For example, here is how to install a sub that will be executed whenever
+    the main window comes into focus:
+
+        $main_window->on('focus', sub { say "FOCUSED" });
+
+    Note: Due to a current limitation, "sub"s nested inside hashes or arrays
+    will not get stubbed out correctly.
+
+    If you are seeing this error when closing the browser window:
+
+        EV: error in callback (ignoring): AnyEvent::Handle uncaught error: Broken pipe at...
+
+    then it means that the "electron" process has exited but you haven't
+    handled the "close" event. In this case, typically you just want to exit
+    the perl process also:
+
+        $main_window->on(close => sub { exit });
+
+DEBUGGING
+    If you set the "VALENCE_DEBUG" value to 1 or higher, you will see a
+    prettified dump of the JSON protocol between the perl and electron
+    process
+
+        Sending to electron >>>>>>>>>>>>>>>>>
+        {
+           "args" : [
+              "app"
+           ],
+           "cmd" : "call",
+           "method" : "require",
+           "save" : "1"
+        }
+
+
+        Sending to electron >>>>>>>>>>>>>>>>>
+        {
+           "args" : [
+              "ready",
+              null
+           ],
+           "args_cb" : [
+              [
+                 1,
+                 1
+              ]
+           ],
+           "cmd" : "call",
+           "method" : "on",
+           "obj" : "1",
+           "save" : "3"
+        }
+
+
+        ...
+
+                        <<<<<<<<<<<<<<<<< Message from electron
+                        {
+                           "args" : [
+                              {}
+                           ],
+                           "cb" : 1,
+                           "cmd" : "cb"
+                        }
+
+    If you set "VALENCE_DEBUG" to 2 or higher, you will also see the
+    standard error output from the electron process, which includes
+    "console.error()" output.
+
+IPC
+    An essential feature of valence is providing bi-directional,
+    asynchronous messaging between your application and the browser render
+    process. It does this over the standard input/standard output interface
+    provided by "valence.js". Without this support we would need to allocate
+    some kind of network port or unix socket and start something like an
+    AJAX or websocket server.
+
+  BROWSER TO PERL
+    In order for the browser to send a message to your perl code, it should
+    execute something like the following javascript code:
+
+        var ipcRenderer = require('electron').ipcRenderer;
+        ipcRenderer.send('my-event', 'my message');
+
+    On the perl side, you receive these messages like so:
+
+        my $ipcMain = $electron->attr('ipcMain');
+        $ipcMain->on('my-event' => sub {
+            my ($event, $message) = @_;
+
+            print $message; ## prints 'my message'
+        });
+
+  PERL TO BROWSER
+    Sending messages from perl to the browser should use code like this:
+
+        my $web_contents = $main_window->attr('webContents');
+        $web_contents->send('my-event' => 'my message');
+
+    And the javascript side can receive these messages like so:
+
+        var ipcRenderer = require('electron').ipcRenderer;
+        ipcRenderer.on('my-event', function(event, message) {
+            console.log(message); // prints 'my message'
+        });
+
+  IPC READY EVENTS
+    Before applications can send messages from perl to javascript, the
+    "ipcRenderer.on()" function must have been called to handle these
+    messages. If you try to send a message before this, it is likely that
+    the message will be delivered to the browser before the handler has been
+    installed so your message will be lost. Applications should have
+    javascript send a message indicating that the communication channel is
+    ready, after which the perl component can begin sending messages to the
+    browser.
+
+    For an example of how this is done, see the "t/ipc.t" test and how the
+    perl side subscribes to a "ready" IPC message before attempting to send
+    its "ping" message, and how the "t/static/remote.html" arranges for
+    javascript to send the "ready" message after it has installed its "ping"
+    handler.
+
+TESTS
+    Currently this software has two tests, "load.t" which verifies Valence
+    is installed and "ipc.t" which starts electron and then proceeds to
+    confirm bi-directional transfer of messages between javascript and perl.
+
+BACKWARDS COMPATIBILITY
+    The extent to which this module is backwards-compatible depends on the
+    underlying "electron" project. The API was changed drastically between
+    electron 0.25.1 and 1.0.1 (corresponding to Valence releases 0.100 and
+    0.200) so you will have to port your apps over. Sorry about that. The
+    changes are described in more detail in this electron blog post
+    <http://electron.atom.io/blog/2015/11/17/electron-api-changes>.
+
+    Presumably now that "electron" has reached version 1.0.0 it should now
+    be more stable.
+
+BUGS
+    A fairly large limitation with the proxying approach is that event
+    handlers cannot prevent the default event from firing (ie with
+    "event.preventDefault()"). This is because the stub event handler in
+    javascript simply forwards the event trigger and its arguments to the
+    perl process and returns.
+
+    As mentioned above, "sub"s nested inside hashes or arrays will currently
+    not properly get stubbed out (but this can be fixed if needed).
+
+    Attributes should ideally be accessed via a hash reference overload
+    instead of the "attr" special method.
+
+    "new" methods cannot yet accept more than one parameter (due to a
+    limitation in "valence.js" -- how do you do this in JS?).
+
+    When a callback function is deleted on the javascript side, the
+    perl-side doesn't know about this so its corresponding callback will
+    remain forever. Is there a way to detect this in JS?
+
+    It currently always sends a "save" (immediately followed by a "destroy")
+    even when it doesn't need the value. This is inefficient and should be
+    fixed using "wantarray".
+
+    Exceptions thrown in the JS side should be handled better (using
+    Callback::Frame).
+
+SEE ALSO
+    The Valence perl module github repo
+    <https://github.com/hoytech/Valence-p5>
+
+    Alien::Electron
+
+    The electron project <https://github.com/atom/electron> - Official
+    website
+
+    Valence was heavily inspired by the thrust
+    <https://github.com/breach/thrust> project and some parts were ported
+    over from my Thrust module.
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2015-2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+
+    The bundled "valence/valence.js" library is Copyright (c) 2015-2016 Doug
+    Hoye and is licensed under the 2-clause BSD license.
+
+    Electron itself is Copyright (c) 2014-2016 GitHub Inc. and is licensed
+    under the MIT license.
+

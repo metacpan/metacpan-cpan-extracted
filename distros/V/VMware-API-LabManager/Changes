@@ -1,0 +1,241 @@
+Revision history for VMware::API::LabManager
+
+2.11  2015/06/08
+
+  Corrected:
+    Using GNU TAR now. The previous release had PAX headers in the tar file.
+
+  Improved:
+    Build scripts now automatically configure minium perl version.
+
+2.09  2014/03/26
+
+  Improved:
+    Added RT bug number to Changes for release 2.01, and closed the bug
+
+2.08  2014/03/06
+
+  Corrected:
+    POD errors in formatting codes
+
+  Added:
+    POD test
+
+2.07  2014/02/27
+
+  Corrected:
+    Makefile.PL improperly called for the prerequisite Perl version.
+
+2.05  2014/02/27
+
+  Improved:
+    Now auto-generating META.json and META.yml
+
+2.04  2014/02/25
+
+  Added:
+    The Artistic 2.0 license as LICENSE
+
+  Improved:
+    Updating meta: perl base, provides, resources and correct license
+
+2.04  2014/02/19
+
+  Improved:
+    Changed 'Crypt::SSLeay' prerequisite to 'Net:SSL'
+    Removed the RCS style 'Revision' version info from the example scripts
+
+2.03  2014/02/18
+
+  Corrected:
+    %ENV workaround did not need BEGIN block or "our" context.
+    Added explicit declaration of Net::SSL to help with self-signed certs
+
+2.01  2010/12/09
+
+  Corrected:
+    Call of Data::Dumper without instancing the module. (RT #69478)
+
+  Improved:
+    Added -I to example scripts for local execution within the distribution
+    Added a %ENV workaround for self-signed certs due to changes in LWP
+
+1.10  2010/09/17
+
+  Added:
+    Example configuration to POD.
+
+  Corrected:
+    Quoting error in unknown parameter warning for config()
+
+  Improved:
+    Minor POD cleanups.
+    Added 'Crypt::SSLeay' as a prerequisite. (Used by SOAP::Lite for HTTPS)
+
+1.9  2010/09/17
+
+  Added example script:
+    list-configurations.pl
+
+  Corrected:
+    Syntax error on all example scripts.
+
+  Improved:
+    Command line parameter checks added to all example scripts.
+    Accidental UTF characters (curly quotes) removed from POD.
+    UserPerformAction() added to WISH LIST section of POD.
+    Trailing spaces removed from all lines.
+    Minor POD cleanups.
+
+1.8  2010/09/13
+  
+  Added test:
+    02-header.t - SOAP connection header tests
+  
+  Improved:
+    GetMachineByName() - Clenaed up perl syntax.
+    GetSingleConfigurationByName() - Corrected error in fault handling.
+    LiveLink() - Clenaed up perl syntax.
+
+  POD cleanup:
+    Moved API method names from a head 2 level to smaller to reduce outline.
+    Moved POD past __END__ token as per Perl best practices.
+    Added section for returned values.
+    Added section for example scripts.
+
+  Added example scripts:
+    conditions.pl
+    delete-all.pl
+    hwupgrade.pl
+    list-machines.pl
+    list-networks.pl
+    list-organization.pl
+    list-templates.pl
+    list-users.pl
+    list-workspaces.pl
+    move.pl
+  
+1.7  2010/09/01
+
+  Added "WISH LIST" to the POD.
+
+  Added:
+    GetConfigurationByName()
+    priv_ConfigurationGetNetworks()
+    priv_ListNetworks()
+    priv_ListTransportNetworksInCurrentOrg()
+    priv_NetworkInterfaceModify()
+    
+  Improved:
+    priv_ConfigurationMove() - Proper handling of optional parameters and empty VMid array condition.
+    priv_GetNetworkInfo() - Set to return an array result like the List*() methods.
+
+1.6  2010/08/23
+
+  Removed errant unicode emdashes from the POD.
+
+  Added:
+    priv_ConfigurationMove()
+    priv_MachineUpgradeVirtualHardware()
+    priv_TemplateChangeOwner()
+
+  Improved:
+    ListConfigurations() - handling of empty result set condition.
+    priv_ListTemplates() - handling of empty result set condition.
+    priv_ListUsers() - handling of empty result set condition.
+
+1.5  2010/08/19
+
+  Added "Authentication and latentcy" under "BUGS AND LIMITATIONS" in the POD.
+
+  Added:
+    priv_GetTemplate()
+
+  Corrected:
+    priv_TemplateExport() - UNCPath parameter capitalization error.
+    priv_TemplateImport() - Malformed parameter names.
+    
+  Improved:
+    MachinePerformAction() - Actions 9-14 now listed in POD.
+    priv_TemplatePerformAction() - Action values now listed in POD.
+
+1.4  2010/08/18
+
+  Added the "CONFUSING ERROR CODES" section to the POD.
+
+  Created a TODO file.
+
+  Added:
+    priv_ConfigurationChangeOwner()
+    priv_GetAllWorkspaces()
+    priv_GetOrganization()
+    priv_GetOrganizations()
+    priv_GetOrganizationByName()
+    priv_GetOrganizationWorkspaces()
+    priv_GetUser()
+    priv_ListUsers()
+    priv_TemplateExport()
+    priv_TemplateImport()
+
+  Improved:
+    ListConfigurations() - Documentation.
+    priv_GetWorkspaceByName() - Better fault handling.
+    priv_ListTemplates - Better fault handling.
+
+1.3  2010/08/03
+
+  Added auth header test.
+
+  Resolved bug on load test by removing unneeded SOAP query in new()
+
+  Corrected string / void context errors in:
+    priv_ConfigurationArchiveEx()
+    priv_ConfigurationCaptureEx()
+    priv_LibraryCloneToWorkspace()    
+
+1.2  2010/07/27
+
+  Added:
+    priv_ConfigurationArchiveEx()
+    priv_ConfigurationCloneToWorkspace()
+
+  Improved:
+    priv_LibraryCloneToWorkspace()
+
+  Corrected prerequiste declarations in Makefile.PL
+
+  Improved the POD documentation
+
+1.1 (1.0) 2010/07/24
+
+  Forked from VMWare::LabmanSoap (alpha) to add features and resolve bugs.
+
+  Moved all printing on STDOUT to a debug method.
+
+  Split private and public SOAP calls to use their respective URLs.
+
+  Provided option to handle faults without a forced die()
+
+  Standardized fault handling on all methods.
+
+  ConfigurationDeployEx2 moved to priv_ConfigurationDeployEx2.
+
+  Added the following private API calls:  
+
+    priv_ConfigurationAddMachineEx()
+    priv_ConfigurationCaptureEx()
+    priv_ConfigurationCopy()
+    priv_ConfigurationCreateEx()
+    priv_ConfigurationExport()
+    priv_ConfigurationImport()
+    priv_GetNetworkInfo()
+    priv_GetObjectConditions()
+    priv_GetWorkspaceByName()
+    priv_LibraryCloneToWorkspace()
+    priv_ListTemplates()
+    priv_NetworkInterfaceCreate()
+    priv_NetworkInterfaceDelete()
+    priv_StorageServerVMFSFindByName()
+    priv_TemplateImportFromSMB()
+    priv_TemplatePerformAction()
+    priv_WorkspaceCreate()

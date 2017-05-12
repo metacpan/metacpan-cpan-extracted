@@ -1,0 +1,81 @@
+==================================================
+Changes from 2012-07-22 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------------------
+version 1.20130722.2105 at 2013-07-22 21:05:18 +0000
+----------------------------------------------------
+
+  Change: 0c2630fcde22310e4ccac1e1083bbb3c4537e226
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-23 00:05:10 +0000
+
+    Make Test::Validator::Declarative public 
+
+  Change: 8bb68d5ccc0b38519f6a6620b5e9eccd1b9e9ffc
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-22 23:35:01 +0000
+
+    Implemented convreters 
+
+  Change: 57c5b2f6db9b40fa001744e371fbb0e0a3b09f8c
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-19 15:59:17 +0000
+
+    Misc housekeeping
+
+    - added all planned aliases and tests for them - added CHANGES file
+    (thanks to Dist::Zilla::Plugin::ChangelogFromGit) - added README file
+    (thanks to Dist::Zilla::Plugin::ReadmeFromPod) 
+
+  Change: 71744330f44dca8b090ad40ab80ab57ac806dac4
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-19 15:59:17 +0000
+
+    Added documentation 
+
+  Change: a7d1da993709da7c354d97e9ba511b476e1cbe4b
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-19 02:20:19 +0000
+
+    Implemented parametrized types 
+
+  Change: 695310c20003d0d92fa7f8c348bb9904d587cb01
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-19 02:20:19 +0000
+
+    Implemented simple types 
+
+  Change: b4aa6a4aa7486767ca02038ed9fb1238a43f461a
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-19 02:17:36 +0000
+
+    Implemented built-in rules 
+
+  Change: 264d6a73c023bd770287277a880053464cf92dfc
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-19 01:59:55 +0000
+
+    Implemented stubs 
+
+  Change: 0f29eca548b037ea3628b22fffe80fbb3ee35eb8
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-11 16:44:26 +0000
+
+    Initial creation by Distzilla 
+
+  Change: 9433586afd2b41802a4d7be688950a5a7caf02d4
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-11 16:44:25 +0000
+
+    Created .gitignore 
+
+  Change: eb7066bd8222e8462000e418fb8b0dd9284a6fb6
+  Author: Oleg Kostyuk <cub.uanic@gmail.com>
+  Date : 2013-07-11 16:41:50 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

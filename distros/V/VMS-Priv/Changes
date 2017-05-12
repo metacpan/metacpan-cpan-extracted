@@ -1,0 +1,35 @@
+Revision history for Perl extension vms::priv.
+
+1.00  Tue Jul  8 17:30:25 1997
+	- original version; created by h2xs 1.18
+
+1.10  Mon Jul 14 15:10:05 1997
+    - Applied patches by Charles Bailey. Tighter code, tied hashes, 
+      and a better test suite.
+
+1.20  Fri Jul 18 10:54:06 1997
+    - Applied patches by Charles Bailey. get_image_privs and
+      get_settable_privs added, along with more tests. Added docs for the
+      new, neato-keen tied hash interface and new routines.
+    - Added Copyright notice to make the school lawyers happy. (Not that
+      there's all that much of my code left--Charles has redone a whole
+      bunch)
+    - Messed around with t/basic.t to get around a DCL write length limit.
+      Had to add a command file to do it.
+    - Added get_default_privs
+
+1.20  Fri July 25 13:40:18 1997
+    - Actually got get_default_privs working.
+
+1.30  Tue July 29 13:51:45 1997
+    - Documented the tied hash and object methods
+    - Added some tests for the tied hash and object methods
+
+1.31  Wed Feb 25 08:12:00 1998
+    - TIEHASH was passing "package" to new rather than PID, fixed
+    - basic.t warning about "my" variables not in () fixed
+      (These patches courtesy of Charles Lane)
+
+1.32  Sat Apr 11 10:36:00 2009
+    - Modernized a few global variables (e.g., sv_yes -> PL_sv_yes).
+

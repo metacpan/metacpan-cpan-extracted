@@ -1,0 +1,17 @@
+Revision history for Perl extension Video::FFmpeg.
+
+0.42 Wed Dec 23 10:43:03 2009
+	- First public release.
+0.43 Wed Dec 29 04:43:20 2009
+	- Fixed insufficient thread locking around avcodec_open/close() error;
+0.44 Wed Jun 4 12:14:20 2010
+	- Fixed typo in metatag functions. Thanks Sergiy Borodych.
+0.45 Wed Jun 4 03:40:00 2010
+	- Added META.yml
+	- Fixed versioning info.
+0.46 Wed Jun 4 03:40:00 2010
+	- Fixed issue with test video. Variable bitrates give variable responses.
+0.47 Wed Oct 27 7:27:00 2010
+	- Fixed Mac OS X Compilation issue. Thanks Mischa Spiegelmock.
+	- Fixed META.yml desription.
+	- Lowered required version of libavformat to compile on Debian Lenny.

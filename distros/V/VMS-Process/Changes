@@ -1,0 +1,56 @@
+Revision history for Perl extension VMS::Process.
+
+0.01  Thu Sep 18 12:22:04 1997
+	- Copied over from VMS::ProcInfo. (Yes, I know they're not all that
+      similar. It was a place to start)
+
+0.02  Mon Sep 22 11:40:04 1997
+    - Added support for passing an array ref to process_list()
+    - Added support in for handling COMPARISON and MODIFIER elements
+    - Added in enum support, so you can pass names to STATE, MODE, and
+      JOBTYPE.
+
+0.03  Tue Sep 23 10:00:00 1997
+    - Took the pre and * things out of COMPARISONS and put 'em in
+      MODIFIERS where they really belong.
+
+1.00  Mon Sep 29 11:31:00 1997
+    - Made a few tweaks to get it to compile and run properly on an OpenVMS
+      Alpha 6.2 cluster system. Seems to be release quality, so it is.
+
+1.01  Tue Nov 25 17:50:00 1997
+    - Started the merge of Process and ProcInfo.
+    - Fixed some typos in the README
+    - Disabled the tied hash and object interfaces for right now, until I
+      can get them better sorted out.
+
+1.02  Wed Nov 26 8:19:03 1997
+    - It's alive! Final debugging and testing, and it works. Function only,
+      but it's a darned good start, I think.
+
+1.03  Wed Nov 26 8:57:12 1997
+    - Can't resist tweaking some. Made doc changes to Process.PM
+
+1.04  Thu Jan 15 14:17:43 1998
+    - Forgot DFWSCNT! How could I have forgotten that? :) Added it in.
+    - Minor doc tweak. (Took out mention of ProcInfo, which has gone away)
+
+1.05  Tue May 26 13:15:43 1998
+    - Tweaked some for Vax builds. (#ifdef'd out all the references to
+      Quadwords and __int64s)
+
+1.06  Fri Oct 02 20:43:03 1998
+    - Fixed up the item pre-clear code in process_list
+    - Fixed another dopey programming error that filled in the wrong SV in
+      some cases. (Duh!)
+    Both these fixes courtesy of Sebastian Bazley.
+
+1.07 Sat Apr 11 09:44:00 2009
+    - Changed C<#ifdef __ALPHA> to C<#ifndef __VAX> so we can run on OpenVMS I64.
+    - Modernized a few global variables (e.g., sv_yes -> PL_sv_yes).
+
+1.08 Sat Apr 11 10:11:00 2009
+    - PAUSE refused to index 1.07
+
+1.09 Mon Jun 17 20:50:00 2013
+    - Dodge memory leak by mortalizing AllPurposeHV.

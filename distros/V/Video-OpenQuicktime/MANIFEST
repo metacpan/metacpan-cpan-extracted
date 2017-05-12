@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+OpenQuicktime.pm
+README
+eg/sample.mov
+eg/p8241014.mov
+t/JpegQuicktime.t
+t/OpenQuicktime.t
+

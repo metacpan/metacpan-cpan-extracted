@@ -1,0 +1,24 @@
+---
+abstract: 'Powerful Data Validation Framework'
+author:
+  - 'Al Newkirk <anewkirk@ana.io>'
+build_requires:
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Validation-Class
+requires:
+  Hash::Flatten: '0'
+  Hash::Merge: '0'
+  List::MoreUtils: '0'
+  Module::Find: '0'
+  Module::Runtime: '0'
+  Scalar::Util: '0'
+  perl: '5.010'
+version: '7.900057'

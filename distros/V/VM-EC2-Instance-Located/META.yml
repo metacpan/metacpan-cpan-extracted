@@ -1,0 +1,25 @@
+---
+abstract: 'A quick check to determine if the currently running code is running on a AWS EC2 instance.'
+author:
+  - 'Rusty Conover <rusty@luckydinosaur.com>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VM-EC2-Instance-Located
+requires:
+  Net::DNS: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rustyconover/vm-ec2-instance-located/issues
+  homepage: http://search.cpan.org/dist/VM-EC2-Instance-Located/
+  repository: git://github.com/rustyconover/vm-ec2-instance-located.git
+version: '0.13'

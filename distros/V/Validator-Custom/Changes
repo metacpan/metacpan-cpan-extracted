@@ -1,0 +1,398 @@
+Revision history for Perl module Validator::Custom
+
+1.0201 2017-01-07
+  - improve document
+1.02 2017-01-07
+  - Fixed typo: SYNOPSYS -> SYNOPSIS
+  - Fixed pod warning - multibyte unicode character requires "=encoding UTF-8"
+  - Fixed a couple of small typos in the doc
+  - Fix test because Object::Simple is updated.
+1.01 2015-12-10
+  - add more simple interface for validation.
+    Documentation is rewrited completely.
+    I recommend current interface.
+  - add Validator::Custom::Validation object.
+  - add add_check method.
+  - add check method.
+  - add check_each method.
+  - add add_filter method.
+  - add filter method.
+  - add filter_each method.
+  - add the following checking functions.
+      ascii_graphic
+      number
+      int
+      in
+  - add the following filter functions.
+      remove_blank
+      trim
+0.28
+  - improve decimal check. you can specify undef value which mean unlimit muximanu digits
+    Example:
+    Data: {num1 => '1233555.89345', num2 => '1121111.45', num3 => '12.555555555'}
+    Rule: $rule->require('num1')->check('decimal')
+      $rule->require('num2')->check({'decimal' => [undef, 2]})
+      $rule->require('num2')->check({'decimal' => [2, undef]})
+0.27
+  - add to_array_remove_blank constraint.
+0.26
+  - add filter method, this is check method alias for readability
+  - rename Validator::Custom::Rule array(this is added at 0.25) method to each
+0.25
+  - add string constraint. This is used to check the value is string.
+    $rule->require('k1')->check('string')
+    If value is not defined or reference, this check return false.
+  - You can call multiple check calls.
+    $rule->check('string')->check('not_blank');
+  - You can write only $rule->require('k1')
+    from now, $rule->require('k1') take syntax error.
+  - message can write each check
+    $rule->require('k1')
+      ->check('string')->message('k1 should be string')
+      ->check('not_blank)->message('k1 should be not blank')
+  - add message fallback system.
+    If message is not set to some constraint, the message is automatically set
+    by using after message.
+    $rule->require('k1')
+      ->check('string')->check('not_blank')->message('k1 should be string having length')
+  - add check_or method to Validator::Custom::Rule
+    $rule->require('k1')->check_or('blank', 'int');
+    This is improvemet of "or" validation, for exmpale 'blank || int'
+  - Validator::Custom::Result error_reason is DEPRECATED! This method don't work correct from now.
+  - add array method to Validator::Custom::Rule
+    $rule->require('nums')->array(1)->check('int');
+    This is improvement of array validation using "@"
+    $rule->require('nums')->check('@int');
+0.24
+  - when default option is specified, result data become valid
+    (This is backword imcompatible, but old behavior is a little
+     wrong and new behavior is better)
+0.23
+  - remove syntax attribute
+  - use constraints function from $_ in constraint function;
+    ----------------------------------------------------
+    my $rule = [
+      title => [
+        sub { $_->blank($_[0]) || $_->regex($_[0], qr/[0-9]+/) }
+      ]
+    ];
+    ----------------------------------------------------
+
+  - add create_rule method and new rule syntax
+    ----------------------------------------------------
+    my $rule = $vc->create_rule;
+    $rule->require('id')->check(
+      'int'
+    )->message('id should be integer');
+    $rule->require('name')->check(
+      ['not_blank' => 'name is emtpy'],
+      [{length => [1, 5]} => 'name is too long']
+    );
+    $rule->optional('age')->check(
+      'int'
+    )->default(20);
+    ----------------------------------------------------
+0.22
+  - remove Validator::Custom::Rules(EXPERIMANTAL) because this rule set can't manipulate
+    multiple rules well
+0.21
+  - normalized_rule attribute(EXPERIMENTAL) is changed to rule_obj(EXPERIMENTAL)
+    rule become saved as object.
+  - validate method can receive Validator::Custom::Rule object(EXPERIMENTAL)
+  - add Validator::Custom::Rule and Validator::Custom::Rules to manipulate multiple rules easily
+  - add EXPERIMENTAL filter representation in filter function
+    {result => 1, output => $value} mean [1, $value];
+0.20
+  - add EXPERIMENTAL feature that you can return custom error message
+    in user constraint function.
+0.19
+  - suppress filter function undef warning.
+0.18
+  - remove EXPERIMENTAL parse_rule method.
+  - add EXPERIMENTAL normalized_rule attribute.
+  - improved syntax error message.
+0.17
+  - improved description.
+0.16
+  - added EXPERIMANTAL parse_rule method
+    to know how Validator::Custom parse rule
+0.15
+  - added length constraint syntax {length => {min => ..., max => ...}}
+  - added trim_uni, trim_uni_collapse, trim_uni_lead, trim_uni_trail
+    to trim unicode space charctor
+0.1428
+  - fixed bug that number related constraint match unicode number by \d.
+    From now, only 0-9 is matched.
+    the following constraint functions is effected.
+      between, date_to_timepiece, datetime_to_timepiece, equal_tom,
+      greater_than, less_than, int, uint
+  - fixed bug that between constraint can't receive decimal number.
+  - fixed bug that equal_to constraint can't receive decimal number.
+  - fixed bug that greater_than constraint can't receive decimal number.
+  - fixed bug that less_than constraint can't receive decimal number.
+  - fixed but that not_space, space match unicode space character.
+  - fixed bug that trim, trim_collapse, trim_lead, trim_trail remove unicode space character.
+0.1427
+  - fixed bug that missing parameter had not send to constraint function.
+0.1426
+  - improved undefined value validation
+  - removed EXPERIMETAL status from Validator::Custom::Result::loose_data method
+0.1425
+  - added EXPERIMENTAL Validator::Custom::Result loose_data method
+  - can set code reference to rule default option to get data at read time.
+  - changed backword compatible policy
+    ------------------------------------------------------------------------
+    If a functionality is DEPRECATED, you can know it by DEPRECATED warnings
+    except for attribute method.
+    You can check all DEPRECATED functionalities by document.
+    DEPRECATED functionality is removed after five years,
+    but if at least one person use the functionality and tell me that thing
+    I extend one year each time you tell me it.
+
+    EXPERIMENTAL functionality will be changed without warnings.
+    ------------------------------------------------------------------------
+    
+0.1424
+  - added to_array filter
+0.1422
+  - added require option
+0.1421
+  - removed EXPERIMENTAL status from DBIx::Custom::Result to_hash()
+  - removed EXPERIMENTAL status from js_fill_form_button, 
+  - removed EXPERIMENTAL status from datetime_to_timepiece, date_to_timepiece
+0.1420
+  updated pod
+0.1419
+  fixed test
+0.1418
+  fixed test
+0.1417
+  fixed test
+0.1416
+  adeed experimental datetime_to_timepiece constraint
+0.1415
+  added experimental Validator::Custom::Result to_hash method
+  added experimental date_to_timepiece constraint
+0.1414
+  fixed merge constraint bug
+0.1413
+  added any constraint
+  fixed js_fill_form_button bug
+0.1412
+  fixed tests
+0.1411
+  added experimental js_fill_form_button method
+0.1410
+  fixed negativate constraint bug
+  fixed "or" condition constraint function
+0.1409
+  added space constraint function
+0.1408
+  updated document
+  (experimental) added merge filter
+  deprecated shared_rule attribute
+  (experimental)improved "or" condition validation syntax
+0.1407
+  fixed document
+0.1406
+  updated document
+0.1405
+  updated document
+0.1404
+  deprecated calling register_constraint method from class.
+  removed the document of deprecated methods
+0.1403
+  moved documents to Validator::Custom::Guides
+0.1402
+  added is_valid('ARG') syntax
+0.1401
+  fixed duprication result value([$value, $value] to $value])
+  renamed Validator::Custom::Result::has_missing_param to has_missing
+  renamed Validator::Custom::Reuslt::is_valid to is_ok. is_valid is deprecated
+  added experimental has_invalid
+  removed experimental default_message
+  added experimental message option
+  adeed experimantal copy option
+  added experimental default option
+0.1304
+  added experimental "Validate::Custom::Result has_missing_param" method
+0.1303
+  fix missing_params bugs
+  added experimental "default_messages" attributes
+  depricated "error_infos", "add_error_info", and "remove_error_info"
+0.1302
+  added experimental "Validator::Custom::Result missing_params" attribute
+0.1301
+  added experimental negative syntax
+0.1211
+  fixed document
+0.1210
+  required Perl 5.008001, enable Carp trust relationship
+0.1209
+  fixed Carp trust relationship
+0.1208
+  added the following constraints
+    trim
+    trim_lead
+    trim_trail
+    trim_collapse
+
+0.1207
+  added the following constraints
+    not_defined
+    defined
+    not_space
+    not_blank
+    blank
+    int
+    uint
+    ascii
+    shift
+    duplication
+    length
+    regex
+    http_url
+    selected_at_least
+    greater_than
+    less_than
+    equal_to
+    between
+    decimal
+    in_array
+
+0.1206
+  updated document
+0.1205
+  updated document
+0.1204
+  updated document
+0.1203
+  updated document
+0.1202
+  fixed document
+  fixed error message
+  added EXPERIMENTAL shared_rule attribute
+0.1201
+  added Validator::Custom::Result message()
+  added Validator::Custom::Result messages()
+  added Validator::Custom::Result messages_to_hash()
+  added Validator::Custom::Result invalid_params()
+  added Validator::Custom::Result invalid_rule_keys()
+  added Validator::Custom::Result raw_data()
+  deprecated Validator::Custom::Result errors()
+  deprecated Validator::Custom::Result errors_to_hash()
+  deprecated Validator::Custom::Result error()
+  deprecated Validator::Custom::Result invalid_keys
+0.1103
+  updated document.
+  Validator::Custom became stable. Backword compatible of 0.1103 is keeped in. You can use Validator::Custom at ease.
+0.1102
+  removed add_constraint() method(not backword compatible)
+0.1101
+  constraint function must return array reference, not array(not backword compatible)
+  removed Validator::Custom validation_rule attribute(not backword compatibe)
+  saved all value of data to Validator::Customm::Result data attribute(not backword compatible)
+  Validator::Custom::Result products attribute renamed to data(not backword compatible)
+0.1002
+  add_constraint is depricated. it is renamed to register_constraint
+0.1001
+  added Validator::Custom::data_filter()
+  added Validator::Custom::Result::errors_to_hash()
+  improved exception logic
+0.0902
+  update document
+0.0901
+  Validator::Custom error_infos data structure is changed(array ref to hash ref)
+  add or validation
+0.0802
+  fix pod-coverage.t
+0.0801
+  "rule" is added in place of "validaton_rule"
+  "validation_rule" is deprecated
+updata document
+  "error_infos" and "add_error_info" is added to Validation::Custom::Result
+0.0708
+  catch up with 'Object::Simple' update
+0.0706
+  fix error message test
+0.0705
+  catch up with 'Object::Simple' update
+0.0704
+  cleanup
+0.0702
+  cleanup
+0.0701
+  add 'error' method
+  'is_invalid' method can receive a specified key.
+0.0608
+  update document
+  fix corelative key bug
+0.0607
+  improve error message
+  add syntax method for seeing validation rule syntax
+0.0606
+  improve error message
+  delete Validator::Custom::Result errors_to method (not backword compatible)
+  delete Validator::Custom::Result products_to method (not backword compatible)
+  delete Validator::Custom::Result invalid_keys_to method (not backword compatible)
+0.0605
+  catch up Object::Simple version up 2.0702
+0.0604
+  catch up Object::Simple version up 2.0701
+0.0603
+  catch up Object::Simple version up 2.0603
+0.0602
+  catch up Object::Simple version up 2.0602
+0.0601
+  add_constraint method can be used as object method and class method
+  constraints method can be used as object mehtod and class mehtod
+0.0501
+  add 'is_valid' method to Validator::Custom::Result
+0.0401
+  validate method return Validator::Custom::Result object, not $self (not backword compatible)
+  resutls method is renamed to products (not backword compatible)
+0.0303
+  bag fix: second validation is fail when hash specify as constraint
+0.0302
+  improve error message
+0.0301
+  rename validators to validation_rule to understand easy (not backword compatible). 
+0.0211
+  add output accessor. errors_to, invalid_keys_to, results_to.
+0.0210
+  bag fix : validator args is passed as empty array ref when args don't exists
+0.0209
+  add : syntax sugur
+  add : invalid_keys accessors
+0.0208
+  delete : some accessors
+0.0207 
+  add : some accessors
+0.0206
+  change: options delete
+  change: the way to get result is changed
+  add   : add some test
+0.0205
+  change : Build.PL requires => { Object::Simple => 2.0018 }
+  add : can pass option to constraint function
+  add : results attribute
+  add : can inheritable customize
+  add : error_stock attribute
+  add : correlation check
+
+0.0204
+  catch up Object::Simple update 2.0003
+  change: errors methods dereference
+
+0.0203
+  rename add_validator to add_constraint
+  rename validators to constraints
+  rename $VALIDATORS to $CONSTRINTS
+  catch up Object::Simple bag fix
+
+0.0202
+  bag fix: $validator is spliced
+0.0201
+  first release
+0.01_01
+  first develope release

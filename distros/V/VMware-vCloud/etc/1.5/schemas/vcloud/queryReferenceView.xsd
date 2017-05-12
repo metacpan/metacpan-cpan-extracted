@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright © 2009 VMware, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Except as explicitly provided herein, no express or implied licenses, under any VMware patents, copyrights, trademarks, or any other intellectual property rights, are granted or waived by implication, exhaustion, estoppel, or otherwise, on modified versions of the Software.
+-->
+<xs:schema xmlns="http://www.vmware.com/vcloud/v1.5" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.vmware.com/vcloud/v1.5" version="1.0">
+
+    <xs:include schemaLocation="common.xsd"/>
+    <xs:include schemaLocation="entity.xsd"/>
+       <xs:annotation>
+        <xs:documentation xml:lang="en">
+            Schema for the entities returned by the referenceView query handler.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="OrgReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Org reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="OrgReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Org reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="OrgVdcReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for OrgVdc reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="OrgVdcReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               OrgVdc reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="MediaReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Media reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="MediaReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Media reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppTemplateReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VAppTemplate reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppTemplateReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VAppTemplate reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VApp reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VApp reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VMReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VM reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VMReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VM reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="OrgNetworkReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for OrgNetwork reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="OrgNetworkReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               OrgNetwork reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppNetworkReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VAppNetwork reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppNetworkReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VAppNetwork reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="CatalogReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Catalog reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="CatalogReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Catalog reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="AdminVdcReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for AdminVdc reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="AdminVdcReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               AdminVdc reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VMWProviderVdcReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VMWProviderVdc reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VMWProviderVdcReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VMWProviderVdc reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="NetworkReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Network reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="NetworkReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Network reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="GroupReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Group reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="GroupReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Group reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="UserReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for User reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="UserReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               User reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="RoleReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Role reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="RoleReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Role reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="DatastoreReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Datastore reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="DatastoreReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Datastore reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="NetworkPoolReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for NetworkPool reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="NetworkPoolReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               NetworkPool reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VirtualCenterReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VirtualCenter reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VirtualCenterReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VirtualCenter reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="HostReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Host reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="HostReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Host reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="RightReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Right reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="RightReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Right reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppOrgNetworkRelationReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for VAppOrgNetworkRelation reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="VAppOrgNetworkRelationReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               VAppOrgNetworkRelation reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="CatalogItemReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for CatalogItem reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="CatalogItemReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               CatalogItem reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="TaskReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for Task reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="TaskReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               Task reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="BlockingTaskReferences" type="ReferencesType" substitutionGroup="References">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               A container for BlockingTask reference elements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:element name="BlockingTaskReference" type="ReferenceType" substitutionGroup="Reference">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+               BlockingTask reference element.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+</xs:schema>

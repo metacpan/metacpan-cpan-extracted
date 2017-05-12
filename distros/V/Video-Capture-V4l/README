@@ -1,0 +1,84 @@
+NAME
+    Video::Capture::V4l - Perl interface to the Video4linux framegrabber
+    interface.
+
+SYNOPSIS
+      use Video::Capture::V4l;
+
+DESCRIPTION
+    Not documentation AGAIN! Please see the scripts grab, inexer or vbi that
+    are packaged in the distribution and direct any question and feature
+    requests (as well as bug reports) to the author.
+
+Exported constants
+    The following hideous constants are defined in the "Video::Capture::V4l"
+    package, but you rarely need to use them.
+
+      AUDIO_BASS
+      AUDIO_MUTABLE
+      AUDIO_MUTE
+      AUDIO_TREBLE
+      AUDIO_VOLUME
+      CAPTURE_EVEN
+      CAPTURE_ODD
+      MAX_FRAME
+      MODE_AUTO
+      MODE_NTSC
+      MODE_PAL
+      MODE_SECAM
+      PALETTE_COMPONENT
+      PALETTE_GREY
+      PALETTE_HI240
+      PALETTE_PLANAR
+      PALETTE_RAW
+      PALETTE_RGB24
+      PALETTE_RGB32
+      PALETTE_RGB555
+      PALETTE_RGB565
+      PALETTE_UYVY
+      PALETTE_YUV410P
+      PALETTE_YUV411
+      PALETTE_YUV411P
+      PALETTE_YUV420
+      PALETTE_YUV420P
+      PALETTE_YUV422
+      PALETTE_YUV422P
+      PALETTE_YUYV
+      SOUND_LANG1
+      SOUND_LANG2
+      SOUND_MONO
+      SOUND_STEREO
+      TUNER_LOW
+      TUNER_MBS_ON
+      TUNER_NORM
+      TUNER_NTSC
+      TUNER_PAL
+      TUNER_RDS_ON
+      TUNER_SECAM
+      TUNER_STEREO_ON
+      TYPE_CAMERA
+      TYPE_TV
+      VC_AUDIO
+      VC_TUNER
+      TYPE_CAPTURE
+      TYPE_CHROMAKEY
+      TYPE_CLIPPING
+      TYPE_FRAMERAM
+      TYPE_MONOCHROME
+      TYPE_OVERLAY
+      TYPE_SCALES
+      TYPE_SUBCAPTURE
+      TYPE_TELETEXT
+      TYPE_TUNER
+
+AUTHOR
+    Marc Lehmann <schmorp@schmorp.de>
+
+LICENSE
+    This module is available under GPL only (see the file COPYING for
+    details), if you want an exception please contact the author, who might
+    grant exceptions freely ;)
+
+SEE ALSO
+    perl(1).
+

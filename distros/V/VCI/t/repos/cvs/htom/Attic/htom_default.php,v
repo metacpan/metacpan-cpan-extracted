@@ -1,0 +1,71 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \class HTOM_Default
+*/
+class HTOM_Default implements HTOM_Attribute
+{
+  //! Construct the HTOM_Default object.
+  /* \param value either the string value, or HTOM_Default object
+   */
+  public function __construct( $value="" )
+  {
+    if ($value instanceof HTOM_Default) {
+      $this->value = $value->value;
+    } else {
+      $this->value = $value;
+    }
+  }
+
+
+  //! Get the object name.
+  public function Name()
+  {
+    return "HTOM_Default";
+  }
+
+  //! Evaluate to default attribute.
+  public function Evaluate()
+  {
+    return "value='".$this->value."'";
+  }
+
+  private $value = "";
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

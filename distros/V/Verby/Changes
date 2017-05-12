@@ -1,0 +1,26 @@
+* Changes for 0.05
+
+- Fix the skip() calls in t/action_run.t
+- Weird occasionaly premature deletion of output handle caused failure of same
+  test. Wheel is no longer deleted in the sigchld handler, allowing remaining
+  output to be delivered.
+
+* Changes for 0.04
+
+- Fix Test::Plan idiocy
+- Fix Verby::Action::Run
+- Remove various miscellaneous actions from the main Verby distribution into
+  their own dists
+- Add support for POE::Component::ResourcePool, to facilitate throttling of
+  step execution
+
+* Changes for 0.03 (9.12.2006)
+
+* Changes for 0.02 (9.12.2006)
+
+- Use Moose for all the boring OO bits
+- use POE for the underlying async runloop
+
+* Changes for 0.01 (6.25.2005)
+
+- module released to the unsuspecting world

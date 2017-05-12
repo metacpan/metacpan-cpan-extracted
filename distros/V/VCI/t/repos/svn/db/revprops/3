@@ -1,0 +1,19 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-05-07T05:07:26.506639Z
+K 7
+svn:log
+V 307
+Scrapped the base->protocol->driver logic, simplified to base->protocol, abstracting the game-specific display aspect into simple php templates.
+
+Redid the naming scheme for protocols and templates.
+
+Added support for HalfLife and SourceEngine protocols.
+
+Added a simple "Dump" template, useful for testing.
+END

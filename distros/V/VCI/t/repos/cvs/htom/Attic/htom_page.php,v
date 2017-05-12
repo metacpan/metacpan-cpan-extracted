@@ -1,0 +1,177 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.43.04;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \mainpage HyperText Object Model
+\image html  htom-logo.png
+The hTom library is a set of PHP5 classes that abstracts HTML elements into object oriented PHP language structure.
+The idea of hTom libary is to create a simple design methodolody that enables web-page developers for object-oriented
+page structure design and code reusing.
+\paragraph Elements
+\ref ElementsDesignMetodology refer the short descriptio on how the HTML elements are build.
+\section EmbeddingJavaScript Embedding JavaScript
+\section StylesheetUsage Stylesheet usage
+\section todo ToDo
+*/
+
+/*! \page ElementsDesignMetodology Elements desing methodology
+\section Introduction Introduction
+All the HTML objects are designed as a classes that extends the HTOM_Element class. The 
+HTOM_Element creates an interface for rendering the element into a HTML output derived form
+the HTOM_Evaluable. On the other hand, the HTOM_Element implements some common HTML 
+elements methods that enables the HTML object attributes management and JavaScript handling.
+\subsection ElementID Element ID
+Each of the HTML elemetnts contains an unique identifier. Every HTOM element should create own
+ID on the constructor, so the user of hTom elemet classes does not care about it.
+\subsection ElementAttributes Attributes
+The HTOM_Element may contain a number of HTML attributes. All the attributes extends the HTOM_Attribute
+class. The common way to set the attribute for the HTOM_Element is to call the HTOM_Element::SetAttributes method:
+\code
+$paragraph = new HTOM_Paragraph();
+$paragraph->SetAttributes( new HTOM_SimpleAttribute("color","black") );
+\endcode
+
+\subsection ElementJavaScript Element JavaScript actions
+One can add a JavaScript that handles the HTML element actions. The JS handler may be attached to
+the HTML element event by using the HTOM_Element::SetJSAction. 
+Usualy the JavaScript uses some ID's of the elements. When attaching thr HTOM_JScript to the
+HTOM_Element, the elements automaticaly register an keyword {ID} for the script body. The {ID} keyword 
+is set to the ID of the element, so one can use it in the JavaScript in order to refer the element - see the example:
+\code
+$showAction = new HTOM_JScript("alert('The link {ID} has been clicked.')");
+$link = new HTOM_Link( "Click here to see the JavaScript result of the first link","" );
+$link->SetJSAction("onclick",$showAction);
+\endcode
+
+\subsection ElementOwndElement Creating own elements
+In order to create own HTOM element, one have to extend the HTOM_Element class. The element
+implementation must call to the HTOM_Element::Init method in the constructor, and implement the
+HTOM_Evaluable interface.
+First call initializes the HTOM_Element - especialy sets the ID of the element.
+While evaluating the element to HTML string one has to use attributes assigned to the element.
+In order to get the attributes, one has to get the attributes string as a result of the HTOM_Evaluable::Attributes
+method.
+*/
+
+
+
+/*! \class HTOM_Page
+ * \brief The HTOM_Page class represents a HTML page. 
+ * 
+ * The HTOM_Page object may be used to render the HTML page. It creates all esential page
+ * tags, and sets the page body. The page body shoul be set by the SetContent method.
+ * \example htom_example1.php
+ */
+class HTOM_Page implements HTOM_Evaluable
+{
+  /*! \brief Initialize the HTOM_Page object.
+   *
+   * \param title a page title,
+   * \param style a page style definition.
+   */
+  public function __construct( $title=NULL, HTOM_StyleDef $style=NULL )
+  {
+    $this->title = $title;
+    $this->styleDef = $style;
+  }
+
+  //! Set the definition of a style to be used on the page.
+  public function SetStyle( HTOM_StyleDef $style )
+  {
+    $this->style = $style;
+  }
+
+  //! Change the default character set encoding.
+  public function SetCharacterSet( $cs )
+  {
+    $this->characterSet=$cs;
+  }
+  
+  //! Set the page content.
+  public function SetContent( HTOM_Element $content )
+  {
+    $this->content = $content;
+  }
+  
+  //! Get the page stream data.
+  public function Evaluate()
+  {
+    $result = "";
+    $result.= "<html>";
+    $result.="<head>";
+    $result.="<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html\"; charset=\"".$this->characterSet."\">\n";
+    foreach( HTOM_JSRegistry::GetList() as $key => $value )
+      {
+	$result.="   <script language=\"JavaScript\" charset=\"".$this->characterSet."\" src=\"".$value."\"></script>\n";
+      }
+    $result.="</head>";
+    $result.= "<body>";
+    if (isset($this->styleDef)) {
+      $result.= $this->styleDef->Evaluate();
+    }
+    $result.= "<title>".$this->title."</title>";
+    if (isset($this->content)) {
+      $result.= $this->content->Evaluate();
+    }
+    $result.= "</body>";
+    $result.= "</html>";
+    return $result;
+  }
+
+  private $styleDef = NULL;
+  private $title;
+  private $content;
+  private $characterSet = "utf-8";
+}  
+
+
+?>
+@
+
+
+1.2
+log
+@Added documentation main-page
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d3 53
+@
+

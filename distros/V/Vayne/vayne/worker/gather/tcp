@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use Vayne::Socks;
+use Vayne::Worker;
+use Storable qw(thaw freeze);
+use JSON::XS;
+
+register 'tcp' => sub {
+    my($workload, $step, $result, $status) = @_;
+
+    my (%opt, %ret) = %{ $step->{param} };
+
+    my($fh, $err) = Vayne::Socks::connect($workload => $opt{port}, 10);
+
+    $ret{node} = $workload;
+
+    if(!$err and $fh and my $output = <$fh>)
+    {
+        if($output =~ /$opt{check}/){
+            $ret{msg} = "check ok";
+            $status->($ret{stat} = 1);
+        }else{
+            $ret{msg} = "invalid response";
+            $status->($ret{stat} = 0);
+        }
+
+    }else{
+        $err = "read timeout" if !$err and $!;
+        $ret{msg} = $err || "connect failed";
+        $status->($ret{stat} = 0);
+    }
+    $result->( lc $opt{serial} eq 'storable' ? freeze \%ret : encode_json \%ret );
+
+}, 100;
+Vayne::Worker->run;

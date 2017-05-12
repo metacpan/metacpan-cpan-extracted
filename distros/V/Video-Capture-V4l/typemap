@@ -1,0 +1,15 @@
+TYPEMAP
+
+Video::Capture::V4l::Capability			STRUCT
+Video::Capture::V4l::Channel			STRUCT
+Video::Capture::V4l::Audio			STRUCT
+Video::Capture::V4l::Tuner			STRUCT
+Video::Capture::V4l::Picture			STRUCT
+
+UI						T_IV
+
+INPUT
+
+STRUCT
+	$var = old_struct ($arg, \"$ntype\")
+

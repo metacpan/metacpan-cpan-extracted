@@ -1,0 +1,291 @@
+=head1 NAME
+
+VirtualFS::ISO9660 - Perl extension allowing programs to open files inside
+ISO-9660 format CD images.
+
+=head1 SYNOPSIS
+
+	$ref = new VirtualFS::ISO9660('file.iso') or die "Can't open file.iso: $!";
+	$ref = new VirtualFS::ISO9660('file.iso', -verbose => 1);
+	
+	$ref->opendir($dh, '/') or die "Can't open rootdir in file.iso";
+	print "files in file.iso's root directory:\n";
+	for ($dh->readdir) { print "\t$_\n"; }
+	print "let's see that again!";
+	$dh->rewinddir();
+	for ($dh->readdir) { print "\t$_\n"; }
+	# there is no $dh->closedir; just undef $dh or something when you're done
+	# with it.
+
+	# NOTE! ONLY THE 3-ARGUMENT FORM OF open IS SUPPORTED!
+	$ref->open($fh, '<', '/MANIFEST');
+	print "the MANIFEST file contains:\n";
+	# this will have to do until perl adds STAT support for tied filehandles
+	@stats1 = tied($fh)->STAT;
+	@stats2 = $ref->stat('/MANIFEST');
+	while (<$fh>) {
+		print "$_\n";
+	}
+	# unlike closedir, $fh is a "real" (tied) filehandle, and you close it
+	# normally.
+	close $fh;
+
+=head1 DESCRIPTION
+
+Linux systems (and probably other Unix-y OSes like *BSD) have a 'loop' device that
+allow you to take a filesystem embedded in another file, and mount it as if it
+were normal media:
+
+		mount file.iso /cdrom -t iso9660 -o ro,loop
+		
+Unfortunately, this suffers from some problems:
+
+=over
+
+=item *
+
+Windows users cannot benefit from this. (I<You> may not think that Windows is
+important, but you are not the only person on the planet.)
+
+=item * 
+
+For the systems that *do* support such a loop device, this only works if the
+kernel has been compiled loop device compiled in; thus, using this feature 
+may require recompilation of the kernel.
+
+=item *
+
+And for systems that have a loop device, and for which the loop device is
+enabled, a user also must normally be root in order to execute the mount
+command.  Not everybody has root on the machines they're using.
+
+=back
+
+VirtualFS::ISO9660 was written to avoid these three issues entirely, by
+internally emulating a ISO-9660 filesystem driver.  It can be used to list
+the contents of a directory (with ->opendir() and ->readdir()), and it can be
+used to open files inside the ISO image and read their contents.
+
+=head2 VirtualFS::ISO9660 Public Methods
+
+=head3 C<new>
+
+Constructs a new VirtualFS::ISO9660 object tied to a specific file, specified by
+C<filename>.
+If options are specified, they are a set of (name, value) pairs (think flattened
+hash). Currently, no options are defined.
+
+Examples:
+
+	# open foo.iso with default options
+	$x = new VirtualFS::ISO9660 ('foo.iso');
+	# open bar.iso, disabling Joliet support (this is moot because this module
+	# does not yet support Joliet)
+	$y = new VirtualFS::ISO9660 ('bar.iso', -nojoliet => 1);
+
+=head3 C<opendir>
+
+	$x->opendir(my $ref, $path) or die "can't open $path\: $!";
+
+Open a directory specified by C<path>.  It doesn't matter if C<path> starts with '/',
+since everything has to be absolute (there is no current directory to be relative to).
+Note that, since there is no such thing as a tied directory handle, $ref MUST be
+a scalar lvalue capable of holding a reference to an object.  Unlike the real
+C<opendir>, where C<opendir($dirh, 'bar')> would make $dirh a reference to the GLOB
+containing the IO handle, this method simply creates an object. 
+
+=head3 C<stat>
+
+	@s = $x->stat('/');
+	@s = $x->stat('/COPYRIGH');	# note that ISO9660 limits filenames to 8 characters
+	
+Emulates the L<perlfunc/stat> builtin. Returns the same arguments, in the same
+order.  Zeroes most values.  The first two values (device and inode), which are
+numbers when returned by the real C<stat>, are actually references to data related
+to file being statted.
+
+=head3 C<identifier>
+
+	%all_ids = $o->identifier;
+	$one_id  = $o->identifier('system');
+	@several_ids = $o->identifier('system', 'publisher');
+
+Pulls stuff out of the Volume Descriptor.
+The valid keys are 'system', 'volume', 'volume_set', 'publisher', 'preparer', and 'application'.
+
+=head3 C<id_file>
+
+See C<identifier> for instructions on use. Here, the keys are 'copyright', 'abstract', and 'biblio'.
+
+NOTE: These accessors will probably change in the future. As in, within the next few versions.
+
+=head2 VirtualFS::ISO9660 Internal Methods/Functions
+
+These functions are documented so that people who want to hack at this module
+can better understand how it works.
+
+=head3 C<__readsectors>
+
+	__readsectors($filehandle, $buffer, $firstsector); # reads 1 sector
+	__readsectors($filehandle, $buffer, $firstsector, $N); # reads $N sectors
+
+This internal function is used to read one or more sectors out of the ISO image.
+Each CD-ROM sector is 2048 bytes.
+
+=head3 C<__extract_pathtablerec>
+
+	$info = __extract_pathtablerec($data);	# leaves $data alone
+	$info = __extract_pathtablerec(\$data); # strips the record it reads from $data
+
+This function is used to process the path tables (somewhat of a cached copy of the
+directory tree located on the CD-ROM).	It reads and decodes exactly one path table
+entry.
+
+=head3 C<__extract_pathtable>
+
+	$pathtable = __extract_pathtable($pathtabledata, $pathtabledatasize);
+	
+This function calls _extract_pathtablerec repeatedly to extract every path table
+entry into one large array, then returns a reference to that array.
+
+=head3 C<__build_pathtree>
+
+	$pathtree = __build_pathtree(__extract_pathtable($ptdata, $ptdatasize));
+
+This function converts the flat array generated by __extract_pathtable into
+a hierarchical nest of hashes and arrayrefs that reflects the actual directory
+tree.
+
+=head3 C<__extract_direntry>
+
+	$direntry = __extract_direntry($rawentry);
+	
+Extracts the contents of $rawentry into a hash, then returns a reference to
+that hash.
+
+=head3 C<__extract_voldesc>
+
+	$voldesc = __extract_voldesc($rawvd);
+	
+Extracts the contents of $rawvd into a hash, then returns a reference to that
+hash.
+
+=head3 C<__startpos>
+
+	$filepos = $iso9660obj->__startpos('/autorun.inf');
+	$rootpos = $iso9660obj->__startpos('/');
+	
+Returns the fileposition in the .ISO where the contents of the specified file
+or directory begin.  Intended as a debugging aid for those with a decent hex
+editor/viewer open to the .ISO image.
+
+=head3 C<__stat>
+
+	@s = $iso9660obj->__stat($href);
+	
+$href is a hash reference containing the information from a directory entry.
+This function is the backend for C<VirtualFS::ISO9660::stat> as well
+as C<VirtualFS::ISO9660::FileHandle::STAT>.
+
+=head2 VirtualFS::ISO9660::DirHandle Public Methods
+
+These are the public methods for the object referenced by $dirh after successfully
+calling:
+
+	$iso9660obj->opendir($dirh, '/');
+	
+
+=head3 C<readdir>
+
+This is the biggie. Works almost exactly like the real C<readdir>:
+
+	$one_file = $dirh->readdir;
+	@all_files = $dirh->readdir;
+
+=head3 C<rewinddir>
+
+Just like the real C<rewinddir>:
+
+	print "here are the files:\n";
+	for my $filename ($dirh->readdir) {
+		print "$filename\n";
+	}
+	$dirh->rewinddir;
+	print "and here they are again:\n";
+	for my $filename ($dirh->readdir) {
+		print "$filename\n";
+	}
+
+=head3 C<closedir>
+
+This function is only there for completeness; it is a no-op.  If you really
+want to close the handle, then just throw away the reference to the object.
+
+=head2 VirtualFS::ISO9660::DirHandle Internal Methods/Functions
+
+=head3 C<__readdir>
+
+This method reads exactly one directory entry and returns exactly one filename.
+It is called once for C<$dirh->readdir> in scalar context and looped over for
+array context.
+
+=head2 VirtualFS::ISO9660::FileHandle Public Methods
+
+=head3 C<STAT>
+
+This method does the equivalent of L<perlfunc/stat> on this virtual filehandle.
+
+=head2 VirtualFS::ISO9660::FileHandle Internal Methods/Functions
+
+TIEHANDLE, GETC, READ, and READLINE, for tying purposes.
+
+Also includes a __READLINE method; this is related to READLINE the exact
+same way that VirtualFS::ISO9660:DirHandle's C<__readdir> and C<readdir> methods
+are related.
+
+=head1 AUTHOR
+
+Stevie-O, soberholtzerE<#64>freedompay.com
+
+=head1 BUGS AND THEIR FRIENDS
+
+=over
+
+=item *
+
+The C<stat $fh> syntax doesn't work when $fh is a tied filehandle.  This means 
+that other things that depend on stat, like just about everything in -X, won't work either.
+For this, you'd need to do:
+
+	@stats = tied($fh)->STAT();
+
+It would be nice if someone could patch Perl to provide this functionality.
+
+=item *
+
+The following features do NOT work on the magic filehandles:
+
+=over
+
+=item *
+
+binmode
+
+=item *
+
+seek
+
+=item *
+
+tell
+
+=item *
+
+eof
+
+=back
+
+This is because L<perltie> (or at least 5.8.0's perltie) mentions them, but does not document how to use them.
+It also mentions an OPEN, but I have *no* idea what that does.
+
+=cut

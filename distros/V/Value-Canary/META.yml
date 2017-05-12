@@ -1,0 +1,16 @@
+---
+abstract: 'Callbacks for value destruction'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+generated_by: 'Dist::Zilla version 1.093000'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Value-Canary
+requires:
+  Carp: 0
+  Sub::Exporter: 0
+  Variable::Magic: 0
+  namespace::clean: 0
+version: 0.01

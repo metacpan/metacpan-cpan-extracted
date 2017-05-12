@@ -1,0 +1,32 @@
+Revision history for Perl extension Vector-QRCode-EPS
+
+0.08 2017-02-19T03:11:32Z
+    - Fixed a test-utility to support a setup section in generated postscript.
+      (Thanks to Josef Kutej and Wooter)
+
+0.07 2014-08-05T07:13:00Z
+    - more loose testing about cell accuracy
+
+0.06 2014-08-04T15:34:56Z
+    - refactor cell tests
+
+0.05 2014-06-25T04:58:18Z
+    - change dependency from PostScript::Easy to PostScript::Simple v0.08.
+      Because, PostScript::Simple was fixed a bug about providing some Test::* modules in version 0.08.
+    - fixed test to use Test::Differences.
+
+0.04 2014-06-04T09:02:44Z
+    - change dependency from PostScript::Simple to PostScript::Easy.
+      Because, PostScript::Simple provides Test::Simple 0.18 forcely under Carton.
+
+0.03 2014-05-07T09:47:27Z
+    - remove unwanted work in test
+    - add "qrcode_options" attribute
+
+0.02 2014-03-14T08:36:51Z
+    - add background color and transparent feature
+
+0.01 2014-02-28T07:02:15Z
+
+    - original version
+

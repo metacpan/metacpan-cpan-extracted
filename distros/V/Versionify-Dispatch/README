@@ -1,0 +1,32 @@
+Versionify-Dispatch version 0.2.4
+
+This module is designed to allow a version friendly approach to dispatching
+function calls. One possible use of this is in an API situation, where the
+behaviour of functionality with a similar purpose may change over time.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+Moose
+MooseX::FollowPBP
+Sort::Versions
+
+Build/testing Dependencies
+
+Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Glenn Fowler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

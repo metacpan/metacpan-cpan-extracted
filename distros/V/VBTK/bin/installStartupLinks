@@ -1,0 +1,23 @@
+#!/bin/ksh
+
+# This script looks for files in /usr/vbtk/etc/rc2.d and rc3.d 
+# and links them into /etc/rc2.d and /etc/rc3.d
+
+homeDir=/usr/vbtk
+
+echo "\nLinking startup files..."
+for RCDIR in rc2.d rc3.d
+do
+    if [ -f $homeDir/etc/$RCDIR/* ]
+    then
+        cd $homeDir/etc/$RCDIR
+        if [ $? -ne 0 ]; then exit 1; fi
+
+        for FILE in *
+        do
+            rm -f /etc/$RCDIR/$FILE
+            ln -s $homeDir/etc/$RCDIR/$FILE /etc/$RCDIR/$FILE
+            echo "Linked '$homeDir/etc/$RCDIR/$FILE' to '/etc/$RCDIR/$FILE'"
+        done
+    fi
+done

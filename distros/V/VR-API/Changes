@@ -1,0 +1,10 @@
+1.06  Tue Aug 07 20:22:00 2007
+	- Update available API methods: added getEmailCreditBalance
+1.05  Tue Aug 07 19:06:00 2007
+	- Update available API methods: added transferEmailCredits
+1.02  Tue Apr 24 21:51:03 2007
+	- Update available API methods: added undeleteList and undeleteCampaign
+1.01  Tue Apr 10 12:19:52 2007
+	- Update available API methods
+1.00  Mon Mar 13 22:19:52 2007
+	- original version

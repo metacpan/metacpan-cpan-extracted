@@ -1,0 +1,72 @@
+Revision history for VendorAPI-2Checkout-Client
+
+0.1500  2012-01-19
+        - moose client inherits from non-moose parent.
+
+0.1400  2012-01-09
+        - refactored non moose client into it's own file.
+        - added Moose client.
+        - turned original client lib into a factory.
+          - Boy howdy, does this need cleaned up - but all the tests pass.
+
+0.1300  2012-01-09
+        - ?
+
+0.1200  2012-01-09
+        - made sorts and comparisons case-insensitive
+
+0.1100  2011-07-19
+        - added list_options()
+        - added list_products()
+        - refactored FormatTests modules
+        - added tests for 'RECORD_NOT_FOUND' conditions.
+
+0.1000  2011-07-19
+        - added list_payments()
+
+0.0902  2011-07-17
+        - added detail_coupon()
+
+0.0901  2011-07-17
+        - forgot to update README for VAPI_HAS_COUPONS
+
+0.0900  2011-07-17
+        - add list_coupons()
+
+0.0802  2011-07-15
+        - change from use parent to use base to allow for pre 5.10 compatibility (for now)
+
+0.0801  2011-07-12
+        - Some numbskull forgot to run make manifest to add the new test code
+
+0.08    2011-07-11
+        - implemented JSON output format, and tests for list_sales()
+
+0.07    2011-07-05
+        - implemented last three input parameters for list_sales()
+
+0.06    2011-07-04
+        - implemented sorting input params for list_sales()
+
+0.05    2011-07-04
+        - implemented more input params for list_sales()
+        - some house keeping in t/02-list_sales.t
+
+0.04    2011-07-03
+        - removed Test::Output from instatiation test.
+        - use URI and URI::QueryParam
+        - implemented pagesize and curpage params for list_sales()
+
+0.03    2011-07-01/09:00
+        - README typos fixed
+        - added invoice_id parameter to detail_sale
+
+0.02    2011-06-30/22:00
+        - Fixed typos in the README that I discovered at YAPC::NA 2011 (Dahut!)
+        - BAILing on the tests was a bad idea. Changed it to SKIP.
+
+0.01    2011-06-26/02:01
+        First version, uploaded to CPAN.
+        - it can list_sales() and detail_sale(sale_id)
+     
+

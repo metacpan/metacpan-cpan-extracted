@@ -1,0 +1,15 @@
+TYPEMAP
+VMDBM	T_PTROBJ
+#############################################################################
+INPUT
+T_PTROBJ
+        if (sv_isa($arg, \"VMS::IndexedFile\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = ($type) tmp;
+        }
+        else
+            croak(\"$var is not of type VMS::IndexedFile\")
+###########################################################
+OUTPUT
+T_PTROBJ
+        sv_setref_pv($arg, \"VMS::IndexedFile\", (void*)$var);

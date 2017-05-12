@@ -1,0 +1,3 @@
+struct DATA *      T_PTROBJ
+pos_t              T_UV
+prob_t             T_DOUBLE

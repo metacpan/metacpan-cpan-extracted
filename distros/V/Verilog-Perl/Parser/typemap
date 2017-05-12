@@ -1,0 +1,30 @@
+TYPEMAP
+const char *		T_PV
+VParserXs *		O_CTHIS
+
+
+OUTPUT
+# The variable is stored into a pre-blessed $self->{_cthis}
+O_CTHIS
+    // SELF->{_cthis} = THIS
+    if( sv_isobject(SELF) && (SvTYPE(SvRV(SELF)) == SVt_PVHV) ) {
+	SV **svp = hv_fetch ((HV*)SvRV(SELF), \"_cthis\", 6, 1);
+	sv_setiv(*svp, PTR2IV( $var ));
+	XSRETURN_UNDEF;
+    } else {
+        warn( \"${Package}::$func_name() -- $var is not a Verilog::Parser object\" );
+        XSRETURN_UNDEF;
+    }
+
+INPUT
+O_CTHIS
+    $var = NULL;
+    if( sv_isobject($arg) && (SvTYPE(SvRV( $arg )) == SVt_PVHV) ) {
+        SV **svp = hv_fetch ((HV*)SvRV(( $arg )), \"_cthis\", 6, 0);
+	$var = NULL;
+	if (svp) { $var = INT2PTR($type,SvIV( *svp )); }
+    }
+    if (!$var || !dynamic_cast<VParserXs*>($var)) {
+        warn( \"${Package}::$func_name() -- $var is not a Verilog::Parser object\" );
+        XSRETURN_UNDEF;
+    }

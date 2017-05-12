@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use Pod::Usage;
+use Getopt::Long;
+use FindBin qw($Bin);
+use Path::Tiny;
+use IPC::Open3;
+
+BEGIN{$ENV{VAYNE_HOME} = $Bin};
+
+use Vayne;
+use Vayne::Tracker;
+
+
+=head1 SYNOPSIS
+
+   $0 --expire seconds --count count
+
+=cut
+
+$| = 1;
+my %opt = (expire => 60, count => 1000);
+GetOptions(\%opt, qw( expire=i count=i) ) or pod2usage(2);
+
+my $time = time;
+my $step = Vayne->task('benchmark');
+my $taskid = Vayne::Tracker->add_task(
+    'region:benchmark',
+    {
+        name   => 'benchmark',
+        step   => $step,
+        expire => $opt{expire},
+    },
+    map{time}1..$opt{count}
+);
+printf "send [%s] job, using [%s] seconds. taskid [%s]\n", $opt{count}, (time - $time), $taskid;

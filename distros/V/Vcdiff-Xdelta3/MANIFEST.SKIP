@@ -1,0 +1,15 @@
+MANIFEST.bak
+Makefile.old
+Makefile$
+README.pod
+.gitignore
+.git/
+blib/
+pm_to_blib
+MYMETA.*
+Vcdiff-Xdelta3.*tar[.]gz$
+Xdelta3.bs
+xdelta3.o
+Interface.o
+Interface.bs
+Interface.c

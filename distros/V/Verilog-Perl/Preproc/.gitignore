@@ -1,0 +1,15 @@
+blib
+gen
+Makefile
+pm_to_blib
+VPreLex*.cpp
+*.def
+*.dll
+*.exp
+*.o
+*.c
+*.bs
+*.xsc
+*.output
+*.old
+*_cleaned.*

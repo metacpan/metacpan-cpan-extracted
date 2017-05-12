@@ -1,0 +1,48 @@
+VSGDR::StaticData
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+cpanm offers a quicker and simpler way to install this software.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VSGDR/StaticData.pm
+
+Each utility script contains its own documentation.  You can run perldoc
+on the script, or use 'scriptname.pl --man' to view the help.
+
+
+QUICK START GUIDE
+
+Here's a quick overview of how to get started with using the system:-
+
+To generate a post-deployment static data population script, type this at a command line:-
+    genStaticData -c namedODBCConnectionToYourInstanceAndDatabase -t schema.tablename > SomeFileYouWantToSaveTheScriptTo.sql
+
+
+OTHER
+
+You can also look for information at:
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Ded MedVed
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

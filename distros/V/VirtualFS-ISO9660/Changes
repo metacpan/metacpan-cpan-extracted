@@ -1,0 +1,14 @@
+Revision history for Perl extension VirtualFS::ISO9660.
+
+0.00  1-21-2004 at about 1pm
+	- Preliminary version, pasted to freenode.net #perl's pastebot.
+	  Could only do directories.
+
+0.01  Wed Jan 21 18:51:02 2004
+	- First real version! Can read directories *and* files! Woo.
+
+0.02  1/24/2004 3:17PM
+
+	- Added extract_file method for easy file extraction.
+	- Fixed the MANIFEST so testfs.iso gets included. 'make test' should
+	  actually work now.

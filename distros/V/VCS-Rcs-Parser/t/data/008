@@ -1,0 +1,719 @@
+head	1.10;
+access;
+symbols
+	rel-0-1:1.1.1.1 ziya:1.1.1;
+locks; strict;
+comment	@# @;
+
+
+1.10
+date	2001.10.03.15.31.57;	author ziya;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2001.10.03.15.07.27;	author ziya;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2001.10.02.16.27.21;	author ziya;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2001.10.01.16.22.32;	author ziya;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2001.10.01.08.34.36;	author ziya;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2001.09.27.18.26.28;	author ziya;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2001.09.12.16.31.25;	author ziya;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.09.12.14.30.58;	author ziya;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.09.11.15.52.21;	author ziya;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches
+	1.1.1.1;
+next	;
+
+1.1.1.1
+date	2001.09.11.12.26.01;	author ziya;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.10
+log
+@last modifications for namespace change.
+@
+text
+@%{
+
+##########################################################################
+#
+# This is the Parse::Yapp grammar file. To reproduce a modul out of it 
+# you should have CPAN module Parse::Yapp installed on your 
+# system and run
+#
+#yapp -s -m'VCS::Rcs::YappRcsParser' -o'lib/Rcs/YappRcsParser.pm' YappRcsParser.yp
+#
+# But you won't need Parse::Yapp unless you want to reproduce the module.
+#
+#
+# Here is Parse::Yapp's COPYRIGHT
+#
+#       The Parse::Yapp module and its related modules and shell
+#       scripts are copyright (c) 1998-2001 Francois Desarmenien,
+#       France. All rights reserved.
+#
+#       You may use and distribute them under the terms of either
+#       the GNU General Public License or the Artistic License, as
+#       specified in the Perl README file.
+#
+#       If you use the "standalone parser" option so people don't
+#       need to install Parse::Yapp on their systems in order to
+#       run you software, this copyright noticed should be
+#       included in your software copyright too, and the copyright
+#       notice in the embedded driver should be left untouched.
+#
+# End of Parse::Yapp's COPYRIGHT
+#
+#
+# Copyright (c) 2001 by RIPE-NCC.  All rights reserved.
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# You should have received a copy of the Perl license along with
+# Perl; see the file README in Perl distribution.
+#
+# You should have received a copy of the GNU General Public License
+# along with Perl; see the file Copying.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# You should have received a copy of the Artistic License
+# along with Perl; see the file Artistic.
+#
+#                            NO WARRANTY
+#
+# BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+# FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+# OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+# PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+# OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+# TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
+# PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
+# REPAIR OR CORRECTION.
+#
+# IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+# WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+# REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+# INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+# OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
+# TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+# YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+# PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGES.
+#
+#                     END OF TERMS AND CONDITIONS
+#
+#
+#
+##########################################################################
+
+    require 5.6.0;
+
+    use VCS::Rcs::Deltatext;
+
+    use Data::Dumper;
+
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+
+    my $dt;
+    my $input;
+    my $state;
+    my $ft;
+#    my $init_rev_no;
+    my $revs_to_co;
+    my $dates_to_co;
+
+    our $debug = 0;
+
+%}
+
+%start rcstext
+
+%%
+
+rcstext:
+                      admin {warn "admin OK\n" if $debug}
+                      delta {warn "delta OK\n" if $debug}
+                      desc  {warn "desc  OK\n" if $debug}
+                      deltatext 
+                      {warn "Parsed OK!\n" if $debug;}
+;
+
+admin:                head    {warn "head  OK\n" if $debug}
+                      branch  {warn "branc OK\n" if $debug}
+                      access  {warn "acces OK\n" if $debug}
+                      symbols {warn "symbl OK\n" if $debug}
+                      locks  strict {warn "lock  OK\n" if $debug}
+                      comment {warn "commt OK\n" if $debug}
+                      expand  {warn "expan OK\n" if $debug}
+                      newphrase
+;
+
+head:    HEAD ';' | HEAD  num ';' #{$ta->{LastRev} = $_[2][0];}
+;
+
+branch:  /* empty */    
+         {warn "branch OK(EMPTY)\n" if $debug}
+    |    BRANCH {$state='nums'}  nums ';'  
+         {warn "branch OK",$_[1]," ",$_[3][0],"\n" if $debug}
+;
+
+access:   ACCESS ';'                          
+          {warn "access OK",$_[1],"\n" if $debug}
+    |     ACCESS   {$state='ids'}     ids ';' 
+          {warn "access OK",$_[1]," ",$_[3][0],"\n" if $debug}
+;
+
+symbols: SYMBOLS  {$state='symnums'} symnums ';' 
+;
+
+locks:   LOCKS    {$state='idnums'}  idnums ';' 
+;
+
+strict:  /* empty */ | STRICT  ';' 
+;
+
+comment: /* empty */ 
+   |     COMMENT ';' 
+   |     COMMENT  string ';'
+         #{$ta->{Comment} = $_[2][0];}
+;
+
+expand:  /* empty */       
+   |     EXPAND ';'        
+   |     EXPAND  string ';'
+;
+
+
+
+delta:    /* empty */ 
+   |      delta  
+          num
+          DATE       num                    ';'
+          AUTHOR     id                     ';'
+          STATE      {$state='ido'}   ido   ';'
+          BRANCHES   {$state='nums'}  nums  ';'
+          NEXT       {$state='nums'}  nums  ';'
+          newphrase
+          {&as_other( $_[2][0], $_[4][0]);}
+;
+
+
+desc:    DESC  string
+         {&revs_to_co();} 
+;
+
+
+deltatext:  /* empty */ 
+     |      deltatext
+            num
+            LOG        string
+            newphrase
+            TEXT      {$state='longstring';} string
+            {
+             print STDERR $_[2][0],"        \r" if($debug);
+             &co_rev( $_[8][0], $_[2][0] );
+            }
+;
+
+
+newphrase:  /* empty */ | newphrase id word ';'
+;
+
+word:       /* empty */ | id | num | string | ':'
+;
+
+%%
+
+sub revs_to_co {
+    my $revs = $revs_to_co;
+
+    unless ($dates_to_co) {
+        $dt->revs2co($revs);
+	return;
+    }
+
+    my $rev;
+    my $rdate;
+    my %date;
+
+    for $rev ($dt->revs) {
+        $rdate = $dt->date($rev);
+        $rdate = '19'.$rdate if (length($rdate) ==  17);
+        $date{$rdate} = $rev;
+    }
+
+    my @@alldates  = sort keys %date;
+    my @@dates2add = @@$dates_to_co;
+
+    my $bi=0;
+    my($a,$b,@@dates2add_proper);
+
+    for $b (@@dates2add) {
+	for $a (@@alldates) {
+	    $dates2add_proper[$bi]=$a if ($a lt $b);
+	}
+	$bi++;
+    }
+
+    for (@@dates2add_proper) {
+	push @@$revs, $date{$_} if (defined $date{$_});
+    }
+
+    if($debug){
+        print STDERR "$_\n" for(@@$revs);
+        print STDERR "$_\n" for(@@dates2add_proper);
+        print STDERR "$_\n" for(@@dates2add);
+    }
+
+    $dt->revs2co($revs);
+}
+
+sub as_other {
+    my $rev = shift;
+    my $date = shift;
+
+#    $init_rev_no = $rev;
+
+    $dt->date($rev, $date);
+}
+
+sub co_rev {
+    my $ptext = shift;
+    my $rev   = shift;
+    
+    if ($ft) {
+	$ft = 0;
+	$dt->lastrev($ptext, $rev);
+	return;
+    }
+
+    $dt->deltarev($ptext, $rev);
+}
+
+sub _Error {
+
+    exists $_[0]->YYData->{ERRMSG} 
+    and do {
+        print $_[0]->YYData->{ERRMSG};
+        delete $_[0]->YYData->{ERRMSG};
+        return;
+    };
+    warn "Syntax error.\n";
+
+}
+
+
+sub _Lexer {
+    my($parser)=shift;
+
+    #
+    # EOF
+    #
+    pos($$input) >= length($$input)  and return('',[ undef, -1 ]);
+
+
+    # 
+    # longstring
+    #
+    $state eq 'longstring' and do {
+
+        $state = 'norm';
+
+        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@@/sgc);
+
+        my $text_tmp='';
+        my $text;
+        while ($$input =~ m/\G((?:[^@@\n]|@@@@)*\n?)/gcs) {
+            $text_tmp = $1;
+            $text_tmp =~ s/@@@@/@@/g;
+            $text .= $text_tmp;
+        }
+        return('',[ undef, -1 ]) if ($$input !~ m/\G[\s\n]*@@/sgc);
+
+        return('string',[\$text]);
+    };
+
+
+    #
+    # Ignore blanks
+    #
+    $$input=~m/\G\s+/scg;
+    
+
+    #
+    # norm
+    #
+    $state eq 'norm' and do {
+
+        # SIMPLE TOKENS
+        $$input =~ m/\Ghead/gc      and return('HEAD',    'head');
+
+        $$input =~ m/\Gbranches/gc  and return('BRANCHES','branches');
+        $$input =~ m/\Gbranch/gc    and return('BRANCH',  'access');
+
+        $$input =~ m/\Gaccess/gc    and return('ACCESS',  'access');
+        $$input =~ m/\Gsymbols/gc   and return('SYMBOLS', 'symbols');
+        $$input =~ m/\Glocks/gc     and return('LOCKS',   'locks');
+        $$input =~ m/\Gstrict/gc    and return('STRICT',  'strict');
+        $$input =~ m/\Gcomment/gc   and return('COMMENT', 'comment');
+
+        $$input =~ m/\Gdate/gc      and return('DATE',    'date');
+        $$input =~ m/\Gauthor/gc    and return('AUTHOR',  'author');
+        $$input =~ m/\Gstate/gc     and return('STATE',   'state');
+
+        $$input =~ m/\Gnext/gc      and return('NEXT',    'next');
+ 
+        $$input =~ m/\Glog/gc       and return('LOG',     'log');
+        $$input =~ m/\Gtext/gc      and return('TEXT',    'text');
+
+        $$input =~ m/\Gdesc/gc      and return('DESC',    'desc');
+                
+        $$input =~ m/\G;/gc         and return(';',       ';');
+        $$input =~ m/\G:/gc         and return(':',       ';');
+
+
+        # num
+        $$input =~ m/\G([\d\.]+)/gc and return('num',     [$1]);
+
+
+        # id
+        $$input =~ m/\G
+                         ((?:[\d\.]+)?)                      # {num}
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                    /xgc                      
+                                    and return('id',      [$1,$2,$3] );
+
+
+        # simple string
+        $$input =~ m/\G
+                           @@
+                           ((?:[^@@]|@@@@)*)
+                           @@
+                    /xgcs                      
+                                    and return('string',  [$1] );
+
+    };
+
+
+    #
+    # ids
+    #
+    $state eq 'ids' and do {
+   
+        $state = 'norm';
+
+        $$input =~ m{\G
+                         (?:
+                         (\d?)
+                         ([^\$,\.:;@@\x00-\x1F])
+                         ([^\$,\.:;@@\x00-\x1F]*)
+                         )*
+                   }xgc           
+                   and return('ids', [$1,$2,$3]);
+    };
+
+
+    #
+    # symnums
+    #
+    $state eq 'symnums' and do {
+
+        $state = 'norm';
+
+        $$input =~ m{\G
+                         (?:
+                         (\d*)                   # {digit}*
+                         ([^\$,\.:;@@\x00-\x1F])  # idchar
+                         ([^\$,\.:;@@\x00-\x1F]*) # {idchar | digit}*
+                         :                       # :
+                         ([\d\.]+)[\s\n\r]*      # num
+                         )*
+                   }xgcs           
+                   and return('symnums', [$1,$2,$3,$4]);
+    };
+
+
+    #
+    # idnums
+    #
+    $state eq 'idnums' and do {
+
+        $state = 'norm';
+
+        $$input =~ m{\G
+                         (?:
+
+                         ((?:[\d\.]+)?)                      # {num}
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         :                                   # :
+                         ([\d\.]+)                           # num
+                         )*
+                   }xgc           
+                   and return('idnums', [$1,$2,$3,$4]);
+    };
+
+
+    #
+    # ido
+    #
+    $state eq 'ido' and do {
+
+        $state = 'norm';
+
+        $$input =~ m{\G
+                         (?:
+                         ((?:[\d\.]+)?)                      # {num}
+                         ([^\$,\.:;@@\x00-\x1F])              # idchar
+                         ([^\$,\.:;@@\x00-\x1F]|(?:[\d\.]+))* # {idchar | num}*
+                         )?
+                   }xgc           
+                   and return('ido', [$1,$2,$3]);
+    };
+
+
+    #
+    # nums
+    #
+    $state eq 'nums' and do {
+
+        $state = 'norm';
+
+        $$input =~ m/\G([\d\.]*)/gc           and return('nums', [$1]);
+    };
+
+
+    #
+    # NO EXPECTED TOKEN! ERROR
+    #
+    return('',[ undef, -1 ]);
+}
+
+
+
+sub Run {
+    my $self     = shift;
+    $input       = shift;
+    $revs_to_co  = shift;
+    $dates_to_co = shift;
+
+    $dt = new VCS::Rcs::Deltatext();
+    $state = 'norm';
+    $ft = 1;
+#    $init_rev_no = undef;
+
+    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, yydebug => 0x00 );
+
+    $dt
+}
+@
+
+
+1.9
+log
+@namespace changed from Rcs:: to VCS::Rcs::
+@
+text
+@d78 1
+a78 1
+    use Rcs::Deltatext;
+d82 1
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d468 1
+a468 1
+    $dt = new Rcs::Deltatext();
+@
+
+
+1.8
+log
+@Solved some 'undefined ...' warnings.
+@
+text
+@d9 1
+a9 1
+#yapp -s -m 'Rcs::YappRcsParser' -o 'lib/Rcs/YappRcsParser.pm' YappRcsParser.yp
+d82 1
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+@
+
+
+1.7
+log
+@date co routine added.
+@
+text
+@d82 1
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d225 3
+a227 1
+    push @@$revs, $date{$_} for (@@dates2add_proper);
+@
+
+
+1.6
+log
+@Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+@
+text
+@d80 3
+a82 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d88 3
+a90 1
+    my $init_rev_no;
+a92 1
+    require Data::Dumper if $debug;
+d168 2
+a169 1
+desc:    DESC  string 
+d180 1
+a180 1
+             #print STDERR $_[2][0],"        \r";
+d194 42
+d240 1
+a240 1
+    $init_rev_no = $rev;
+d461 4
+a464 2
+    my $self =shift;
+    $input   =shift;
+d466 1
+a466 1
+    $dt = new Rcs::Deltatext;
+d469 1
+a469 1
+    $init_rev_no = undef;
+@
+
+
+1.5
+log
+@added some new files to MANIFEST, Copyright to Yapp Grammar.
+@
+text
+@d80 1
+a80 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+d245 1
+a245 1
+        while ($$input =~ m/\G((?:[^@@\n]|@@@@)*\n)/gcs) {
+@
+
+
+1.4
+log
+@sorted the problem of calling new more then onece in one program.
+@
+text
+@d32 42
+d80 1
+a80 1
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+@
+
+
+1.3
+log
+@version info added.
+@
+text
+@d38 1
+a38 3
+    our ($VERSION) = (q$Revision: 1.1 $ =~ /([\d\.]+)/);
+
+    my $dt = new Rcs::Deltatext;
+d40 1
+d42 3
+a44 4
+
+    my $state = 'norm';
+
+    my $ft = 1;
+a48 2
+    my $init_rev_no;
+
+d375 5
+@
+
+
+1.2
+log
+@Last fixes.
+@
+text
+@d6 1
+a6 1
+# you should have CPAN module Parse::Yapp installed on you 
+d35 1
+a35 1
+    use Data::Dumper;
+d38 2
+d48 2
+a49 1
+    my $debug = 0;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d61 1
+a61 1
+                      {warn "Parsed OK!\n";}
+@
+
+
+1.1.1.1
+log
+@Initial release.
+@
+text
+@@

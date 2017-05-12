@@ -1,0 +1,161 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2005 Alexander Taler (dissent@0--0.org)
+#
+# All rights reserved. This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+
+###############################################################################
+### Tag the base revisions of a branch
+###############################################################################
+
+use strict;
+use Carp;
+use Getopt::Long;
+use File::Spec;
+
+use VCS::LibCVS;
+
+#$VCS::LibCVS::Client::DebugLevel = VCS::LibCVS::Client::DEBUG_PROTOCOL;
+
+###############################################################################
+### Command line arguments processing
+###############################################################################
+
+my ($prog_name) = ($0 =~ /.*[\\\/](.*)/);
+
+my ($opt_help, $opt_version, $opt_branch, $opt_tag, $opt_cvsroot);
+
+if (! GetOptions("help|h" => \$opt_help,
+                 "version|v" => \$opt_version,
+                 "branch|b=s" => \$opt_branch,
+                 "tag|t=s" => \$opt_tag,
+                 "cvsroot|d=s" => \$opt_cvsroot,
+                )) {
+  $opt_help = 1;
+}
+
+# Branch and tag are mandatory
+if (!defined $opt_branch || !defined $opt_tag) {
+  $opt_help = 1;
+}
+
+# At least one file or directory must be specified.
+if (@ARGV == 0) {
+  $opt_help = 1;
+}
+
+if ($opt_version) {
+  print '$Header: /cvsroot/libcvs-perl/libcvs-perl/examples/lcvs-tagbase,v 1.2 2005/09/10 02:21:06 dissent Exp $ ' . "\n";
+  print "VCS::LibCVS::VERSION = $VCS::LibCVS::VERSION\n";
+  exit;
+}
+
+if ($opt_help) {
+  print
+"Tag the base revisions of a branch
+
+  $prog_name [--version] [--help|-h]
+  $prog_name [options] --branch BRANCH --tag TAG [FILES AND DIRECTORIES]
+
+The specified files and directories will be recursively traversed, and the base
+revisions of BRANCH will be tagged with TAG.  For each of the traversed files
+which do not have the named branch, a message will be output to stderr.
+
+Files and directories are specified by a relative path from the root of the
+repository.  Local filesystem paths are not accepted.
+
+Options:
+
+  -d --cvsroot=...  If not specified, it will look in the cwd.
+  -h --help         Print out this help and exit.
+  -b --branch=...   The branch whose base is to be tagged.
+  -t --tag=...      The tag to apply to the base revision.
+  -v --version      Print out the version and exit.
+
+";
+  exit;
+}
+
+###############################################################################
+### Internal helper routines
+###############################################################################
+
+# Although the command line args are only traversed once, this routine may be
+# more widely applicable, so it is preserved here as an example.  It is called
+# with a single argument which is a callback.  It will call the callback with a
+# RepositoryFile object for each file to be traversed.  If the callback returns
+# false, this routine will return immediately, terminating the traversal.
+
+sub traverse_args {
+  my ($repo, $routine) = @_;
+
+  foreach my $arg (@ARGV) {
+    # Find the named object
+    my $f_or_d = VCS::LibCVS::RepositoryFileOrDirectory->find($repo, $arg);
+
+    if ($f_or_d->isa("VCS::LibCVS::RepositoryFile")) {
+
+      &$routine($f_or_d) || return;
+
+    } else {
+      foreach my $file ( @{$f_or_d->get_files({Recursive => 1})} ) {
+        &$routine($file) || return;
+      }
+    }
+  }
+}
+
+# Print a message to stderr.  Probably will want to make this configurable.
+sub mlog {
+  print STDERR (shift() . "\n");
+}
+
+###############################################################################
+### Internal data structures
+###############################################################################
+
+# The repository.
+my $repo;
+if ($opt_cvsroot) {
+  $repo = VCS::LibCVS::Repository->new($opt_cvsroot);
+} else {
+  my $cwd = VCS::LibCVS::WorkingDirectory->new(".");
+  $repo = $cwd->get_repository();
+}
+
+# A Slice representing the base of the branch.  For each file traversed, if the
+# specified branch exists on that file, a FileRevision object for the base is
+# added to this slice.  At the end the slice is tagged.
+my $slice = VCS::LibCVS::Slice->new();
+
+###############################################################################
+### File traversal and internal data structure population.
+###############################################################################
+
+# This routine is passed to traverse_args, and it receives a RepositoryFile
+# object for each file to process.
+sub process_file {
+  my $file = shift;
+
+  my $file_branch = $file->get_branch($opt_branch);
+
+  # If the branch doesn't exist on this file, issue a message and skip it.
+  if (!defined $file_branch) {
+    mlog "***Skipping " . $file->get_name() . " missing branch.";
+    return 1;
+  }
+
+  my $base_rev = $file_branch->get_first_revision();
+
+  $slice->add_revision($base_rev);
+}
+
+traverse_args($repo, \&process_file);
+
+foreach my $file_rev ($slice->get_revisions()) {
+  mlog "Tagging revision " . $file_rev->get_file()->get_name() .
+    " [" . $file_rev->get_revision_number()->as_string() . "]";
+}
+
+$slice->tag($opt_tag);

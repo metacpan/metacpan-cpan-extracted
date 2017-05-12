@@ -1,0 +1,17 @@
+Revision history for Perl extension VMS::Mail.
+
+0.01  Sun Jul  9 09:14:38 2000
+	- original version; created by h2xs 1.18
+ * 0.01  00.07.09 DGN	Original version created
+0.02  Sat Jul 15 22:00:00 2000
+	- First complete implementation - partially untested
+	- First zip 00.07.19
+0.03  Sat Jul 21 20:00:00 2000
+	- Renamed to VMS::Mail from VMS::VMSmail
+0.04  Thu Aug 17 08:26:21 2000
+	- CPAN release, minor bugfixes, changes to work with Perl 5.6
+0.05  Thu Aug 17 13.25.29 2000
+	- CPAN re-release - remove vms attributes from the zipfile
+0.06  Sun Apr 12 2009
+	- renamed I_STR macro to I_CSTR to avoid conflict with stropts.h
+	- handle non-default mail file (from Kim Marshall)

@@ -1,0 +1,403 @@
+Canada,inside,English-speaking_world
+Canada,inside,North_America
+Canada,inside,Americas
+Canada,name,Canada
+Illinois,inside,United_States
+Illinois,inside,Midwestern_United_States
+Illinois,name,Illinois
+Philadelphia_Pennsylvania,name,Philadelphia
+Philadelphia_Pennsylvania,inside,Pennsylvania
+Philadelphia_Pennsylvania,inside,Philadelphia_County
+Philadelphia_Pennsylvania,inside,United_States
+Philadelphia_Pennsylvania,longitude,-75.1642
+Philadelphia_Pennsylvania,latitude,39.9522
+Philadelphia_Pennsylvania,mayor,John F. Street
+Philadelphia_Pennsylvania,population,1448394
+San_Jose_California,name,San Jose
+San_Jose_California,inside,San_Francisco_Bay_Area
+San_Jose_California,inside,United_States
+San_Jose_California,inside,Silicon_Valley
+San_Jose_California,inside,Santa_Clara_County
+San_Jose_California,inside,California
+San_Jose_California,inside,Northern_California
+San_Jose_California,longitude,-121.872734
+San_Jose_California,latitude,37.304051
+San_Jose_California,mayor,Norman Mineta
+San_Jose_California,population,929936
+Metropolitan_area,name,Metropolitan area
+New_Hampshire,inside,New_England
+New_Hampshire,inside,United_States
+New_Hampshire,inside,Eastern_United_States
+New_Hampshire,inside,Western_Hemisphere
+New_Hampshire,inside,Northeastern_United_States
+New_Hampshire,inside,North_America
+New_Hampshire,inside,Northern_Hemisphere
+New_Hampshire,name,New Hampshire
+Philadelphia_County,inside,Pennsylvania
+Philadelphia_County,name,Philadelphia County
+Fontana_California,name,Fontana
+Fontana_California,inside,San_Bernardino_County
+Fontana_California,inside,Inland_Empire
+Fontana_California,inside,California
+Fontana_California,longitude,-117.4342
+Fontana_California,latitude,34.0922
+Fontana_California,mayor,Mark Nuaimi
+Fontana_California,mayor,Acquanetta Warren
+Fontana_California,population,170099
+Half_Moon_Bay_California,name,Half Moon Bay
+Half_Moon_Bay_California,inside,San_Francisco_Bay_Area
+Half_Moon_Bay_California,inside,California
+Half_Moon_Bay_California,inside,San_Mateo_County
+Half_Moon_Bay_California,longitude,-122.4275
+Half_Moon_Bay_California,latitude,37.4636
+Half_Moon_Bay_California,mayor,John Muller
+Half_Moon_Bay_California,mayor,Bonnie McClung
+Half_Moon_Bay_California,population,11842
+Rockingham_County,inside,New_Hampshire
+Rockingham_County,name,Rockingham County
+Detroit_Michigan,name,Detroit
+Detroit_Michigan,inside,United_States
+Detroit_Michigan,inside,Wayne_County
+Detroit_Michigan,inside,Michigan
+Detroit_Michigan,inside,Metro_Detroit
+Detroit_Michigan,longitude,-83.0458
+Detroit_Michigan,latitude,42.3314
+Detroit_Michigan,mayor,Frank Murphy
+Detroit_Michigan,population,1514063
+Southeast_Michigan,name,Southeast Michigan
+United_States,inside,English-speaking_world
+United_States,inside,North_America
+United_States,name,United States
+Alaska,inside,Western_United_States
+Alaska,inside,United_States
+Alaska,name,Alaska
+Hillsdale_Michigan,name,Hillsdale
+Hillsdale_Michigan,inside,Hillsdale_County
+Hillsdale_Michigan,inside,Michigan
+Hillsdale_Michigan,longitude,-84.6306
+Hillsdale_Michigan,latitude,41.92
+Hillsdale_Michigan,mayor,Michael Sessions
+Hillsdale_Michigan,population,8233
+Garden_Grove_California,name,Garden Grove
+Garden_Grove_California,inside,Orange_County
+Garden_Grove_California,inside,California
+Garden_Grove_California,longitude,-117.9406
+Garden_Grove_California,latitude,33.7739
+Garden_Grove_California,mayor,Mark Rosen
+Garden_Grove_California,mayor,William Dalton
+Garden_Grove_California,population,166296
+Northern_Hemisphere,name,Northern Hemisphere
+Alameda_California,name,Alameda
+Alameda_California,inside,San_Francisco_Bay_Area
+Alameda_California,inside,California
+Alameda_California,inside,Alameda_County
+Alameda_California,longitude,-122.2406
+Alameda_California,latitude,37.7653
+Alameda_California,mayor,Lena Tam
+Alameda_California,mayor,Beverly Johnson
+Alameda_California,population,72259
+San_Francisco_California,name,San Francisco
+San_Francisco_California,inside,California
+San_Francisco_California,longitude,-122.4183
+San_Francisco_California,latitude,37.775
+San_Francisco_California,mayor,Gavin Newsom
+San_Francisco_California,population,744042
+Christchurch_New_Zealand,latitude,-43.5
+Christchurch_New_Zealand,inside,South_Island
+Christchurch_New_Zealand,inside,New_Zealand
+Christchurch_New_Zealand,inside,Canterbury
+Christchurch_New_Zealand,name,Christchurch
+Christchurch_New_Zealand,longitude,172.6
+Christchurch_New_Zealand,population,359900
+Bakersfield_California,name,Bakersfield
+Bakersfield_California,inside,Kern_County
+Bakersfield_California,inside,California
+Bakersfield_California,longitude,-119.0178
+Bakersfield_California,latitude,35.3733
+Bakersfield_California,mayor,Harvey Hall
+Bakersfield_California,population,328692
+English-speaking_world,name,English-speaking world
+Corona_California,name,Corona
+Corona_California,inside,Riverside_County
+Corona_California,inside,California
+Corona_California,longitude,-117.5656
+Corona_California,latitude,33.8753
+Corona_California,mayor,Steve Nolan
+Corona_California,mayor,Jeff Miller
+Corona_California,population,150253
+Oceania,name,Oceania
+Hong_Kong_China,latitude,22.3
+Hong_Kong_China,inside,China
+Hong_Kong_China,name,Hong Kong
+Hong_Kong_China,longitude,114.166666667
+Hong_Kong_China,population,6980412
+Edmonton_Canada,name,Edmonton
+Edmonton_Canada,inside,Canada
+Edmonton_Canada,inside,Alberta
+Edmonton_Canada,longitude,-113.500555556
+Edmonton_Canada,latitude,53.5472222222
+Edmonton_Canada,mayor,Bill Smith
+Edmonton_Canada,population,752412
+New_York,inside,United_States
+New_York,name,New York
+Southwestern_United_States,name,Southwestern United States
+Wasilla_Alaska,name,Wasilla
+Wasilla_Alaska,inside,United_States
+Wasilla_Alaska,inside,Matanuska-Susitna_Borough
+Wasilla_Alaska,inside,Alaska
+Wasilla_Alaska,longitude,-149.4525
+Wasilla_Alaska,latitude,61.5816666667
+Wasilla_Alaska,mayor,Sarah Palin
+Wasilla_Alaska,population,9780
+Michigan,inside,Continental_United_States
+Michigan,inside,United_States
+Michigan,inside,Great_Lakes_region
+Michigan,inside,Midwestern_United_States
+Michigan,inside,Canada-United_States_border
+Michigan,name,Michigan
+Canada-United_States_border,name,Canada-United States border
+San_Bernardino_County,inside,California
+San_Bernardino_County,name,San Bernardino County
+Kern_County,inside,California
+Kern_County,name,Kern County
+China,inside,Asia
+China,name,China
+Banning_California,name,Banning
+Banning_California,inside,Riverside_County
+Banning_California,inside,California
+Banning_California,longitude,-116.8756
+Banning_California,latitude,33.9256
+Banning_California,mayor,Brenda Salas
+Banning_California,mayor,Debbie Franklin
+Banning_California,population,23562
+Fresno_County,inside,California
+Fresno_County,name,Fresno County
+North_America,name,North America
+Glendale_California,name,Glendale
+Glendale_California,inside,California
+Glendale_California,inside,Los_Angeles_County
+Glendale_California,longitude,-118.2542
+Glendale_California,latitude,34.1425
+Glendale_California,mayor,John Drayman
+Glendale_California,population,199463
+Portsmouth_New_Hampshire,name,Portsmouth
+Portsmouth_New_Hampshire,inside,Rockingham_County
+Portsmouth_New_Hampshire,inside,New_Hampshire
+Portsmouth_New_Hampshire,inside,New_Hampshire’s_1st_congressional_district
+Portsmouth_New_Hampshire,longitude,-70.7631
+Portsmouth_New_Hampshire,latitude,43.0717
+Portsmouth_New_Hampshire,mayor,Thomas G. Ferrini
+Portsmouth_New_Hampshire,mayor,John Blalock
+Portsmouth_New_Hampshire,population,20784
+Los_Angeles_City_Center_California,latitude,34.0522
+Los_Angeles_City_Center_California,inside,California
+Los_Angeles_City_Center_California,inside,Los_Angeles_County
+Los_Angeles_City_Center_California,name,Los Angeles
+Los_Angeles_City_Center_California,longitude,-118.2428
+Los_Angeles_City_Center_California,population,3849378
+Ohio,inside,United_States
+Ohio,inside,Midwestern_United_States
+Ohio,name,Ohio
+Chicago_Illinois,name,Chicago
+Chicago_Illinois,inside,Cook_County
+Chicago_Illinois,inside,United_States
+Chicago_Illinois,inside,Illinois
+Chicago_Illinois,longitude,-87.65
+Chicago_Illinois,latitude,41.85
+Chicago_Illinois,mayor,Richard M. Daley
+Chicago_Illinois,population,2833321
+Western_United_States,name,Western United States
+Northern_California,inside,United_States
+Northern_California,inside,California
+Northern_California,name,Northern California
+Athens_Greece,name,Athens
+Athens_Greece,inside,Greece
+Athens_Greece,longitude,23.7277777778
+Athens_Greece,latitude,37.9777777778
+Athens_Greece,mayor,Dora Bakoyannis
+Athens_Greece,population,3370000
+Asia,name,Asia
+Santa_Clara_County,inside,California
+Santa_Clara_County,name,Santa Clara County
+Alberta,inside,Canada
+Alberta,name,Alberta
+Stuttgart_Germany,name,Stuttgart
+Stuttgart_Germany,inside,Germany
+Stuttgart_Germany,longitude,9.1775
+Stuttgart_Germany,latitude,48.776667
+Stuttgart_Germany,mayor,Manfred Rommel
+Stuttgart_Germany,population,590429
+Delegaciones_del_Distrito_Federal,inside,Mexico_City
+Delegaciones_del_Distrito_Federal,inside,Mexico
+Delegaciones_del_Distrito_Federal,name,Delegaciones del Distrito Federal
+Europe,name,Europe
+Cincinnati_Ohio,name,Cincinnati
+Cincinnati_Ohio,inside,Ohio
+Cincinnati_Ohio,inside,United_States
+Cincinnati_Ohio,inside,Hamilton_County
+Cincinnati_Ohio,longitude,-84.4569
+Cincinnati_Ohio,latitude,39.1619
+Cincinnati_Ohio,mayor,Jerry Springer
+Cincinnati_Ohio,population,332252
+Metropolitan_areas_of_Mexico,inside,Metropolitan_area
+Metropolitan_areas_of_Mexico,inside,Mexico
+Metropolitan_areas_of_Mexico,name,Metropolitan areas of Mexico
+Cleveland_Ohio,name,Cleveland
+Cleveland_Ohio,inside,Cuyahoga_County
+Cleveland_Ohio,inside,United_States
+Cleveland_Ohio,inside,Ohio
+Cleveland_Ohio,longitude,-81.6956
+Cleveland_Ohio,latitude,41.4994
+Cleveland_Ohio,mayor,Dennis Kucinich
+Cleveland_Ohio,mayor,Frank G. Jackson
+Cleveland_Ohio,mayor,Newton D. Baker
+Cleveland_Ohio,population,478403
+California,inside,Western_United_States
+California,inside,Southwestern_United_States
+California,inside,United_States
+California,name,California
+Great_Lakes_region,name,Great Lakes region
+New_Zealand,inside,Australasia
+New_Zealand,inside,Oceania
+New_Zealand,inside,English-speaking_world
+New_Zealand,name,New Zealand
+New_York_New_York,name,New York
+New_York_New_York,inside,New_York
+New_York_New_York,longitude,-74.0064
+New_York_New_York,latitude,40.7142
+New_York_New_York,mayor,Michael Bloomberg
+New_York_New_York,population,8214426
+Pennsylvania,inside,United_States
+Pennsylvania,inside,Northeastern_United_States
+Pennsylvania,name,Pennsylvania
+Anaheim_California,name,Anaheim
+Anaheim_California,inside,Orange_County
+Anaheim_California,inside,United_States
+Anaheim_California,inside,California
+Anaheim_California,longitude,-117.9136
+Anaheim_California,latitude,33.8353
+Anaheim_California,mayor,Curt Pringle
+Anaheim_California,population,334425
+Latin_America,name,Latin America
+Americas,name,Americas
+Australasia,name,Australasia
+Canterbury,inside,New_Zealand
+Canterbury,name,Canterbury
+East_Bay,name,East Bay
+San_Diego_County,inside,United_States
+San_Diego_County,inside,California
+San_Diego_County,name,San Diego County
+San_Mateo_County,inside,California
+San_Mateo_County,name,San Mateo County
+Wayne_County,inside,Michigan
+Wayne_County,inside,Metro_Detroit
+Wayne_County,inside,Great_Lakes_region
+Wayne_County,name,Wayne County
+Inland_Empire,inside,Southern_California
+Inland_Empire,inside,California
+Inland_Empire,name,Inland Empire
+Silicon_Valley,inside,San_Francisco_Bay_Area
+Silicon_Valley,inside,California
+Silicon_Valley,name,Silicon Valley
+Cuyahoga_County,inside,Ohio
+Cuyahoga_County,name,Cuyahoga County
+Chula_Vista_California,name,Chula Vista
+Chula_Vista_California,inside,California
+Chula_Vista_California,inside,San_Diego_County
+Chula_Vista_California,longitude,-117.0833
+Chula_Vista_California,latitude,32.64
+Chula_Vista_California,mayor,Cheryl Cox
+Chula_Vista_California,population,212756
+Hillsdale_County,inside,Michigan
+Hillsdale_County,name,Hillsdale County
+South_Island,inside,New_Zealand
+South_Island,name,South Island
+Cook_County,inside,Illinois
+Cook_County,name,Cook County
+Southern_California,name,Southern California
+Hamilton_County,inside,Ohio
+Hamilton_County,name,Hamilton County
+Orange_County,inside,California
+Orange_County,name,Orange County
+Germany,inside,Europe
+Germany,name,Germany
+Alameda_County,inside,California
+Alameda_County,inside,East_Bay
+Alameda_County,name,Alameda County
+Capital_of_Mexico,latitude,19.13
+Capital_of_Mexico,inside,Delegaciones_del_Distrito_Federal
+Capital_of_Mexico,inside,Mexico_City
+Capital_of_Mexico,inside,Metropolitan_areas_of_Mexico
+Capital_of_Mexico,inside,Mexico
+Capital_of_Mexico,name,Mexico City
+Capital_of_Mexico,longitude,-99.4
+Capital_of_Mexico,population,8720916
+"Division_No._11,_Alberta",inside,Alberta
+"Division_No._11,_Alberta",name,"Division No. 11, Alberta"
+Continental_United_States,name,Continental United States
+Mexico_City,inside,Mexico_City
+Mexico_City,inside,Mexico
+Mexico_City,inside,Metropolitan_areas_of_Mexico
+Mexico_City,inside,Latin_America
+Mexico_City,inside,Western_Hemisphere
+Mexico_City,inside,Metropolitan_area
+Mexico_City,inside,North_America
+Mexico_City,inside,Northern_Hemisphere
+Mexico_City,inside,Delegaciones_del_Distrito_Federal
+Mexico_City,name,Mexico City
+Midwestern_United_States,name,Midwestern United States
+Los_Angeles_County,inside,California
+Los_Angeles_County,name,Los Angeles County
+Adelanto_California,name,Adelanto
+Adelanto_California,inside,San_Bernardino_County
+Adelanto_California,inside,California
+Adelanto_California,longitude,-117.4083
+Adelanto_California,latitude,34.5828
+Adelanto_California,mayor,Charley B. Glasper
+Adelanto_California,mayor,Steven R. Baisden
+Adelanto_California,population,23419
+Fresno_California,name,Fresno
+Fresno_California,inside,California
+Fresno_California,inside,Fresno_County
+Fresno_California,longitude,-119.7714
+Fresno_California,latitude,36.7478
+Fresno_California,mayor,Alan Autry
+Fresno_California,population,466714
+Eastern_United_States,name,Eastern United States
+Matanuska-Susitna_Borough,inside,Alaska
+Matanuska-Susitna_Borough,name,Matanuska-Susitna Borough
+Northeastern_United_States,name,Northeastern United States
+New_England,name,New England
+Mexico,inside,Western_Hemisphere
+Mexico,inside,Latin_America
+Mexico,inside,North_America
+Mexico,inside,Northern_Hemisphere
+Mexico,name,Mexico
+Aliso_Viejo_California,name,Aliso Viejo
+Aliso_Viejo_California,inside,Orange_County
+Aliso_Viejo_California,inside,United_States
+Aliso_Viejo_California,inside,California
+Aliso_Viejo_California,longitude,-117.725555556
+Aliso_Viejo_California,latitude,33.575
+Aliso_Viejo_California,mayor,William Phillips
+Aliso_Viejo_California,mayor,Donald Garcia
+Aliso_Viejo_California,population,45037
+Riverside_County,inside,California
+Riverside_County,name,Riverside County
+Fremont_California,name,Fremont
+Fremont_California,inside,San_Francisco_Bay_Area
+Fremont_California,inside,California
+Fremont_California,inside,Alameda_County
+Fremont_California,longitude,-121.9875
+Fremont_California,latitude,37.5483
+Fremont_California,mayor,Bob Wasserman
+Fremont_California,mayor,Bill Harrison
+Fremont_California,population,201691
+Western_Hemisphere,name,Western Hemisphere
+Greece,inside,Europe
+Greece,name,Greece
+San_Francisco_Bay_Area,inside,Northern_California
+San_Francisco_Bay_Area,name,San Francisco Bay Area
+Metro_Detroit,inside,Michigan
+Metro_Detroit,inside,Southeast_Michigan
+Metro_Detroit,name,Metro Detroit

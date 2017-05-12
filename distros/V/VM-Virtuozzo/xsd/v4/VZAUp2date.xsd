@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzat="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzaup2date" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzaup2date" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:element name="vzaup2date" type="vzaup2dateType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>vzaup2date operator.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzaup2dateType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_config">
+							<xs:annotation>
+								<xs:documentation>Returns vzup2date configuration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="set_config"/>
+						<xs:element ref="list"/>
+						<xs:element ref="install"/>
+						<xs:element ref="uninstall"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element ref="config"/>
+						<xs:element ref="update"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get_config">
+		<xs:annotation>
+			<xs:documentation>Gets configuration of update service.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_configResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_config">
+		<xs:annotation>
+			<xs:documentation>Sets configuration of update service.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_configResponse"/>
+	<xs:element name="list">
+		<xs:annotation>
+			<xs:documentation>Request the list of updates. If update's is specified - list gets list of products according to filter - update tag. May be filtered by type, by id. If id is empty - returns all updates given type.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="update" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="update" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="install">
+		<xs:annotation>
+			<xs:documentation>Install updates. Returns Ok/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="update" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>List of update identifiers for install. If this list is empty - install all available updates</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:restriction base="updateType">
+								<xs:sequence>
+									<xs:element name="id" type="xs:string" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Update identifier.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Update name.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:restriction>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="no_reboot" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Suppress automatically reboot the system in case it is needed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="no_boot_loader" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Don't autoconfigure  bootloader for a newly installed kernel (if any). (Linux)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="installResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="update" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="uninstall">
+		<xs:annotation>
+			<xs:documentation>Remove updates.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="update" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>List of update identifiers for uninstall.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:restriction base="updateType">
+								<xs:sequence>
+									<xs:element name="id" type="xs:string" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Update identifier.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Update name.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:restriction>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="no_reboot" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Suppress automatically reboot the system in case it is needed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="uninstallResponse"/>
+	<xs:complexType name="configurationType">
+		<xs:annotation>
+			<xs:documentation>Up-to-date service configuration.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="connection" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Up2date service connection settings.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="server" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>URL of update server. (Linux).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="user" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>User name. (Linux).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="password" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Password for update server. (Linux).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="proxy" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Proxy server settings.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="type" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Type of proxy settings: "explorer" - like in Internet Explorer, "custom" - using custom settings (see parameters server, user, password), no_proxy - proxy server not uses. If not specified - proxy settings does not changed.</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:choice>
+												<xs:element name="explorer">
+													<xs:annotation>
+														<xs:documentation>Use internet explorer proxy settings. (Windows only).</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="custom">
+													<xs:annotation>
+														<xs:documentation>Use custom proxy settings.</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="no_proxy">
+													<xs:annotation>
+														<xs:documentation>Dont't use proxy.</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:choice>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="server" type="xs:string" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Proxy server IP or hostname in form [proto://]server[:port]</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="user" type="xs:base64Binary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>User name for proxy server.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="password" type="xs:base64Binary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Password for proxy server.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="local_path" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>A local repository directory.  The default is /vz/vzup2date. (Linux).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="log_path" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>A log file path.  The default is /var/log/vzup2date.(Linux).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="product" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Product settings. (Windows)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="service" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Service settings. (Windows)</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="autoreboot" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Enable automatic reboot.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="check_period" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Check period for new updates. If not specified - every day.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:choice>
+									<xs:element name="sunday"/>
+									<xs:element name="monday"/>
+									<xs:element name="tuesday"/>
+									<xs:element name="wednesday"/>
+									<xs:element name="thursday"/>
+									<xs:element name="friday"/>
+									<xs:element name="saturday"/>
+								</xs:choice>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="hour" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>Update check hour.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="disabled" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>service vzupsvc is disabled.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="config" type="configurationType">
+		<xs:annotation>
+			<xs:documentation>Configuration of update service.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="update" type="updateType">
+		<xs:annotation>
+			<xs:documentation>Update for product.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="updateType">
+		<xs:annotation>
+			<xs:documentation>Type for update.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Update identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Update name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Update description.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="size" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Update size.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="reboot" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reboot after intall needed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Version of update. If version unknown - "unknown". If version is not specified - no updates is available for given item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="installed_version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Version of previous installed update for given item. If not specified - given item is not installed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="date" type="vzlt:datetime_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Update date.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="system_updateType">
+		<xs:annotation>
+			<xs:documentation>System update: core update, tools update, virtuozzo update.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="updateType">
+				<xs:sequence>
+					<xs:element name="type" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Type of update.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:choice>
+								<xs:element name="hotfix"/>
+								<xs:element name="servicepack"/>
+								<xs:element name="version"/>
+							</xs:choice>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="category" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Category of update type: core, tools, virtuozzo.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="windows_system_updateType">
+		<xs:annotation>
+			<xs:documentation>System update for windows.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="system_updateType">
+				<xs:sequence>
+					<xs:element name="product" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Product identifier.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="template_updateType">
+		<xs:annotation>
+			<xs:documentation>Base update type for given os and ez templates.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="updateType">
+				<xs:sequence>
+					<xs:element name="app_template" type="app_template_updateType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Application template list for given template.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="os_template_updateType">
+		<xs:annotation>
+			<xs:documentation>OS template update. Containing child app_template updates.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="template_updateType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ez_template_updateType">
+		<xs:annotation>
+			<xs:documentation>EZ template update. Containing child app_template updates.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="template_updateType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="app_template_updateType">
+		<xs:annotation>
+			<xs:documentation>Application template update.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="updateType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="product">
+		<xs:annotation>
+			<xs:documentation>Product definition.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:sequence>
+					<xs:element name="id" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Product id.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="name" type="xs:base64Binary">
+						<xs:annotation>
+							<xs:documentation>Product name.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="install">
+						<xs:annotation>
+							<xs:documentation>Automatic installation type.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:choice>
+								<xs:element name="manual"/>
+								<xs:element name="automatic"/>
+								<xs:element name="disabled"/>
+								<xs:element name="auto_download"/>
+							</xs:choice>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="source" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Location of product's update repositary.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="value" type="xs:base64Binary">
+									<xs:annotation>
+										<xs:documentation>URL of source. Path to XML file.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="standard" type="xs:base64Binary" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Read only - value of source is standard location.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="destination" type="xs:base64Binary" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Download location.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="vzaup2date_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="no_signatures" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>If value "1" - don't check digital signatures on installed update (Linux).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

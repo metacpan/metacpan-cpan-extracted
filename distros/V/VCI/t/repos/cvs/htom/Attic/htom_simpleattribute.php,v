@@ -1,0 +1,80 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+//! Class represents a simple HTML tag attribute.
+/*! User can use this class in order to pass attributes that aren't described by the specialized abstraction.
+ */
+class HTOM_SimpleAttribute implements HTOM_Attribute
+{
+  //! initialize attribute 
+  /*! \param name a name of attribute or the HTOM_SimpleAttribute object.
+   * \param value a value of attribute.
+   */
+  public function __construct( $name="", $value=NULL )
+  {
+    if ($value instanceof HTOM_SimpleAttribute) {
+      $this->value = $name->value;
+      $this->name  = $name->name;
+    } else {
+      $this->name = $name;
+      $this->value = $value;
+    }
+  }
+
+  //! Get a name of the attribue
+  public function Name()
+  {
+    return $this->name;
+  }
+
+  //! Evaluate to the attribute HTML tag string.
+  public function Evaluate()
+  {
+    $rc = " ".$this->name;
+    if (isset($this->value)) {
+      $rc.="='".$this->value."'";
+    }
+    return $rc." ";
+  }
+
+  private $value = "";
+  private $name = "";
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

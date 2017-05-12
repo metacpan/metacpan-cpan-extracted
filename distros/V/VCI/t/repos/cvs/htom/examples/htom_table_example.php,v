@@ -1,0 +1,64 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.43;	author mkanat;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@// Initialize class loader object.
+require_once '..\htom_autoloader.php';
+HTOM_Autoloader::AddPath("..");
+
+
+// Create a table object.
+$grid = new HTOM_Table();
+
+// Add some fields to a table.
+$grid->AddElement(0,0,"Column0 row0");
+$grid->AddElement(0,1,"Column1 row0");
+
+// Create a page object.
+$page = new HTOM_Page("HTOM Table example");
+
+// Set the table as a content object
+$page->SetContent( $grid );
+
+// Evaluate page.
+echo $page->Evaluate();
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@a0 2
+<?PHP
+
+a20 3
+
+
+?>@
+

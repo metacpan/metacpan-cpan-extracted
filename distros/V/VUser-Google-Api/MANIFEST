@@ -1,0 +1,29 @@
+COPYING
+INSTALL
+lib/VUser/Google/ApiProtocol.pm
+lib/VUser/Google/ApiProtocol/V2_0.pm
+lib/VUser/Google/EmailSettings.pm
+lib/VUser/Google/EmailSettings/V2_0.pm
+lib/VUser/Google/Groups.pm
+lib/VUser/Google/Groups/GroupEntry.pm
+lib/VUser/Google/Groups/V2_0.pm
+lib/VUser/Google/Provisioning.pm
+lib/VUser/Google/Provisioning/UserEntry.pm
+lib/VUser/Google/Provisioning/V2_0.pm
+lib/VUser/Google/ProvisioningAPI.pm
+lib/VUser/Google/ProvisioningAPI/V1_0.pm
+lib/VUser/Google/ProvisioningAPI/V2_0.pm
+lib/VUser/Google/ProvisioningAPI/V2_0/EmailListEntry.pm
+lib/VUser/Google/ProvisioningAPI/V2_0/EmailListRecipientEntry.pm
+lib/VUser/Google/ProvisioningAPI/V2_0/NicknameEntry.pm
+lib/VUser/Google/ProvisioningAPI/V2_0/UserEntry.pm
+Makefile.PL
+MANIFEST			This list of files
+README.Google-ProvisioningAPI
+t/run.t
+t/tests/My/Test/Class.pm
+t/tests/Test/VUser/Google/Groups.pm
+t/tests/Test/VUser/Google/Groups/V2_0.pm
+t/tests/Test/VUser/Google/Provisioning.pm
+t/tests/Test/VUser/Google/Provisioning/V2_0.pm
+META.yml                                 Module meta-data (added by MakeMaker)

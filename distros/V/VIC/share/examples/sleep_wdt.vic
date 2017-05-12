@@ -1,0 +1,16 @@
+PIC P16F690;
+
+Main {
+    digital_output RC0;
+    timer_enable WDT, 17ms;
+    sleep;
+    write RC0, 1;
+}
+
+Simulator {
+    attach_led RC0;
+    log RC0;
+    scope RC0;
+    stop_after 500ms;
+    autorun;
+}

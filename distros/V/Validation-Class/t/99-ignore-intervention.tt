@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use utf8;
+use strict;
+use warnings;
+use Test::More;
+
+package T;
+use Validation::Class;
+
+field email     => {
+    required    => 1,
+    pattern     => qr/\@localhost$/,
+    max_length  => 15
+};
+
+field login     => {
+    required    => 1,
+    min_length  => 5,
+    alias       => ['user']
+};
+
+field password  => {
+    required    => 1,
+    min_length  => 5,
+    min_digits  => 1,
+    alias       => ['pass']
+};
+
+package main;
+
+my $params = {
+    user    => '',
+    pass    => '',
+    email   => '',
+};
+
+my $t0 = T->new(params => $params);
+ok !$t0->validate;
+is $t0->error_count, 3;
+for (sort $t0->get_errors) {
+    like $_, qr/required/;
+}
+
+my $t1 = T->new(params => $params, ignore_intervention => 0);
+ok !$t1->validate;
+is $t1->error_count, 3;
+for (sort $t1->get_errors) {
+    like $_, qr/required/;
+}
+
+my $t2 = T->new(params => $params, ignore_intervention => 1);
+ok !$t2->validate;
+is $t2->error_count, 7;
+is $t2->fields->get('email')->errors->count, 2;
+is $t2->fields->get('login')->errors->count, 2;
+is $t2->fields->get('password')->errors->count, 3;
+
+done_testing();
+

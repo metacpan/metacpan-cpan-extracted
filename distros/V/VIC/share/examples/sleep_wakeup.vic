@@ -1,0 +1,25 @@
+PIC P16F690;
+
+Main {
+    digital_output RC0;
+    digital_input RA0;
+    write RC0, 0;
+    read RA0, ISR {
+        $value = shift;
+        write RC0, $value;
+    };
+    sleep;
+    write RC0, $value;
+}
+
+Simulator {
+    attach_led RC0;
+    log RA0, RC0;
+    scope RA0, RC0;
+    # a simple 100ms high
+    stimulate RA0, wave [
+        100000, 1, 200000, 0
+    ];
+    stop_after 500ms;
+    autorun;
+}

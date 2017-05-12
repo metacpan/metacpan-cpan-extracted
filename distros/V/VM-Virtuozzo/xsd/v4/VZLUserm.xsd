@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/userm" elementFormDefault="qualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/userm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="userm" type="usermType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>User/Group Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="usermType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:sequence minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="group_del_user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="add_user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="del_user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="edit_user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="del_group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="add_group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="get_user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="group_add_user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="get_group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="edit_group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="group_set_users" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="get_limits" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="authenticate" minOccurs="0"/>
+					</xs:sequence>
+					<xs:sequence minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="limits" minOccurs="0"/>
+						<xs:element ref="token" minOccurs="0"/>
+					</xs:sequence>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="group_del_user">
+		<xs:annotation>
+			<xs:documentation>Remove user from group. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:choice>
+					<xs:element name="user">
+						<xs:annotation>
+							<xs:documentation>User to delete.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>User name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="member_group">
+						<xs:annotation>
+							<xs:documentation>Group to delete</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Group name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_user">
+		<xs:annotation>
+			<xs:documentation>Add user. Returns Created user information/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="user"/>
+				<xs:element name="min_uid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>For UID change the first UID of the range.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="max_uid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>For UID change the last UID of the range.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="create_home_dir" type="xs:boolean" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If it is not specified then it works template specific (some templates create user directory but others not), if specified and set to 1 - user directory will be created always, if set to 0 - user directory will not be created always. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="create_initial_group" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Valid only if "initial_group/name" specified.  If set then specified "initial_group/name" will be created. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_user">
+		<xs:annotation>
+			<xs:documentation>Delete user. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="user">
+					<xs:annotation>
+						<xs:documentation>User to delete.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>User name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="remove_home_dir" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Remove user directory also.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="remove_initial_group" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Remove user initial group.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_user">
+		<xs:annotation>
+			<xs:documentation>Change user information. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name o the user to edit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="user"/>
+				<xs:element name="min_uid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>For UID change the resulting UID will be not less than the specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="max_uid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>For UID change the resulting UID will be not less than the specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_group">
+		<xs:annotation>
+			<xs:documentation>Delete group. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group">
+					<xs:annotation>
+						<xs:documentation>Group to delete.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_group">
+		<xs:annotation>
+			<xs:documentation>Add group. Returns created "group" information or Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group">
+					<xs:annotation>
+						<xs:documentation>Group to add</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="min_gid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>The resulting GID will be not less than this one.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="max_gid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>The resulting GID will be not greater than this one.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_user">
+		<xs:annotation>
+			<xs:documentation>Get user information. If "user" is not specified gets all of them. Returns "user"s or Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="user" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>User to get info about.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="uid" type="xs:int" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>User ID</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="name" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>User name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="group_add_user">
+		<xs:annotation>
+			<xs:documentation>Add user to group. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group">
+					<xs:annotation>
+						<xs:documentation>Group to add user to.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:choice>
+					<xs:element name="user">
+						<xs:annotation>
+							<xs:documentation>User to add.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>User name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="member_group">
+						<xs:annotation>
+							<xs:documentation>Group to add</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Group name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_group">
+		<xs:annotation>
+			<xs:documentation>Get group information. If "group" is not specified gets all of them. Returns "group"s or Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Group to get info about.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="gid" type="xs:int" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Group ID</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_group">
+		<xs:annotation>
+			<xs:documentation>Change group information. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Group to edit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="group">
+					<xs:annotation>
+						<xs:documentation>New group values structure.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="gid" type="xs:int" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Group ID</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="min_gid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>For GID change the resulting GID will be not less than the specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="max_gid" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>For GID change the resulting GID will be not greater than the specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="group_set_users">
+		<xs:annotation>
+			<xs:documentation>Removes all users from group and set new ones. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group">
+					<xs:annotation>
+						<xs:documentation>Group to set users to.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="user" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Users to set.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>User name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="member_group" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Groups to set.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Group name</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_limits">
+		<xs:annotation>
+			<xs:documentation>Get Container uid/gid limits. Returns "limits" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="authenticate">
+		<xs:annotation>
+			<xs:documentation>Verify user authenticity for given username and password. Returns "authenticity" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string"/>
+				<xs:element name="password" type="xs:base64Binary"/>
+				<xs:element name="type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Authorization type. If not specified that default "system" is used. Possible values: "system", "system_admin", "system_admin_group"</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="system"/>
+							<xs:enumeration value="plesk"/>
+							<xs:enumeration value="system_admin"/>
+							<xs:enumeration value="system_admin_group"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="user" type="vzlt:userType">
+		<xs:annotation>
+			<xs:documentation>User information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="group" type="vzlt:groupType">
+		<xs:annotation>
+			<xs:documentation>Group information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="limits">
+		<xs:annotation>
+			<xs:documentation>Limits for user and group creation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="umin" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>min UID used for user creation.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="umax" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>max UID used for user creation.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="gmin" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>min GID used for group creation.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="gmax" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>max GID used for group creation.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="token" type="vzlt:tokenType">
+		<xs:annotation>
+			<xs:documentation>Result of "authenticate" command.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="group_del_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_userResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="user"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_groupResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="group"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_userResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="user" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="group_add_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_groupResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="group" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="group_set_usersResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_limitsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="limits"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="authenticateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

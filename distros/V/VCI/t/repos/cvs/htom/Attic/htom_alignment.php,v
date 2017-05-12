@@ -1,0 +1,157 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+/*!  \brief The alignment object encapsulates the HTML alignment property.
+ */
+class HTOM_Alignment implements HTOM_Attribute
+{
+  //! Initialize the HTOM_Alignment object.
+  /*! \param $alignment either the HTOM_Alignment or the name of alignment.
+   */
+  public function __construct( $alignment = NULL )
+  {
+    if ($alignment instanceof HTOM_Alignment) {
+      $this->text = $alignment->text;
+    } else if (is_string($alignment))      {
+      if ($alignment=="center" || $alignment=="left" || $alignment=="right" || $alignment=="justify") {
+	$this->text = $alignment;
+      } else {
+	HTOM_Debug::Out("WARINIG: the allignemnt ".$alignment." is invalid.",0);
+      }
+    }
+  }
+  
+  //! Returns a name HTOM_Alignment.
+  public function Name()
+  {
+    return "HTOM_Alignment";
+  }
+
+  //! Clear the alignment attribute.
+  /*! This method returns the HTOM_Alignment object when called as a static, if called from 
+   an istance of existing object it sets the propery.*/
+  public function Reset()
+  {
+    $rc = NULL;
+    if (isset($this)) {
+      $this->text = NULL;
+      $rc=$this;
+    } else {
+      $rc = new HTOM_Alignment();
+    }
+    return $rc;
+  }
+
+
+  //! Set the alignment to center.
+  /*! This method returns the HTOM_Alignment object when called as a static, if called from 
+   an istance of existing object it sets the propery.*/
+  public function Center()
+  {
+    $rc = NULL;
+    if (isset($this) && $this instanceof HTOM_Alignment) {
+      $this->text = "center";
+      $rc=$this;
+      HTOM_Debug::Out( "HTOM_Alignment::Center: return current object set center",4,"HTOM.Alignment");
+    } else {
+      HTOM_Debug::Out( "HTOM_Alignment::Center: return new center object",4,"HTOM.Alignment");
+      $rc = new HTOM_Alignment("center");
+    }
+    return $rc;
+  }
+
+  //! Set the alignment to left
+  /*! This method returns the HTOM_Alignment object when called as a static, if called from 
+   an istance of existing object it sets the propery.*/
+  public function Left()
+  {
+    $rc = NULL;
+    if (isset($this)) {
+      $this->text = "left";
+      $rc=$this;
+    } else {
+      $rc = new HTOM_Alignment("left");
+    }
+    return $rc;
+  }
+
+  //! Set the alignment to right
+  /*! This method returns the HTOM_Alignment object when called as a static, if called from 
+   an istance of existing object it sets the propery.*/
+  public function Right()
+  {
+    $rc = NULL;
+    if (isset($this)) {
+      $this->text = "right";
+      $rc=$this;
+    } else {
+      $rc = new HTOM_Alignment("right");
+    }
+    return $rc;
+  }
+
+  //! Set the alignment to justify
+  /*! This method returns the HTOM_Alignment object when called as a static, if called from 
+   an istance of existing object it sets the propery.*/
+  public function Justify()
+  {
+    $rc = NULL;
+    if (isset($this)) {
+      $this->text = "justify";
+      $rc=$this;
+    } else {
+      $rc = new HTOM_Alignment("justify");
+    }
+    return $rc;
+  }
+
+  //! Get the HTML tag argumet that sets the alignment property
+  public function Evaluate()
+  {
+    $rc="";
+    if (isset($this->text)) {
+      $rc = " align='".$this->text."' ";
+    }
+    return $rc;
+  }
+
+  private $text=NULL;
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

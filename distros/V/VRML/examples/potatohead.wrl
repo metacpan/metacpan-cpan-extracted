@@ -1,0 +1,322 @@
+#VRML V2.0 utf8
+Background {
+	groundColor	0.647058823529412 0.164705882352941 0.164705882352941
+	skyColor	0.67843137254902 0.847058823529412 0.901960784313726
+}
+WorldInfo {
+	title	"Potato Head"
+}
+Viewpoint {
+	description	"Front"
+	position	0 -5.25 15.125
+	orientation	0 0 1 0
+	fieldOfView	1.04719753333333
+}
+Viewpoint {
+	description	"Right"
+	position	13.875 -5.25 1.25
+	orientation	0 1 0 1.5707963
+	fieldOfView	1.04719753333333
+}
+Viewpoint {
+	description	"Back"
+	position	0 -5.25 -12.625
+	orientation	0 1 0 3.1415926
+	fieldOfView	1.04719753333333
+}
+Viewpoint {
+	description	"Left"
+	position	-13.875 -5.25 1.25
+	orientation	0 1 0 -1.5707963
+	fieldOfView	1.04719753333333
+}
+Viewpoint {
+	description	"Top"
+	position	0 8.625 1.25
+	orientation	1 0 0 -1.5707963
+	fieldOfView	1.04719753333333
+}
+Viewpoint {
+	description	"Bottom"
+	position	0 -19.125 1.25
+	orientation	1 0 0 1.5707963
+	fieldOfView	1.04719753333333
+}
+DirectionalLight {
+	direction	0 0 -1
+	intensity	0.3
+}
+DEF HEAD
+Transform {
+    children [
+	DEF HEAD-TOUCH TouchSensor {}
+	Transform {
+	    scale		4 3 2
+	    children [
+		Shape {
+			appearance Appearance {
+				material Material {
+					emissiveColor	0.3 0.194117647058824 0
+					diffuseColor	1 0.647058823529412 0
+				}
+			}
+			geometry Sphere {
+				radius	1
+			}
+		}
+	    ]
+	}
+	Transform {
+	    translation	0 4 0
+	    children [
+		Shape {
+			appearance Appearance {
+				material Material {
+					diffuseColor	0 0 1
+				}
+			}
+			geometry Cone {
+				bottomRadius	2
+				height	3
+			}
+		}
+	    ]
+	}
+	Transform {
+	    translation	-1 1 1
+	    children [
+		DEF eye
+		Group {
+		    children [
+			Shape {
+				appearance Appearance {
+					material Material {
+						diffuseColor	1 1 1
+					}
+				}
+				geometry Sphere {
+					radius	0.9
+				}
+			}
+			Transform {
+			    translation	0 .1 .8
+			    children [
+				Shape {
+					appearance Appearance {
+						material Material {
+							diffuseColor	0 0 0
+						}
+					}
+					geometry Sphere {
+						radius	0.2
+					}
+				}
+			    ]
+			}
+		    ]
+		}
+	    ]
+	}
+	Transform {
+	    translation	1 1 1
+	    children [
+		USE eye
+	    ]
+	}
+	Transform {
+	    translation	0 -0.3 2.5
+	    rotation	1 0 0 1.5707963
+	    children [
+		Shape {
+			appearance Appearance {
+				material Material {
+					diffuseColor	1 0 0
+				}
+			}
+			geometry Cone {
+				bottomRadius	0.5
+				height	2
+			}
+		}
+	    ]
+	}
+	Transform {
+	    translation	0 -.4 0.7
+	    rotation	1 0 0 1.39626337777778
+	    children [
+		Shape {
+			appearance Appearance {
+				material Material {
+					diffuseColor	1 0 0
+				}
+			}
+			geometry Cylinder {
+				radius	2
+				height	1
+			}
+		}
+	    ]
+	}
+    ]
+}
+Transform {
+    translation	0 -3 0
+    children [
+	Shape {
+		appearance Appearance {
+			material Material {
+				diffuseColor	1 1 0
+			}
+		}
+		geometry Cylinder {
+			radius	0.8
+			height	2
+		}
+	}
+    ]
+}
+Transform {
+    translation	0 -6.5 0
+    children [
+	DEF BODY-TOUCH TouchSensor {}
+	Shape {
+		appearance Appearance {
+			material Material {
+				diffuseColor	0 0.392156862745098 0
+			}
+		}
+		geometry Cylinder {
+			radius	2.5
+			height	6
+		}
+	}
+    ]
+}
+DEF ARM
+Transform {
+    translation	0 -5.5 0
+    children [
+	Transform {
+	    translation	-4 2 0
+	    rotation	0 0 1 1.04719753333333
+	    children [
+		DEF arm
+		Shape {
+			appearance Appearance {
+				material Material {
+					diffuseColor	0 0.501960784313725 0
+				}
+			}
+			geometry Cylinder {
+				radius	.5
+				height	6
+			}
+		}
+	    ]
+	}
+    ]
+}
+Transform {
+    translation	4 -3.5 0
+    rotation	0 0 1 -1.04719753333333
+    children [
+	USE arm
+    ]
+}
+Transform {
+    translation	1.2 -12 0
+    children [
+	DEF leg
+	Shape {
+		appearance Appearance {
+			material Material {
+				diffuseColor	0 0.501960784313725 0
+			}
+		}
+		geometry Cylinder {
+			radius	.5
+			height	5
+		}
+	}
+    ]
+}
+Transform {
+    translation	-1.2 -12 0
+    children [
+	USE leg
+    ]
+}
+Transform {
+    translation	1.2 -14.5 0.3
+    children [
+	DEF shoe
+	Shape {
+		appearance Appearance {
+			material Material {
+				diffuseColor	0 0 0
+			}
+		}
+		geometry Box {
+			size	1.4 .5 2
+		}
+	}
+    ]
+}
+Transform {
+    translation	-1.2 -14.5 0.3
+    children [
+	USE shoe
+    ]
+}
+Sound {
+	direction	0 0 -1
+	maxFront	100
+	source DEF HALLO AudioClip {
+		url		"hallo.wav"
+		description	"HALLO"
+		loop		FALSE
+		pitch		2
+	}
+}
+DEF MOVE PositionInterpolator {
+	key [
+		0,
+		0.5,
+		1
+	]
+	keyValue [
+		0 0 0,
+		0 1 0,
+		0 0 0
+	]
+}
+DEF TURN OrientationInterpolator {
+	key [
+		0,
+		0.2,
+		0.5,
+		0.7,
+		1
+	]
+	keyValue [
+		0 0 1 0,
+		0 0 1 .5,
+		0 0 1 0,
+		0 0 1 .5,
+		0 0 1 0
+	]
+}
+DEF TS1 TimeSensor {
+	cycleInterval	0.5
+}
+DEF TS2 TimeSensor {
+	cycleInterval	2
+}
+ROUTE HEAD-TOUCH.touchTime TO TS1.startTime
+ROUTE TS1.fraction_changed TO MOVE.set_fraction
+ROUTE MOVE.value_changed TO HEAD.translation
+ROUTE BODY-TOUCH.touchTime TO TS2.startTime
+ROUTE TS2.fraction_changed TO TURN.set_fraction
+ROUTE TURN.value_changed TO ARM.rotation
+ROUTE HEAD-TOUCH.touchTime TO HALLO.startTime
+ROUTE BODY-TOUCH.touchTime TO HALLO.startTime

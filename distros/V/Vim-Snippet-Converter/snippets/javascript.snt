@@ -1,0 +1,9 @@
+
+;super
+<<CLASS>>.superclass.constructor.call( this , <<ARGS>> );
+<<>>
+;end
+
+;ext
+Ext.extend( <<CLASS>> , <<INHERIT>> , { <<>> } );
+;end

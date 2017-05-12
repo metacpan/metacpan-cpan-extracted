@@ -1,0 +1,514 @@
+#!/usr/bin/perl -w
+use strict;
+BEGIN {
+    if ($ENV{HOME}) {
+        eval "use lib '$ENV{HOME}/perl/lib'"; die $@ if $@;
+    }
+    *DUMP = *DUMP = *VCS::SaVeS::SVS::DUMP;
+    *PRINT = *PRINT = *VCS::SaVeS::SVS::PRINT;
+}
+use VCS::SaVeS::SVS;
+my ($svs_switches, $cmd, $cmd_switches, $cmd_arguments) =
+   ( {},            '',   {},            [] );
+
+my %valid_svs_switches = map { ($_, 1) }
+  qw(--version --help --stdin --quiet);
+
+my %valid_svs_switch_aliases =
+  qw( -v --version
+      -h --help
+      -? --help
+      -  --stdin
+      -q --quiet
+    );
+
+my @valid_cmds = 
+    qw(add archive break config delete diff export find help history
+    import log manifest merge message remove restore save split status
+    tag undo);
+
+my @args = @ARGV;
+
+while (@args and $args[0] =~ /^-/) {
+    my $switch = shift(@args);
+    $switch = $valid_svs_switch_aliases{$switch}
+      if defined $valid_svs_switch_aliases{$switch};
+    die "$switch used twice" 
+      if $svs_switches->{$switch};
+    $switch =~ s/^--//;
+    $svs_switches->{$switch} = 1;
+}
+
+VCS::SaVeS::SVS->version(), exit
+  if $svs_switches->{version};
+
+my $word = @args 
+           ? shift(@args)
+           : do {
+                 require VCS::SaVeS::Help;
+                 die VCS::SaVeS::Help->usage();
+             };
+
+for (@valid_cmds) {
+    if (/^\Q$word/) {
+        die "'$word' is ambiguous with '$cmd' and '$_'\n"
+          if $cmd;    
+        $cmd = $_;
+    }
+}
+die "'$word' is an invalid svs command\n" 
+  unless $cmd;
+$cmd .= '_' if $cmd eq 'import';
+
+my @switches = ();
+while (@args and $args[0] =~ /^-/) {
+    push @switches, shift(@args);
+}
+
+if ($svs_switches->{stdin}) { 
+    die "Arguments not allowed on command when reading them from stdin\n" 
+      if @args;
+    @$cmd_arguments = grep { not /^\#/ } map {chomp; $_} <STDIN>;
+}    
+else {
+    @$cmd_arguments = @args;
+}
+
+for (@$cmd_arguments) {
+    s|/+|/|g;
+    s|/$||g;
+}
+
+# Parse command switches
+my $getopts = 
+  {
+   add     => [qw(m=s M)],
+   delete  => [qw(f)],
+   diff    => [qw(r=s)],
+   import_ => [qw(m=s M)],
+   restore => [qw(r=s)],
+   save    => [qw(m=s M)],
+  };
+    
+if (defined $getopts->{$cmd}) {
+    @ARGV = @switches;
+    eval {require Getopt::Long;
+          Getopt::Long->import(':config', 'gnu_getopt');
+         }; 
+    die $@ if $@;
+    my @options = map {
+                       (my $switch = $_) =~ s/^(\w+).*/$1/;
+                       ($_, \ $cmd_switches->{$switch})
+                      } @{$getopts->{$cmd}};
+    Getopt::Long::GetOptions(@options);
+    for (keys %$cmd_switches) {
+        delete $cmd_switches->{$_}
+          unless defined $cmd_switches->{$_};
+    }
+}
+
+# Call command support routine to do the rest of the work.
+VCS::SaVeS::SVS->$cmd($cmd_switches, $cmd_arguments);
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+svs - The SaVeS(tm) (Standalone Versioning System) command line interface tool.
+
+=head1 USAGE
+
+    svs [svs-options] command [command-options] [command-arguments]
+
+    saves  # DWIM shorthand. Does 'svs import' or 'svs save'.
+
+=head1 DESCRIPTION
+
+SaVeS is the Standalone Versioning System. It works like CVS but is
+simpler to use. The main interface is the command line tool C<svs>. This
+manpage describes all of the information needed to use SaVeS.
+
+=head1 THE .saves REPOSITORY
+
+All revision information for a given directory tree is stored in a
+C<.saves> directory at the root of that tree. This directory is known as
+a SaVeS B<repository>. All SaVeS commands must be issued from the
+directory containing the repository.
+
+A repository is responsible for the entire tree below it. However, if
+any directory below the root, contains a C<.saves> directory itself,
+then that directory is not processed by the commands issued above it.
+
+A directory with a C<.saves> repository might have the following layout:
+
+    ./.saves/
+    ./.saves/MANIFEST
+    ./.saves/SAVES/
+    ./.saves/SAVES/foo.txt,v
+    ./.saves/SAVES/src/
+    ./.saves/SAVES/src/prog.c,v
+    ./bar.txt
+    ./foo.txt
+    ./src/
+    ./src/prog.c
+    ./src/prog.h
+
+The MANIFEST contains a list of every B<file> in the repository. It
+doesn't contain any pathnames of directories. The MANIFEST of the
+above directory might look like this:
+
+    foo.txt
+    src/prog.c
+
+The SAVES subdirectory contains the revision files inside a directory
+structure that mirrors the current directory.
+
+=head1 ESSENTIAL COMMANDS
+
+=over 4
+
+=item help
+
+Get help about the SaVeS system or a given C<svs> command.
+
+=item import
+
+Start a repository in the current directory.
+
+=item save
+
+Save the current state of files in the repository.
+
+=item history
+
+Show the revision history of a given file.
+
+=item restore
+
+Restore an older revision of files in the repository.
+
+=back
+
+=head1 GLOBAL svs OPTIONS
+
+=head2 --stdin (-)
+
+=head2 --version (-v)
+
+=head2 --help (-h or -?)
+
+=head1 THE svs COMMANDS
+
+=head2 add
+
+Add a list of files to the MANIFEST. Also save an initial revision for
+every file that has never been saved.
+
+    svs add [-mmessage -M] [file-list]
+
+Options:
+
+=over 4 
+
+=item * -m'A message'
+
+Specify a message in the command line.
+
+=item * -M
+
+Don't prompt for a message. Use the default message.
+
+=back
+
+Examples:
+
+    # Add all files in current directory
+    svs add .
+    # Add the files foo.txt and everything in the lib/fun/ directory
+    svs add foo.txt lib/fun 
+
+=head2 archive XXX
+
+Create a tar archive of a repository. This can be used to transport
+the repository to another system where it can be unarchived with the
+import command.
+
+=head2 break
+
+This creates an empty SaVeS repository in the current directory. Doing
+this serves to keep C<svs> commands used at higher directories from
+traversing the into this directory.
+
+    svs break
+
+I<NOTE: The empty repository consists of a single file:
+C<.saves/MANIFEST>. This repository can be made active, simply by using
+the C<svs add> command.>
+
+=head2 config XXX
+
+This command is used to show and set the various SaVeS
+configuration options.
+
+=head2 delete
+
+Remove files from the repository. This does not actually remove the
+actual files. It merely erases the revision history.
+
+    svs delete [-f] file-list
+
+=over 4 
+
+=item * -f
+
+Don't confirm deletion.
+
+=back
+
+I<NOTE: SaVeS commands will never delete your working files. So don't
+worry about that.>
+
+=head2 diff
+
+Show the difference between files at different revision levels.
+
+    svs diff [-r<rev1> [-r<rev2>]] file-list
+
+=over 4 
+
+=item * -r<revision-number>
+
+The revision number is an integer which must correspond to the line
+number from an C<svs history> command.
+
+=back
+
+If you use the C<-r> flags then you may only specify one filename.
+
+=head2 export XXX
+
+Convert a repository into a form that can be imported into another VCS,
+like C<CVS>.
+
+=head2 find
+
+Find all the files in the repository that match a given regular
+expression pattern.
+
+=head2 help
+
+Get help about the SaVeS system in general, or help on a specific
+C<svs> command.
+
+=head2 history
+
+Show the revision history for individual files in the repository. You
+usually use this command before an C<svs restore> command, in order to
+identify the revision number you wish to get. If the working file is
+newer than the last save, the message on the first line will be prefixed
+with a C<*>.
+
+    svs history file-name
+
+Sample Output:
+
+    1) 2002-10-25 14:41:17-07 (Origin) saves 
+    2) 2002-10-25 14:45:52-07 ( +2 -4) saves 
+    3) 2002-10-29 17:31:30-08 (+58 -35) Changed die to DIE
+    4) 2002-10-29 20:29:10-08 (+11 -5) saves 
+    5) 2002-10-29 20:59:03-08 ( +3 -2) Added asterisk before message
+    *) Working file has been modified since last save
+
+=head2 import
+
+This command creates a new SaVeS repository in the current directory. It
+can take a list of files and directories under the current directory.
+These get added to the MANIFEST, and will be the only files to be
+affected by further commands, unless the MANIFEST is modified by other
+C<svs> commands.
+
+    svs import [-mmessage -M] [file-list]
+
+Options:
+
+=over 4 
+
+=item * -m'A message'
+
+Specify a message in the command line.
+
+=item * -M
+
+Don't prompt for a message. Use the default message.
+
+=back
+
+=head2 log XXX
+
+Display a log of previous C<svs> commands performed on the current directory.
+
+=head2 manifest
+
+This command is use to either list or set the contents of the current
+C<.saves/MANIFEST> file. The MANIFEST controls which files in the tree
+are affected by the SaVeS system.
+
+The C<manifest> command can be used in a pipeline unix command to list,
+modify and reset the MANIFEST:
+
+    svs manifest | grep -v CVS | svs --stdin manifest
+
+=head2 merge XXX
+
+The inverse of C<split>. This command will take a repository from a
+subdirectoryand integrate it into the repository in the current
+directory.
+
+=head2 message XXX
+
+Change the message for a certain revision of a file.
+
+=head2 remove
+
+    svs remove file-list
+
+Remove files from the MANIFEST. This does not delete files from the
+repository. See C<delete> for that.
+
+I<NOTE: SaVeS commands will never delete your working files. So don't
+worry about that.>
+
+=head2 restore
+
+Restore a single file in the repository to a given revision. If no
+revision number is given, restore to last save.
+
+    svs restore [-r<rev>] [file-list]
+
+Options:
+
+=over 4 
+
+=item * -r<revision-number>
+
+The revision number is an integer which must correspond to the line
+number from an C<svs history> command.
+
+=back
+
+Examples:
+
+    # Show a list of revisions for 'foo.txt'
+    svs history foo.txt
+        # Restore revision number 3 in the history list
+        svs restore -r3 foo.txt
+        # Restore the last saved revision
+        svs restore foo.txt
+
+    =head2 save
+
+    This command saves files which have been modified since the last C<svs
+    save> or C<svs import> command.
+
+        svs save [-mmessage -M] [file-list]
+
+    Options:
+
+    =over 4 
+
+    =item * -m'A message'
+
+    Specify a message in the command line.
+
+    =item * -M
+
+    Don't prompt for a message. Use the default message.
+
+    =back
+
+    =head2 split XXX
+
+    This command takes a subdirectory of the current repository and makes it
+    a repository of its own.
+
+    =head2 status
+
+    This command will print a report detailing the status of each requested
+    file that is in the repository. The information displayed contains the
+    name of the file, the current number of revisions and the date of last
+    save. If the working file is newer than the last save, it's name will be
+    prefixed with a C<*>.
+
+        svs status [file-list]
+
+    Sample output:
+
+        2002-10-29 20:55:31-08 (2) SaVeS.pm
+        2002-10-25 14:50:34-07 (2)*ToDo
+        2002-10-25 14:41:17-07 (1) bin/saves.PL
+        2002-10-25 14:41:17-07 (1)*bin/svs.PL
+        2002-10-25 14:41:17-07 (1) lib/VCS/SaVeS/Config.pm
+        2002-10-25 14:41:17-07 (1)*lib/VCS/SaVeS/Help.pm
+        2002-10-29 20:59:03-08 (5)*lib/VCS/SaVeS/SVS.pm
+
+    =head2 tag XXX
+
+    Associate a symbolic name with a set of files.
+
+    =head2 undo XXX
+
+    Undo the last C<svs> command. This can be applied as many times as needed.
+
+=head1 COMMON USAGE EXAMPLES
+
+=head2 Simply backup the files in a directory.
+
+    saves
+
+The C<saves> command is the simplest way to backup a directory tree. If
+the repository doesn't exist, C<saves> is the same as saying:
+
+    svs import -m'saves' .
+
+If the repository already exists, then C<saves> is the same as:
+
+    svs save -m'saves' .
+
+If C<saves> is called with any options or arguments, these are passed on
+to the <svs import> or <svs save> command that is actually invoked.
+
+Whenever you feel like backing everything up, just say C<'saves'>. You
+don't even need to think about it.
+
+=head2 Restore a file to a certain revision.
+
+    svs restore [-r<rev>] file-name
+
+Without any arguments, this command simply sets things back to the way
+they were when you last saved.
+
+=head1 SOFTWARE
+
+The SaVeS system is written in Perl. It is a wrapper around the standard
+Unix toolset RCS (Revision Control System). It is distributed as a Perl
+module called C<VCS::SaVeS> on the CPAN (Comprehesive Perl Archive
+Network). It installs the Perl scripts C<svs> and <saves> as command
+line programs. It also installs some Perl modules, but you probably
+won't use those directly.
+
+=head1 SEE
+
+The C<saves> manpage.
+
+C<http://search.cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 Brian Ingerson. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

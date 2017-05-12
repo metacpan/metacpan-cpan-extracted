@@ -1,0 +1,10 @@
+README
+Hms.pm
+Hms/Dir.pm
+Hms/File.pm
+Hms/Version.pm
+MANIFEST			This list of files
+Makefile.PL
+t/VCS-Hms.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

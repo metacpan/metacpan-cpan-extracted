@@ -1,0 +1,137 @@
+#!perl
+use Vim::Snippet::Converter;
+use Vim::Snippet::Completion;
+use File::Basename;
+use Getopt::Long;
+use File::Path qw(mkpath rmtree);
+use File::Copy 'copy';
+
+my ( 
+    $opt_src_fn,
+    $opt_install_to,
+    $opt_help,
+    $opt_default_target_dir,
+    $opt_completion);
+
+GetOptions(
+    'h|help'     => \$opt_help,
+    's|src=s'    => \$opt_src_fn,
+    'd'          => \$opt_default_target_dir,
+    'i|install-to=s' => \$opt_install_to,
+    'c|create-completion=s' => \$opt_completion ,
+);
+
+if( $opt_help ) {
+    print <<'EOF';
+
+Slippery Snippets Converter.
+
+    Usage:
+
+    # generate snippet vim script to stdout
+    $ scc -s filename.snt > perl_snippets.vim
+    
+    # to replace the previous install automatically.
+    $ scc -s filename.snt -i ~/.vim/syntax/perl.vim
+
+    -s, --src  [filename]
+        specify source file path
+
+    -i, --install-to [filename]
+        specify vim script path, e.g.  ~/.vim/syntax/perl.vim
+
+    -c, --create-completion [filepath]
+        create snippet keyword completion file for vim
+
+EOF
+    exit;
+}
+
+die("Please specify source file: -s filename.snt") if ( !defined $opt_src_fn );
+
+
+
+my $src_filename = basename( $opt_src_fn );
+
+$scc = new Vim::Snippet::Converter;
+my ($in,$out);
+open $in,  '<', $opt_src_fn;
+
+if( $opt_install_to ) {
+    
+# mkpath $opt_install_to;
+
+    # if file exists 
+    # find the previous install
+    if( -e $opt_install_to ) {
+        # remove the previous install
+
+        open my $fh1, "<" , $opt_install_to;
+        my @lines = <$fh1>;
+        my $i = 0;
+        my $idx_start = -1;
+        my $idx_end   = -1;
+        foreach my $line ( @lines ) {
+            $idx_start = $i  if ( $line =~ m{\Q"=====SNIPPET START:$src_filename} );
+            $idx_end = $i    if ( $line =~ m{\Q"=====SNIPPET END:$src_filename} );
+            $i++;
+        }
+        close $fh1 ;
+
+        # splice 
+        if( $idx_start > -1 ) {
+            print STDERR "Found previous install: $idx_start-$idx_end\n";
+            splice @lines,$idx_start,$idx_end - $idx_start + 1;
+
+            # write back
+            open $fh1 , ">" , $opt_install_to;
+            print $fh1 @lines;
+            close $fh1;
+        }
+    }
+
+    # open file descriptor to target
+    open $out, '>>', $opt_install_to;
+} 
+else {
+    open $out, '>&', STDOUT;
+}
+
+print $out "\"=====SNIPPET START:$src_filename \n";
+$scc->convert( $in, $out );
+print $out "\"=====SNIPPET END:$src_filename \n";
+
+close( $in, $out );
+print STDERR <<END;
+
+Use these settings to beautify your snippet:
+------------------------------------------------
+        let g:snip_start_tag = "«"
+        let g:snip_end_tag = "»"
+END
+
+
+if ($opt_completion) {
+    $keywords = $scc->{triggers};
+    $comp     = new Vim::Snippet::Completion;
+    $comp->gen({   
+            output => $opt_completion ,
+            list   => $scc->{triggers},
+            opt    => 'new',
+    });
+    
+    print STDERR <<EOF;
+
+Vim completion file: $opt_completion 
+please move $opt_completion to your home directory 
+and append the below setting in your .vimrc
+
+    set dict+=~/$opt_completion
+
+EOF
+}
+
+print STDERR "Done";
+
+__END__
+

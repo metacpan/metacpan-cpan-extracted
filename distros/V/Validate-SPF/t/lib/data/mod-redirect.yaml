@@ -1,0 +1,31 @@
+#
+# Parser tests: modifier "redirect"
+#
+---
+positive:
+    'redirect=_spf.google.com':
+        domain: '_spf.google.com'
+
+negative:
+    'redirect=':
+        code: E_DOMAIN_EXPECTED
+        context: 'redirect'
+    'redirect':
+        code: E_DOMAIN_EXPECTED
+        context: 'redirect'
+    # TODO: more specific error?
+    'redirect=тест.com':
+        code: E_SYNTAX
+        context: 'redirect=<*>тест.com'
+    'redirect=127.0.0.1':
+        code: E_DOMAIN_EXPECTED
+        context: '127.0.0.1'
+    'redirect=127.0.0.1/8':
+        code: E_DOMAIN_EXPECTED
+        context: '127.0.0.1/8'
+    'redirect=2a00:f940::37':
+        code: E_DOMAIN_EXPECTED
+        context: '2a00:f940::37'
+    'redirect=2a00:f940::38/96':
+        code: E_DOMAIN_EXPECTED
+        context: '2a00:f940::38/96'

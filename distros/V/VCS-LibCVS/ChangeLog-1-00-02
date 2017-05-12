@@ -1,0 +1,340 @@
+2005-10-10  dissent
+
+	* libcvs-perl/README [1.10]
+
+	Update for release 1.00.02.
+
+2005-10-10  dissent
+
+	* libcvs-perl/Makefile.PL [1.15]
+
+	Update ChangeLog generation script for migration to savannah.
+	  + ChangeLog and tag names no longer include the word Perl.
+	  + New CVS module name.
+
+2005-10-10  dissent
+
+	* libcvs-perl/.cvsignore [1.4]
+
+	Ignore META.yml, generated during build.
+
+2005-10-10  dissent
+
+	* libcvs-perl/Makefile.PL [1.14]
+
+	Install LibCVS scripts by default.
+
+2005-10-10  dissent
+
+	* libcvs-perl/README [1.9]
+	* libcvs-perl/VCS/LibCVS.pm [1.28]
+
+	Update version numbers for impending release.
+
+2005-10-10  dissent
+
+	* libcvs-perl/Makefile.PL [1.13]
+	* libcvs-perl/README [1.8]
+	* libcvs-perl/VCS/LibCVS.pm [1.27]
+	* libcvs-perl/VCS/Makefile.PL [1.5]
+	* libcvs-perl/VCS/LibCVS/Admin.pm [1.18]
+	* libcvs-perl/VCS/LibCVS/Branch.pm [1.4]
+	* libcvs-perl/VCS/LibCVS/Client.pm [1.34]
+	* libcvs-perl/VCS/LibCVS/Datum.pm [1.14]
+	* libcvs-perl/VCS/LibCVS/DirectoryBranch.pm [1.11]
+	* libcvs-perl/VCS/LibCVS/FileBranch.pm [1.13]
+	* libcvs-perl/VCS/LibCVS/FileRevision.pm [1.25]
+	* libcvs-perl/VCS/LibCVS/IgnoreChecker.pm [1.9]
+	* libcvs-perl/VCS/LibCVS/Repository.pm [1.19]
+	* libcvs-perl/VCS/LibCVS/RepositoryDirectory.pm [1.10]
+	* libcvs-perl/VCS/LibCVS/RepositoryFile.pm [1.18]
+	* libcvs-perl/VCS/LibCVS/RepositoryFileOrDirectory.pm [1.14]
+	* libcvs-perl/VCS/LibCVS/WorkingDirectory.pm [1.10]
+	* libcvs-perl/VCS/LibCVS/WorkingFile.pm [1.15]
+	* libcvs-perl/VCS/LibCVS/WorkingFileOrDirectory.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/WorkingUnmanagedFile.pm [1.9]
+	* libcvs-perl/VCS/LibCVS/Client/Connection.pm [1.20]
+	* libcvs-perl/VCS/LibCVS/Client/LoggingIOHandle.pm [1.5]
+	* libcvs-perl/VCS/LibCVS/Client/Request.pm [1.23]
+	* libcvs-perl/VCS/LibCVS/Client/Response.pm [1.27]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/CvsPass.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/Ext.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/Local.pm [1.16]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/Pserver.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Client/Request/Argument.pm [1.12]
+	* libcvs-perl/VCS/LibCVS/Client/Request/ArgumentUsingRequests.pm [1.18]
+	* libcvs-perl/VCS/LibCVS/Client/Request/Requests.pm [1.23]
+	* libcvs-perl/VCS/LibCVS/Client/Response/FileUpdateModifyingResponses.pm [1.11]
+	* libcvs-perl/VCS/LibCVS/Client/Response/FileUpdatingResponses.pm [1.14]
+	* libcvs-perl/VCS/LibCVS/Client/Response/Responses.pm [1.16]
+	* libcvs-perl/VCS/LibCVS/Datum/DirectoryName.pm [1.8]
+	* libcvs-perl/VCS/LibCVS/Datum/Entry.pm [1.19]
+	* libcvs-perl/VCS/LibCVS/Datum/FileContents.pm [1.11]
+	* libcvs-perl/VCS/LibCVS/Datum/FileMode.pm [1.10]
+	* libcvs-perl/VCS/LibCVS/Datum/FileName.pm [1.8]
+	* libcvs-perl/VCS/LibCVS/Datum/LogMessage.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Datum/PathName.pm [1.8]
+	* libcvs-perl/VCS/LibCVS/Datum/RevisionNumber.pm [1.16]
+	* libcvs-perl/VCS/LibCVS/Datum/Root.pm [1.19]
+	* libcvs-perl/VCS/LibCVS/Datum/String.pm [1.8]
+	* libcvs-perl/VCS/LibCVS/Datum/TagSpec.pm [1.11]
+	* libcvs-perl/VCS/LibCVS/Datum/Time.pm [1.9]
+	* libcvs-perl/examples/Makefile.PL [1.6]
+	* libcvs-perl/examples/lcvs-example [1.5]
+	* libcvs-perl/examples/lcvs-get [1.4]
+	* libcvs-perl/examples/lcvs-logsummary [1.15]
+	* libcvs-perl/examples/lcvs-st [1.29]
+	* libcvs-perl/examples/lcvs-version [1.4]
+	* libcvs-perl/examples/t/lcvs-st.t [1.12]
+	* libcvs-perl/examples/t/lcvs-st.t-setup.sh [1.8]
+
+	Add 2005 to Copyright notices
+
+2005-10-10  dissent
+
+	* libcvs-perl/VCS/LibCVS/WorkingUnmanagedFile.pm [1.8]
+
+	New implementation of is_in_the_way() which handles the case of a
+	directory in the repository with the same name.  Fixes issue #14190.
+
+2005-10-10  dissent
+
+	* libcvs-perl/VCS/LibCVS/Command.pm [1.15]
+
+	Add get_errors() method.  Useful in some cases.
+
+2005-09-21  dissent
+
+	* libcvs-perl/VCS/LibCVS/WorkingFile.pm [1.14]
+
+	get_file_branch(): Only do the trunk shortcut if there is no sticky
+	tag.  This handles the case where the file is on the first revision
+	of a branch from the trunk.
+	get_branch(): Add implementation, using get_file_branch().
+
+2005-09-11  dissent
+
+	* libcvs-perl/VCS/LibCVS/Command.pm [1.14]
+	* libcvs-perl/VCS/LibCVS/Client/Request/ArgumentUsingRequests.pm [1.17]
+
+	Respect the fact that some requests use file contents and entry
+	lines, but don't require them.
+	  ArgumentUsingRequests: Rename needs_file_contents() to
+	  uses_file_contents(), and needs_file_entry() to uses_file_entry().
+	  Command: Don't require file contents or entry lines.
+
+2005-09-09  dissent
+
+	* libcvs-perl/examples/lcvs-tagbase [1.2]
+
+	Actually tag the revisions.
+
+2005-09-09  dissent
+
+	* libcvs-perl/VCS/LibCVS/Command.pm [1.13]
+	* libcvs-perl/VCS/LibCVS/FileRevision.pm [1.24]
+	* libcvs-perl/VCS/LibCVS/Slice.pm [1.2]
+
+	Add the tag() routine to Slice.
+	  Slice: Add the new routine.
+	  Command: Add support for FileRevision objects in the list of file
+	           and directories.  Reorganise the loop in issue() to do
+	           better error handling in cases where required information
+	           (revision or file contents) is not available.
+	  FileRevision: add _get_entry(), which is needed by Command->issue().
+
+2005-08-14  dissent
+
+	* libcvs-perl/VCS/LibCVS/Client.pm [1.33]
+
+	Better implementation for handling failures when testing a
+	repository for multiple command support.  Traverse parents of the
+	test directory, rather than jumping straight to the root.
+
+2005-08-14  dissent
+
+	* libcvs-perl/VCS/LibCVS/Client.pm [1.32]
+
+	When checking if a repository supports multiple commands on a
+	connection, if the TestDir cannot be used, fallback to using the
+	root of the repository.
+
+2005-08-14  dissent
+
+	* libcvs-perl/VCS/LibCVS/RepositoryFile.pm [1.17]
+
+	When grouping lines of log output into log messages, ignore
+	separators if the next line is not properly formed.
+	Reword many of the comments.
+
+2005-08-14  dissent
+
+	* libcvs-perl/examples/lcvs-tagbase [1.1]
+
+	Initial incomplete version.
+
+2005-08-14  dissent
+
+	* libcvs-perl/VCS/LibCVS.pm [1.26]
+	* libcvs-perl/VCS/LibCVS/Slice.pm [1.1]
+
+	Add VCS::LibCVS::Slice.
+	Will be used by the upcoming lcvs-tagbase script.
+
+2005-08-01  dissent
+
+	* libcvs-perl/COPYING [1.4]
+	* libcvs-perl/GPL [1.1]
+	* libcvs-perl/PerlArtisticLicense [1.1]
+
+	Include copies of both the Artistic License and GPL.  Clarify the
+	what the same terms as Perl itself means.
+
+2005-07-19  dissent
+
+	* libcvs-perl/VCS/LibCVS/Datum/Root.pm [1.18]
+
+	Fix an error in the POD document, an unescaped @ was in a string.
+	Reported anonymously via rt.cpan.org.
+	https://rt.cpan.org/Ticket/Display.html?id=13718
+
+2005-04-09  dissent
+
+	* libcvs-perl/VCS/LibCVS/RepositoryFile.pm [1.16]
+	* libcvs-perl/VCS/LibCVS/RepositoryFileOrDirectory.pm [1.13]
+
+	Add an additional check when parsing log messages.
+
+2005-04-09  dissent
+
+	* libcvs-perl/examples/lcvs-logsummary [1.14]
+
+	Update comments
+
+2004-10-14  dissent
+
+	* libcvs-perl/VCS/LibCVS.pm [1.25]
+	* libcvs-perl/VCS/LibCVS/IgnoreChecker.pm [1.8]
+	* libcvs-perl/VCS/LibCVS/RepositoryFile.pm [1.15]
+	* libcvs-perl/examples/lcvs-get [1.3]
+	* libcvs-perl/examples/lcvs-logsummary [1.13]
+	* libcvs-perl/VCS/LibCVS/FileSticky.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/Sticky.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/StickyRevision.pm [1.3]
+	* libcvs-perl/VCS/LibCVS/StickyTag.pm [1.7]
+
+	These were stupid, and have been removed from the LibCVS-API.  In all
+	cases where they were used, they just made the code longer and more
+	confusing.
+	
+	LibCVS.pm: remove use statements and docs.
+	IgnoreChecker.pm: Don't use StickyTag anymore.  Update for changes to
+	                  RepositoryFile->get_revision().
+	RepositoryFile.pm: change signatures and implementation for get_tags()
+	                   and get_revision().  Remove get_tag(), replacing it
+	                   with has_tag() which has a similar use.
+	lcvs-get: Don't use Sticky any more, just call get_revision() directly.
+	lcvs-logsummary: Update for the changes to get_tag() and get_revision().
+
+2004-10-14  dissent
+
+	* libcvs-perl/examples/t/lcvs-st.t [1.11]
+
+	Ensure that lcvs-st.t-setup.sh is executable.
+	This should be done in the Makefile, but I couldn't figure
+	out how to add dependencies to target test.
+
+2004-10-14  dissent
+
+	* libcvs-perl/VCS/LibCVS/DirectoryBranch.pm [1.10]
+
+	Grammatical correction to docs.
+
+2004-10-08  dissent
+
+	* libcvs-perl/COPYING [1.3]
+	* libcvs-perl/Makefile.PL [1.12]
+	* libcvs-perl/README [1.7]
+	* libcvs-perl/VCS/LibCVS.pm [1.24]
+	* libcvs-perl/VCS/Makefile.PL [1.4]
+	* libcvs-perl/VCS/LibCVS/Admin.pm [1.17]
+	* libcvs-perl/VCS/LibCVS/Branch.pm [1.3]
+	* libcvs-perl/VCS/LibCVS/Client.pm [1.31]
+	* libcvs-perl/VCS/LibCVS/Command.pm [1.12]
+	* libcvs-perl/VCS/LibCVS/Datum.pm [1.13]
+	* libcvs-perl/VCS/LibCVS/DirectoryBranch.pm [1.9]
+	* libcvs-perl/VCS/LibCVS/FileBranch.pm [1.12]
+	* libcvs-perl/VCS/LibCVS/FileRevision.pm [1.23]
+	* libcvs-perl/VCS/LibCVS/IgnoreChecker.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Repository.pm [1.18]
+	* libcvs-perl/VCS/LibCVS/RepositoryDirectory.pm [1.9]
+	* libcvs-perl/VCS/LibCVS/RepositoryFile.pm [1.14]
+	* libcvs-perl/VCS/LibCVS/RepositoryFileOrDirectory.pm [1.12]
+	* libcvs-perl/VCS/LibCVS/WorkingDirectory.pm [1.9]
+	* libcvs-perl/VCS/LibCVS/WorkingFile.pm [1.13]
+	* libcvs-perl/VCS/LibCVS/WorkingFileOrDirectory.pm [1.5]
+	* libcvs-perl/VCS/LibCVS/WorkingUnmanagedFile.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Client/Connection.pm [1.19]
+	* libcvs-perl/VCS/LibCVS/Client/LoggingIOHandle.pm [1.4]
+	* libcvs-perl/VCS/LibCVS/Client/Request.pm [1.22]
+	* libcvs-perl/VCS/LibCVS/Client/Response.pm [1.26]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/CvsPass.pm [1.5]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/Ext.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/Local.pm [1.15]
+	* libcvs-perl/VCS/LibCVS/Client/Connection/Pserver.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/Client/Request/Argument.pm [1.11]
+	* libcvs-perl/VCS/LibCVS/Client/Request/ArgumentUsingRequests.pm [1.16]
+	* libcvs-perl/VCS/LibCVS/Client/Request/Requests.pm [1.22]
+	* libcvs-perl/VCS/LibCVS/Client/Response/FileUpdateModifyingResponses.pm [1.10]
+	* libcvs-perl/VCS/LibCVS/Client/Response/FileUpdatingResponses.pm [1.13]
+	* libcvs-perl/VCS/LibCVS/Client/Response/Responses.pm [1.15]
+	* libcvs-perl/VCS/LibCVS/Datum/DirectoryName.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Datum/Entry.pm [1.18]
+	* libcvs-perl/VCS/LibCVS/Datum/FileContents.pm [1.10]
+	* libcvs-perl/VCS/LibCVS/Datum/FileMode.pm [1.9]
+	* libcvs-perl/VCS/LibCVS/Datum/FileName.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Datum/LogMessage.pm [1.6]
+	* libcvs-perl/VCS/LibCVS/Datum/PathName.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Datum/RevisionNumber.pm [1.15]
+	* libcvs-perl/VCS/LibCVS/Datum/Root.pm [1.17]
+	* libcvs-perl/VCS/LibCVS/Datum/String.pm [1.7]
+	* libcvs-perl/VCS/LibCVS/Datum/TagSpec.pm [1.10]
+	* libcvs-perl/VCS/LibCVS/Datum/Time.pm [1.8]
+	* libcvs-perl/examples/Makefile.PL [1.5]
+	* libcvs-perl/examples/lcvs-example [1.4]
+	* libcvs-perl/examples/lcvs-get [1.2]
+	* libcvs-perl/examples/lcvs-logsummary [1.12]
+	* libcvs-perl/examples/lcvs-st [1.28]
+	* libcvs-perl/examples/lcvs-version [1.3]
+	* libcvs-perl/examples/t/lcvs-st.t [1.10]
+	* libcvs-perl/examples/t/lcvs-st.t-setup.sh [1.7]
+	* libcvs-perl/VCS/LibCVS/FileSticky.pm [1.5]
+	* libcvs-perl/VCS/LibCVS/Sticky.pm [1.5]
+	* libcvs-perl/VCS/LibCVS/StickyRevision.pm [1.2]
+	* libcvs-perl/VCS/LibCVS/StickyTag.pm [1.6]
+
+	Add (c) to the Copyright notices.
+
+2004-09-22  dissent
+
+	* libcvs-perl/VCS/LibCVS/RepositoryFile.pm [1.13]
+
+	Correct documentation reference to obsolete LocalFile.
+
+2004-09-21  dissent
+
+	* libcvs-perl/VCS/LibCVS/Client/Connection/CvsPass.pm [1.4]
+
+	prepend an underscore to names of private routines.
+
+2004-09-21  dissent
+
+	* libcvs-perl/VCS/LibCVS/Client/Connection/CvsPass.pm [1.3]
+	* libcvs-perl/VCS/LibCVS/Datum/Root.pm [1.16]
+
+	Handle a pserver CVSROOT where the username isn't specified.
+	Use the result of getlogin() instead.
+	
+	I'm not sure this is the best way to fix this bug.  See issue 65 for further
+	discussion.
+

@@ -1,0 +1,6 @@
+<div id="footer">
+<a href="http://forge.ipsl.jussieu.fr/epoll"> Epoll [% Vote.VERSION | html %]</a>
+<a href="http://www.catalystframework.org/"><img src="[% c.uri_for('/static', 'images', 'btn_88x31_powered_shadow.png') %]"></a>
+</div>
+</body>
+</html>

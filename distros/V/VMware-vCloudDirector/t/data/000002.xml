@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<Session xmlns="http://www.vmware.com/vcloud/v1.5" org="System" user="sysuser" userId="urn:vcloud:user:3424dce6-e7c8-11e6-9cfe-a10a25e3d85d" href="https://vcloud.example.com/api/session" type="application/vnd.vmware.vcloud.session+xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vmware.com/vcloud/v1.5 http://vcloud.example.com/api/v1.5/schema/master.xsd">
+    <Link rel="down" href="https://vcloud.example.com/api/org/" type="application/vnd.vmware.vcloud.orgList+xml"/>
+    <Link rel="remove" href="https://vcloud.example.com/api/session"/>
+    <Link rel="down" href="https://vcloud.example.com/api/admin/" type="application/vnd.vmware.admin.vcloud+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/admin/extension" type="application/vnd.vmware.admin.vmwExtension+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/org/3424de61-e7c8-11e6-9cfe-b2ce727b09b7" name="System" type="application/vnd.vmware.vcloud.org+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/query" type="application/vnd.vmware.vcloud.query.queryList+xml"/>
+    <Link rel="entityResolver" href="https://vcloud.example.com/api/entity/" type="application/vnd.vmware.vcloud.entity+xml"/>
+    <Link rel="down:extensibility" href="https://vcloud.example.com/api/extensibility" type="application/vnd.vmware.vcloud.apiextensibility+xml"/>
+</Session>

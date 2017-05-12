@@ -1,0 +1,6 @@
+[% vote = c.model('Vote') %]
+
+[% FOREACH voteid = vote.list_comming_vote %]
+<a href="[% c.uri_for('/admin', voteid) %]">[% vote.vote_info(voteid).label | html %]</a>
+<br>
+[% END %]

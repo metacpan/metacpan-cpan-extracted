@@ -1,0 +1,85 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.42.02;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+/*! \brief The HTOM_Contaner represents a style container DIV element. 
+ */
+class HTOM_Container extends HTOM_Element
+{
+  //! Create a style container object
+  /*! The $content parameter may be either HTOM_Evaluable or the oridary string containg a HTML data.
+   */
+  public function __construct($content,$style=NULL)
+  {
+    if ($content instanceof HTOM_Element) {
+      $this->text = $content;
+    } else {
+      $this->text = new HTOM_Static("".$content);
+    }
+    $this->SetAttributes(new HTOM_Style($style));
+    $this->Init();
+  }
+
+
+  //! Get the paragraph html formated data.
+  public function Evaluate()
+  {
+    return $this->text = "<div ".$this->Attributes().">".$this->text->Evaluate()."</div>";
+  }
+  
+  private $text=NULL;
+
+}
+
+?>@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d25 1
+a25 1
+    return $this->text = "<div ".$this->ID()->Evaluate().$this->Attributes().">".$this->text->Evaluate()."</div>";
+@
+

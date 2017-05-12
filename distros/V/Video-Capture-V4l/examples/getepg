@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+
+# EPG (Electronic Program Guide Decoder)
+# Commercial Name: nexTView
+
+use Video::Capture::V4l;
+use Video::Capture::VBI;
+
+package Video::Capture::VBI::EPG;
+
+use Video::Capture::VBI qw(:DEFAULT %VPS_CNI %VT_NI);
+use Storable;
+
+use base 'Video::Capture::VBI::VT';
+
+sub new {
+   my $class = shift;
+   my $self = $class->SUPER::new(@_);
+   $self;
+}
+
+my $lastcni = -1;
+sub feed {
+   my $self = shift;
+   my @r;
+   for ($self->SUPER::feed(@_)) {
+      if ($_->[0] == VBI_VPS) {
+         if ($_->[3] != $lastcni) {
+            $lastcni = $_->[3];
+            printf "CNI %04x (%s)\n", $_->[3], $VPS_CNI{$_->[3] & 0xfff};
+         }
+      } else {
+         push @r, $_;
+      }
+   }
+   @r;
+}
+
+sub mydump {
+   local $_ = shift;
+   if (ref $_ eq "HASH") {
+      print "{ ";
+      while(my($k,$v)=each %$_) {
+         print ", $k => ";
+         mydump($v);
+      }
+      print " }";
+   } elsif (ref $_ eq "ARRAY") {
+      print "[ ";
+      for (@$_) {
+         print ", ";
+         mydump($_);
+      }
+      print " ]";
+   } else {
+      y/\x20-\x7e//cd;
+      print $_;
+   }
+}
+
+sub set_epg {
+   my $self = shift;
+   my $name = shift;
+   my $new_db = main::gen_db_name ($name);
+   print "SET_EPG $new_db <= ", $self->{db_name}, "\n";
+   if ($self->{db_name} and $new_db eq $self->{db_name}) {
+      print "saving ",$new_db,"...";
+      Storable::nstore($self->db, "$new_db~");
+      rename "$new_db~", $new_db;
+      print "ok\n";
+   } else {
+      $self->{db_name} = $new_db;
+      print "trying to load $new_db...";
+      $self->db(eval { $self->db(Storable::retrieve($new_db)) });
+      print "ok\n";
+   }
+}
+
+# just display the page
+sub enter_page {
+   my($self,$page)=@_;
+
+   $pages++;
+
+   return unless $page->{page} == 0x1df;
+
+   my $sub = $page->{ctrl};
+   my $stream = VTX_S3($sub);
+   my $height = VTX_S4($sub)<<3 | VTX_S2($sub);
+   my $seq    = VTX_S1($sub);
+
+   my $s = \%{$self->{stream}{$stream}};
+
+   delete $s->{raw} unless (($seq-1)&15) == $s->{seq};
+   $s->{seq}=$seq;
+   push @{$s->{raw}}, @{$page->{packet}}[1..$height];
+
+   $packets[$stream]++;
+   #print "stream $stream, height $height, seq $seq, ",scalar @{$s->{raw}},"<\n";
+
+   for(decode_stream $s->{raw})  {
+      if (my ($dt, $bi) = decode_block $_, \@{$self->{bundle}}) {
+         if ($dt == 1) {
+            my $ai = $self->{db}{ai};
+            $self->set_epg($bi->{service_name});
+            if ($ai) {
+               print "$ai->{epg_version}, $ai->{epg_version_swo}, $ai->{this_network_op}, $ai->{service_name}\n";
+               if ($bi->{epg_version} != $ai->{epg_version}
+                   || $bi->{epg_version_swo} != $ai->{epg_version_swo}
+                   || $bi->{this_network_op} != $ai->{this_network_op}) {
+                  print "CHANNEL SWITCH, WIPING DATABASE\n";
+                  delete $self->{db};
+               }
+            }
+            $self->{db}{ai} = $bi;
+         } elsif ($dt == 2) {
+            $self->{db}{pi}{$bi->{netwop_no}}{$bi->{block_no}} = $bi;
+         } elsif ($dt == 3) {
+            $self->{db}{ni}{$bi->{block_no}} = $bi;
+         } elsif ($dt == 4) {
+            $self->{db}{oi}{$bi->{block_no}} = $bi;
+         } elsif ($dt == 5) {
+            $self->{db}{mi}{$bi->{block_no}} = $bi;
+         } else {
+            print "UNKNOWN BLOCK TYPE $dt found\n";
+         }
+      }
+   }
+   $|=1;
+   printf "%7d %6d %6d %5d %5d %5d %5d\r", $pages, $packets[0], $packets[1],
+          1*%{$self->{db}{pi}},
+          1*%{$self->{db}{ni}},
+          1*%{$self->{db}{oi}},
+          1*%{$self->{db}{mi}};
+
+   #printf "received epg page %04x\n", $sub;
+}
+
+sub enter_packet {
+   my $self = shift;
+   my $p = shift;
+   return unless $p->[3] <= 1 && $p->[2] == 30;
+   #printf "packet(@$p %04x)", $p->[6];
+   print "\n";
+}
+
+sub db {
+   my $self = shift;
+   $self->{db} = shift if @_;
+   $self->{db};
+}
+
+package main;
+
+$vbi = new Video::Capture::V4l::VBI or die;
+
+# the next line is optional (it enables buffering)
+$vbi->backlog(150); # max. 5 seconds backlog (~4.6Mb)
+
+$inp_fd = fileno STDIN;
+$vbi_fd = $vbi->fileno;
+
+$vt = new Video::Capture::VBI::EPG;
+
+sub gen_db_name {
+   shift() . ".epg";
+}
+
+print "Capturing VBI block. Make sure you have tuned in to a channel with EPG!\n";
+print "Aquisition may take up to twenty minutes (and more)!\n";
+
+for(;;) {
+   my $r="";
+   vec($r,$inp_fd,1)=1;
+   vec($r,$vbi_fd,1)=1;
+   select $r,undef,undef,0.04;
+   $vt->feed(decode_field $vbi->field, VBI_VT|VBI_VPS) while $vbi->queued;
+   if (vec($r,$inp_fd,1)) {
+      $_ = <STDIN>;
+      if (/^q/i) {
+         last;
+      }
+   }
+}
+

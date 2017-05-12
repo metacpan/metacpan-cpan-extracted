@@ -1,0 +1,17 @@
+Yes, there are a couple of known bugs. For 
+example:
+
+  o A few methods that are currently documented
+    are not actually implemented. So far, you only
+    have read access to RCS and CVS repositories..
+    
+  o Caching is done inside the Rcs.pm and Cvs.pm
+    libraries, while it should probably be inside
+    the Rcs::File and Cvs::File libraries.
+    
+  o Caching doesn't work for long-lived processes.
+    
+  o vcsweb.cgi does not run correctly with tainting
+  
+But hopefully that's about it ;-)
+

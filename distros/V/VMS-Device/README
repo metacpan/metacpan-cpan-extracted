@@ -1,0 +1,25 @@
+README for VMS::Device
+
+Copyright (c) 1998 Dan Sugalski <dan@sidhe.org>
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets you fetch a list of devices, get info on those devices, as
+well as mount, unmount, allocate, deallocate, and initialize devices.
+
+perl Makefile.pl
+mms
+mms test
+
+to build and test the extension. If it tests OK, then
+
+mms install
+
+to install it.
+
+This beta release is fully functional, but not thoroughly tested. It may
+well misbehave under some circumstances, leak memory, or die gracelessly
+when passed truly bogus parameters. Use with appropriate care.
+
+See Changes for history.

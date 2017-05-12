@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Video/CPL.pm
+lib/Video/CPL/Annotation.pm
+lib/Video/CPL/AnnotationList.pm
+lib/Video/CPL/Cue.pm
+lib/Video/CPL/DirectoryList.pm
+lib/Video/CPL/Layout.pm
+lib/Video/CPL/MXML.pm
+lib/Video/CPL/MXMLField.pm
+lib/Video/CPL/Story.pm
+lib/Video/CPL/Target.pm
+lib/Video/CPL/TargetList.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

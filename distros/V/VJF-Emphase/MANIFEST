@@ -1,0 +1,7 @@
+EM.c
+Emphase.xs
+Makefile.PL
+MANIFEST
+typemap
+lib/VJF/Emphase.pm
+META.yml                                 Module meta-data (added by MakeMaker)

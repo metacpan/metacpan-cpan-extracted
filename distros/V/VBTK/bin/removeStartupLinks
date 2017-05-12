@@ -1,0 +1,22 @@
+#!/bin/ksh
+
+# Remove any startup scripts installed in /etc/rc2.d and rc3.d
+# by the installStartupLinks script.
+
+homeDir=/usr/vbtk
+
+echo "\nUn-Linking startup files..."
+for RCDIR in rc2.d rc3.d
+do
+    if [ -f $homeDir/etc/$RCDIR/* ]
+    then
+        cd $homeDir/etc/$RCDIR
+        if [ $? -ne 0 ]; then exit 1; fi
+
+        for FILE in *
+        do
+            rm -f /etc/$RCDIR/$FILE
+            echo "Removed link '/etc/$RCDIR/$FILE'"
+        done
+    fi
+done

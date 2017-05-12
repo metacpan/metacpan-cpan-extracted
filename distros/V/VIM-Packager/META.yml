@@ -1,0 +1,20 @@
+---
+author: Cornelius
+dependency:
+  - name: libperl.vim
+    required_files:
+      - from: http://github.com/c9s/libperl.vim/raw/master/autoload/libperl.vim
+        target: autoload/libperl.vim
+  - name: search-window.vim
+    required_files:
+      - from: http://github.com/c9s/search-window.vim/raw/master/vimlib/plugin/window.vim
+        target: plugin/window.vim
+name: cpan.vim
+repository: http://github.com/c9s/cpan.vim
+script:
+  - '# not implmeneted yet'
+type: plugin
+version: 3.0
+vim_version:
+  op: '>='
+  version: 7.0

@@ -1,0 +1,58 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@<?PHP
+
+//!  Class represents a file input object.
+class  HTOM_FileInput extends HTOM_Input
+{
+  /*! \brief Initialize the HTOM_TextInput object
+
+  * \param $id object identifier.
+  * \param $maxSize maximal length of file in bytes.
+  * \param $mimeFormats a list of supported MIME formats.
+  * \param $attributes either an HTOM_Attribute object or list of attributes.
+  */
+  public function __construct($id, $maxSize, array $mimeFormats=NULL, $attributes=NULL )
+  {
+    parent::__construct($id, "file", $attributes);
+    if (is_array($mimeFormats))
+      {
+	$accept="";
+	foreach ($mimeFormats as $format)
+	  $accept.=$accept.",".$format;
+	$this->SetAttributes("accept",$accept);
+      }
+    $this->maxSize = new HTOM_HiddenInput("MAX_FILE_SIZE",$maxSize);
+  }
+
+  //! Return a string representig the file input element.
+  public function Evaluate()
+  {
+    return $this->maxSize->Evaluate().parent::Evaluate();
+  }
+
+  private $maxSize;
+}
+
+
+?>@

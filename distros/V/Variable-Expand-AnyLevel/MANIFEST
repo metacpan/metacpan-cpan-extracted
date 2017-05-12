@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Variable/Expand/AnyLevel.pm
+minil.toml
+t/00_compile.t
+t/01_expand.t
+t/Obj.pm
+xt/02_perlcritic.t
+xt/04_synopsys.t
+xt/06_module_used.t
+xt/perlcriticrc
+META.yml
+MANIFEST

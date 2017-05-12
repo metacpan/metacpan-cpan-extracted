@@ -1,0 +1,3 @@
+o Write better test suite
+o In Lite.pm Check Config file for VOs supported
+o Perhaps a VOMS server suitable for xinetd?  -- Implemented via a VOMS::Lite::VOMS::Server function, maybe?

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/op_log" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:progress="http://www.swsoft.com/webservices/vzl/4.0.0/progress_event" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/op_log" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/progress_event" schemaLocation="VZLProgressEvent.xsd"/>
+	<xs:element name="op_log" type="op_logType">
+		<xs:annotation>
+			<xs:documentation>Log of Operations.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="op_logType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_ops"/>
+						<xs:element ref="put_ops"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element name="progress" type="progress:progress_eventType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get_ops">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+				<xs:element name="status" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Only one initial starting progress message is returned for each operation along with its current status, if this flag is specified.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="current" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If specified, operations currently in progress are reported (only their initial requests, starting them)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="op" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Name of the operation</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="id" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Initial packet ID. Returned in packets, created by DBM in response to "get_ops" command.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="start_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Start time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="end_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>End time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="records" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of last records
+ to retrieve.Records will be presented in reverse order, i.e. oldest record is the last.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="parent_id" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Parent operation ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_opsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="progress" type="progress:progress_eventType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="put_ops">
+		<xs:annotation>
+			<xs:documentation>Save progress messages into database</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="progress" type="progress:progress_eventType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="op_log_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="operation_log" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>Age of oldest operation to keep in log.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

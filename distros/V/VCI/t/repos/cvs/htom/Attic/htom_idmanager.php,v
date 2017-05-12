@@ -1,0 +1,75 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+require_once "htom_id.php";
+
+
+// this is the realization of the HTOM_ID abstraction.
+class HTOM_ID_impelementation extends HTOM_ID
+{
+  public function __construct( $id )
+  {
+    $this->id = $id;
+  }
+  public function GetValue()
+  {
+    return $this->id;
+  }
+  private $id; 
+}
+
+
+/*! \class HTOM_IDManager
+ * \brief Objects identifiers generator class.
+ *
+ * The HTOM_IDManager class should be used by the HTOM evaluable classes in order
+ * to get the unique ID of each HTML element
+*/
+class HTOM_IDManager
+{
+  /*! \static This method returns a unique HTOM_ID object. */
+  public static function ID()
+  {
+    self::$lastId++;
+    return new HTOM_ID_impelementation(self::$lastId);
+  }
+
+  private static $lastId=0;
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

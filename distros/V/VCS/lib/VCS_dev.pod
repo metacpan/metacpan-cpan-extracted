@@ -1,0 +1,213 @@
+
+=head1 NAME
+
+VCS_dev - Information for VCS::* developers
+
+=head1 SYNOPSIS
+
+VCS_dev provides internal API information for generic 
+B<VCS::*> programming access in Perl.  This document
+is for VCS::* developers, not necessarily for users of VCS itself.
+
+=head1 DESCRIPTION
+
+C<VCS> is an API for abstracting access to all version control systems
+from Perl code. This is achieved in a similar fashion to the C<DBI>
+suite of modules. There are "container" classes, C<VCS::Dir>,
+C<VCS::File>, and C<VCS::Version>, and "implementation" classes, such
+as C<VCS::Cvs::Dir>, C<VCS::Cvs::File>, and C<VCS::Cvs::Version>, which
+are subclasses of their respective "container" classes.
+
+The container classes are instantiated with URLs. There is a URL scheme
+for entities under version control. The format is as follows:
+
+    vcs://localhost/VCS::Cvs/fs/path/?query=1
+
+The "query" part is ignored for now. The path must be an absolute path,
+meaningful to the given class. The class is an implementation class,
+such as C<VCS::Cvs>.
+
+The "container" classes work as follows: when the C<new> method of a
+container class is called, it will parse the given URL, using the
+C<VCS-E<gt>parse_url> method. It will then call the C<new> of the
+implementation's appropriate container subclass, and return the
+result. For example,
+
+    VCS::Version->new('vcs://localhost/VCS::Cvs/fs/path/file/1.2');
+
+will return a C<VCS::Cvs::Version>.
+
+=head1 Imp IMPLEMENTATION
+
+For the purposes of concretely illustrating the layout of an implementation
+suppose that there is a need for a VCS::Imp or $Imp implementation.
+
+An implementation class is recognised as follows: its name starts with
+C<VCS::>, and C<require "VCS/Imp.pm"> will load the appropriate
+implementation classes corresponding to the container classes -
+C<VCS::Imp::Dir>, C<VCS::Imp::File> and C<VCS::Imp::Version>..
+
+Hence in MANIFEST, or Unix file specificaton, syntax the Imp implementation
+ought to be composed of at least these files:
+
+    VCS/Imp.pm
+    VCS/Imp/Dir.pm
+    VCS/Imp/File.pm
+    VCS/Imp/Version.pm
+
+In addition to the usual module distribution files such as F<MANIFEST>,
+F<Makefile.PL>, etc.
+
+Implementation classes must include documentation for their special
+requirements, such as mandatory environment variables. See L<VCS::Cvs>
+for an example.
+
+If a method, or an argument to a method makes no sense for a particular
+implementation, then the implementation may ignore it, but must do so
+quietly.
+
+The modules that make up a VCS implementation might act as wrappers
+around a command language interpreter (CLI or shell) command, or might
+directly look at files or talk over the network. It is recommended that
+before implementing a VCS::*::* class that implements direct access, the
+developer first implement a version that uses the CLI tools, and writes
+appropriate tests for it. Doing this will ensure that the direct-access
+version, which passes the tests, will be correct.
+
+=over 4
+
+=item * VCS/Imp.pm
+
+The variable C<$LOG_CMD> is the CLI command for obtaining revision 
+history logs.  This module typically implements five distinct
+non-public sub routines: C<sub _boiler_plate_info {}>, 
+C<sub _split_log {}>, C<sub _parse_log_rev {}>, 
+C<sub _parse_log_header {}>, C<sub _read_pipe {}> is for reading
+from the CLI.
+
+=item * VCS/Imp/Dir.pm
+
+This module implements three public sub routines/methods:
+C<sub new {}>, C<sub name {}>, C<sub content {}>.
+
+=item * VCS/Imp/File.pm
+
+Revisions should be returned in reverse time order (latest first, 
+oldest last).  This module implements three public sub routines/methods:
+C<sub new {}>, C<sub name {}>, C<sub versions {}>.
+
+=item * VCS/Imp/Version.pm
+
+The variable C<$DIFF_CMD> is the CLI command for doing diffs.
+The variable C<$UPDATE_CMD> is the CLI command for doing updates.
+This module implements nine public sub routines/methods:
+C<sub new {}>, C<sub name {}>, C<sub version {}>,
+C<sub tags {}>, C<sub text {}>, C<sub diff {}>, C<sub author {}>,
+C<sub date {}>, C<sub reason {}>.
+
+=back
+
+=head1 EXAMPLES
+
+If you prefer there is a pod stub in Imp_pod.tpl that you could
+catenate onto the tail of your F<VCS/$Imp.pm> file, making sure
+to edit the template with C<s/Imp/$Your_VCS_Name/g>.  For simple
+version control system APIs (i.e. with a CLI interface and no need 
+for XS, C, or header file worries) an easy way to get started 
+would be to use B<h2xs> like so:
+
+    h2xs -AXf -n VCS::Imp
+
+then add a VCS/Imp/VCS directory and put appropriate File.pm, Dir.pm
+and Version.pm modules in it (add them the the MANIFEST as well).
+If calling in to your version control system requires XS then omit 
+the C<-X> and C<-f> switches and specify the header file name.
+
+You might also be interested in looking at the other implementations
+for tips on how to map your version control systems' CLI commands 
+to VCS::* methods.  For parsing details it can prove helpful to see 
+an example of the output of some of the other version control systems.
+(e.g. the output of the $LOG_CMD in typical usage).
+
+=head2 Cvs
+
+=over 4
+
+=item * VCS/Cvs.pm
+
+The variable C<$LOG_CMD> is C<'cvs log'>.
+
+=item * VCS/Cvs/Dir.pm
+
+=item * VCS/Cvs/File.pm
+
+=item * VCS/Cvs/Version.pm
+
+The variable C<$DIFF_CMD> is C<'cvs diff -u2'>.
+The variable C<$UPDATE_CMD> is C<'cvs update -p'>.
+
+=back
+
+=head2 Rcs
+
+=over 4
+
+=item * VCS/Rcs.pm
+
+The variable C<$LOG_CMD> is C<'rlog'>.
+
+=item * VCS/Rcs/Dir.pm
+
+=item * VCS/Rcs/File.pm
+
+=item * VCS/Rcs/Version.pm
+
+The variable C<$DIFF_CMD> is C<'rcsdiff -u2'>.
+The variable C<$UPDATE_CMD> is C<'co -p'>.
+
+=back
+
+=head2 Hms
+
+=over 4
+
+=item * VCS/Hms.pm
+
+The variable C<$LOG_CMD> is C<'flog'>.
+
+=item * VCS/Hms/Dir.pm
+
+=item * VCS/Hms/File.pm
+
+=item * VCS/Hms/Version.pm
+
+The variable C<$DIFF_CMD> is C<'fdiff'>.
+The variable C<$UPDATE_CMD> is C<'fco -p'>.
+B<flog> output is reversed here.
+
+=back
+
+=head1 TODO
+
+Where are the wrappers around rcs's B<ci> or CVS's B<cvs ci>?  (This
+is listed as a known BUG in that VCS is currently read only).
+
+Does Hms have a B<fci> command?
+
+See the pod in VCS/File.pm for other unimplemented things.
+
+=head1 SEE ALSO
+
+L<VCS>, and the generic implementation in L<VCS::Dir>, L<VCS::File>, 
+and L<VCS::Version>.
+
+The CVS implementation is in L<VCS::Cvs> along with the unpodded 
+VCS/Cvs/*.pm modules.
+
+The Hms implementation is in L<VCS::Hms> along with the unpodded 
+VCS/Hms/*.pm modules.
+
+The rcs implementation is in L<VCS::Rcs> along with the unpodded 
+VCS/Rcs/*.pm modules.
+
+=cut

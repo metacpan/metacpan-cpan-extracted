@@ -1,0 +1,25 @@
+---
+abstract: 'Creation client applications for vk.com'
+author:
+  - 'Misha Genaev (mag@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: VK-App
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: 2.53
+  LWP: 5.834
+  LWP::Protocol::https: 0
+  Test::Simple: 0.44
+version: 0.12

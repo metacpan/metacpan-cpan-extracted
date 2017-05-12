@@ -1,0 +1,33 @@
+Revision history for Perl extension VCS::StarTeam.
+
+0.01  Tue May 29 21:30:37 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n VCS::StarTeam
+
+0.02  Wed May 30 17:13:57 2001
+	- implemented contructor, _hist (and its convenience 
+		methods hist and history), and list
+
+0.03  Thu May 31 13:35:37 2001
+	- implemented log (a new convenience method for history), 
+		_co (and its convenience methods checkout, get, and co), 
+		and _diff (and its convenience methods diff and vdiff).
+		Did a little twiddling with POD.
+
+0.04  Thu May 31 23:33:07 2001
+	- Twiddled with the POD some more. Added properties 'batchmode',
+		'recurse', and 'stoponerror'.
+
+0.05  Thu Jun 01 00:40:31 2001
+	- Oops! Using %EXPORT_TAGS instead of @EXPORT.
+
+0.06  Thu Jun 01 00:44:23 2001
+	- Oops! Forgot log convenience method in POD.
+
+0.07  Mon Jun 11 21:01:17 2001
+	- implemented _ci (and its convenience methods checkin, put,
+		and ci). Updated POD.
+
+0.08  Mon Jun 11 21:25:15 2001
+	- fixed bug in private method _getpparam.
+

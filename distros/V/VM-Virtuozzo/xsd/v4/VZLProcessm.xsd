@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/processm" elementFormDefault="qualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/processm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="processm" type="processmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Process and system information and Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="processmType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Process and system information and Management.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="execute" minOccurs="0"/>
+						<xs:element ref="kill" minOccurs="0"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="exec" minOccurs="0"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="kill">
+		<xs:annotation>
+			<xs:documentation>Send a signal to the specified process. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pid" type="xs:int" maxOccurs="unbounded"/>
+				<xs:element name="signal" type="xs:int"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="execute">
+		<xs:annotation>
+			<xs:documentation>Exec program. Returns program exit status (and some stdout / stderr output) or Error when program can't be run. NOTE: when "stream" option is specified return OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="argv" type="xs:base64Binary" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Program arguments. NOTE: order is important</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="envp" type="xs:base64Binary" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Environment variables that will be pass to program. NOTE: order is important</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="stream_mode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>In case of success return Ok ant switch channel with client to special mode when program in/outputs directly redirected to client, in such case client may know program exit status from ssh exit code. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="cred">
+					<xs:annotation>
+						<xs:documentation>Specify credentials to program. By default program  executed with 'root' credentials.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:choice>
+								<xs:element name="user" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>login user name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="uid" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>user identificator</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:choice>
+							<xs:choice>
+								<xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>user group name.            There are may be more then one group given, then the 1-st one will be set as an effective group others (2 ...) will set as supplementary groups. This ( supplementary groups list ) will affect any of newcome elements.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="gid" type="xs:long" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>user group id.                 Note: There are no dedicated operations to get group id by it's name. It means, do not use this parameter if you're not sure it's correct ( it'll cause to cancel entire operation if it's wrong ).</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:choice>
+							<xs:element name="chroot" type="xs:base64Binary" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Do chroot to specified dir</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="chdir" type="xs:base64Binary" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Change directory</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="umask" type="xs:int" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Operation umask.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="stdio" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Options to report standard program input/outpus.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="input" type="xs:base64Binary" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Pass program some input</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="output" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Report usual program output</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="error" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Report error program output</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="mixed" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Report error information into output</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="exec">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="status" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Program exit status</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="output" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Program std output</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="error" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Program err output</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="executeResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="exec"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="killResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

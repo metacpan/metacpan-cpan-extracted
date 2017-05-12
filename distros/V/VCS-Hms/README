@@ -1,0 +1,28 @@
+NAME
+    VCS::Hms - notes for the HMS implementation
+
+IMPORTANT NOTE
+    I have no way to test this module and so I have removed it out of the
+    main VCS distribution. If you have access to Hms and would like to
+    maintain this module please contact me - greg@mccarroll.org.uk.
+
+SYNOPSIS
+        use VCS;
+        $file = VCS::File->new('Makefile');
+
+DESCRIPTION
+    Currently, the user needs to ensure that their environment has the HMS
+    toolset available, including fhist, fdiff, fco, et al. On Unix like
+    environments ensure that the $PATH environment variable has the
+    appropriate directory listed.
+
+COPYRIGHT
+        Copyright (c) 2003      Greg McCarroll.
+        Copyright (c) 1998-2001 Leon Brocard.
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+    VCS.
+

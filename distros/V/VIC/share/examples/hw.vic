@@ -1,0 +1,5 @@
+PIC P16F690;
+Main {
+    digital_output RC0; # mark pin RC0 as output
+    write RC0, 0x1; # write the value 1 to RC0
+}

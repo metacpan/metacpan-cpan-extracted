@@ -1,0 +1,61 @@
+Revision history for Perl extension VMS::Device.
+
+0.01  Thu May 21 12:05:22 1998
+	- original version; created by h2xs 1.18
+
+0.01  Tue May 26 16:48:34 1998
+    - All the items for device_info are in, along with appropriate bitmap
+      decodes for them.
+
+0.01  Tue May 26 22:54:04 1998 (Or too damn late)
+    - Added device_list (sans special hash) and decode_device_bitmap
+
+0.01  Wed May 27 13:45:23 1998
+    - Changed device_list--no special hash. Now just takes two extra
+      parameters.
+    - Added device_classes and device_types functions. 
+
+0.02  Wed May 27 17:03:32 1998
+    - Added allocate and deallocate functions. Keen!
+
+0.02  Thu May 28 11:32:34 1998
+    - Fixed the example for total free blocks
+    - #ifdef'd all the device types and classes. (Yay, perl! :) Should
+      function much better on non-alpha non-7.1 systems.
+
+0.03  Mon Sep 28 10:48:43 1998
+    - Quick fix to the $GETDVIW call--I was leaving off an optional
+      trailing parameter, and it bites folks on some platforms
+    - Added in #ifdefs for all the $GETDVI items. I think they're all valid
+      on all versions of VMS, but it can't hurt to be careful.
+
+0.04  Mon Sep 28 15:50:12 1998
+    - Added in code for initialize()
+
+0.05  Wed Sep 30 20:36:12 1998
+    - Added code for mount() and, after way too long a struggle, got it
+      working. Now module's completely implemented, though error checking
+      and the like could stand to be beefed up. (Docs are still lousy too,
+      alas)
+
+0.06  Thu Mar 11 14:18:23
+    - Fixed a boneheaded error in decode_device_bitmaps. (& is bitwise and,
+      not &&. Bloody C...)
+
+0.07  Thu Aug 24 09:58:34 2000
+    - Updated to build against 5.6.0
+
+0.08  Mon Dec 18 17:00:00 2000
+    - Added in a patch from Ed James to add names to the devclass and
+      to fix up times some
+
+0.09  Sun Aug 20 15:30 2006
+    - Fixed some memory leakage courtesy of Thomas Pfau.
+    - First maintenance upload by Craig Berry taking over from Dan.
+
+0.10  Thu May 19 12:00 2011
+    - Added support for about a hundred new(er) item codes.
+    - Added ability to handle arbitrary-length bitmaps.
+    - Updated ppport.h.
+    - Changed #ifdef __ALPHA to #ifndef __VAX
+

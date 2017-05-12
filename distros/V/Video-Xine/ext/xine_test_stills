@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use X11::FullScreen;
+use Video::Xine;
+use Video::Xine::Driver::Video qw/:constants/;
+use Video::Xine::Util qw/make_x11_fs_visual/;
+
+my $still = "$ENV{'HOME'}/Pictures/still_1.png";
+my $display = ':0';
+
+MAIN: {
+	my $xine = Video::Xine->new();
+
+	my $display = X11::FullScreen->new($display);
+	my $window = $display->show();
+
+	my $fs_visual = make_x11_fs_visual( $display );
+    my $video_driver = Video::Xine::Driver::Video->new($xine,"auto", XINE_VISUAL_TYPE_X11, $fs_visual);
+
+	$display->display_still($still);
+	sleep(10);
+}

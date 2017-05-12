@@ -1,0 +1,45 @@
+---
+abstract: 'A module to append QRCode as vector data into PDF'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vector-QRCode-IntoPDF
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Vector::QRCode::IntoPDF:
+    file: lib/Vector/QRCode/IntoPDF.pm
+    version: 0.02
+requires:
+  File::Spec: 0
+  File::Temp: 0
+  PDF::API2: 0
+  PostScript::Convert: 0
+  Vector::QRCode::EPS: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ytnobody/Vector-QRCode-IntoPDF/issues
+  homepage: https://github.com/ytnobody/Vector-QRCode-IntoPDF
+  repository: git://github.com/ytnobody/Vector-QRCode-IntoPDF.git
+version: 0.02

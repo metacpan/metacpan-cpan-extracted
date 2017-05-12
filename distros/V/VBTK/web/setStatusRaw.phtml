@@ -1,0 +1,15 @@
+<!--#perl 
+  my $masterObj = &VBTK::Objects::FindObjByName();
+
+  # Pass in the basic settings.  Advanced settings are grouped into
+  # the objStruct hash.
+  my $retval = $masterObj->setStatus(
+      Name        => $_parms->{name},
+      Status      => $_parms->{status},
+      Text        => $_parms->{text},
+      ObjStruct   => $_parms->{objStruct}
+  );
+  
+  my $reply = ($retval < 0) ? "Error" : "OK";
+
+-->$reply

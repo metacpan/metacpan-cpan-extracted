@@ -1,0 +1,3 @@
+callback:
+  server: localhost:6379
+#  password: foobar

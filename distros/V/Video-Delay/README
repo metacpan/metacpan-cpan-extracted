@@ -1,0 +1,28 @@
+NAME
+     Video::Delay - Perl classes for delays between frames generation.
+
+SEE ALSO
+    Video::Delay::Array
+        Video::Delay class for predefined list of delays.
+
+    Video::Delay::Const
+        Video::Delay class for constant delay.
+
+    Video::Delay::Func
+        Video::Delay class for delays defined by math function.
+
+REPOSITORY
+    <https://github.com/tupinek/Video-Delay>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2012-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

@@ -1,0 +1,18 @@
+rm -rf *.log
+rm -rf INCA_libs
+rm -rf RUN_NC
+rm -rf hdl.var
+rm -rf cds.lib
+rm -rf nc*
+
+rm -rf simv*
+rm -rf csrc
+
+rm -rf debussy*
+rm -rf nWaveLog
+rm -rf vfastLog
+rm -rf trace.vcd
+
+rm -rf *% *.bck
+
+rm -rf in.dat

@@ -1,0 +1,67 @@
+VoiceXML::Client version 1.00
+============================
+
+The VoiceXML::Client library allows you to fetch, parse and interpret VoiceXML files.  
+
+It was developed as a supporting component of the (upcoming version of the) VOCP voice messaging system (http://www.vocpsystem.com).
+
+It's role is to:
+
+	- fetch vxml files
+	- parse their contents
+	- interpret them by executing the instructions therein
+
+It is not (yet) a complete implementation of the VoiceXML specs, but does support many interesting features.  Have a look at the project website:
+
+	http://voicexml.psychogenic.com/
+
+For examples and instructions.
+
+
+PLEASE NOTE:
+
+This library is released under the terms of the GNU GPL version 3, making it available only for 
+free programs ("free" here being used in the sense of the GPL, see http://www.gnu.org for more details). 
+Anyone wishing to use this library within a proprietary or otherwise non-GPLed program MUST contact http://www.psychogenic.com to acquire a distinct license for their application.  This approach encourages the use of free software 
+while allowing for proprietary solutions that support further development. Thanks.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+  
+  XML::Mini
+  LWP::UserAgent
+  HTTP::Cookies
+  Hash::Util
+
+COPYRIGHT AND LICENCE
+
+
+	
+	Copyright (C) 2007,2008 by Pat Deegan.
+	All rights reserved
+	http://voicexml.psychogenic.com
+ 
+    VoiceXML::Client is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    VoiceXML::Client is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with VoiceXML::Client.  If not, see <http://www.gnu.org/licenses/>.
+

@@ -1,0 +1,57 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+//!  Class represents a button object.
+class  HTOM_Button extends HTOM_Input
+{
+  /*! \brief Initialize the HTOM_Submit object.
+
+  * \param $id a name of the input.
+  * \param $value a string to be displayed on the submition button.
+  * \param $attributes either the HTOM_Attribute or an array of HTOM_Attribute objects.
+  */
+  public function __construct($id, $value, $attributes=NULL )
+  {
+    parent::__construct($id, "button", $attributes);
+    $this->SetAttributes( new HTOM_SimpleAttribute("value",$value) );
+  }
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

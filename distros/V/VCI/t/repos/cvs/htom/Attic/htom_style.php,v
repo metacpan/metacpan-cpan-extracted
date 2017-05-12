@@ -1,0 +1,87 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \class HTOM_Style
+ * \brief This class holds the style attribute.
+ *
+ * The style attribute could be assigned to any of the HTOM_Element object in
+ * order to modify the object view.
+*/
+class HTOM_Style implements HTOM_Attribute
+{
+  /*! Construct the style. The $value may contain either a inline style description (e.g. color:white),
+or the style class name, or an object of HTOM_Style. 
+\note to determinate the $value is a class name or inline style class checks if the 
+$value string contains a : character.
+   */
+  public function __construct( $value="" )
+  {
+    if (isset($value) && $value!="")
+      {
+	if ($value instanceof HTOM_Style)
+	  {
+	    $this->text=$value->text;
+	  } else {
+	    if (strstr($value,":")) { // assume inline style definiton
+	      $this->text="style='".$value."'";
+	    } else { // assume class definition
+	      $this->text="class='".$value."'";
+	    }
+	  }
+      }
+
+    HTOM_Debug::Out("HTOM_Style: the style  evaluated to ".$this->text."<br>",3,"HTOM.Style");
+  }
+
+  //! Get the name - HTOM_Style
+  public function Name()
+  {
+    return "HTOM_Style";
+  }
+
+  //! Evaluate a style definition content.
+  public function Evaluate()
+  {
+    return $this->text;
+  }
+
+
+  private $text="";
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

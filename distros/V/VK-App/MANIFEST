@@ -1,0 +1,9 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/VK/App.pm
+t/001_load.t
+META.yml
+META.json

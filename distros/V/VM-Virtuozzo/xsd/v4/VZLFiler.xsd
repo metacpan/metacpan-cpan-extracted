@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/filer" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/filer" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="filer" type="filerType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>File managment</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="filerType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice>
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="list"/>
+						<xs:element ref="remove"/>
+						<xs:element ref="copy"/>
+						<xs:element ref="mkdir"/>
+						<xs:element ref="move"/>
+						<xs:element ref="upload"/>
+						<xs:element ref="download"/>
+						<xs:element ref="chmod"/>
+						<xs:element ref="chown"/>
+						<xs:element ref="link"/>
+						<xs:element ref="stat"/>
+						<xs:element ref="readlink"/>
+						<xs:element ref="search"/>
+					</xs:choice>
+					<xs:sequence>
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="file" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="navigateType">
+		<xs:sequence>
+			<xs:element name="path" type="xs:base64Binary" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Path on filesystem. If path is  empty then look up partitions.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cwd" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current working directory. If absent, it is set to "/" by default.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cred" type="credType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Credentials with which the requested operation will be performed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="navigate_wildType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="navigateType">
+				<xs:sequence minOccurs="0">
+					<xs:element name="wildcard" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Wildcards can be present in specified "paths"</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="fileType">
+		<xs:sequence minOccurs="0">
+			<xs:element name="file" type="fileType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Children elements if file is directory.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>Contains name of an element.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="type" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>1 FIFO2 Character device4 Directory.6 Block device8 Regular File10 Symbolic link12 Socket 16 Floppy disk 17 Hard disk 18 Remote drive 19 CD ROM 20 RAM disk 21 Loop back (link points to full path of loop back file)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mode" type="mode_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Element access mode. (NOTE: in decimal form)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="user" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="group" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Group name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uid" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="gid" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Group ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="size" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Element size.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="date" type="vzlt:datetime_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Element date (time of last change) in standard UTS type time_t.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="links" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Number of hard links.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="link_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Where link is point to.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="offset" type="xs:long" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Offset of found block.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="body" minOccurs="0"/>
+			<xs:element name="content_type" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>file contents description (in MIME format)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="credType">
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>There can be specified</xs:documentation>
+			</xs:annotation>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>either of</xs:documentation>
+				</xs:annotation>
+				<xs:element name="user" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>User name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="uid" type="xs:long" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>User ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>and either of</xs:documentation>
+				</xs:annotation>
+				<xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Group name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="gid" type="xs:long" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Group ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="umask" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Operation umask.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="mode_type">
+		<xs:union memberTypes="xs:int xs:string"/>
+	</xs:simpleType>
+	<xs:element name="info">
+		<xs:annotation>
+			<xs:documentation>The fields to provide output for.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0">
+				<xs:element name="user" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>User name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="group" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Group name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="uid" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>User ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="gid" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Group ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="mode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Element mode</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="size" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Element size</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="date" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Time of last change</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="links" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of hard links</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="link_name" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Where link points to</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="content_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>If present, return information  about file contents</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list">
+		<xs:annotation>
+			<xs:documentation>List directory contents. Returns list of "file" elements  or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="usage" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If present, the size returned for an element is a gross size on a disk, so for directories it is calculated by traversing their children.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence minOccurs="0">
+									<xs:element name="single_fs" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Do not go across different partitions, while traversing.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="follow_links" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If present, the information returned for links will be about their references, instead of themselves.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="filter" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Filter the files by some criteria. Inside 'filter' AND rule works  (all must be satisfied). Multiple 'filter's work as OR rule (at least one should be satisfied).</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence minOccurs="0">
+									<xs:choice minOccurs="0">
+										<xs:element name="user" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>User name.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="uid" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>User ID</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:sequence>
+											<xs:element name="start_uid" type="xs:int" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>First UID of the range</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="end_uid" type="xs:int" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>Last UID of the range</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:choice>
+									<xs:choice minOccurs="0">
+										<xs:element name="gid" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Group ID</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="group" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>Group name.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:sequence>
+											<xs:element name="start_gid" type="xs:int" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>First GID of the range</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="end_gid" type="xs:int" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>Last UID of the range</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:choice>
+									<xs:element name="start_date" type="xs:date" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Time of last change to start with</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="end_date" type="xs:date" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Time of last change to end with</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="min_size" type="xs:long" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Size minimum</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="max_size" type="xs:long" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Size maximum</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="type" type="xs:int" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>1 FIFO2 Character device4 Directory.6 Block device8 Regular File10 Symbolic link12 Socket</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Contains name of an element.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="block" type="xs:base64Binary" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Substring to find in file. NOTE that substring search on many files is a long time operation.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Reports all subdirectories recursively.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="info" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove">
+		<xs:annotation>
+			<xs:documentation>Remove filesystem entries. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Apply changes recursively.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="force" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Ignore errors during operation.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="copy">
+		<xs:annotation>
+			<xs:documentation>Copy elements in the list into location "dst_path". Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="dst_path" type="xs:base64Binary">
+							<xs:annotation>
+								<xs:documentation>path where to copy ..</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Copy recursively.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="force" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Overwrite if destination exists.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:sequence minOccurs="0">
+							<xs:element name="dst" type="vzlt:connection_infoType"/>
+							<xs:element name="mode" type="mode_type" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>New access mode for elements. (NOTE: in decimal form)  Mode is affected by umask.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mkdir">
+		<xs:annotation>
+			<xs:documentation>Create new directory. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="mode" type="mode_type" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>New access mode for elements (NOTE: in decimal form). Mode is affected by umask.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If any part of the path does not exist, create it.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="move">
+		<xs:annotation>
+			<xs:documentation>Moves elements in the list into location "dst_path". Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="dst_path" type="xs:base64Binary">
+							<xs:annotation>
+								<xs:documentation>The destination path.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Move recursively. Must be specified for directories.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="force" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Overwrite if destination exists.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="upload">
+		<xs:annotation>
+			<xs:documentation>Upload files or directories to Container or Hardware Node.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cwd" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Current working directory. If absent, it is set to "/" by default.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="cred" type="credType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Credentials with which the requested operation will be performed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="file" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>File to upload.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="path" type="xs:base64Binary">
+								<xs:annotation>
+									<xs:documentation>Path on filesystem</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="size" type="xs:long">
+								<xs:annotation>
+									<xs:documentation>Size of the block to be transfered.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="offset" type="xs:long" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Offset in file. If absent, existed file will be truncated. If "offset" is set to -1, file will be opened in append mode.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element ref="body" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="mode" type="mode_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>New access mode for elements. (NOTE: in decimal form)  Mode is affected by umask.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="force" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Overwrite if destination exists.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="download">
+		<xs:annotation>
+			<xs:documentation>Download files or directories from Container or Hardware Node.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cwd" type="xs:base64Binary" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Current working directory. If absent, it is set to "/" by default.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="cred" type="credType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Credentials with which the requested operation will be performed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="file" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>File to download</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="path" type="xs:base64Binary">
+								<xs:annotation>
+									<xs:documentation>Path on filesystem</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="size" type="xs:long" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Size of the block to be transfered.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="offset" type="xs:long" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Offset in file.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="chmod">
+		<xs:annotation>
+			<xs:documentation>Change access permissions for all elements in the list. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="mode" type="mode_type">
+							<xs:annotation>
+								<xs:documentation>New access mode. (NOTE: in decimal form)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:choice minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Turn on/off bits given in mode. It's analogues +/- in "chmod" command.</xs:documentation>
+							</xs:annotation>
+							<xs:element name="on"/>
+							<xs:element name="off"/>
+						</xs:choice>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Apply changes recursively.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="chown">
+		<xs:annotation>
+			<xs:documentation>Change user:group pair for  all elements in the list. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="recursively" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Process elements recursively.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="owner">
+							<xs:annotation>
+								<xs:documentation>Owner name like it's given in "/etc/passwd'</xs:documentation>
+							</xs:annotation>
+							<xs:complexType mixed="false">
+								<xs:complexContent mixed="false">
+									<xs:restriction base="credType">
+										<xs:sequence>
+											<xs:annotation>
+												<xs:documentation>There can be specified</xs:documentation>
+											</xs:annotation>
+											<xs:choice>
+												<xs:annotation>
+													<xs:documentation>either of</xs:documentation>
+												</xs:annotation>
+												<xs:element name="user" type="xs:string" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>User name</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="uid" type="xs:long" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>User ID</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:choice>
+											<xs:choice>
+												<xs:annotation>
+													<xs:documentation>and either of</xs:documentation>
+												</xs:annotation>
+												<xs:element name="group" type="xs:string" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>Group name</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="gid" type="xs:long" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>Group ID</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:choice>
+										</xs:sequence>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="follow_links" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Operates as lchown.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="link">
+		<xs:annotation>
+			<xs:documentation>Create new link element.  Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="name" type="xs:base64Binary">
+							<xs:annotation>
+								<xs:documentation>Link name.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="symbolic" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Creates symbolic link if present, otherwise hard link.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="force" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Ignores errors if present.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stat">
+		<xs:annotation>
+			<xs:documentation>Provide stat information. Returns "file" elements or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence minOccurs="0">
+						<xs:element name="usage" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If present, the size returned for an element is a gross size on a disk, so for directories it is calculated by traversing their children.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence minOccurs="0">
+									<xs:element name="single_fs" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Do not go across different partitions, while traversing.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="follow_links" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If present, the information returned for links will be about their references, instead of themselves.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="info" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="readlink">
+		<xs:annotation>
+			<xs:documentation>Return the link value in "file/name" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:restriction base="navigateType">
+					<xs:sequence>
+						<xs:element name="path" type="xs:base64Binary" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Path on filesystem.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="cwd" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Current working directory. If absent, it is set to "/" by default.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="cred" type="credType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Credentials with which the requested operation will be performed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="search">
+		<xs:annotation>
+			<xs:documentation>Search the files for a block of data. Returns "file" elements with "offset" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="navigateType">
+					<xs:sequence>
+						<xs:element name="offset" type="xs:long" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Starting search offset. Positive offset means offset from beginning of file, and negative from end of file (-1 end of file).</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="block" type="xs:base64Binary">
+							<xs:annotation>
+								<xs:documentation>Block to find in file.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="backward" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Backward search.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="file" type="fileType">
+		<xs:annotation>
+			<xs:documentation>   It represents an output information.                          To reflect recursive character of an output there is a folded "file" node within.      This will be generated for only 'list' and 'stat' methods which represents an explicit output. </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="body" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>Buffer of data.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="file" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="removeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="copyResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mkdirResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="moveResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="uploadResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="downloadResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="file" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="chmodResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="chownResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="linkResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="statResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="file" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="readlinkResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="file"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="searchResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="file" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="filer_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="timeouts">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="progress" type="xs:int"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="umask" type="xs:int"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

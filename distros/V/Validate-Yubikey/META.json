@@ -1,0 +1,42 @@
+{
+   "abstract" : "Validate Yubikey OTPs",
+   "author" : [
+      "Ben Wilber <ben@desync.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Validate-Yubikey",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Rijndael" : "1.09",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Validate::Yubikey" : {
+         "file" : "lib/Validate/Yubikey.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

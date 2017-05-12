@@ -1,0 +1,426 @@
+%{#
+# Validate::SPF::Parser source file
+#
+# Author: Anton Gerasimov
+#
+
+use Regexp::Common qw( net );
+use utf8;
+
+binmode( STDOUT, ':utf8' );
+
+my $input;
+
+my %errors = (
+    E_DEFAULT               => "Just error",
+    E_SYNTAX                => "Syntax error near token '%s'",
+    E_INVALID_VERSION       => "Invalid SPF version",
+    E_IPADDR_EXPECTED       => "Expected ip or network address",
+    E_DOMAIN_EXPECTED       => "Expected domain name",
+    E_UNEXPECTED_BITMASK    => "Unexpected bitmask",
+    E_UNEXPECTED_IPADDR     => "Unexpected ip address",
+    E_UNEXPECTED_DOMAIN     => "Unexpected domain name",
+);
+
+%}
+
+%%
+
+spf
+    : chunks
+        { $_[1] }
+    ;
+
+version
+    : VERSION
+        {
+            $_[1] eq 'v=spf1' and
+                return $_[0]->_ver_generic( $_[1] );
+
+            $_[0]->raise_error( 'E_INVALID_VERSION', $_[1] );
+        }
+    ;
+
+chunks
+    : chunks chunk
+        { push( @{$_[1]}, $_[2] ) if defined $_[2]; $_[1] }
+    | chunk
+        { defined $_[1] ? [ $_[1] ] : [ ] }
+    ;
+
+chunk
+    : version
+    | mechanism
+    | modifier
+    ;
+
+mechanism
+    : with_ipaddress
+    | with_domain_bitmask
+    | with_bitmask
+    | with_domain
+    ;
+
+modifier
+    : LITERAL
+        {
+            # print "got (LITERAL): $_[1]\n";
+
+            # for known literals - specific error
+            $_[0]->raise_error( 'E_DOMAIN_EXPECTED', $_[1] )
+                if $_[1] =~ /\A(redirect|exp)\Z/i;
+
+            # for unknown literals - syntax error
+            $_[0]->YYError;
+
+            return;
+        }
+    | LITERAL '=' DOMAIN
+        {
+            # print "got (LITERAL_DOMAIN): $_[1] = $_[3]\n";
+
+            return          unless $_[1] =~ /\A(redirect|exp)\Z/i;
+
+            return $_[0]->_mod_generic( $_[1], $_[3] );
+        }
+    | LITERAL '=' LITERAL
+        {
+            # print "got (LITERAL_LITERAL): $_[1] = $_[3]\n";
+
+            # looks like "version"
+            if ( $_[1] eq 'v' ) {
+                my $ctx = $_[1] . '=' . $_[3];
+
+                return $_[0]->_ver_generic( $ctx )      if $_[3] eq 'spf1';
+
+                $_[0]->raise_error( 'E_INVALID_VERSION', $ctx );
+            }
+
+            return;
+        }
+    | LITERAL '=' IPADDRESS
+        {
+            # print "got (LITERAL_IPADDRESS): $_[1] = $_[3]\n";
+
+            # known literals
+            $_[0]->raise_error( 'E_DOMAIN_EXPECTED', $_[3] )
+                if $_[1] =~ /\A(redirect|exp)\Z/i;
+
+            return;
+        }
+    | LITERAL '=' IPADDRESS '/' BITMASK
+        {
+            # print "got (LITERAL_IPADDRESS_BITMASK): $_[1] = $_[3] / $_[5]\n";
+
+            # known literals
+            $_[0]->raise_error( 'E_DOMAIN_EXPECTED', $_[3] . '/' . $_[5] )
+                if $_[1] =~ /\A(redirect|exp)\Z/i;
+
+            return;
+        }
+    ;
+
+# ptr, exists, include, mx, a, all
+with_domain
+    : MECHANISM
+        {
+            $_[0]->raise_error( 'E_IPADDR_EXPECTED', $_[1] )
+                if $_[1] =~ /ip[46]/i;
+            $_[0]->raise_error( 'E_DOMAIN_EXPECTED', $_[1] )
+                if $_[1] =~ /\A(exists|include)\Z/i;
+
+            $_[0]->_mech_domain( '+', $_[1], $_[1] =~ /all/i ? undef : '@' );
+        }
+    | QUALIFIER MECHANISM
+        {
+            $_[0]->raise_error( 'E_IPADDR_EXPECTED', $_[1] . $_[2] )
+                if $_[2] =~ /ip[46]/i;
+            $_[0]->raise_error( 'E_DOMAIN_EXPECTED', $_[1] . $_[2] )
+                if $_[2] =~ /\A(exists|include)\Z/i;
+
+            $_[0]->_mech_domain( $_[1], $_[2], $_[2] =~ /all/i ? undef : '@' );
+        }
+    | MECHANISM ':' DOMAIN
+        {
+            my $ctx = $_[1] . ':' . $_[3];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_DOMAIN', $ctx )
+                if $_[1] =~ /all/i;
+
+            $_[0]->_mech_domain( '+', $_[1], $_[3] );
+        }
+    | QUALIFIER MECHANISM ':' DOMAIN
+        {
+            my $ctx = $_[1] . $_[2] . ':' . $_[4];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_DOMAIN', $ctx )
+                if $_[2] =~ /all/i;
+
+            $_[0]->_mech_domain( $_[1], $_[2], $_[4] );
+        }
+    ;
+
+# mx, a
+with_bitmask
+    : MECHANISM '/' BITMASK
+        {
+            my $ctx = $_[1] . '/' . $_[3];
+
+            $_[0]->raise_error( 'E_IPADDR_EXPECTED', $ctx )
+                if $_[1] =~ /ip[46]/i;
+
+            $_[0]->raise_error( 'E_UNEXPECTED_BITMASK', $ctx )
+                if $_[1] =~ /\A(ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_domain_bitmask( '+', $_[1], '@', $_[3] );
+        }
+    | QUALIFIER MECHANISM '/' BITMASK
+        {
+            my $ctx = $_[1] . $_[2] . '/' . $_[4];
+
+            $_[0]->raise_error( 'E_IPADDR_EXPECTED', $ctx )
+                if $_[2] =~ /ip[46]/i;
+
+            $_[0]->raise_error( 'E_UNEXPECTED_BITMASK', $ctx )
+                if $_[2] =~ /\A(ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_domain_bitmask( $_[1], $_[2], '@', $_[4] );
+        }
+    ;
+
+# mx, a
+with_domain_bitmask
+    : MECHANISM ':' DOMAIN '/' BITMASK
+        {
+            my $ctx = $_[1] . ':' . $_[3] . '/' . $_[5];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_BITMASK', $ctx )
+                if $_[1] =~ /\A(ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_domain_bitmask( '+', $_[1], $_[3], $_[5] );
+        }
+    | QUALIFIER MECHANISM ':' DOMAIN '/' BITMASK
+        {
+            my $ctx = $_[1] . $_[2] . ':' . $_[4] . '/' . $_[6];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_BITMASK', $ctx )
+                if $_[2] =~ /\A(ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_domain_bitmask( $_[1], $_[2], $_[4], $_[6] );
+        }
+    ;
+
+# ip4, ip6
+with_ipaddress
+    : MECHANISM ':' IPADDRESS
+        {
+            my $ctx = $_[1] . ':' . $_[3];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_IPADDR', $ctx )
+                if $_[1] =~ /\A(a|mx|ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_ipaddr_bitmask( '+', $_[1], $_[3], undef );
+        }
+    | QUALIFIER MECHANISM ':' IPADDRESS
+        {
+            my $ctx = $_[1] . $_[2] . ':' . $_[4];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_IPADDR', $ctx )
+                if $_[2] =~ /\A(a|mx|ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_ipaddr_bitmask( $_[1], $_[2], $_[4], undef );
+        }
+    | MECHANISM ':' IPADDRESS '/' BITMASK
+        {
+            my $ctx = $_[1] . ':' . $_[3] . '/' . $_[5];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_IPADDR', $ctx )
+                if $_[1] =~ /\A(a|mx|ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_ipaddr_bitmask( '+', $_[1], $_[3], $_[5] );
+        }
+    | QUALIFIER MECHANISM ':' IPADDRESS '/' BITMASK
+        {
+            my $ctx = $_[1] . $_[2] . ':' . $_[4] . '/' . $_[6];
+
+            $_[0]->raise_error( 'E_UNEXPECTED_IPADDR', $ctx )
+                if $_[2] =~ /\A(a|mx|ptr|all|exists|include)\Z/i;
+
+            $_[0]->_mech_ipaddr_bitmask( $_[1], $_[2], $_[4], $_[6] );
+        }
+    ;
+
+%%
+
+sub parse {
+    my ( $self, $text ) = @_;
+
+    $input = $self->YYData->{INPUT} = $text;
+    delete $self->YYData->{ERRMSG};
+
+    return $self->YYParse( yylex => \&_lexer, yyerror => \&_error );
+}
+
+sub error {
+    my ( $self ) = @_;
+    return $self->YYData->{ERRMSG};
+}
+
+sub _build_error {
+    my ( $self, $code, $context, @extra ) = @_;
+
+    $code = 'E_DEFAULT'     unless exists $errors{$code};
+
+    $self->YYData->{ERRMSG} = {
+        text    => sprintf( $errors{$code} => @extra ),
+        code    => $code,
+        context => $context,
+    };
+}
+
+sub raise_error {
+    my ( $self, @params ) = @_;
+
+    $self->_build_error( @params );
+    $self->YYError;
+}
+
+sub _error {
+    my ( $self ) = @_;
+
+    unless ( exists $self->YYData->{ERRMSG} ) {
+        substr( $input, index( $input, ($self->YYCurval || '') ), 0, '<*>' );
+
+        $self->_build_error( 'E_SYNTAX', $input, ($self->YYCurval || '') );
+    }
+
+    return;
+}
+
+sub _lexer {
+    my ( $parser ) = @_;
+
+    $parser->YYData->{INPUT} =~ s/^\s*//;
+
+    for ( $parser->YYData->{INPUT} ) {
+        # printf( "[debug] %s\n", $_ );
+
+        s/^(v\=spf1)\b//i
+            and return ( 'VERSION', $1 );
+
+        s/^(\/)\b//i
+            and return ( '/', '/' );
+        s/^(\:)\b//i
+            and return ( ':', ':' );
+        s/^(\=)\b//i
+            and return ( '=', '=' );
+
+        # qualifiers
+        s/^([-~\+\?])\b//i
+            and return ( 'QUALIFIER', $1 );
+
+        # mechanisms
+        s/^(all|ptr|a|mx|ip4|ip6|exists|include)\b//i
+            and return ( 'MECHANISM', $1 );
+
+        s/^($RE{net}{IPv4}{dec}|$RE{net}{IPv6}{-sep=>':'})\b//i
+            and return ( 'IPADDRESS', $1 );
+
+        s/^([_\.a-z\d][\-a-z\d]*\.[\.\-a-z\d]*[a-z\d]?)\b//i
+            and return ( 'DOMAIN', $1 );
+
+        s/^(\d{1,3})\b//i
+            and return ( 'BITMASK', $1 );
+
+        s/^([a-z\d\.\-_]+)\b//i
+            and return ( 'LITERAL', $1 );
+
+        # garbage
+        s/^(.+)\b//i
+            and return ( 'UNKNOWN', $1 );
+    }
+
+    # EOF
+    return ( '', undef );
+}
+
+# generic modifier
+sub _mod_generic {
+    my ( $self, $mod, $domain ) = @_;
+
+    return +{
+        type => 'mod',
+        modifier => lc $mod,
+        (
+            $domain
+                ? ( domain => $domain ) :
+                ( )
+        ),
+    };
+}
+
+# generic skip
+sub _skip_generic {
+    my ( $self, $token, $val ) = @_;
+
+    return +{
+        type => 'skip',
+        token => lc $token,
+        value => $val,
+    };
+}
+
+# generic version
+sub _ver_generic {
+    my ( $self, $ver ) = @_;
+
+    return +{
+        type => 'ver',
+        version => lc $ver,
+    };
+}
+
+
+# generic mechanism
+sub _mech_generic {
+    my ( $self, $qualifier, $mech, $domain, $ipaddr, $bitmask ) = @_;
+
+    return +{
+        type => 'mech',
+        qualifier => $qualifier,
+        mechanism => lc $mech,
+        (
+            $domain
+                ? ( domain => $domain ) :
+                ( )
+        ),
+        (
+            $ipaddr
+                ? ( ( defined $bitmask ? 'network' : 'ipaddress' ) => $ipaddr )
+                : ( )
+        ),
+        (
+            defined $bitmask
+                ? ( bitmask => $bitmask )
+                : ( )
+        ),
+    };
+}
+
+sub _mech_domain {
+    my ( $self, $qualifier, $mech, $domain ) = @_;
+
+    return $self->_mech_generic( $qualifier, $mech, $domain, undef, undef );
+}
+
+sub _mech_domain_bitmask {
+    my ( $self, $qualifier, $mech, $domain, $bitmask ) = @_;
+
+    return $self->_mech_generic( $qualifier, $mech, $domain, undef, $bitmask );
+}
+
+sub _mech_ipaddr_bitmask {
+    my ( $self, $qualifier, $mech, $ipaddr, $bitmask ) = @_;
+
+    return $self->_mech_generic( $qualifier, $mech, undef, $ipaddr, $bitmask );
+}

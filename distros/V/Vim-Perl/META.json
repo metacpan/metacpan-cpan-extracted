@@ -1,0 +1,46 @@
+{
+   "abstract" : "Perl-VimScript interface",
+   "author" : [
+      "Oleksandr Poplavskyy"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Vim-Perl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Slurp" : "0",
+            "File::Spec::Functions" : "0",
+            "OP::Base" : "0",
+            "Text::TabularDisplay" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Vim::Perl" : {
+         "file" : "lib/Vim/Perl.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

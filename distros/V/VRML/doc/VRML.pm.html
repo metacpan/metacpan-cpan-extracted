@@ -1,0 +1,1063 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>VRML - Specification independent VRML methods</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#groups">Groups</a></li>
+		<li><a href="#independent_methods">Independent Methods</a></li>
+		<li><a href="#shapes">Shapes</a></li>
+		<li><a href="#misc">Misc</a></li>
+		<li><a href="#interpolators">Interpolators</a></li>
+		<li><a href="#sensors">Sensors</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>VRML - Specification independent VRML methods (1.0, 2.0, 97)</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use VRML;</pre>
+<pre>
+  $vrml = new VRML(2);
+  $vrml-&gt;browser('Cosmo Player 2.0','Netscape');
+  $vrml-&gt;at('-15 0 20');
+  $vrml-&gt;box('5 3 1','yellow');
+  $vrml-&gt;back;
+  $vrml-&gt;print;
+  $vrml-&gt;save;</pre>
+<pre>
+  OR with the same result</pre>
+<pre>
+  use VRML;</pre>
+<pre>
+  VRML-&gt;new(2)
+  -&gt;browser('Cosmo Player 2.0','Netscape')
+  -&gt;at('-15 0 20')-&gt;box('5 3 1','yellow')-&gt;back
+  -&gt;print-&gt;save;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>These modules were conceived for the production of VRML worlds on WWW servers
+via GCI and/or for generating abstract worlds. They are the clarity of Perl
+scripts with VRML code to increase and (hopefully) for VRML beginners the
+entrance in VRML facilitate. In the following the modules are described
+briefly.</p>
+<dl>
+<dt><strong><a name="item_vrml_3a_3abase">VRML::Base</a></strong><br />
+</dt>
+<dd>
+contains base functionality such as a producing, an outputting and saving. It
+represents the base class for all other modules
+</dd>
+<p></p>
+<dt><strong><a name="item_vrml_3a_3avrml1">VRML::VRML1</a></strong><br />
+</dt>
+<dd>
+combines several VRML 1.0 nodes into complex methods - e.g. geometric shapes
+inclusive there material. This module accepts angle data in degrees and as
+material color names. The methods have the same names as in the VRML
+specification (if meaningfully), are however in lower case.
+</dd>
+<p></p>
+<dt><strong><a name="item_vrml_3a_3avrml1_3a_3astandard">VRML::VRML1::Standard</a></strong><br />
+</dt>
+<dd>
+implemented only the VRML 1.0 nodes. All method names are identical (in the
+way of writing) with those of the VRML specification. The parameters are
+arranged after the frequency of their use (subjective estimate). This module
+is possibly omitted in the next version. The production of the VRML nodes
+takes over then VRML::Base.
+</dd>
+<p></p>
+<dt><strong><a name="item_vrml_3a_3avrml2">VRML::VRML2</a></strong><br />
+</dt>
+<dd>
+combines several VRML 2.0 nodes into complex methods - e.g. geometric shapes
+inclusive there material. This module accepts angle data in degrees and as
+material color names. The methods have the same names as in the VRML
+specification (if meaningfully), are however in lower case. The names are also
+as far as possible identical to those of the module VRML::VRML1. Thus the
+user between the VRML versions which can be produced can switch.
+</dd>
+<dd>
+<p>Contains for example $in{VRML} '1' or '2' (e.g. via CGI), then only the following
+line at the start of the Perl script must be inserted.</p>
+</dd>
+<dd>
+<pre>
+    new VRML($in{'VRML'})</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_vrml_3a_3avrml2_3a_3astandard">VRML::VRML2::Standard</a></strong><br />
+</dt>
+<dd>
+implemented only the VRML 2.0 nodes. All method names are identical (in the
+way of writing) with those the VRML specification. The parameters are
+arranged after the frequency of their use (subjective estimate) This module
+is possibly omitted in the next version. The production of the VRML nodes
+takes over then VRML::Base.
+</dd>
+<p></p>
+<dt><strong><a name="item_vrml_3a_3acolor">VRML::Color</a></strong><br />
+</dt>
+<dd>
+contains the color names and conversion functions.
+</dd>
+<p></p></dl>
+<p>The VRML methods are at present identically in the modules VRML::VRML1.pm and
+VRML::VRML2.pm implemented. The basic methods like <code>new</code>, <code>print</code>
+or <code>save</code> are in the module VRML::Base described.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The methods of this module are easier to use than the VRML::*::Standard methods
+because the methods are on a higher level. For example you can use X11 color
+names and it's simple to apply textures to an object. All angles could be
+assigned in degrees.</p>
+<p>If a method does the same like its VRML pedant then it has the same name but in
+lowercase (e.g. box). The open part of a group method ends with a
+_begin (e.g. anchor_begin). The closing part ends with an _end (e.g.
+anchor_end). For a detailed description how the generated node works, take a
+look at the VRML 2.0 specification on VAG.</p>
+<p>Following methods are currently implemented. (Values in '...' must be strings!)</p>
+<p>
+</p>
+<h2><a name="groups">Groups</a></h2>
+<dl>
+<dt><strong><a name="item_begin">begin</a></strong><br />
+</dt>
+<dd>
+<em>begin('comment')</em>
+</dd>
+<dd>
+<p>Before you use an geometry or transform method please call this method.
+It's necessary to calculate something at the end.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    new VRML
+    -&gt;begin
+      -&gt;at('0 0.1 -0.3')
+        -&gt;sphere(1,'red')
+      -&gt;back
+    -&gt;end
+    -&gt;print;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_end">end</a></strong><br />
+</dt>
+<dd>
+<em>end('comment')</em>
+</dd>
+<dd>
+<p>After <a href="#item_end"><code>end</code></a> there should no geometry or transformation. This method completes
+the calculations of viewpoints etc.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_at">at('type=value','type=value', ...)</a></strong><br />
+</dt>
+<dd>
+is the short version of the method <a href="#item_transform_begin"><code>transform_begin</code></a>. It has the same
+parameters as <a href="#item_transform_begin"><code>transform_begin</code></a>.
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;at('0 2 0')
+      -&gt;sphere(0.5,'red')
+    -&gt;back</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_back">back</a></strong><br />
+</dt>
+<dd>
+is the short version of the method <a href="#item_transform_end"><code>transform_end</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_anchor_begin">anchor_begin</a></strong><br />
+</dt>
+<dd>
+<em>anchor_begin('url', 'description', 'parameter', 'bboxSize', 'bboxCenter')</em>
+</dd>
+<dd>
+<pre>
+ url         MFString []
+ description SFString &quot;&quot;
+ parameter   MFString []
+ bboxSize    SFVec3f  undef
+ bboxCenter  SFVec3f  '0 0 0'</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;anchor_begin('<a href="http://www.gfz-potsdam.de/~palm/vrmlperl/">http://www.gfz-potsdam.de/~palm/vrmlperl/</a>',
+      'VRML-Perl Moduls', 'target=_blank')
+      -&gt;sphere(1,'blue')
+    -&gt;anchor_end;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_anchor_end">anchor_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_anchor_begin"><code>anchor_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_billboard_begin">billboard_begin</a></strong><br />
+</dt>
+<dd>
+<em>billboard_begin('axisOfRotation', 'bboxSize', 'bboxCenter')</em>
+</dd>
+<dd>
+<pre>
+ axisOfRotation  SFVec3f  '0 1 0'
+ bboxSize        SFVec3f  undef
+ bboxCenter      SFVec3f  '0 0 0'</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_billboard_end">billboard_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_billboard_begin"><code>billboard_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_collision_begin">collision_begin</a></strong><br />
+</dt>
+<dd>
+<em>collision_begin(collide, proxy, 'bboxSize', 'bboxCenter')</em>
+</dd>
+<dd>
+<pre>
+ collide    SFBool  1
+ proxy      SFNode  NULL
+ bboxSize   SFVec3f undef
+ bboxCenter SFVec3f '0 0 0'</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;collision_begin(1, sub{$vrml-&gt;box('5 1 0.01')})
+      -&gt;text('collide','yellow',1,'MIDDLE')
+    -&gt;collision_end</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_collision_end">collision_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_collision_begin"><code>collision_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_group_begin"><code>group_begin('comment')</code></a></strong><br />
+</dt>
+<dd>
+Example:
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;group_begin
+      -&gt;sphere(1,'red')
+    -&gt;group_end</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_group_end">group_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_group_begin"><code>group_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_lod_begin">lod_begin</a></strong><br />
+</dt>
+<dd>
+<em>lod_begin('range', 'center')</em>
+</dd>
+<dd>
+<pre>
+ range  MFFloat []
+ center SFVec3f '0 0 0'</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;lod_begin('30')
+      -&gt;text('good readable')
+      -&gt;group_begin-&gt;group_end # empty Group
+    -&gt;lod_end</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_lod_end">lod_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_lod_begin"><code>lod_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_switch_begin">switch_begin</a></strong><br />
+</dt>
+<dd>
+<em>switch_begin(whichChoice)</em>
+</dd>
+<dd>
+<pre>
+ whichChoice SFInt32 -1</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_switch_end">switch_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_switch_begin"><code>switch_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_transform_begin">transform_begin</a></strong><br />
+</dt>
+<dd>
+<em>transform_begin('type=value','type=value', ...)</em>
+</dd>
+<dd>
+<p><em>Where type can be:</em></p>
+</dd>
+<dd>
+<pre>
+    t = translation
+    r = rotation
+    c = center
+    s = scale
+    so = scaleOrientation
+    bbs = bboxSize
+    bbc = bboxCenter</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;transform_begin('t=0 1 0','r=180')
+      -&gt;cone('0.5 2','red')
+    -&gt;transform_end</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_transform_end">transform_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_transform_begin"><code>transform_begin</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_inline">inline</a></strong><br />
+</dt>
+<dd>
+<em>inline('url', 'bboxSize', 'bboxCenter')</em>
+</dd>
+<dd>
+<pre>
+ url        MFString []
+ bboxSize   SFVec3f  undef
+ bboxCenter SFVec3f  '0 0 0'</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="independent_methods">Independent Methods</a></h2>
+<dl>
+<dt><strong><a name="item_background">background</a></strong><br />
+</dt>
+<dd>
+<em>background(
+frontUrl =&gt; '...',
+leftUrl =&gt; '...',
+rightUrl =&gt; '...',
+backUrl =&gt; '...',
+bottomUrl =&gt; '...',
+topUrl =&gt; '...',
+skyColor =&gt; '...',
+skyAngle =&gt; '...',
+groundColor =&gt; '...',
+groundAngle =&gt; '...'
+)</em>
+</dd>
+<dd>
+<pre>
+ frontUrl    MFString []
+ leftUrl     MFString []
+ rightUrl    MFString []
+ backUrl     MFString []
+ bottomUrl   MFString []
+ topUrl      MFString []
+ skyColor    MFColor  ['0 0 0']
+ skyAngle    MFFloat  []
+ groundColor MFColor  []
+ groundAngle MFFloat  []</pre>
+</dd>
+<dd>
+<p>This is a parameter hash. Only use the parts you need.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;background(skyColor =&gt; 'lightblue',
+                      frontUrl =&gt; '<a href="http://www.yourdomain.de/bg/berge.gif">http://www.yourdomain.de/bg/berge.gif</a>');</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_backgroundcolor">backgroundcolor</a></strong><br />
+</dt>
+<dd>
+<em>backgroundcolor('skyColor', 'groundColor')</em>
+</dd>
+<dd>
+<pre>
+ skyColor     SFColor  '0 0 0'
+ groundColor  SFColor  '0 0 0'</pre>
+</dd>
+<dd>
+<p>is the short version of <a href="#item_background"><code>background</code></a>. It specifies only colors.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;backgroundcolor('lightblue');</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_backgroundimage">backgroundimage</a></strong><br />
+</dt>
+<dd>
+<em>backgroundimage('url')</em>
+</dd>
+<dd>
+<pre>
+ url SFString &quot;&quot;</pre>
+</dd>
+<dd>
+<p>is the short version of <a href="#item_background"><code>background</code></a>. It needs only one image. The
+given Url will assigned to all parts of the background cube.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;backgroundimage('<a href="http://www.yourdomain.de/bg/stars.gif">http://www.yourdomain.de/bg/stars.gif</a>');</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_title">title</a></strong><br />
+</dt>
+<dd>
+<em>title('string')</em>
+</dd>
+<dd>
+<pre>
+ string SFString &quot;&quot;</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;title('My virtual world');</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_info">info</a></strong><br />
+</dt>
+<dd>
+<em>info('string')</em>
+</dd>
+<dd>
+<pre>
+ string MFString []</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;info('last update: 8.05.1997');</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_worldinfo">worldinfo</a></strong><br />
+</dt>
+<dd>
+<em>worldinfo('title', 'info')</em>
+</dd>
+<dd>
+<pre>
+ title  SFString &quot;&quot;
+ info   MFString []</pre>
+</dd>
+<dd>
+<p>combines <a href="#item_title"><code>title</code></a> and <a href="#item_info"><code>info</code></a>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_navigationinfo">navigationinfo</a></strong><br />
+</dt>
+<dd>
+<em>navigationinfo('type', speed, headlight, visibilityLimit, avatarSize)</em>
+</dd>
+<dd>
+<pre>
+ type         MFEnum     ['WALK', 'ANY'] # ANY, WALK, FLY, EXAMINE, NONE
+ speed        SFFloat    1.0
+ headlight    SFBool     1
+ visibilityLimit SFFloat 0.0
+ avatarSize   MFFloat    [0.25, 1.6, 0.75]</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;navigationinfo('WALK', 1.5, 0, 1000);</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_viewpoint_begin">viewpoint_begin</a></strong><br />
+</dt>
+<dd>
+starts the hidden calculation of viewpoint center and distance for the
+method <a href="#item_viewpoint_auto_set"><code>viewpoint_auto_set()</code></a>. It collects also the viepoints to place
+they in the first part of the VRML source.
+</dd>
+<p></p>
+<dt><strong><a name="item_viewpoint">viewpoint</a></strong><br />
+</dt>
+<dd>
+<em>viewpoint('description', 'position', 'orientation', fieldOfView, jump)</em>
+</dd>
+<dd>
+<pre>
+ description SFString          &quot;&quot;
+ position    SFVec3f           0 0 10
+ orientation SFRotation/SFEnum 0 0 1 0 # FRONT, LEFT, BACK, RIGHT, TOP, BOTTOM
+ fieldOfView SFFloat           45 # Grad
+ jump        SFBool            1</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;viewpoint('Start','0 0 0','0 0 -1 0',60);</pre>
+</dd>
+<dd>
+<p>is the same like</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;viewpoint('Start',undef,'FRONT',60);</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_viewpoint_set">viewpoint_set</a></strong><br />
+</dt>
+<dd>
+<em>viewpoint_set('center', distance, fieldOfView, avatarSize)</em>
+</dd>
+<dd>
+<pre>
+ center       SFVec3f '0 0 0'
+ distance     SFFloat 10
+ fieldOfView  SFFloat 45 # Grad
+ avatarSize   MFFloat [0.25, 1.6, 0.75]</pre>
+</dd>
+<dd>
+<p>places six viewpoints around the center.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_viewpoint_auto_set">viewpoint_auto_set</a></strong><br />
+</dt>
+<dd>
+sets all parameters of <a href="#item_viewpoint_set"><code>viewpoint_set</code></a> automatically.
+</dd>
+<p></p>
+<dt><strong><a name="item_viewpoint_end">viewpoint_end</a></strong><br />
+</dt>
+<dd>
+close <a href="#item_viewpoint_begin"><code>viewpoint_begin</code></a>.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="shapes">Shapes</a></h2>
+<dl>
+<dt><strong><a name="item_box">box</a></strong><br />
+</dt>
+<dd>
+<em>box('size', 'appearance')</em>
+</dd>
+<dd>
+<pre>
+ size       SFVec3f  '2 2 2' # width height depth
+ appearance SFString &quot;&quot;      # see Appearance</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_cone">cone</a></strong><br />
+</dt>
+<dd>
+<em>cone('bottomRadius height', 'appearance')</em>
+</dd>
+<dd>
+<pre>
+ bottomRadius height SFVec2f '1 2'
+ appearance          SFString &quot;&quot; # see Appearance</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_cylinder">cylinder</a></strong><br />
+</dt>
+<dd>
+<em>cylinder('radius height', 'appearance')</em>
+</dd>
+<dd>
+<pre>
+ radius height SFVec2f  '1 2'
+ appearance    SFString &quot;&quot; # see Appearance</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_line">line</a></strong><br />
+</dt>
+<dd>
+<em>line('from', 'to', radius, 'appearance', 'path')</em>
+</dd>
+<dd>
+<pre>
+ from        SFVec3f   &quot;&quot;
+ to          SFVec3f   &quot;&quot;
+ radius      SFFloat   0 # 0 = haarline
+ appearance  SFString  &quot;&quot;
+ path        SFEnum    &quot;&quot; # XYZ, XZY, YXZ, YZX, ZXY, ZYX</pre>
+</dd>
+<dd>
+<p>draws a line (cylinder) between two points with a given radius. If radius
+is '0' only a hairline will be printed. The last parameter specifies the
+devolution along the axes. An empty stands for direct connection.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    new VRML(2)
+    -&gt;begin
+      -&gt;line('1 -1 1', '-3 2 2', 0.03, 'red', 'XZY')
+      -&gt;line('1 -1 1', '-3 2 2', 0.03, 'white')
+    -&gt;end
+    -&gt;print;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_pyramid">pyramid</a></strong><br />
+</dt>
+<dd>
+<em>pyramid('size', 'appearance')</em>
+</dd>
+<dd>
+<pre>
+ size       SFVec3f  '2 2 2' # width height depth
+ appearance SFString &quot;&quot;      # see Appearance</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;pyramid('1 1 1','blue,green,red,yellow,white');</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_sphere">sphere</a></strong><br />
+</dt>
+<dd>
+<em>sphere(radius, 'appearance')</em>
+</dd>
+<dd>
+<pre>
+ radius     SFFloat  1
+ appearance SFString &quot;&quot; # see Appearance</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_elevationgrid">elevationgrid</a></strong><br />
+</dt>
+<dd>
+<em>elevationgrid(height, color, xDimension, zDimension, xSpacing,
+zSpacing, creaseAngle, colorPerVertex, solid)</em>
+</dd>
+<dd>
+<pre>
+ height          MFFloat  []
+ color           MFColor  [] # resp. material and color
+ xDimension      SFInt32  0
+ zDimension      SFInt32  0
+ xSpacing        SFFloat  1.0
+ zSpacing        SFFloat  1.0
+ creaseAngle     SFFloat  0
+ colorPerVertex  SFBool   1
+ solid           SFBool   0</pre>
+</dd>
+<dd>
+<p>If <em>color</em> is not a reference of an ARRAY it would be assumed that <em>color</em>
+is the appearance.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    open(FILE,&quot;&lt;height.txt&quot;);
+    my @height = &lt;FILE&gt;;
+    open(COL,&quot;&lt;color.txt&quot;);
+    my @color = &lt;COL&gt;;
+    $vrml-&gt;navigationinfo([&quot;EXAMINE&quot;,&quot;FLY&quot;],200)
+         -&gt;viewpoint(&quot;Top&quot;,&quot;1900 6000 1900&quot;,&quot;TOP&quot;)
+         -&gt;elevationgrid(\@height, \@color, undef, undef, 250, undef, 0)
+         -&gt;print;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_text">text</a></strong><br />
+</dt>
+<dd>
+<em>text('string', 'appearance', 'font', 'align')</em>
+</dd>
+<dd>
+<pre>
+ string     MFString []
+ appearance SFString &quot;&quot; # see Appearance
+ font       SFString '1 SERIF PLAIN'
+ align      SFEnum   'BEGIN' # BEGIN, MIDDLE, END</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_billtext">billtext</a></strong><br />
+</dt>
+<dd>
+<em>billtext('string', 'appearance', 'font', 'align')</em>
+</dd>
+<dd>
+<pre>
+ string     MFString []
+ appearance SFString &quot;&quot; # see Appearance
+ font       SFString '1 SERIF PLAIN'
+ align      SFEnum   'BEGIN' # BEGIN, MIDDLE, END</pre>
+</dd>
+<dd>
+<p>does the same like method <a href="#item_text"><code>text</code></a>, but the text better readable.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_appearance">Appearance</a></strong><br />
+</dt>
+<dd>
+<em>appearance('type=value1,value2 ; type=...')</em>
+</dd>
+<dd>
+<p>The appearance method specifies the visual properties of geometry by defining
+the material and texture. If more than one type is needed separate the types
+by semicolon. The types can choosen from the following list.</p>
+</dd>
+<dd>
+<p>Note: one character mnemonic are colors
+      two characters mnemonic are values in range of [0..1]
+      more characters are strings like file names or labels</p>
+</dd>
+<dd>
+<pre>
+        d = diffuseColor
+        e = emissiveColor
+        s = specularColor
+        ai = ambientIntensity
+        sh = shininess
+        tr = transparency
+        tex = texture filename,wrapS,wrapT
+        name = names the MovieTexture node (for a later route)</pre>
+</dd>
+<dd>
+<p>The color values can be strings (X11 color names) or RGB-triples. It is
+possible to reduce the intensity of colors (names) by appending a two digit
+value (percent). This value must be separated by an underscore (_) or
+a percent symbol (%). Note: Do not use a percent symbol in URL's. It would
+be decoded in an ascii character.</p>
+</dd>
+<dd>
+<p>Sample (valid color values):
+        '1 1 0' # VRML standard
+        'FFFF00' or 'ffff00', '255 255 0', 'yellow'</p>
+</dd>
+<dd>
+<p>or reduced to 50%
+        '.5 .5 .5' # VRML standard
+        '808080', '128 128 0', 'yellow%50' or 'yellow_50'</p>
+</dd>
+<dd>
+<p>For a list of <em>X11 color names</em> take a look at VRML::Color</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="misc">Misc</a></h2>
+<dl>
+<dt><strong><a name="item_directionallight">directionallight</a></strong><br />
+</dt>
+<dd>
+<em>directionallight('direction', intensity, ambientIntensity, 'color', on)</em>
+</dd>
+<dd>
+<pre>
+ direction         SFVec3f  '0 0 -1'
+ intensity         SFFloat  1
+ ambientIntensity  SFFloat  1
+ color             SFColor  '1 1 1' #white
+ on                SFBool   1</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;directionallight(&quot;0 0 -1&quot;, 0.3);</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_sound">sound</a></strong><br />
+</dt>
+<dd>
+<em>sound('url','description', 'location', 'direction', intensity, loop, pitch)</em>
+</dd>
+<dd>
+<pre>
+ url         MFString []
+ description SFString &quot;&quot;
+ location    SFVec3f  '0 0 0'
+ direction   SFVec3f  '0 0 1'
+ intensity   SFFloat  1.0
+ loop        SFBool   0
+ pitch       SFFloat  1.0</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_def">def</a></strong><br />
+</dt>
+<dd>
+<em>def('name')</em>
+</dd>
+<dd>
+<pre>
+ name SFString &quot;&quot;</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;def('RedSphere')-&gt;sphere(1,'red')</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_use">use</a></strong><br />
+</dt>
+<dd>
+<em>use('name')</em>
+</dd>
+<dd>
+<pre>
+ name SFString &quot;&quot;</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml-&gt;use('RedSphere')</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_route">route</a></strong><br />
+</dt>
+<dd>
+<em>route('from','to')</em>
+</dd>
+<dd>
+<pre>
+ FROM.feldname SFString &quot;&quot;
+ TO.feldname   SFString &quot;&quot;</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="interpolators">Interpolators</a></h2>
+<dl>
+<dt><strong><a name="item_interpolator">interpolator</a></strong><br />
+</dt>
+<dd>
+<em>interpolator('name','type',[keys],[keyValues])</em>
+</dd>
+<dd>
+<pre>
+ name      SFString &quot;&quot;
+ type      SFEnum   &quot;&quot; # Color, Coordinate, Normal, Orientation,
+                       # Position und Scalar
+ keys      MFFloat  [] # [0,1]
+ keyValues MF...    [] # Type of Interpolator</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="sensors">Sensors</a></h2>
+<dl>
+<dt><strong><a name="item_cylindersensor">cylindersensor</a></strong><br />
+</dt>
+<dd>
+<em>cylindersensor('name',maxAngle,minAngle,diskAngle,offset,autoOffset,enabled)</em>
+</dd>
+<dd>
+<pre>
+ name       SFString &quot;&quot;
+ maxAngle   SFFloat  undef
+ minAngle   SFFloat  0
+ diskAngle  SFFloat  15
+ offset     SFFloat  0
+ autoOffset SFBool   1
+ enabled    SFBool   1</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_planesensor">planesensor</a></strong><br />
+</dt>
+<dd>
+<em>planesensor('name',maxPosition,minPosition,offset,autoOffset,enabled)</em>
+</dd>
+<dd>
+<pre>
+ name         SFString  &quot;&quot;
+ maxPosition  SFVec2f  undef
+ minPosition  SFVec2f  '0 0'
+ offset       SFVec3f  '0 0 0'
+ autoOffset   SFBool  1
+ enabled      SFBool  1</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_proximitysensor">proximitysensor</a></strong><br />
+</dt>
+<dd>
+<em>proximitysensor('name',size,center,enabled)</em>
+</dd>
+<dd>
+<pre>
+ name    SFString &quot;&quot;
+ size    SFVec3f  '0 0 0'
+ center  SFVec3f  '0 0 0'
+ enabled SFBool   1</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_spheresensor">spheresensor</a></strong><br />
+</dt>
+<dd>
+<em>spheresensor('name',offset,autoOffset,enabled)</em>
+</dd>
+<dd>
+<pre>
+ name       SFString   &quot;&quot;
+ offset     SFRotation '0 1 0 0'
+ autoOffset SFBool     1
+ enabled    SFBool     1</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_timesensor">timesensor</a></strong><br />
+</dt>
+<dd>
+<em>timesensor('name',cycleInterval,loop,startTime,stopTime,enabled)</em>
+</dd>
+<dd>
+<pre>
+ name          SFString &quot;&quot;
+ cycleInterval SFFloat  1
+ loop          SFBool   0
+ startTime     SFFloat  0
+ stopTime      SFFloat  0
+ enabled       SFBool   1</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_touchsensor">touchsensor</a></strong><br />
+</dt>
+<dd>
+<em>touchsensor('name',enabled)</em>
+</dd>
+<dd>
+<pre>
+    name    SFString &quot;&quot;
+    enabled SFBool   1</pre>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    $vrml
+    -&gt;begin
+        -&gt;touchsensor('Switch')
+        -&gt;sphere(1,'white')
+        -&gt;def('Light')-&gt;directionallight(&quot;&quot;, 1, 0, 'red', 0)
+        -&gt;route('Switch.isActive', 'Light.on')
+    -&gt;end
+    -&gt;print-&gt;save;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_visibitysensor">visibitysensor</a></strong><br />
+</dt>
+<dd>
+<em>visibitysensor('name',size,center,enabled)</em>
+</dd>
+<dd>
+<pre>
+    name    SFString &quot;&quot;
+    size    SFVec3f  '0 0 0'
+    center  SFVec3f  '0 0 0'
+    enabled SFBool   1</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>VRML::VRML2</p>
+<p>VRML::VRML2::Standard</p>
+<p>VRML::Base</p>
+<p><a href="http://www.gfz-potsdam.de/~palm/vrmlperl/">http://www.gfz-potsdam.de/~palm/vrmlperl/</a> for a description of <em>VRML-modules</em> and how to obtain it.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Hartmut Palm <em>&lt;<a href="mailto:palm@gfz-potsdam.de">palm@gfz-potsdam.de</a>&gt;</em></p>
+<p>Homepage <a href="http://www.gfz-potsdam.de/~palm/">http://www.gfz-potsdam.de/~palm/</a></p>
+
+</body>
+
+</html>

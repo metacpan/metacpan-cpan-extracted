@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Attribute;
+use Vim::Complete;
+use Pod::Usage;
+
+sub usage ($;$$) {
+    my ($message, $exitval, $verbose) = @_;
+
+    # make sure there's exactly one newline;
+    1 while chomp $message;
+    $message .= "\n";
+    $exitval ||= 1;
+    $verbose ||= 2;
+    pod2usage(
+        {   -message => $message,
+            -exitval => $exitval,
+            -verbose => $verbose,
+            -output  => \*STDERR
+        }
+    );
+}
+our @dirs : Getopt(dir|d=s);
+our $filename : Getopt(file|f=s);
+our $min_length : Getopt(minlen|m=s);
+our $verbose : Getopt(verbose|v);
+our $no_inc : Getopt(noinc|n);
+our $help : Getopt(help|h);
+pod2usage(-verbose => 2, -exitval => 0) if $help || Getopt::Attribute->error;
+usage "need --dir if --no_inc is given\n" if $no_inc && (@dirs == 0);
+$filename = "$ENV{HOME}/.vimcomplete" unless defined $filename;
+push @dirs => grep { !/^\.+$/ } grep { !ref } @INC unless $no_inc;
+Vim::Complete->new(
+    dirs       => \@dirs,
+    verbose    => $verbose,
+    min_length => $min_length,
+)->parse->report_to_file($filename);
+
+=head1 NAME
+
+mk_vim_complete - Gather Perl identifiers for vim's autocompletion
+
+=head1 SYNOPSIS
+
+    mk_vim_complete -f ~/.vimcomplete -v --dir /path/to/my/working/dir
+
+=head1 DESCRIPTION
+
+All is explained in the documentation of the command-line options.
+
+=head1 COMMAND-LINE OPTIONS
+
+=over 4
+
+=item --file <file>, -f <file>
+
+The filename where the gathered list of identifiers should be written to. You
+need to tell vim about this file; see L<Vim::Complete> for details.
+
+=item --dir, -d
+
+This option can be given several times. The directories are added to the list
+of directories in which to look for module files.
+
+=item --minlen, -m
+
+The minimum length of identifiers that should be reported. It doesn't make
+sense to set this to 1; even setting it to 2 would likely produce so many
+identifers that the autocompletion mechanism is thrown off because you will
+have to cycle through too many identifiers. So the default minimum length is
+3.
+
+=item --noinc, -n
+
+By default, the directories included in C<@INC> - with the exception of C<.>,
+which denotes the current directory - are searched, so identifiers from
+all installed modules are gathered. You can turn this behaviour off by
+specifying this option. If you do, you need to specify at least one
+C<--dir> option.
+
+=item --verbose, -v
+
+Be more verbose.
+
+=item --help, -h
+
+Show this documentation.
+
+=back
+
+=cut

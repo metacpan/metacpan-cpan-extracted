@@ -1,0 +1,13 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-06-07T04:40:00.529669Z
+K 7
+svn:log
+V 67
+Removed an errant debug statement from the BattleField2142 protocol
+END

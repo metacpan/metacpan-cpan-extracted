@@ -1,0 +1,38 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@<?php
+
+/*! \interface HTOM_Evaluable
+ * \brief This is an interface that must be inplemented by each evauable elements of the document.
+ * 
+ * Each HTOM classes that are is to evaluate on to the HTML page object must implement this interface.
+ */
+interface  HTOM_Evaluable
+{
+  //! The evaluable element must implement this method.
+  /*! The evaluate methods returns the content of the object in the HTML language.
+   */
+  public function Evaluate();
+}
+
+?>@

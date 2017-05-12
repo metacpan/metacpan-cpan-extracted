@@ -1,0 +1,25 @@
+PIC P16F690;
+
+# enable gpsim as a simulator
+pragma simulator gpsim;
+
+Main {
+    digital_output PORTC;
+    $display = 0x08; # create a 8-bit register by checking size
+    sim_assert $display == 0x08, "$display should be 0x08";
+    Loop {
+        write PORTC, $display;
+        delay 100ms;
+        # improve this depiction
+        # circular rotate right by 1 bit
+        ror $display, 1;
+    }
+}
+
+Simulator {
+    attach_led PORTC, 4; # attach 4 LEDs to PORTC on RC0-RC3;
+    stop_after 60s;
+    logfile "rotater.lxt";
+    log PORTC;
+    scope PORTC;
+}

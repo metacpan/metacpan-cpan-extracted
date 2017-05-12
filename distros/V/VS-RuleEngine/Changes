@@ -1,0 +1,50 @@
+Revision history for Perl extension VS::RuleEngine.
+
+0.09  2008-08-04
+    - Hooks can now also return KV_SKIP
+    - Fix Changes (this file) to use same format as rest of my modules
+
+0.08  2008-01-01
+    - Renamed to VS::RuleEngine
+    - Added KV_SKIP return code for rule to abort further processing of the loop and goto processing
+      of posthooks directly. 
+    - Fixed bug caused because iterator is not reset if exiting a each prematurely [BUG]
+    - Fixed a few doc typos
+    - Added Kvasir::Action::Set(Local|Global) which sets key/values to the local and global 
+      runloop objects
+
+0.07  2007-10-08
+    - with_args argument is now passed as a hash instead of a hash reference to entities
+    - Added 'defaults' and 'with_defaults' to declarative interface
+    - Added default argument sets to entities
+    - Corrected typo (post_hook => posthook) in Kvasir synopsis [DOC]
+    - Corrected POD names in InputUnderThreshold to actually match that module [DOC]
+
+0.06  2007-10-02
+    - Don't install Test::Kvasir::*
+    - Doesn't require the non-existing Perl 5.6.20 (5.00602) anymore. Spotted by David Cantrell [BUG]
+    - Added generic rules InputMatchesRegexp, InputOverThreshold and InputUnderThreshold
+
+0.05  2007-10-01
+    - Don't try to require a package if it's already defined [BUG]
+    - is_existing_package in Kvasir::Util should now work correctly [BUG]
+    - Corrected calling posthooks so that their argument positions are correct [BUG]
+    - Specifying a default global is now possible either via add_engine for Runloop or via run for Engine
+
+0.04  2007-09-16
+    - add_* in Engine now also accepts objects that'll be used to the specific item. Declarative interface
+      is supports this using 'input => $object' etc.
+    - Added POD to Kvasir/Engine/* to make doc tests not complain that did does not contain any POD [DOC]
+
+0.03  2007-09-16
+    - Added some synopsises and better documentation [DOC]
+    - Removed some double docs from Engine.pm and cleaned it up a bit [DOC]
+    - Kvasir/Engine/*.pm doesn't set package anymore to avoid confusion and making them mixins [BUG/DOC]
+ 
+0.02  2007-09-16
+    - Inputs are now reset before each iteration [BUG]
+    - Added another example in synopsis so that peopledon't think this is a spam filter. [DOC]
+    - Updated documentation with some fixes. [DOC]
+  
+0.01  2007-09-15
+    - Initial release to CPAN

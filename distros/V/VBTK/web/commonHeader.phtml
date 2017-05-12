@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<!--#perl 
+  my $datetime = &Date::Manip::UnixDate("today", "%D %T");
+  my $hdrLinkColor = "midnightblue";
+  my $hdrStyle = "text-decoration:none;font-family:sans-serif";
+
+  $bodySettings = 'bgcolor="#FFFFFF"' if (! defined $bodySettings);
+  $hdrLinkSize = "-1" if (! defined $hdrLinkSize);
+  
+  # Default the title if it's not passed in
+  if ((! defined $title)&&(defined $name))
+  {
+      my @segments = split(/\./,$name);
+      my $lastSegName = pop(@segments);
+      my ($pos,$segName,$fullName);
+      foreach $pos (0..($#segments)) 
+      { 
+          $segName = $segments[$pos];
+          $fullName = join('.',@segments[0..$pos]);
+          $title .= "<A HREF=\"$matrixUrl?name=$fullName\">$segName</A>.";
+      }
+      $title .= qq(<A HREF="$statusUrl?name=$name">$lastSegName</A>);
+  }
+-->
+
+<html>
+<head>
+  <!-- Only put in the refresh META tag if the refresh variable is set -->
+  <!--#perl if ($refresh > 0) { -->
+    <META HTTP-EQUIV="refresh" CONTENT="$refresh">
+  <!--#perl } -->
+  <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+  <title>Virtual Brent - $datetime</title>
+</head>
+<body $bodySettings>
+
+<table width="620" border="0" cellspacing="0" cellpadding="1" fgcolor="Black">
+  <tr bgcolor="lightsteelblue">
+    <td valign="top" align="left" valign="center">
+      <a href="/" STYLE="$hdrStyle">
+        <font size="+2" color="$hdrLinkColor">
+          VBTK</font></a>
+    </td>
+    <td>
+      <font color="$hdrLinkColor">$company</font>
+    </td>
+    <td>
+      <font color="$hdrLinkColor" size="$hdrLinkSize">$datetime</font>
+    </td>
+    <td valign="TOP" align="RIGHT" colspan="2">
+      <table border="0" cellspacing="0" cellpadding="4">
+        <tr valign="CENTER">
+          <th>
+            <a href="/oncall.phtml" STYLE="$hdrStyle">
+              <FONT COLOR="$hdrLinkColor" SIZE="$hdrLinkSize">oncall</FONT></a>
+          </th>
+          <th>
+            <a href="http://web.keynote.com/MyKeynote/?LoginName=demo&Password=demo" STYLE="$hdrStyle" target="_blank">
+              <FONT COLOR="$hdrLinkColor" SIZE="$hdrLinkSize">keynote</FONT></a>
+          </th>
+          <th>
+            <a href="" STYLE="$hdrStyle">
+              <FONT COLOR="$hdrLinkColor" SIZE="$hdrLinkSize">usage</FONT></a>
+          </th>
+          <th>
+            <a href="/matrix.phtml" STYLE="$hdrStyle">
+              <FONT COLOR="$hdrLinkColor" SIZE="$hdrLinkSize">status</FONT></a>
+          </th>
+          <th>
+            <a href="/availability.phtml" STYLE="$hdrStyle">
+              <FONT COLOR="$hdrLinkColor" SIZE="$hdrLinkSize">logs</FONT></a>
+          </th>
+          <th>
+            <a href="/dynPod.phtml?pkg=VBTK" STYLE="$hdrStyle" target="_blank">
+              <FONT COLOR="$hdrLinkColor" SIZE="$hdrLinkSize">help</FONT></a>
+          </th>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table width="620" border="0" cellspacing="0" cellpadding="5" fgcolor="Black">
+  <tr>
+    <td align="CENTER">
+      <B><FONT COLOR="black" SIZE="+1" STYLE="$hdrStyle">$title</FONT></B>
+    </td>
+  </tr>
+</table>

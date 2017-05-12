@@ -1,0 +1,77 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@<?PHP
+
+require_once '..\htom_autoloader.php';
+HTOM_Autoloader::AddPath("..");
+
+
+
+function Content()
+{  
+  $table = new HTOM_Table();
+  
+  $static = new HTOM_Static("Static basic text", new HTOM_Style("background-color:#453792"));
+  $static->Append( new HTOM_Paragraph("This is the text in the static without own style"));
+  $static->Append( new HTOM_Paragraph("This is the text in the static - color red",array(new HTOM_Style("color:red"),HTOM_Alignment::Center())) );
+  
+  $table->AddElement( 0,0,"row 0 column 0");
+  $table->AddElement( 0,1,"row 0 column 1",new HTOM_Style("color:green"));
+  $table->AddElement( 1,0,"row 1 column 0",new HTOM_Style("color:blue"));
+  $table->AddElement( 1,1,"row 1 column 1",new HTOM_Style("font-size: 20px"));
+  $table->SetRowStyle(1,"font-weight: bold");
+  $table->SetColumnStyle(0,"color:red");
+  $table->AddElement(2,1,$static);
+  $table->AddElement(2,0,new HTOM_Image( "img/btntest.PNG" ));
+  
+  $mainGrid = new HTOM_Table();
+  $mainGrid->AddElement(0,0,$table);
+  $image2 = new HTOM_Image("img/htom.png", "The button 2 image", array(new HTOM_Size("50%",50),HTOM_Alignment::Center()));
+  $mainGrid->AddElement(1,0,$image2);
+  
+  $exemple2Link = new HTOM_Link("Click here to and liunch example 2","exemple2.php", new HTOM_Style("color:black"));
+  $mainGrid->AddElement(2,0,$exemple2Link);
+  
+  $exampleForm = new HTOM_Form("index2.php",NULL,"POST", new HTOM_SimpleAttribute("name","LoginForm"));
+  $passwordTable=new HTOM_Table();
+  $passwordTable->AddElement(0,0,"User name:");
+  $passwordTable->AddElement(0,1,new HTOM_TextInput("userName","The user name") );
+  $passwordTable->AddElement(1,0,"Password:");
+  $passwordTable->AddElement(1,1,new HTOM_TextInput("password",NULL,TRUE) );
+  $passwordTable->AddElement(2,0,new HTOM_CheckBox("savePassword","Save password",TRUE));
+  $passwordTable->AddElement(2,1,"Save password");
+  $passwordTable->AddElement(3,0, new HTOM_Submit("handler","ITB_Users") );
+  $passwordTable->AddElement(3,1, new HTOM_Submit("passwordSubmit","Reject") );
+  $exampleForm->SetContent($passwordTable);
+  $mainGrid->AddElement(3,0,$exampleForm);
+  
+  return $mainGrid;
+}
+
+
+
+$page = new HTOM_Page("The test HTOM page");
+$page->SetContent( Content() );
+echo $page->Evaluate();
+
+?>@

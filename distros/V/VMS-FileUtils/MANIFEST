@@ -1,0 +1,11 @@
+CHANGES
+Makefile.PL
+MANIFEST
+README
+Root/Makefile.PL
+Root/Root.pm
+SafeName/Makefile.PL
+SafeName/SafeName.pm
+t/Root.t
+t/SafeName.t
+META.yml                                 Module meta-data (added by MakeMaker)

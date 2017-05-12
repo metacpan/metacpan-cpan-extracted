@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Video-TeletextDB
+version:      0.02
+version_from: lib/Video/TeletextDB.pm
+installdirs:  site
+requires:
+    DB_File:                       1.75
+    Exporter::Tidy:                0.05
+    HTML::Entities:                0
+    Test::More:                    0.11
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

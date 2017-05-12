@@ -1,0 +1,21 @@
+Revision history for Perl extension Validate::Net.
+
+0.6  Tue  3 Jun 2008
+	- Moving into SVN repository
+	- Upgrading to Module::Install 0.75
+	- Upgrading tests to current usage style
+	- Removing File::Spec dependency
+
+0.5  Thu  4 Dec 2003
+	- Fixed the tests to be Win32 compatible
+
+0.4  missing
+
+0.3  missing
+
+0.2  Mon April 14 8:29:21 2003
+	- Updated to better comply with the RFCs
+
+0.1  Fri July 12 21:01:52 2002
+	- original version
+

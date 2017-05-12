@@ -1,0 +1,46 @@
+<!--#perl 
+  # Load list of log entries
+  my @entries = $logObj->getEntryList($sortCol);
+  
+  my ($x,$y,$header,$newSortCol,$row,$align);
+-->  
+<!-- Start the form and table -->
+<form method="POST" enctype="application/x-www-form-urlencoded"> 
+<table width="620" border="1">
+  <tr>
+<!--#perl
+    for($x = 0; $x < @headers; $x++)
+    {
+      ($header,$align) = split(/\|/,$headers[$x]);
+      $newSortCol = $x + 1;
+      $newSortCol *= -1 if ($sortCol == $newSortCol);
+-->
+      <th>
+        <a href="?sortCol=$newSortCol">$header</a>
+      </th>
+<!--#perl } -->
+      <th>
+        Del
+      </th>
+  </tr>
+<!--#perl 
+  for($x = 0; $x < @entries; $x++)
+  {
+    $row=$entries[$x];
+-->  
+  <tr align="CENTER" valign="CENTER">
+<!--#perl
+    for($y = 0; $y < @headers; $y++)
+    {
+      ($header,$align) = split(/\|/,$headers[$y]);
+      $align = "align=\"$align\"" if ($align);
+-->
+    <td $align>$row->[$y+1]</td>
+<!--#perl } -->
+    <td>
+      <input type="checkbox" name="pos" value="$row->[0]">
+    </td>
+  </tr>
+<!--#perl } -->
+
+

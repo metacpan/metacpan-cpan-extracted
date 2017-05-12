@@ -1,0 +1,125 @@
+2005-11-09 00:00 aakhter
+
+        * release of 1.010. Added samples.
+
+2005-08-13 00:44  aakhter
+
+	* Visio.pm: Filled in abstract and Description
+
+2005-08-13 00:34  aakhter
+
+	* Visio/: Hyperlink.pm, Layout.pm, Line.pm, Master.pm, Page.pm,
+	  PageProps.pm, PageSheet.pm, Shape.pm: * fix for goof of MANIFEST
+	  file (forgot hyperlink, tests still passed, as I was testing in
+	  the wrong directory)
+
+	  * rearrangements of perl doc in various modules to hopefully
+	  satisfy CPAN extractor
+
+2005-08-12 23:20  aakhter
+
+	* MANIFEST: manifast update
+
+2005-08-05 19:03  aakhter
+
+	* LICENSE: add ms lic to lic file
+
+2005-08-05 12:51  aakhter
+
+	* MANIFEST: update of lic files
+
+2005-08-05 12:47  aakhter
+
+	* LICENSE, Visio.pm, Visio/Hyperlink.pm, Visio/Layout.pm,
+	  Visio/Line.pm, Visio/Master.pm, Visio/Page.pm,
+	  Visio/PageProps.pm, Visio/PageSheet.pm, Visio/Shape.pm: license
+	  change before release
+
+2005-07-28 11:07  aakhter
+
+	* Visio.pm, Visio/Hyperlink.pm, Visio/Layout.pm, Visio/Line.pm,
+	  Visio/Master.pm, Visio/Page.pm, Visio/PageProps.pm,
+	  Visio/PageSheet.pm, Visio/Shape.pm: changes after talkinng with
+	  legal
+
+2005-07-19 14:14  aakhter
+
+	* LICENSE, MSPATENTLICENSE, Visio.pm, Visio/Hyperlink.pm,
+	  Visio/Layout.pm, Visio/Line.pm, Visio/Master.pm, Visio/Page.pm,
+	  Visio/PageProps.pm, Visio/PageSheet.pm, Visio/Shape.pm: prep for
+	  export
+
+2005-02-07 11:51  aakhter
+
+	* sample/sample.pl: added sample
+
+2005-02-06 21:43  aakhter
+
+	* Visio/Hyperlink.pm, Visio/Shape.pm, Makefile.PL: support for
+	  hyperlinks
+
+2005-02-06 21:21  aakhter
+
+	* Visio.pm, Visio/Shape.pm: ref different way, better handling of
+	  undefined connects
+
+2005-02-06 19:02  aakhter
+
+	* Visio.pm: strict refs
+
+2005-02-06 18:41  aakhter
+
+	* .cvsignore, Visio/Page.pm: var definition fix
+
+2005-02-06 11:22  aakhter
+
+	* Makefile.PL: make dist
+
+2005-02-06 11:05  aakhter
+
+	* .cvsignore, MANIFEST, Makefile.PL, t/1.t: makefile stuff
+
+2005-02-06 01:29  aakhter
+
+	* Visio/: Page.pm, Shape.pm: basic connection
+
+2005-02-06 00:43  aakhter
+
+	* Visio/: Layout.pm, Line.pm, Shape.pm: line and layout addition
+
+2005-02-06 00:01  aakhter
+
+	* Visio.pm, golden.vsx, Visio/Page.pm, Visio/Master.pm,
+	  Visio/Shape.pm: stencil and baisc shape support
+
+2005-02-05 18:30  aakhter
+
+	* Visio.pm, updateDoc.sh: namespace changes
+
+2005-02-05 14:38  aakhter
+
+	* Visio.pm, updateDoc.sh, visio.pm, Visio/Page.pm,
+	  Visio/PageProps.pm, Visio/PageSheet.pm: file renaming
+
+2005-02-05 13:46  aakhter
+
+	* visio.pm: documentation update
+
+2005-02-01 15:49  aakhter
+
+	* visio.pm: writers
+
+2005-02-01 15:34  aakhter
+
+	* visio.pm: writers
+
+2005-02-01 09:01  aakhter
+
+	* Changes, MANIFEST, Makefile.PL, README, visio.pm, t/1.t: Initial
+	  revision
+
+2005-02-01 09:01  aakhter
+
+	* Changes, MANIFEST, Makefile.PL, README, visio.pm, t/1.t: initial
+	  commit
+

@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+=pod
+
+Look at actual error messages.
+
+=cut
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Verilog::VCD qw(:all);
+
+my @opts = 'a' .. 'z';
+my %opt;
+GetOptions(\%opt, @opts) or die "Error: 1 of these options required: @opts\n";
+%opt                     or die "Error: 1 of these options required: @opts\n";
+
+if (exists $opt{a}) { list_sigs(           ) }   # filename required
+if (exists $opt{b}) { list_sigs( undef     ) }   # die if undef filename
+if (exists $opt{c}) { list_sigs( 'foo.vcd' ) }   # die if file doesn't exist
+if (exists $opt{d}) { parse_vcd(           ) }   # filename required
+if (exists $opt{e}) { parse_vcd( undef     ) }   # die if undef filename
+if (exists $opt{f}) { parse_vcd( 'foo.vcd' ) }   # die if file doesn't exist
+

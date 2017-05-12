@@ -1,0 +1,68 @@
+0.09 2013-08-24
+ - Moved objects to Moo
+ - Moved database to SQLite for easier installation
+ - Changed database interface to DBIx-Class
+ - Eliminated information from database that can be deduced from the file
+   system
+ - Only one file per movie
+ - Eliminated ContentManager
+ - Added scripts to import the schedule from a CSV file
+ - Simplified should_be_playing() to just "if something should be playing
+   now, play it"
+ - Eliminated the "wait list". Before, if movie Foo was scheduled to be
+   played, and movie Bar was still playing, we would try to play movie Foo
+   after Bar was done playing and there was enough time to do so. Now movie
+   Bar is simply skipped.
+
+0.08 2013-06-27
+ - Reenabled most scheduler.t tests
+ - Removed misuse of UNIVERSAL::isa
+ - Switched to dzil and git
+
+0.07 2008-01-12
+ - Added POD docs for AVFile
+ - Changed Movie getTitle() to get_title and added quote overload
+ - Fixed logging in player test (which we skip, but still)
+ - Updated to match changes to Xine interface
+ - Pulled out the Player EventWheel into its own class
+ - Eliminated the whole PlayerBackEnd idea, since it wasn't being used
+ - Documented AVFile
+ - Eliminated AbstractListable superclass, since we currently have only one
+   kind of Listable thing
+ - Inlined the X_DISPLAY constant in Player
+ - Eliminated Listable interface, since we have only one kind of Listable
+   thing.
+
+0.06 2008-01-09
+ - Documented configuration in Video::PlaybackMachine::Config
+ - Refactored much of playback_machine.pl into run() method on V::PM object
+ - Added better general description of PlaybackMachine to V::PM docs
+ - Added new --no-daemonize option
+ - Set up default config file to use '${HOME}' rather than hardcoded to my
+   home directory, and otherwise genericized
+ - Moved script installation to Makefile.PL; eliminated install.sh
+
+0.05 2008-01-07
+ - Moved "Changes" to "ChangeLog"
+ - Enabled expansions in configuration file
+ - Inlined Log4perl configuration file
+ - Added explicit OID to sql
+ - Started to re-create mock session
+ - Removed log files from dist
+
+0.04 2007-12-23
+ - Skipped failing tests - Eliminated all references to development
+   environment
+ - Moved logging initialization to config file and Config module
+ - Cleaned up for RPM packaging
+
+0.03 2005-06-12
+ - Moved all magic constants to configuration file
+ - Separated/centralized database access
+
+0.02 2005-06-03
+ - Initial public release
+
+0.01 2003-07-06
+ - original version; created by h2xs 1.22 with options -AX -n
+   Video::PlaybackMachine

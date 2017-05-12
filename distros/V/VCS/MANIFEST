@@ -1,0 +1,34 @@
+BUGS
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/VCS.pm
+lib/VCS_dev.pod
+lib/VCS/Dir.pm
+lib/VCS/File.pm
+lib/VCS/Version.pm
+lib/VCS/Cvs.pm
+lib/VCS/Cvs/Dir.pm
+lib/VCS/Cvs/File.pm
+lib/VCS/Cvs/Version.pm
+lib/VCS/Rcs.pm
+lib/VCS/Rcs/Dir.pm
+lib/VCS/Rcs/File.pm
+lib/VCS/Rcs/Version.pm
+examples/diff-hist
+examples/diff-releases
+examples/dir-test.pl
+examples/vcsweb/file.gif
+examples/vcsweb/folder.gif
+examples/vcsweb/vcsweb.cgi
+examples/vcsweb/vcsweb.ini
+examples/version-test
+t/00VCS.t
+t/01Rcs.t
+t/01Cvs.t
+t/rcs_testfiles/dir/file
+t/rcs_testfiles/dir/RCS/file,v_for_testing
+t/cvs_testfiles/td/dir/file,v_for_testing
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

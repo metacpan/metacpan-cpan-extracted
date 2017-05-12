@@ -1,0 +1,68 @@
+Revision history for VCS::Lite::Repository
+==========================================
+
+0.12    2015-01-22
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+        - added resources list to META.yml.
+
+0.11    2014-04-13
+        - clean up of code.
+        - documentation updates
+
+0.10    2014-04-08
+        - change file dates changed to meet W3CDTF standards.
+        - new maintainer, Barbie, due to the untimely death of Ivor Williams.
+        - License updated to Artistic License v2.0.
+        - reworked Makefile.PL for clarity.
+	    - added minimum perl version (5.006).
+        - added LICENSE & META.json files.
+        - updated META files.
+        - updated test suite.
+
+0.09    2004-12-12T11:01:25
+        - Fix failing tests. Don't autovivity $parent-{transactions} in 
+          check_out. Remove dependency on Cwd 2.19
+
+0.08    2004-12-05T21:35:47
+        - Major rewrite of shell component - added Term::ReadLine support
+        - VCS::Lite::Shell non-OO API
+        - Change to traverse API
+        - Storable is default store type: distributed example now Storablr
+          not YAML
+
+0.07    2004-11-06T12:36:41
+        - Added VCS::Lite::Store - support for multiple backend stores. 
+        - Fixed VMS platform problems.
+
+0.06    2004-06-13T15:37:25
+        - Fix handling of '.' and '..'
+        - Fix bug to do with cloning a freestanding repository
+          added test 10_freestanding.t
+        - Made methods call Params::Validate
+    	- Tests now use strict
+
+0.05    2004-04-12T20:36:12
+        - Added + hooked in VCS::Lite::Element::Binary
+          support for binary files
+
+0.04    2004-03-20T18:42:04
+        - Fixed remaining VMS problems
+          Now passes all tests on VMS.
+        - Souped up VCShell, added documentation, help, tests
+          sadly shell test doesn't work on platforms that can't fork
+
+0.03    2004-01-25T22:21:13
+        - Fixed Win32 problem: "author not specified" for tests
+        - Refactor common methods into VCS::Lite::Common
+        - Add VCShell to executables list
+        - Implement versioning of repositories
+        - Fix VMS problems
+
+0.02    2004-01-01T15:11:47
+        - Fixed install problem with paths
+        - Added VCShell.pl to the manifest
+
+0.01    2003-12-22T07:38:51
+    	- original version; 
+	      Modules VCS::Lite::Repository and VCS::Lite::Element

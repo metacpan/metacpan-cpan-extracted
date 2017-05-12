@@ -1,0 +1,36 @@
+---
+abstract: 'searches for mp3 on vkontakte.ru, also known as vk.com.'
+author:
+  - 'Aleksander Alekseev <eax@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: VK-MP3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: 2.47
+  HTML::Entities: 3.69
+  JSON::XS: 2.32
+  LWP: 6.04
+  LWP::Protocol::https: 6.03
+  MP3::Info: 1.24
+  Test::Mock::LWP: 0.06
+  Text::Unidecode: 0.04
+  URI::Escape: 3.31
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/afiskon/p5-vk-mp3/issues
+  homepage: http://eax.me/vk-get-mp3/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/afiskon/p5-vk-mp3
+version: 0.11

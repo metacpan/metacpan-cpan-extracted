@@ -1,0 +1,11 @@
+Installation instructions:
+
+1. Install prerequisite Perl modules:
+   * X11::FullScreen
+   * Time::Duration
+   * Video::Xine
+   * App::Config
+   * Image::Imlib2
+
+2. Install prerequisite Unix libraries and packages:
+   * xine-lib

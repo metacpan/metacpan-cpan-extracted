@@ -1,0 +1,17 @@
+Revision history for Perl extension VMS::CMS.
+
+0.3   Dec 31 2012
+	- added license file
+	- makefile.pl now aborts if not running on vms or if
+	  cmsshr.exe is not found.
+
+0.02  Oct 02 2010
+        - added get_message_details
+	- added ability to pass differences output through a perl
+	  subroutine
+	- added handling for 64-bit descriptors and pointers passed
+	  to callbacks
+
+0.01  Mar 31 2008
+	- original release
+

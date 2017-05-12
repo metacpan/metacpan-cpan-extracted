@@ -1,0 +1,162 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.42.02;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?php
+
+//! This is an abstract interface that must be inplemented by each evauable elements of the document
+abstract class HTOM_Element implements HTOM_Evaluable
+{
+  //! Initialize evaluable objest.
+  /*! This function must be called by the realization in order to set the object ID property.
+   * \param $id either the ID object or NULL. If NULL Init method will genetare the ID using HTOM_IDManager.
+   */
+  protected function Init( HTOM_ID $id = NULL)
+    {
+      if (isset($id)) {
+	$this->ID = $id;
+      } else {
+	$this->ID = HTOM_IDManager::ID();
+      }
+      $this->SetAttributes( $this->ID );
+    }
+
+  //! Set the JavaScript action on the specified event.
+  /*! The passed java script action will be boud to the specified 
+   * element action. The java script may contain the {ID} keyword 
+   * that will evaluate to the element ID.
+   */
+  public function SetJSAction( $actinName, HTOM_JScript $js )
+  {
+    $this->jsActions[$actinName]=new HTOM_JScript($js);
+  }
+
+  //! Get the ID of the element.
+  /*! \return Method returns HTOM_ID element that identifies the object.
+   */
+  public function ID()
+    {
+      if ( !isset($this->ID) ) {
+	HTOM_Debug::Out("Warning: The ID has not been initialized!",0);
+      }
+      return $this->ID;
+    }
+
+  //! Set the attribute of for the object.
+  /* \param $attribute either the HTOM_Attribute object or an array of HTOM_Attribute objects.
+   */
+  public function SetAttributes( $attribute )
+    {
+      if (isset($attribute)) {
+	if (is_array($attribute)) {
+	  reset($attribute);
+	  $a = current($attribute);
+	  while($a) {
+	    $this->SetAttributes( $a );
+	    $a = next($attribute);
+	  }
+	} else if ($attribute instanceof HTOM_Attribute)	{
+	  $this->attributes[$attribute->Name()]=$attribute;
+	}
+      }
+    }
+  
+  //! Get the list of attrinutes
+  /* \return an array of HTOM_Attribute objects */
+  public function GetAttributes()
+  {
+    return $this->attributes;
+  }
+
+  //! Get the attribute by name.
+  public function GetAttribute( $name )
+    {
+      return $this->attributes[$name];
+    }
+
+  //! Remove the atribute of given name from the object.
+  public function RemoveAttribute($name)
+    {
+      $this->attributes[$name]=NULL;
+    }
+
+  //! Evaluate all atributes to one HTML string
+  protected function Attributes()
+  {
+    $rc = " ";
+    $a = current($this->attributes);
+    while($a) {
+      $rc.=$a->Evaluate();
+      $a = next($this->attributes);
+    }
+    $rc .= " ";
+
+    $act = $this->jsActions;
+    reset($act);
+    while (current($act))
+      {
+	$actName = key($act);
+	$script = current($act);
+	$script->SetKeywordValue( "ID", $this->ID->getValue());
+	$rc.=" ".$actName."=\"".$script->Evaluate()."\" ";
+	next($act);
+      }
+    
+    return $rc;
+  }
+
+  private $attributes = array();
+  private $ID;
+  private $jsActions = array();
+}
+
+?>@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d17 1
+d30 3
+a32 1
+  //! Get the ID of the element. The ID may be used in the java script
+@
+

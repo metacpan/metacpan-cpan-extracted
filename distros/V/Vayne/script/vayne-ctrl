@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+use Getopt::Long;
+use Pod::Usage;
+use Vayne::Zk;
+use List::Util qw(all);
+use Sys::Hostname;
+
+my %opt;
+ 
+GetOptions(\%opt, qw(region=s regions info switch delete host=s set server=s password=s ) ) or pod2usage(2);
+
+my $zk = Vayne::Zk->new();
+
+
+if(all{ $opt{$_} }qw(region switch))
+{
+    $opt{host} ||= hostname;
+    $zk->switch($opt{region}, $opt{host});
+    exec "$0 --regions";
+
+}elsif( $opt{delete} && $opt{region}){
+
+    $zk->delete_region($opt{region});
+    system "$0 --regions";
+
+
+
+}elsif( all{ $opt{$_} }qw( region set server password ) ){
+
+    $zk->define($opt{region}, { server => $opt{server}, password => $opt{password} });
+    system("$0 --regions");
+
+}elsif( keys %opt <= 2 and all{ $opt{$_} }qw(region) ){
+
+    my %region = $zk->meta;
+    print "$opt{region}:\n";
+    %region = %{ $region{ $opt{region} } };
+    while(my($host, $hash) = each %region)
+    {
+        next if $opt{host} && $opt{host} ne $host;
+        print "\t$host\n";
+        while(my($worker, $status) = each %$hash)
+        {
+            next unless $status->{real} && $status->{real} ne '0';
+            printf "\t\t%s: %d (%s)\n", $worker, $status->{real}, join ' ', @{$status->{ proc }};
+        }
+    }
+
+}elsif($opt{regions}){
+
+    my %region = $zk->meta;
+    while(my($region, $hash) = each %region)
+    {
+        print "$region:\n";
+        print "\t $_\n"for keys %$hash;
+    }
+
+}elsif($opt{info}){
+
+    my (%region, $host, $region) = $zk->meta;
+    $host = $opt{host}||hostname;
+    ($region) = grep{ $region{$_}->{$host} }keys %region;
+    $region ? system "$0 --region $region --host $host" : print "$host not belong to any region\n" ;
+
+}elsif( $opt{delete}){
+
+    print "delete $_\n" for $zk->delete($opt{host});
+    $opt{host} ? system "$0 --info --host $opt{host}" :  system "$0 --info";
+
+}else{
+
+    pod2usage(1);
+}
+
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+vayne-ctrl - vayne control script to maintain region info.
+
+=head1 SYNOPSIS
+
+
+  Switch host to region
+    $0 --region foo --switch --host hostname
+
+  Delete region information
+    $0 --delete  --region region
+
+  Set region redis server
+    $0 --region foo --set --server redisserver:port --password redispasswd
+
+  Show region running information
+    $0 --region foo
+    $0 --region foo --host hostname
+
+  Show region information
+    $0 --regions
+
+  Show worker information
+    $0 --info
+    $0 --info  --host hostname
+
+  Delete host region information
+    $0 --delete
+    $0 --delete  --host hostname
+
+=cut

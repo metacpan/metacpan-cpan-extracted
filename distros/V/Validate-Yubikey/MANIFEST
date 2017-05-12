@@ -1,0 +1,8 @@
+Build.PL
+lib/Validate/Yubikey.pm
+t/Yubikey.t
+MANIFEST			This list of files
+META.yml
+META.json
+README
+CHANGES

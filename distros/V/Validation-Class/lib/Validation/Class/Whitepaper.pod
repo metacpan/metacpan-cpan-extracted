@@ -1,0 +1,674 @@
+# PODNAME: Validation::Class::Whitepaper
+# ABSTRACT: Operate with Impunity
+
+# VERSION
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Validation::Class::Whitepaper - Operate with Impunity
+
+=head1 VERSION
+
+version 7.900057
+
+=head1 INTRODUCTION
+
+This whitepaper will serves as a guide to help readers understand the common
+data validation issues as well as the the rationale and various usage scenarios
+for Validation::Class.
+
+Data validation is an important aspect of every application yet it is often
+overlooked or neglected. Data validation should be thought of as your data input
+firewall, a layer that exist between the user of your application and the
+application's business objects.
+
+=head1 DATA VALIDATION PROBLEMS
+
+The most common application security weakness is the failure to properly
+validate input from the client or environment. Data validation is important
+because it provides security, it allows you to ensure user supplied data is
+formatted properly, is within length boundaries, contains permitted characters
+and adheres to business rules.
+
+To understand the problem domain we need to first ask ourselves:
+
+    * what is data validation? and ... is that what I've been doing?
+    * what are the common data validation requirements?
+    * what are the common use-cases where validation becomes tricky?
+
+Data validation is the process of auditing a piece of data to ensure it fits a
+specific criteria. Standard data validation requirements are:
+
+    * existence checking
+    * range checking
+    * type checking
+    * list-lookup checking
+    * dependency checking
+    * pattern checking
+    * custom validation checking (business logic)
+
+Typically when designing an application we tend to name input parameters in an
+arbitrarily fashion and validate the same data at various stages during a
+program's execution (duplicating logic and validation routines) in various
+places in the application stack. This approach is inefficient and prone to bugs,
+inconsistencies and security problems.
+
+Data can be submitted to an application in various formats and it is not always
+ideal, and the option to pre-format the data is not always ideal or even
+possible. A few common use-cases were validation is required and often fails
+(in a big big way) are as follows:
+
+    * handling arbitrarily and/or dynamically-named parameters
+    * handling input for batch-processing
+    * handling multi-type parameters (array or scalar depending on context)
+    * handling complex conditional validation logic
+    * handling multi-variant parameter names (aliases)
+    * handling parameter dependencies
+    * handling errors (reporting messages, localization, etc)
+
+=head1 A DATA VALIDATION SOLUTION
+
+A better approach to data validation is to first consider each parameter hitting
+your application as a transmission fitting a very specific criteria and
+construct a data validation layer that operates with that in mind
+(e.g. exactly like a network firewall). Your data validation rules should act
+as filters which will accept or reject and format the transmission for use
+within your application.
+
+A proper validation framework should allow you to model data and construct
+validation objects with a focus on structuring rules, reusing common declarations,
+defining input filters and validating data. Its main purpose should be to
+properly handle data input errors. It's ulterior motive should be to ensure
+consistency and promote reuse of data validation rules.
+
+=head1 WHY VALIDATION::CLASS
+
+Validation::Class was built around the concept of compartmentalization and
+re-use. That premise gave birth to the idea of persistent data validation rules
+which exist in a class configuration which is associated with a class which acts
+as a validation domain for related validation rules.
+
+Validation classes derived from Validation::Class are typically configured using
+the Validation::Class sugar functions (or keywords). Validation classes are
+typically defined using the following keywords:
+
+    * field     - a data validation rule that matches an input parameter
+    * mixin     - a configuration template which can be merged with a field
+    * directive - a field/mixin rule corresponding to a directive class name
+    * filter    - a custom filtering routine which transforms a field value
+    * method    - a self-validating sub-routine w/ associated validation profile
+
+A data validation framework exists to handle failures, it is its main function
+and purpose, in-fact, the difference between a validation framework and a
+type-constraint system is how it responds to errors.
+
+There are generally two types of errors that occur in an application,
+user-errors which are expected and should be handled and reported so that a user
+can correct the problem, and system-errors which are unexpected and should cause
+the application to terminate and/or handling the exception. Exception handling
+is the process of responding to the occurrence, during computation, of
+exceptions (anomalous or exceptional situations).
+
+User errors and system errors are poplar opposites. It is not always desired
+and/or appropriate to crash from a failure to validate user input. The following
+examples should clearly display how Validation::Class addresses key pain-points
+and handles common use-cases were validation is usually quite arduous.
+
+=head2 Dynamic Parameters
+
+    # handling arbitrary and/or dynamically-named parameters
+
+    package DynamicParameters;
+
+    use Validation::Class;
+
+    field email     => {
+        required    => 1,
+        pattern     => qr/\@localhost$/
+    };
+
+    field login     => {
+        required    => 1,
+        min_length  => 5,
+        alias       => ['user']
+    };
+
+    field password  => {
+        required    => 1,
+        min_length  => 5,
+        min_digits  => 1,
+        alias       => ['pass']
+    };
+
+    package main;
+
+    my $params = {
+        user    => 'admin',             # arbitrary
+        pass    => 's3cret',            # arbitrary
+        email_1 => 'admin@localhost',   # dynamic created
+        email_2 => 'root@localhost',    # dynamic created
+        email_3 => 'sa@localhost',      # dynamic created
+    };
+
+    my $dp = DynamicParameters->new(params => $params);
+
+    $dp->proto->clone_field('email', $_)
+        for $dp->params->grep(qr/^email/)->keys
+    ;
+
+    print $dp->validate ? "OK" : "NOT OK";
+
+    1;
+
+=head2 Batch-Processing
+
+    # handling input for batch-processing
+
+    package BatchProcessing;
+
+    use Validation::Class;
+
+    mixin scrub     => {
+        required    => 1,
+        filters     => ['trim', 'strip']
+    };
+
+    field header    => {
+        mixin       => 'scrub',
+        options     => ['name', 'email', 'contact', 'dob', 'country'],
+        multiples   => 1 # handle param as a scalar or arrayref
+    };
+
+    field name      => {
+        mixin       => 'scrub',
+        filters     => ['titlecase'],
+        min_length  => 2
+    };
+
+    field email     => {
+        mixin       => 'scrub',
+        min_length  => 3
+    };
+
+    field contact   => {
+        mixin       => 'scrub',
+        length      => 10
+    };
+
+    field dob       => {
+        mixin       => 'scrub',
+        length      => 8,
+        pattern     => '##/##/##'
+    };
+
+    field country   => {
+        mixin       => 'scrub'
+    };
+
+    package main;
+
+    my $params = {
+        pasted_data => q{
+            name	email	contact	dob	country
+            john	john@zuzu.com	9849688899	12/05/98	UK
+            jim kathy	kjim@zuz.com	8788888888	05/07/99	India
+            Federar	fed@zuzu.com	4484848989	11/21/80	USA
+            Micheal	micheal@zuzu.com	6665551212	06/10/87	USA
+            Kwang Kit	kwang@zuzu.com	7775551212	07/09/91	India
+            Martin	jmartin@zuzu.com	2159995959	02/06/85	India
+            Roheeth	roheeth@zuzu.com	9596012020	01/10/89	USA
+        }
+    };
+
+    # ... there are many ways this could be parsed and validated
+    # ... but this is simple
+
+    my $bpi = my @pasted_lines = map { s/^\s+//; $_ } split /\n/, $params->{pasted_data};
+    my @headers = split /\t/, shift @pasted_lines;
+
+    my $bp  = BatchProcessing->new(params => { header => [@headers] });
+
+    # validate headers first
+
+    if ($bp->validate) {
+
+        $bp->params->clear;
+
+        $bpi--;
+
+        # validate each line, halt on first bad line
+
+        while (my $line = shift @pasted_lines) {
+
+            my @data = split /\t/, $line;
+
+            for (my $i=0; $i<@data; $i++) {
+
+                $bp->params->add($headers[$i], $data[$i]);
+
+            }
+
+            last unless $bp->validate;
+
+            $bp->params->clear;
+
+            $bpi--;
+
+        }
+
+    }
+
+    print ! $bpi ? "OK" : "NOT OK";
+
+    1;
+
+=head2 Multi-Type Parameters
+
+    # handling multi-type parameters (array or scalar depending on context)
+
+    package MultiType;
+
+    use Validation::Class;
+
+    field letter_type => {
+
+        required  => 1,
+        options   => [ 'A' .. 'Z' ],
+        multiples => 1 # turn on multi-type processing
+
+    };
+
+    package main;
+
+    my $mt = MultiType->new;
+    my $ok = 0;
+
+    $mt->params->add(letter_type => 'A');
+
+    $ok++ if $mt->validate;
+
+    $mt->params->clear->add(letter_type => ['A', 'B', 'C']);
+
+    $ok++ if $mt->validate;
+
+    print $ok == 2 ? "OK" : "NOT OK";
+
+    1;
+
+=head2 Complex Conditions
+
+    # handling complex conditional validation logic
+
+    package ComplexCondition;
+
+    use Validation::Class;
+
+    mixin scrub      => {
+        required     => 1,
+        filters      => ['trim', 'strip']
+    };
+
+    mixin flag       => {
+        length       => 1,
+        options      => [0, 1]
+    };
+
+    field first_name => {
+        mixin        => 'scrub',
+        filters      => ['titlecase']
+    };
+
+    field last_name  => {
+        mixin        => 'scrub',
+        filters      => ['titlecase']
+    };
+
+    field role       => {
+        mixin        => 'scrub',
+        filters      => ['titlecase'],
+        options      => ['Client', 'Employee', 'Administrator'],
+        default      => 'Client'
+    };
+
+    field address    => {
+        mixin        => 'scrub',
+        required     => 0,
+        depends_on   => ['city', 'state', 'zip']
+    };
+
+    field city       => {
+        mixin        => 'scrub',
+        required     => 0,
+        depends_on   => 'address'
+    };
+
+    field state      => {
+        mixin        => 'scrub',
+        required     => 0,
+        length       => '2',
+        pattern      => 'XX',
+        depends_on   => 'address'
+    };
+
+    field zip        => {
+        mixin        => 'scrub',
+        required     => 0,
+        length       => '5',
+        pattern      => '#####',
+        depends_on   => 'address'
+    };
+
+    field has_mail   => {
+        mixin        => 'flag'
+    };
+
+    profile 'registration' => sub {
+
+        my ($self) = @_;
+
+        # address info not required unless role is client or has_mail is true
+
+        return unless $self->validate('has_mail');
+
+        $self->queue(qw/first_name last_name/);
+
+        if ($self->param('has_mail') || $self->param('role') eq 'Client') {
+
+            # depends_on directive kinda makes city, state and zip required too
+            $self->queue(qw/+address/);
+
+        }
+
+        my $ok = $self->validate;
+
+        $self->clear_queue;
+
+        return $ok;
+
+    };
+
+    package main;
+
+    my $ok = 0;
+    my $mt;
+
+    $mt = ComplexCondition->new(
+        first_name => 'Rachel',
+        last_name  => 'Green'
+    );
+
+    # defaults to client, missing address info
+    $ok++ if ! $mt->validate_profile('registration');
+
+    $mt = ComplexCondition->new(
+        first_name => 'monica',
+        last_name  => 'geller',
+        role       => 'employee'
+    );
+
+    # filters (pre-process) role and titlecase, as employee no address needed
+    $ok++ if $mt->validate_profile('registration');
+
+    $mt = ComplexCondition->new(
+        first_name => 'phoebe',
+        last_name  => 'buffay',
+        address    => '123 street road',
+        city       => 'nomans land',
+        state      => 'zz',
+        zip        => '54321'
+    );
+
+    $ok++ if $mt->validate_profile('registration');
+
+    print $ok == 3 ? "OK" : "NOT OK";
+
+    1;
+
+=head2 Multi-Variant Parameters
+
+    # handling multi-variant parameter names (aliases)
+
+    package MultiName;
+
+    use Validation::Class;
+
+    field login => {
+
+        required    => 1,
+        min_length  => 5, # must be 5 or more chars
+        min_alpha   => 1, # must have at-least 1 alpha char
+        min_digits  => 1, # must have at-least 1 digit char
+        min_symbols => 1, # must have at-least 1 non-alphanumeric char
+        alias       => [
+            'signin',
+            'username',
+            'email',
+            'email_address'
+        ]
+
+    };
+
+    package main;
+
+    my $ok = 0;
+
+    # fail
+    $ok++ if ! MultiName->new(login => 'miso')->validate;
+
+    # nice
+    $ok++ if MultiName->new(login => 'm!s0_soup')->validate;
+
+    # no signin field exists, however, the alias directive pre-processing DWIM
+    $ok++ if MultiName->new(signin => 'm!s0_soup')->validate;
+
+    # process aliases
+    $ok++ if MultiName->new(params => {signin        => 'm!s0_soup'})->validate;
+    $ok++ if MultiName->new(params => {username      => 'm!s0_soup'})->validate;
+    $ok++ if MultiName->new(params => {email         => 'm!s0_soup'})->validate;
+    $ok++ if MultiName->new(params => {email_address => 'm!s0_soup'})->validate;
+
+    print $ok == 7 ? "OK" : "NOT OK";
+
+    1;
+
+=head2 Parameter Dependencies
+
+    # handling parameter dependencies
+
+    package ParamDependencies;
+
+    use Validation::Class;
+
+    mixin scrub      => {
+        required     => 1,
+        filters      => ['trim', 'strip']
+    };
+
+    mixin flag       => {
+        length       => 1,
+        options      => [0, 1]
+    };
+
+    field billing_address => {
+        mixin        => 'scrub',
+        required     => 1,
+        depends_on   => ['billing_city', 'billing_state', 'billing_zip']
+    };
+
+    field billing_city => {
+        mixin        => 'scrub',
+        required     => 0,
+        depends_on   => 'billing_address'
+    };
+
+    field billing_state => {
+        mixin        => 'scrub',
+        required     => 0,
+        length       => '2',
+        pattern      => 'XX',
+        depends_on   => 'billing_address'
+    };
+
+    field billing_zip => {
+        mixin        => 'scrub',
+        required     => 0,
+        length       => '5',
+        pattern      => '#####',
+        depends_on   => 'billing_address'
+    };
+
+    field shipping_address => {
+        mixin_field  => 'billing_address',
+        depends_on   => ['shipping_city', 'shipping_state', 'shipping_zip']
+    };
+
+    field shipping_city => {
+        mixin_field  => 'billing_city',
+        depends_on   => 'shipping_address'
+    };
+
+    field shipping_state => {
+        mixin_field  => 'billing_state',
+        depends_on   => 'shipping_address'
+    };
+
+    field shipping_zip => {
+        mixin_field  => 'billing_zip',
+        depends_on   => 'shipping_address'
+    };
+
+    field same_billing_shipping => {
+        mixin        => 'flag'
+    };
+
+    profile 'addresses' => sub {
+
+        my ($self) = @_;
+
+        return unless $self->validate('same_billing_shipping');
+
+        # billing and shipping address always required
+        $self->validate(qw/+billing_address +shipping_address/);
+
+        # address must match if option is selected
+        if ($self->param('same_billing_shipping')) {
+
+            foreach my $param ($self->params->grep(qr/^shipping_/)->keys) {
+
+                my ($suffix) = $param =~ /^shipping_(.*)/;
+
+                my $billing  = $self->param("billing_$suffix");
+                my $shipping = $self->param("shipping_$suffix");
+
+                # shipping_* must match billing_*
+                unless ($billing eq $shipping) {
+                    $self->errors->add(
+                        "Billing and shipping addresses do not match"
+                    );
+                    last;
+                }
+
+            }
+
+        }
+
+        return $self->error_count ? 0 : 1;
+
+    };
+
+    package main;
+
+    my $ok = 0;
+    my $pd;
+
+    $pd = ParamDependencies->new(
+        billing_address => '10 liberty boulevard',
+        billing_city    => 'malvern',
+        billing_state   => 'pa',
+        billing_zip     => '19355'
+    );
+
+    # missing shipping address info
+    $ok++ if ! $pd->validate_profile('addresses');
+
+    $pd = ParamDependencies->new(
+        billing_address  => '10 liberty boulevard',
+        billing_city     => 'malvern',
+        billing_state    => 'pa',
+        billing_zip      => '19355',
+
+        shipping_address => '301 cherry street',
+        shipping_city    => 'pottstown',
+        shipping_state   => 'pa',
+        shipping_zip     => '19464'
+    );
+
+    $ok++ if $pd->validate_profile('addresses');
+
+    $pd = ParamDependencies->new(
+        billing_address  => '10 liberty boulevard',
+        billing_city     => 'malvern',
+        billing_state    => 'pa',
+        billing_zip      => '19355',
+
+        same_billing_shipping => 1,
+
+        shipping_address => '301 cherry street',
+        shipping_city    => 'pottstown',
+        shipping_state   => 'pa',
+        shipping_zip     => '19464'
+    );
+
+    # billing and shipping don't match
+    $ok++ if ! $pd->validate_profile('addresses');
+
+    $pd = ParamDependencies->new(
+        billing_address  => '10 liberty boulevard',
+        billing_city     => 'malvern',
+        billing_state    => 'pa',
+        billing_zip      => '19355',
+
+        same_billing_shipping => 1,
+
+        shipping_address => '10 liberty boulevard',
+        shipping_city    => 'malvern',
+        shipping_state   => 'pa',
+        shipping_zip     => '19355'
+    );
+
+    $ok++ if $pd->validate_profile('addresses');
+
+    print $ok == 4 ? "OK" : "NOT OK";
+
+    1;
+
+=head1 GETTING STARTED
+
+If you are looking for a simple way to get started with L<Validation::Class>,
+please review L<Validation::Class::Simple>. The instructions contained there
+are also relevant for configuring any class derived from L<Validation::Class>.
+
+=head1 ADDITIONAL INSIGHT
+
+The following L<screencast|http://youtu.be/YCPViiB5jv0> and/or
+L<slideshow|http://www.slideshare.net/slideshow/embed_code/9632123> explains
+what L<Validation::Class> is, why it was created, and what it has to offer.
+Please note that this screencast and slideshow was created many moons ago and
+some of its content may be a bit outdated.
+
+=head1 AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

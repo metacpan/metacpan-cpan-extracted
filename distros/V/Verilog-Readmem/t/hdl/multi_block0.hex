@@ -1,0 +1,27 @@
+// Several address corner cases.
+// @ followed by whitespace or comments or underscores all behave like
+// address 0x0 by the major simulators.
+
+
+// this block will begin at address 0x0:
+5 4 3 2 1
+
+// this block will also begin at address 0x0
+// @ followed by whitespace 
+@ a b c
+
+// this block will also begin at address 0x0
+// @ followed by an underscore
+@_
+0 
+9
+
+
+00000003
+
+// this block will also begin at address 0x0
+// @ followed by a comment
+@/* comment */2 4 6 8
+
+
+

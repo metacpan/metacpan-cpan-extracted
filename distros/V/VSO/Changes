@@ -1,0 +1,110 @@
+
+Changelog for VSO
+
+2012-05-07      v0.025
+  - DEPRECATED do not use.
+
+2012-02-22      v0.024
+  - Changed 'use VSO asa => "Foo::Class"' to 'use VSO extends => "Foo::Class"'
+  - Documented the compile-time version of multiple-inheritance also: 'use VSO => [qw( Foo Bar )]'
+  - Updated POD to explain just a tiny bit what's going on here.
+
+2012-02-19      v0.023
+  - Added special import arg 'use VSO asa => "Foo::Class"' and 'use VSO asa => [qw(Foo::Class Bar::Class)]'
+  - Classes that use VSO with the special 'asa' arg will inherit from the classes
+    listed at *COMPILE TIME*.
+  - 'asa' works the same way as 'extends', but instead of during runtime, it happens
+    during compilation.
+
+2012-01-04      v0.022
+  - Maybe[Foo] works as expected (now).
+
+2011-12-21      v0.021
+  - Maybe[Foo] works.  Becomes Undef|Foo internally.
+  - Various minor internal fixes and tweaks around type-checking and validation.
+  - Slight performance boost of about 10%.
+
+2011-12-20      v0.020
+  - Handling of (required => 0) works properly now.
+
+2011-12-14      v0.019
+  - Fixed errant pod.
+
+2011-12-13      v0.018
+  - Fixed odd/even test, updated pod.
+
+2011-12-13      v0.017
+  - Updated POD and added odd/even test.
+
+2011-12-13      v0.016
+  - Added named enum support.
+  - enum 'DayOfWeek' => [qw( Sun Mon Tue Wed Thu Fri Sat )];
+
+2011-12-11      v0.015
+  - The default value was not being properly initialized for new objects.
+
+2011-12-11      v0.014
+  - Fixed 'resources' part of META.yml
+
+2011-12-10      v0.013
+  - Moved development to github
+  - Updated META.yml
+
+2011-12-09      v0.012
+  - Updated the way we deal with subtypes.
+  - 'HashRef[Foo]' is translated -> 'HashRef::of::Foo' and isa HashRef,
+    same goes for ArrayRef[Foo] -> ArrayRef::of::Foo
+  - Basic benchmark shows major speed improvement over v0.011.
+
+2011-12-04      v0.011
+  - Almost a total rewrite.
+  - Type-checking was overhauled.
+  - Major speed degredation.
+
+2011-12-03      v0.010
+  - Type-checking is still a work-in-progress.  Another rewrite might just do it.
+  - Updated description in POD to not be snarky.
+
+2011-12-02      v0.009
+  - Type-checking was re-written.
+  - Subtypes are implemented "correctly".
+  - The full* Moose type-hierarchy is implemented.
+    * excluding RoleName and Maybe[`a]
+  - Added test for leaking memory.
+
+2011-11-30      v0.008
+  - wantarray is correctly preserved for before/after wrapped subs.
+
+2011-11-30      v0.007
+  - Now 'before' and 'after' can be used on subs as well as attributes.
+
+2011-11-29      v0.006
+  - Added subtypes.
+
+2011-11-29      v0.005
+  - Fixed some minor issues with validating new values for object fields.
+
+2011-11-28      v0.004
+  - Updated SYNOPSIS in POD.
+  - Added 'where' checking.
+  - For 'where', $_ is localized to the yet-to-be-validated value and $_[0] is the
+    object to which the attribute (which is validating the value) belongs.
+  - Several tweaks here and there.
+
+2011-11-19      v0.003
+  - Value type-checking on constructor now works.
+  - 'before' and 'after' attribute modifiers now work.
+  - Not yet as fast as I want it to be.
+  - Type-checking now works for things like:
+    isa => 'ArrayRef[My::Thing]'
+    - and -
+    isa => 'HashRef[My::Thing]'
+  - Type-checking slows things down...a lot.
+
+2011-11-17      v0.002
+  - Fixed recursive depency issue.
+
+2011-11-17      v0.001
+  - Initial release.
+  - God help us.
+

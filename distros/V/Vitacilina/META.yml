@@ -1,0 +1,34 @@
+---
+abstract: '¡Ah, qué buena medicina!'
+author:
+  - 'David Moreno, david@axiombox.com. Alexandr Ciornii contributed with'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vitacilina
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Data::Dumper: 0
+  DateTime: 0
+  LWP::UserAgent: 0
+  Template: 0
+  URI: 0
+  XML::Feed: 0.41
+  YAML::Syck: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/damog/vitacilina/tree
+version: 0.2

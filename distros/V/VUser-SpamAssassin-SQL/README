@@ -1,0 +1,7 @@
+$Id: README,v 1.1 2007/04/11 21:42:45 perlstalker Exp $
+
+VUser-SpamAssassin-SQP is an extension to vuser to manage SpamAssassin settings stored in an SQL database.
+
+AUTHOR
+
+Randy Smith <perlstalker@vuser.org>

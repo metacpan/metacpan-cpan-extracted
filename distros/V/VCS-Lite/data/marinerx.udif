@@ -1,0 +1,41 @@
+--- data/mariner.txt 
++++ data/marinerx.txt 
+@@ -1,7 +1,7 @@
+ It is an ancient Mariner,
+ And he stoppeth one of three.
+ "By thy long grey beard and glittering eye,
+-Now wherefore stopp'st thou me?
++Now wherefore stoppest thou me?
+ 
+ "The Bridegroom's doors are opened wide,
+ And I am next of kin;
+@@ -18,10 +18,5 @@
+ And listens like a three years child:
+ The Mariner hath his will.
+ 
+-The Wedding-Guest sat on a stone:
+-He cannot chuse but hear;
+-And thus spake on that ancient man,
+-The bright-eyed Mariner.
+-
+ The ship was cheered, the harbour cleared,
+ Merrily did we drop
+@@ -35,6 +30,7 @@
+ 
+ Higher and higher every day,
+ Till over the mast at noon--
++Wondering about the wretched loon
+ The Wedding-Guest here beat his breast,
+ For he heard the loud bassoon.
+ 
+@@ -92,8 +88,8 @@
+ 
+ In mist or cloud, on mast or shroud,
+ It perched for vespers nine;
+-Whiles all the night, through fog-smoke white,
+-Glimmered the white Moon-shine.
++While all the night, through fog-smoke white,
++Glimmered the white Moonshine.
+ 
+ "God save thee, ancient Mariner!
+ From the fiends, that plague thee thus!--

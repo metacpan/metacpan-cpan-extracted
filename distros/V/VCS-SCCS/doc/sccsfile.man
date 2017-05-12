@@ -1,0 +1,264 @@
+
+
+
+ ssccccssffiillee((44))                                                     ssccccssffiillee((44))
+
+
+
+
+ NNAAMMEE
+      sccsfile − format of SCCS file
+
+ DDEESSCCRRIIPPTTIIOONN
+      An SCCS file is an ASCII file consisting of six logical parts:
+
+           [4mchecksum[24m       Sum of all characters in the file except the first
+                          line.
+           [4mdelta[24m [4mtable[24m    Contains information about each delta.
+           [4muser[24m [4mnames[24m     Login names and/or numerical group IDs of users
+                          who are allowed to add deltas.
+           [4mflags[24m          Definitions of internal keywords.  [4mcomments[0m
+                          Arbitrary descriptive information about the file.
+           [4mbody[24m           Actual text lines intermixed with control lines.
+
+      Throughout an SCCS file there are lines beginning with the ASCII SOH
+      (start of heading) character (octal 001).  This character is hereafter
+      referred to as the [1mcontrol character [22mand is represented graphically as
+      [1m@[22m.  Any line described below that is not depicted as beginning with
+      the control character is prevented from beginning with the control
+      character.  All lines in the SCCS file are limited to [1mBUFSIZ [22m(defined
+      in <[1mstdio.h[22m>) characters in length.
+
+      Entries of the form [4mDDDDD[24m represent a five‐digit string (a number
+      between 00000 and 99999).
+
+      The following describes each logical part of an SCCS file detail:
+
+           [4mChecksum[0m
+                The checksum is the first line of an SCCS file.  The form of
+                the line is:
+
+                     [1m@h[4m[22mDDDDD[0m
+
+                The value of the checksum is the sum of all characters
+                except those in the first line.  The [1m@h [22msequence provides a
+                [1mmagic number [22mconsisting of the two bytes 0x01 and 0x68.
+                (Other versions of UNIX‐like operating systems usually use
+                this same value but it may be displayed or documented as a
+                single number with a different byte order.)
+
+           [4mDelta[24m [4mtable[0m
+                The delta table consists of a variable number of entries of
+                the form:
+
+                     [1m@s  [4m[22mDDDDD/DDDDD/DDDDD[0m
+                     [1m@d [4m[22m<type>[24m [4m<SID>[24m  [4myr/mo/da[24m [4mhr:mi:se[24m  [4m<pgmr>[24m [4mDDDDD[24m [4mDDDDD[0m
+                     [1m@i [4m[22mDDDDD[24m [4m...[0m
+                     [1m@x [4m[22mDDDDD[24m [4m...[0m
+                     [1m@g [4m[22mDDDDD[24m [4m...[0m
+                     [1m@m [4m[22m<MR[24m [4mnumber>[0m
+
+
+
+ Hewlett‐Packard Company            ‐ 1 ‐  HP‐UX Release 11.00: October 1997
+
+
+
+
+
+
+ ssccccssffiillee((44))                                                     ssccccssffiillee((44))
+
+
+
+
+                        .
+                        .
+                        .
+                     [1m@c [4m[22m<comments>[24m [4m...[0m
+                        .
+                        .
+                        .
+                     [1m@e[0m
+
+                The first line ([1m@s[22m) contains the number of lines
+                inserted/deleted/unchanged, respectively.  The second line
+                ([1m@d[22m) contains the type of the delta (currently, normal: [1mD[22m,
+                and removed: [1mR[22m), the [4mSID[24m (SCCS ID) of the delta, the date
+                and time when the delta was created, the login name
+                corresponding to the real user ID at the time the delta was
+                created, and the serial numbers of the delta and its
+                predecessor, respectively.
+
+                The [1m@i[22m, [1m@x[22m, and [1m@g [22mlines contain the serial numbers of
+                deltas included, excluded, and ignored, respectively.  These
+                lines are optional.
+
+                The [1m@m [22mlines (optional) each contain one MR (modification
+                request) number associated with the delta; the [1m@c [22mlines
+                contain comments associated with the delta.
+
+                The [1m@e [22mline ends the delta table entry.
+
+           [4mUser[24m [4mnames[0m
+                The list of login names and/or numerical group IDs of users
+                who are allowed to add deltas to the file, separated by new‐
+                lines.  The lines containing these login names and/or
+                numerical group IDs are surrounded by the bracketing lines
+                [1m@u [22mand [1m@U[22m.  An empty list allows anyone to make a delta.
+                Any line starting with a [1m!  [22mprohibits the specified group or
+                user from making deltas.
+
+           [4mFlags[0m
+                Keywords used internally (see [4madmin[24m(1) for more information
+                on their use).  Each flag line takes the form:
+
+                     [1m@f [4m[22m<flag>[24m     [4m<optional[24m [4mtext>[0m
+
+                The following flags are defined:
+
+                     [1m@f t [4m[22m<type[24m [4mof[24m [4mprogram>[0m
+                     [1m@f v [4m[22m<program[24m [4mname>[0m
+                     [1m@f i [4m[22m<keyword[24m [4mstring>[0m
+                     [1m@f b[0m
+                     [1m@f m [4m[22m<module[24m [4mname>[0m
+                     [1m@f f [4m[22m<floor>[0m
+
+
+
+ Hewlett‐Packard Company            ‐ 2 ‐  HP‐UX Release 11.00: October 1997
+
+
+
+
+
+
+ ssccccssffiillee((44))                                                     ssccccssffiillee((44))
+
+
+
+
+                     [1m@f c [4m[22m<ceiling>[0m
+                     [1m@f d [4m[22m<default‐sid>[0m
+                     [1m@f n[0m
+                     [1m@f j[0m
+                     [1m@f l [4m[22m<lock‐releases>[0m
+                     [1m@f q [4m[22m<user[24m [4mdefined>[0m
+                     [1m@f z [4m[22m<reserved[24m [4mfor[24m [4muse[24m [4min[24m [4minterfaces>[0m
+
+                The above flags function as follows:
+
+                     [1mt    [22mDefines the replacement for the [1m%Y% [22midentification
+                          keyword.
+
+                     [1mv    [22mControls prompting for MR numbers in addition to
+                          comments.  If the optional text is present, it
+                          defines an MR number‐validity checking program.
+
+                     [1mi    [22mControls the warning/error aspect of the ‘‘No id
+                          keywords’’ message.  When the [1mi [22mflag is not
+                          present, the message is only a warning; when the [1mi[0m
+                          flag is present, this message causes a fatal error
+                          (a [4mget[24m on the file fails, or the delta is not
+                          made).
+
+                     [1mb    [22mWhen the [1mb [22mflag is present, the [1m−b [22mkeyletter can
+                          be used on the [4mget[24m command to cause a branch in
+                          the delta tree.
+
+                     [1mm    [22mDefines the first choice for the replacement text
+                          of the [1m%M% [22midentification keyword.
+
+                     [1mf    [22mDefines the ‘‘floor’’ release; the release below
+                          which no deltas can be added.
+
+                     [1mc    [22mDefines the ‘‘ceiling’’ release; the release above
+                          which no deltas can be added.
+
+                     [1md    [22mDefines the default SID to be used when none is
+                          specified on a [4mget[24m command.
+
+                     [1mn    [22mCauses [4mdelta[24m to insert a ‘‘null’’ delta (a delta
+                          that applies [4mno[24m changes) in those releases that
+                          are skipped when a delta is made in a [4mnew[24m release
+                          (such as, when delta 5.1 is made after delta 2.7,
+                          releases 3 and 4 are skipped).  The absence of the
+                          [1mn [22mflag causes skipped releases to be completely
+                          empty.
+
+                     [1mj    [22mCauses [4mget[24m to allow concurrent edits of the same
+                          base SID.  See [4madmin[24m(1) for restrictions.
+
+
+
+
+ Hewlett‐Packard Company            ‐ 3 ‐  HP‐UX Release 11.00: October 1997
+
+
+
+
+
+
+ ssccccssffiillee((44))                                                     ssccccssffiillee((44))
+
+
+
+
+                     [1ml    [22mDefines a [4mlist[24m of releases that are [4mlocked[24m against
+                          editing ([4mget[24m(1) with the [1m−e [22mkeyletter).
+
+                     [1mq    [22mDefines the replacement for the [1m%Q% [22midentification
+                          keyword.
+
+                     [1mz    [22mUsed in certain specialized interface programs.
+
+           [4mComments[0m
+                Arbitrary text is surrounded by the bracketing lines [1m@t [22mand
+                [1m@T[22m.  The comments section typically contains a description
+                of the file’s purpose.
+
+           [4mBody[24m Consists of text lines and control lines.  Text lines do not
+                begin with the control character; control lines do.  There
+                are three kinds of control lines:
+
+                     [4mType[24m      [4mRepresented[24m [4mBy:[0m
+
+                     insert    [1m@I [4m[22mDDDDD[0m
+                     delete    [1m@D [4m[22mDDDDD[0m
+                     end       [1m@E [4m[22mDDDDD[0m
+
+                The digit string is the serial number corresponding to the
+                delta for the control line.
+
+ WWAARRNNIINNGGSS
+      SCCS files can be any length, but the number of lines in the text file
+      itself cannot exceed 99999 lines.
+
+ SSEEEE AALLSSOO
+      admin(1), delta(1), get(1), prs(1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Hewlett‐Packard Company            ‐ 4 ‐  HP‐UX Release 11.00: October 1997
+
+
+

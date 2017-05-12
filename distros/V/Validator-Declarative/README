@@ -1,0 +1,354 @@
+NAME
+    Validator::Declarative - Declarative parameters validation
+
+VERSION
+    version 1.20130722.2105
+
+SYNOPSIS
+        sub MakeSomethingCool {
+            my $serialized_parameters;
+            my ( $ace_id, $upm_id, $year, $week, $timestamp_ms ) = Validator::Declarative->validate(
+                \@_ => [
+                    ace_id         => 'id',
+                    upm_id         => 'id',
+                    year           => 'year',
+                    week           => 'week',
+                    timestamp_ms   => [ 'to_msec', 'mdy', 'timestamp' ],
+                ],
+            );
+
+            # here all parameters are validated
+            # .......
+
+        }
+
+DESCRIPTION
+    Almost every function checks the input parameters, in one or other
+    manner. But often checking of some parameters are not made at all or are
+    made not properly.
+
+    In most cases, checking is done by means of one or more conditional
+    statements for each parameter individually. This reduces the readability
+    of the code and makes it difficult to maintain.
+
+    Often checking is done using "unless" with several conditions, which
+    make things even worse.
+
+    Also, lot of conditional statements increases the cyclomatic complexity
+    of the function, which makes it impossible to use automated tests to
+    check the quality and complexity of the code.
+
+    To solve these problems, we can use declarative description of function
+    parameters.
+
+IMPLEMENTATION
+    In general, code for declarative validation definition looks like this:
+
+        my ($param1_name, $param2_name) = Validator::Declarative->validate( \@_ => [
+            param1_name => [ validation_definition1    ],
+            param2_name => [ validation_definitions2   ],
+            ....
+        ]);
+
+    This is usual key=>value pairs, but it should be written as array, not
+    as hash, because order does matter: one pair represents one parameter,
+    and order of pairs should be same as order of parameters in @_.
+
+    Each validation definition is an array ref. For simple cases, when
+    validation definition is represented by only one rule, we can type less
+    and skip surrounding brackets:
+
+        my ($param1_name, $param2_name, $param3_name, $param4_name) = Validator::Declarative->validate( \@_ => [
+            param1_name => 'name_of_rule1',
+            param2_name => { 'name_of_rule2' => param_for_rule2 },
+            param3_name => { 'name_of_rule3' => [ params_for_rule3 ] },
+            param4_name => { 'name_of_rule4' => { hash_of_params_for_rule4 } },
+            ....
+        ]);
+
+    These are shortcuts for:
+
+        my ($param1_name, $param2_name, $param3_name, $param4_name) = Validator::Declarative->validate( \@_ => [
+            param1_name => [ 'name_of_rule1'                                         ],
+            param2_name => [ { 'name_of_rule2' => param_for_rule2 }                  ],
+            param3_name => [ { 'name_of_rule3' => [ params_for_rule3 ] }             ],
+            param4_name => [ { 'name_of_rule4' => { hash_of_params_for_rule4 } }     ],
+            ....
+        ]);
+
+  Grammars
+    Grammars for validation rules are:
+
+   simple
+        validation_rule ::= 'rule_name'
+
+   parameterized
+        validation_rule ::= { 'rule_name' => 'parameter' }
+        validation_rule ::= { 'rule_name' => [ 'parameter' ] }
+        validation_rule ::= { 'rule_name' => [ 'param1', 'param2', ... ] }
+        validation_rule ::= { 'rule_name' => { 'param1' => 'param2', ... } }
+
+   set of rules
+        validation_rule ::= validation_rule, validation_rule, ....
+
+  Rules
+    Possible kinds of rules are: types (simple and parametrized),
+    converters, constraints.
+
+    Simple and parametrized rules works only on defined values, for undef
+    all of them return OK (this is needed to support declarations of
+    optional parameters).
+
+  Simple types
+   any
+    always true, aliases: string
+
+   bool
+    qr/^(1|true|yes|0|false|no|)$/i, empty string accepted as false,
+    arbitrary data is not allowed
+
+   float
+    qr/^[+-]?\d+(:?\.\d*)?$/
+
+   int
+    qr/^[+-]?\d+$/, aliases: integer
+
+   positive
+    >0
+
+   negative
+    <0
+
+   id
+    int && positive
+
+   email
+    result of Email::Valid->address($_)
+
+  Simple types (date-like)
+   year
+    int && [1970 .. 3000]
+
+   week
+    int && [1 .. 53]
+
+   month
+    int && [1 .. 12]
+
+   day
+    int && [1 .. 31]
+
+   ymd
+    like YYYY-MM-DD
+
+   mdy
+    like M/D/Y (M and D can be 1 or 2 digits, Y can be 2 or 4 digits)
+
+   time
+    like HH:MM:SS, 00:00:00 ... 23:59:59
+
+   hhmm
+    like HH:MM, 00:00 ... 23:59
+
+   timestamp
+    almost same as float (because of Time::HiRes), but can't have sign
+
+   msec
+    timestamp in milliseconds (ts/1000), alias to timestamp
+
+  Parametrized types
+   min => value
+    minimal accepted value for parameter
+
+   max => value
+    maximal accepted value for parameter
+
+   ref => ref_type | [ref_types]
+    ref($_) && ref($_) eq (any of @ref_types)
+
+   class => class_name | [class_names]
+    blessed($_) && $_->isa(any of @class_names)
+
+   can => method_name | [method_names]
+    blessed($_) && $_->can(all of @method_names), aliases: ducktype
+
+   can_any => method_name | [method_names]
+    blessed($_) && $_->can(any of @method_names)
+
+   any_of => [values]
+    anything from values provided in array ref, aliases: enum
+
+   list_of => validation_rule
+    list of "values with specific validation check", recursive
+
+   hash_of => { simple_type => validation_rule }
+    hash of "keys with specific simple type" to "values with specific
+    validation check", recursive
+
+   hash_of => [ validation_rule => validation_rule ]
+    hash of "keys with specific validation check" to "values with specific
+    validation check", recursive
+
+   hash => { key => validation_rule, .... }
+    hash with specified key names (not required to exists) and "values with
+    specific validation check", recursive
+
+   date => format | [formats]
+    date/time in specific format
+
+  
+    Types ref and class can be used as simple (without parameter), in this
+    case they check whether ref($_) and blessed($_) returns true.
+
+    Type date can be used as simple (without parameter), in this case it
+    accept all same formats that accepted by any_to_mdy():
+
+        /^20\d\d\d\d\d\d$/
+        /^[+-]?\d{1,10}$/
+        /^[+-]?\d{11,13}$/
+        /^\d\d\d\d-?\d\d-?\d\d(?:t\d\d:?\d\d:?\d\d(?:z|\+00)?)?$/i
+        /\d+\D+\d+\D+\d+/
+
+    When parameter to date is not skipped, it should be name of any of
+    date-like simple type ('year', 'week', 'mdy' etc) or formatting string
+    for DateTime::Format::Strptime::parse_datetime (example:
+    '%e/%b/%Y:%H:%M:%S %z', see DateTime::Format::Strptime for details).
+    There is no strict requirement for installed DateTime::Format::Strptime
+    - if module can't be loaded, checking with the appropriate format will
+    always lead to a positive result.
+
+  Converters
+   default => value
+    substitute $_ with provided value (only when actual parameter is undef)
+
+   assume_true
+    substitute $_ with 0 if it looks like false value (see bool, except for
+    empty string), and 1 otherwise
+
+   assume_false
+    substitute $_ with 1 if it looks like true value (see bool, except for
+    empty string), and 0 otherwise
+
+  Constraints
+   required
+    result of defined($_), applied by default
+
+   optional
+    OK if !defined($_)
+
+   not_empty
+    for list_of/hash_of/hash: has at least one element
+
+    for any/string: length($_) > 0
+
+  Order of execution
+    Order of rules in validation definition doesn't matters.
+
+    All specified rules will be executed in this order:
+
+   1. Actual parameter is checked to satisfy all constraints.
+    It's error to specify both required and optional at the same time.
+
+    If none of required and optional were specified, then required is
+    implied.
+
+   2. Actual parameter is passed thru converter (if any).
+    It's error to specify more than one converter, except for default. If
+    present, default will be executed at first place.
+
+    It's error to specify default if there is no optional constraint.
+
+   3. Parameter (actual or modified by converter, if any) is checked to satisfy any type (simple or parametrized).
+    If no one type were specified, then any is implied.
+
+    Order of types in checking is not defined and doesn't matter.
+
+    First successful check will finish entire validation for this parameter.
+
+  Errors and logging
+    For any calls all parameters will be checked, and in case of any errors
+    exception should be thrown.
+
+    Description of all errors will be included into exception text message.
+
+METHODS
+  validate(\@params => \@rules)
+  register_type( $name => $code, ...)
+  register_converter( $name => $code, ...)
+  register_constraint( $name => $code, ...)
+EXAMPLES
+        # Parameter is optional, and can be any type
+        field_name => [ 'any', 'optional' ]
+
+        # Parameter is optional, and it's id in database
+        field_name => [ 'id',  'optional' ]
+
+        # Parameter is optional, and it's id in database, with default value
+        field_name => [ 'id',  'optional', {default => undef} ]
+
+        # Parameter is optional, and it's id or list of ids in database
+        field_name => [ 'id',  'optional', {list_of => 'id'}  ]
+
+        # Parameter is mandatory, and can be any type
+        field_name => 'any'     # full form:     [ 'required', 'any' ]
+
+        # Parameter is mandatory, and it's id in database
+        field_name => 'id'      # full form:     [ 'required', 'id'  ]
+
+        # Parameter is mandatory, and it's id or list of ids in database
+        field_name => [ 'id', {list_of => 'id'} ]
+        # full form:  [ 'required', 'id', {list_of => 'id'} ]
+
+        # Parameter is bool and optional
+        field_name => [ 'bool', 'optional' ]
+
+        # Parameter is bool and optional, and default is true
+        field_name => [ 'bool', 'optional', {default => 1} ]
+
+        # Parameter args is mandatory, and it's hash with keys:
+        #   - suspensions: not required, hash with keys:
+        #       - cssnote_ref: not required, id
+        #       - review_deadline: not required, timestamp
+        #       - reasons: required, can be id or list of ids
+        #   - resumptions: not required, hash with keys:
+        #       - cssnote_ref: not required, id
+        #       - reasons: required, can be id, list of ids or hash "id to id"
+        # At least one key (suspensions or resumptions) should exists in args.
+        args => [ 'not_empty', { hash => {
+            suspensions => { hash => {
+                cssnote_ref     => [ 'optional', 'id' ],
+                review_deadline => [ 'optional', 'timestamp' ],
+                reasons         => [ 'id', {list_of => 'id'} ],
+            }},
+            resumptions => { hash => {
+                cssnote_ref     => [ 'optional', 'id' ],
+                reasons         => [ 'id', {list_of => 'id'}, {hash_of => {'id' => 'id'}} ],
+            }},
+        }}]
+
+SEE ALSO
+    Inspired by Validator::LIVR -
+    <https://github.com/koorchik/Validator-LIVR>
+
+AUTHOR
+    Oleg Kostyuk, "<cub at cpan.org>"
+
+TODO
+    Implement types list_of, hash_of, hash and date.
+
+    Implement additional converters, like to_ts, to_mdy and several others.
+
+BUGS
+    Please report any bugs or feature requests to Github
+    <https://github.com/cub-uanic/Validator-Declarative>
+
+AUTHOR
+    Oleg Kostyuk <cub@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Oleg Kostyuk.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

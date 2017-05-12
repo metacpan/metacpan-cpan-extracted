@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Video::Xine;
+use Video::Xine::Stream qw/:status_constants/;
+use Video::Xine::Driver::Video qw/:constants/;
+use Video::Xine::Driver::Audio;
+
+my $Duration_Format = '%r';
+
+my $log_level = 0;
+
+my $result = GetOptions('verbosity=s' => \$log_level,
+			'format=s' => \$Duration_Format
+		       )
+  or pod2usage(2);
+
+
+
+pod2usage("$: No MRL specified.\n") if (@ARGV < 1);
+
+my ($mrl) = @ARGV;
+
+MAIN: {
+    my $xine = Video::Xine->new();
+    $xine->set_param(XINE_ENGINE_PARAM_VERBOSITY, $log_level);
+
+    my $vo = Video::Xine::Driver::Video->new($xine, 'none');
+    my $ao = Video::Xine::Driver::Audio->new($xine, 'none');
+    
+    my $stream = $xine->stream_new($ao, $vo);
+
+    $stream->open($mrl)
+      or die "Couldn't open mrl '$mrl': Xine error " . $stream->get_error() . "\n";
+
+    my $duration = $stream->get_duration();
+
+    my $duration_str = format_duration($duration);
+
+    print "$mrl duration: $duration_str\n";
+
+}
+
+sub format_duration {
+    my ($duration) = @_;
+
+    eval "use DateTime::Format::Duration";
+
+    if ($@) {
+	warn "Couldn't use DateTime::Format::Duration: $@\n";
+	return ( $duration->seconds() . " seconds " . $duration->nanoseconds() . " nanoseconds" );
+    }
+    else {
+	my $fmt = DateTime::Format::Duration->new( pattern => $Duration_Format );
+
+	return $fmt->format_duration($duration);
+    }
+
+}
+
+__END__
+
+=head1 NAME
+
+xine_length - Gets the length of an MRL using Xine
+
+=head1 SYNOPSIS
+
+xine_length [options] [mrl]
+
+  Options:
+   --verbosity    Set verbosity level (0-2)
+   --format       Duration format
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--verbosity>
+
+Set the verbosity level of the Xine engine output. The Xine engine log
+gets printed to STDOUT. Possible values are 0 (no output), 1 (log
+output), or 2 (debug output).
+
+=item B<--format>
+
+If the DateTime::Format::Duration module is installed, uses the given
+format to display the duration. Defaults to C<'%r'>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Video::Xine>
+
+=cut
+

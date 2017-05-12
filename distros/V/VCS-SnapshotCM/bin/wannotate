@@ -1,0 +1,432 @@
+#!/usr/bin/perl -w
+################################################################################
+#
+# $Project: /VCS-SnapshotCM $
+# $Author: mhx $
+# $Date: 2004/09/11 09:49:11 +0200 $
+# $Revision: 10 $
+# $Snapshot: /VCS-SnapshotCM/0.02 $
+# $Source: /bin/wannotate $
+#
+################################################################################
+#
+# Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+################################################################################
+
+use strict;
+use VCS::SnapshotCM::Tools;
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use Term::ANSIColor qw(:constants);
+use Text::Wrap;
+use Text::Tabs;
+
+my($NAME) = $0 =~ /([\w\.]+)$/;
+my $VERSION = ('$Snapshot: /VCS-SnapshotCM/0.02 $' =~ /([^\/\s]+)\s*\$$/)[0];
+
+my %OPT = (
+  'highlight' => [],
+  'debug'     => 0,
+  'tab-size'  => 8,
+  'warnings'  => 0,
+  'color'     => (exists $ENV{TERM} && $ENV{TERM} =~ /^(dt|x)term$/),
+);
+
+Getopt::Long::Configure('bundling');
+
+GetOptions(\%OPT, qw(
+  info|i=s@
+  snapshot|S=s
+  server|host|h=s
+  tab-size=i
+  help|?
+  man
+  version
+  debug+
+  warnings+
+  color!
+)) or pod2usage(2);
+
+if ($OPT{version}) {
+  print <<VERSION;
+
+This is $NAME, v$VERSION ($0).
+
+Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+VERSION
+  exit 0;
+}
+
+pod2usage(-exitstatus => 0, -verbose => 0) if exists $OPT{help};
+pod2usage(-exitstatus => 0, -verbose => 2) if exists $OPT{man};
+
+@ARGV or pod2usage(2);
+
+my $vcs = new VCS::SnapshotCM::Tools debug => $OPT{debug};
+
+unless (exists $OPT{server} and exists $OPT{snapshot}) {
+  if (exists $OPT{server} and not exists $OPT{snapshot}) {
+    die <<END;
+*** No snapshot specified.
+Specify a snapshot using the -S option.
+END
+  }
+  elsif (exists $OPT{snapshot}) {
+    my($project, $snapshot) = $vcs->split_snapshot_path($OPT{snapshot});
+    if ($project) {
+      my $host = $vcs->guess_server_hostname(snapshot => $OPT{snapshot});
+      if (defined $host) {
+        $OPT{server} = $host;
+      }
+      else {
+        die <<END;
+*** Cannot guess a server hostname.
+Specify a server hostname using the -h option.
+END
+      }
+    }
+    else {
+      my $mapping = $vcs->get_current_mapping;
+      if (defined $mapping) {
+        $OPT{server} = $mapping->{server};
+        $OPT{snapshot} = "$mapping->{project}/$OPT{snapshot}";
+      }
+      else {
+        die <<END;
+*** You are not inside a mapped directory.
+You need to specify a full snapshot path.
+END
+      }
+    }
+  }
+  else {
+    my $mapping = $vcs->get_current_mapping;
+    if (defined $mapping) {
+      $OPT{server} = $mapping->{server};
+      $OPT{snapshot} = $mapping->{snapshot_path};
+    }
+    else {
+      die <<END;
+*** You are not inside a mapped directory.
+Either go to a mapped directory, or specify a snapshot.
+END
+    }
+  }
+}
+
+unless ($vcs->exists_snapshot(server => $OPT{server}, snapshot => $OPT{snapshot})) {
+  die <<END;
+*** Snapshot '$OPT{snapshot}' doesn't exist.
+END
+}
+
+my($project) = $vcs->split_snapshot_path($OPT{snapshot});
+
+$vcs->configure(server => $OPT{server}, snapshot => $OPT{snapshot}, project => $project);
+
+unless (exists $OPT{info}) {
+  $OPT{info} = [qw( lineno : revision author : )];
+}
+
+my @info = map { split /,/ } @{$OPT{info}};
+
+$tabstop = $OPT{'tab-size'};
+
+for (@ARGV) {
+  /^(.*)\@(\d+)/ ? annotate($1, $2) : annotate($_);
+}
+
+sub annotate
+{
+  my($filename, $revision) = @_;
+
+  my $history = $vcs->get_history(file => $filename, ancestors => 1);
+
+  my @revs = sort { $a <=> $b } keys %{$history->{revisions}};
+
+  if (defined $revision) {
+    die "*** No revision $revision for file '$filename'\n"
+        unless exists $history->{revisions}{$revision};
+    pop @revs while @revs && $revs[-1] > $revision;
+  }
+
+  my @lines = map { chomp; [$revs[0], $_] } $vcs->read_file(file => $filename, rev => $revs[0]);
+
+  for my $ix (1 .. $#revs) {
+    my @diff = $vcs->read_diff(file => $filename, rev1 => $revs[$ix-1], rev2 => $revs[$ix]);
+    chomp @diff;
+    patch($filename, $revs[$ix], \@lines, \@diff);
+  }
+
+  my @used_revs = do { my %h; $h{$_->[0]}++ for @lines; sort { $a <=> $b } keys %h };
+
+  my %len = (lineno => length scalar @lines);
+
+  for my $ix (0 .. $#used_revs) {
+    my $rev = $history->{revisions}{$used_revs[$ix]};
+    $rev->{author} =~ s/\s*\([^)]+\)//;
+
+    my $r = $rev;
+    unless (defined $r->{used_in}) {
+      my $i = $ix;
+      $i++ until $revs[$i] >= $used_revs[$ix];
+      until (defined $r->{used_in}) {
+        last if ++$i > $#revs;
+        $r = $history->{revisions}{$revs[$i]};
+      }
+    }
+
+    while (my($k, $v) = each %$rev) {
+      $len{$k} = length $v unless exists $len{$k} && length $v <= $len{$k};
+    }
+  }
+
+  my %fmt = (
+    derivation => '%-{}s',
+    change     => '%-{}s',
+    date       => '%-{}s',
+    author     => '%-{}s',
+    size       => '%{}s',
+    revision   => '%{}s',
+    comment    => '%-{}s',
+    snapshot   => '%-{}s',
+    lineno     => '%{}s',
+  );
+
+  for (keys %fmt) {
+    $fmt{$_} =~ s/\{\}/$len{$_}/g if exists $len{$_};
+  }
+
+  my $format = join ' ', map { exists $len{$_} ? $fmt{$_} : $_ } @info;
+  my @i = grep { exists $len{$_} } @info;
+
+  my @bg = $OPT{color} ? (BLACK.ON_YELLOW, BLACK.ON_WHITE) : ('', '');
+  my $reset = $OPT{color} ? RESET : '';
+  my $bgix = 0;
+  my $oldr = $lines[0][0];
+  my $no = 1;
+
+  $format = $format ? "\%s$format\%s \%s\n" : "\%s$format\%s\%s\n";
+
+  for (@lines) {
+    my($r,$l) = @$_;
+    my $rev = $history->{revisions}{$r};
+    my @args = map { $_ eq 'lineno' ? $no : $rev->{$_} || '' } @i;
+    $l = expand($l);
+    $bgix++ if $r != $oldr;
+    printf $format, $bg[$bgix % @bg], @args, $reset, $l;
+    $oldr = $r; $no++;
+  }
+}
+
+sub patch
+{
+  my($file, $info, $lines, $diff) = @_;
+  my @rules = parse_diff($file, $diff);
+
+  for my $r (@rules) {
+    my @out = splice @$lines, $r->{pos}, scalar @{$r->{old}},
+                     map { [$info, $_] } @{$r->{new}};
+
+    for (0 .. $#out) {
+      $out[$_][1] eq $r->{old}[$_] or die "Inconsistency! [$out[$_][1]] <=> [$r->{old}[$_]]\n";
+    }
+  }
+}
+
+sub parse_diff
+{
+  my($file, $diff) = @_;
+  my @rules;
+  my $in_sync = 0;
+  my $offset = 0;
+
+  while (@$diff) {
+    my $line = shift @$diff;
+    if ($line =~ /^(\d+)(?:,(\d+))?([acd])(\d+)(?:,(\d+))?/) {
+      $in_sync = 1;
+      my $c = $3;
+      my @o = ($1, ($2 || $1));
+      my @n = ($4, ($5 || $4));
+      my(@old, @new, $pos);
+
+      if ($c eq 'a') {
+        @new = splice @$diff, 0, ($n[1] - $n[0]) + 1;
+        $pos = $o[0];
+      }
+      elsif ($c eq 'd') {
+        @old = splice @$diff, 0, ($o[1] - $o[0]) + 1;
+        $pos = $o[0] - 1;
+      }
+      elsif ($c eq 'c') {
+        @old = splice @$diff, 0, ($o[1] - $o[0]) + 1;
+        for (;;) {
+          my $l = shift @$diff;
+          $l =~ /^-+$/ and last;
+          if ($OPT{warnings} or $OPT{debug}) {
+            warn "$file: warning: $l\n";
+          }
+        }
+        @new = splice @$diff, 0, ($n[1] - $n[0]) + 1;
+        $pos = $o[0] - 1;
+      }
+      else {
+        die "Unknown change specification '$c'\n";
+      }
+
+      s/^<\s// or die "No < in old code\n" for @old;
+      s/^>\s// or die "No > in new code\n" for @new;
+
+      $_-- for @o, @n;
+
+      push @rules, { pos => $pos+$offset, new => \@new, old => \@old };
+
+      $offset += @new - @old;
+    }
+    elsif ($in_sync) {
+      if ($OPT{warnings} or $OPT{debug}) {
+        warn "$file: warning: $line\n";
+      }
+    }
+  }
+
+  return @rules;
+}
+
+sub colored
+{
+  my($text, @spec) = @_;
+  $OPT{color} or return $text;
+  return join '', @spec, $text, RESET;
+}
+
+__END__
+
+=head1 NAME
+
+wannotate - Show blamelog for snapshot files
+
+=head1 SYNOPSIS
+
+wannotate {I<options>} I<file>[@I<revision>] ...
+
+I<options>:
+
+  -h, --host, --server=SERVER     server hostname
+  -S, --snapshot=SNAPSHOT         snapshot path to use
+  -i, --info=NAME[,NAME]          info prefix for each line
+
+  --tab-size                      tab size for file
+  --(no)color                     (don't) use colored output
+  --warnings                      print additional warnings
+
+  -?, --help                      show this help
+  --man                           show manpage
+  --version                       print version information
+
+=head1 DESCRIPTION
+
+The C<wannotate> tool can be used to display blamelogs for arbitrary
+revisions of files inside a SnapshotCM project. Blamelogs are known
+from various other version control systems, e.g. CVS, Perforce or
+Subversion. As blamelogs are extremely useful, and SnapshotCM doesn't
+provide native support for them, this tool fills the gap.
+
+=head1 OPTIONS
+
+=head2 C<-h>, C<--host>, C<--server> hostname
+
+Specify the hostname of the SnapshotCM server. C<wannotate> uses
+various heuristics to figure out which hostname to use, so you'll
+rarely have to specify this option.
+
+=head2 C<-S>, C<--snapshot> snapshot
+
+Specify the snapshot to display the file from. Inside a mapped
+directory, this defaults to the mapped snapshot. Also, inside
+a mapped directoy, the project path is optional, i.e. these calls
+are equivalent:
+
+  wannotate -S/path/to/my/project/1.2 file
+  wannotate -S1.2 file
+
+=head2 C<-i>, C<--info> name,name,...
+
+This option allows you to control the information displayed in the
+prefix of each line. The option can be specified multiple times,
+which is equivalent to separating the names by commas. Any name
+that cannot be interpreted will be printed unmodified. If this
+option is not specified at all, it defaults to:
+
+  --info lineno,:,revision,author,:
+
+The following names can be used:
+
+=over 4
+
+=item C<lineno>
+
+The current line number.
+
+=item C<author>
+
+The login of the author who committed the change that caused
+this line.
+
+=item C<revision>
+
+The revision that caused this line.
+
+=item C<date>
+
+The date at which this revision was committed.
+
+=back
+
+=head2 C<--tab-size> width
+
+The tabulator size used for editing the files. Defaults to 8.
+
+=head2 C<--(no)color>
+
+Use or don't use color in the output. The default is chosen
+depending on your terminal. When piping the colored output
+into C<less>, you may need to use C<less -R> to display the
+colors correctly.
+
+=head2 C<--warnings>
+
+Enable printing of additional warnings.
+
+=head1 EXAMPLES
+
+Display blamelog for the file F<MANIFEST> while being inside
+a mapped directory:
+
+  wannotate MANIFEST
+
+Display blamelog for revision 3 of file F<README>, and only
+show the author of each line:
+
+  wannotate -i author README@3
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+SnapshotCM is copyright (c) 2000-2003 True Blue Software Company.
+
+=head1 SEE ALSO
+
+See L<whistory>, L<VCS::SnapshotCM::Tools>.
+
+=cut

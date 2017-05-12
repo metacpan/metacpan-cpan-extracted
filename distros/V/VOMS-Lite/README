@@ -1,0 +1,61 @@
+VOMS-Lite version 0.01
+======================
+
+This library contains code to produce VOMS Attribute Certificates and GSI Proxy certificates.
+The Code for producing and parsing GSI and X509 certificates, and ASN1 is purely perl and independent of 
+any OpenSSL Libraries etc.  Some of the utility scripts, however, use SSL Sockets setup via HTTPS::Daemon::SSL 
+and its friends.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::BigInt
+  [ Math::BigInt::GMP ] -- if you want things to work at any reasonable speed
+  Term::ReadKey
+  Digest::MD5
+  Digest::SHA1
+  Digest::MD4
+  Digest::MD2
+  Crypt::DES_EDE3
+  MIME::Base64
+  IO::Socket
+  Regexp::Common        -- for Target URIs in VOMS Credentials
+  File::Copy
+  Time::Local
+  [ DBI ] -- if using DB access to a VOMS server
+  Sys::Hostname
+
+SEE ALSO
+
+RFC3281 and the VOMS Attribute Specification document from the OGSA Athuz Working Group of the Open Grid Forum http://www.ogf.org.
+Also see gLite from the EGEE.
+
+This module was originally designed for the SHEBANGS project at The University of Manchester.
+http://www.mc.manchester.ac.uk/projects/shebangs/
+
+Mailing list, shebangs@listserv.manchester.ac.uk
+Mailing list, voms-lite@listserv.manchester.ac.uk
+
+AUTHOR
+
+Mike Jones <mike.jones@manchester.ac.uk>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2012 by Mike Jones
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

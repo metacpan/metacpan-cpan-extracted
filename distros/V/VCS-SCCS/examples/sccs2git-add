@@ -1,0 +1,65 @@
+#!/pro/bin/perl
+
+use strict;
+use warnings;
+
+use VCS::SCCS;
+
+my @sccs = glob ("SCCS/s.*")       or die "No SCCS source files to convert\n";
+
+-d ".git" and die ".git already exists\n";
+system "git init";
+# http://www.kernel.org/pub/software/scm/git/docs/gitattributes.html
+# could be explored to write checkout hooks that translate SCCS
+# keywords to actual content. Would be hard to translate back
+
+sub pr_date
+{
+    my @dt = localtime shift;
+    sprintf "%s %02d-%02d-%4d %02d:%02d:%02d",
+	(qw( Sun Mon Tue Wed Thu Fri Sat ))[$dt[6]],
+	$dt[3], $dt[4] + 1, $dt[5] + 1900,
+	$dt[2], $dt[1], $dt[0];
+    } # pr_date
+
+# Submit in the same sequence as the original
+my %sccs;
+my %file;
+
+foreach my $f (@sccs) {
+    my $sccs = VCS::SCCS->new ($f) or die "Cannot convert $f\n";
+    my $fn = $sccs->file ();
+    $file{$fn}++;
+    foreach my $rm (@{$sccs->revision_map ()}) {
+	my ($rev, $vsn) = @{$rm};
+	$sccs{pack "NA*", $sccs->delta ($rev)->{stamp}} = [ $sccs, $rev ];
+	}
+    }
+
+foreach my $c (sort keys %sccs) {
+    my ($sccs, $rev) = @{$sccs{$c}};
+
+    # GIT supports get-hooks, to translate on retrieval
+    # $sccs->set_translate ("git");
+
+    my $fn    = $sccs->file ();
+    my %delta = %{$sccs->delta ($rev)};
+    my $stamp = pr_date ($delta{stamp});
+    my $vsn   = $delta{version};
+
+    printf STDERR "%-20s %3d %6s  %s %s %s\n", $fn, $rev, $vsn,
+	$stamp, $delta{date}, $delta{"time"};
+    open my $fh, ">", $fn          or die "Cannot write: $!";
+    print $fh scalar $sccs->body ($rev);
+    close  $fh;
+
+    system "git", "add", $fn;
+
+    # Do the git actions to put this file in git ...
+    my $mr   = $delta{mr} || ""; $mr =~ s/^-$//;
+    my $cmnt = $delta{comment} || "";
+    my $msg  = join ("\n", grep m/\S/, $cmnt, $mr) || "Checkin";
+    $msg .= "\nrev $rev ($vsn) by $delta{committer} on $stamp";
+
+    system "git", "commit", "-m", $msg, $fn;
+    }

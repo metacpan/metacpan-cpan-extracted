@@ -1,0 +1,36 @@
+Revision history for Versionify-Dispatch
+
+0.2.4  Mon Nov  2 2009
+       Removed Readonly as a test dependency
+       Added repository metadata
+       Added version consistency author test
+
+0.2.3  Sun Aug  9 2009
+       Version consistency (README file was old)
+       Recorded Test::More as a dependency in the README file
+
+0.2.2  Thu Aug  6 2009
+       Changed Test::More from a runtime to a buildtime dependency
+
+0.2.1  Mon Jul 20 2009
+       Improved test coverage
+       Fixed version number in POD
+
+0.2.0  Fri Jul 17 2009
+       Fixed register method to work when no function mapping already existed
+       Fixed typos and errors in POD
+
+0.1.0  Tue Jun 16 2009
+       Fixed the problem where the set_function method didn't exist
+       Added the register method for politely adding new version -> function
+            mappings to an existing dispatcher
+
+0.0.3  Tue Jun  9 2009
+       Marking the author tests as such.
+
+0.0.2  Mon Jun  8 2009
+       Install/test fixes for issues raised by cpan-testers automatic testing
+
+0.0.1  Sun Jun  7 2009
+       Initial release.
+

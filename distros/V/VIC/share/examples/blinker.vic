@@ -1,0 +1,21 @@
+PIC P16F690;
+
+# enable gpsim as a simulator
+pragma simulator gpsim;
+
+Main {
+     digital_output RC0;
+     Loop {
+         write RC0, 1;
+         delay 1s;
+         write RC0, 0;
+         delay 1s;
+     }
+}
+
+Simulator {
+    attach_led RC0, 1, 'green';
+    stop_after 30s;
+    logfile;
+    log RC0;
+}

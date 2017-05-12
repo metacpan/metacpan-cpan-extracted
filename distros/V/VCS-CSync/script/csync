@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use lib ();
+use Getopt::Long;
+use File::Spec::Functions ':ALL';
+use VCS::CSync;
+
+use vars qw{$VERSION @PATH};
+BEGIN {
+	$VERSION = '0.01';
+
+	# The search path
+	@PATH = ( curdir(), catdir(rootdir(), 'etc', 'csync') );
+}
+
+# Trace to STDOUT
+$VCS::CSync::TRACE = 'STDOUT';
+
+
+
+
+
+
+#####################################################################
+# Configuration
+
+GetOptions( 'verbose' => \$VCS::CSync::VERBOSE );
+
+# Find a config file
+my $Config = Config();
+
+my $task = shift @ARGV;
+unless ( $task ) {
+	error("Did not specify a task");
+}
+$task = rel2abs( $task );
+
+
+
+
+
+#####################################################################
+# Execution
+
+my $Task = $Config->task( $task ) or error(
+	"Task '$task' does not exist in '$Config'"
+	);
+$Task->run or error("Did not complete task '$Task'");
+trace("Task '$Task' completed");
+
+exit(0);
+
+
+
+
+
+#####################################################################
+# Support Functions
+
+sub Config {
+	foreach my $dir ( @PATH ) {
+		my $file = catfile( $dir, 'csync.conf' );
+		next unless -f $file;
+		$Config = VCS::CSync->new( $file )
+			or error("Failed to load config file $file" );
+		trace("Found $file");
+		return $Config;
+	}
+	error( "Failed to find csync.conf ( searched "
+		. join(', ', @PATH)
+		. " )" );
+}
+
+unless ( $Config ) {	
+}
+
+sub trace {
+	VCS::CSync::trace( @_ );
+}
+
+sub error {
+	VCS::CSync::error(@_);
+	exit(255);
+}

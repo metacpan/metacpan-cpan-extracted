@@ -1,0 +1,16 @@
+0.104   2013-06-22
+  * Fix some signedness and missing return values that resulted
+    in incorrect error messages being reported.
+  * Don't overwrite existing error code if xd3_close_stream
+    fails. This caused write errors to be mis-reported.
+  * Don't lseek() target/delta fds because this behaviour might
+    be surprising
+  * Throw exceptions when closed or memory-mapped file handles
+    are passed in instead of regular files.
+
+0.103   2013-06-18
+  * Use updated test infrastructure
+  * Doc updates
+
+0.100   2013-06-15
+  * Initial CPAN release

@@ -1,0 +1,23 @@
+- name: 'check ssh'
+  worker: tcp
+  param:
+    port: 22
+    input: ''
+    check: '^SSH-2.0-OpenSSH'
+
+- name: 'foo'
+  worker: dump
+  param:
+    bar: baz
+
+- name: 'only suc'
+  need:
+    - 'check ssh': 1
+  worker: dump
+  param:
+    - array
+    - key1: value1
+      key2: value2
+
+- name: 'tracker'
+  worker: track

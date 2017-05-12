@@ -1,0 +1,29 @@
+README for VMS::Process
+
+Copyright (c) 1997 Dan Sugalski
+Portions Copyright (c) 1997 Dan Sugalski and Linn-Benton Community College
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets you fetch a list of processes running on the cluster,
+suspend, resume, and kill processes, get information ($GETJPI stuff) for
+processes, and change prcesses priorities.
+
+perl Makefile.pl
+mms
+mms test
+
+to build and test the extension. If it tests OK, then
+
+mms install
+
+to install it. More info is in the POD documentation in the Process.PM file.
+
+This module can't violate VMS system security in any way that DCL can't, so
+if you don't have privs to see something, you can't. This will result in a
+more restricted list of PIDs unless you've got privs--SHOW SYSTEM shows
+pids that we can't always get to.
+
+There's a sample script, show_sys_clone.pl, that more or less duplicates
+the output of SHOW SYSTEM.

@@ -1,0 +1,100 @@
+This is an interface to Amazon EC2 REST tools that follows the
+2014-05-01 API. I created it because I needed access to the Tag and
+TagSet interfaces, and neither euca2ools nor Net::Amazon::EC2 provided
+this functionality. Support for the following services are complete:
+
+ Elastic Compute Cloud (EC2)
+ Virtual Private Cloud (VPC)
+ Elastic Load Balancing (ELB) and Autoscaling
+ Relational Database Service (RDS)
+
+The module is designed to work in a standard procedural manner, as
+well as in an event-driven application using the AnyEvent framework.
+
+The following code illustrates the object-oriented features of the
+module:
+
+ # get new EC2 object
+ my $ec2 = VM::EC2->new(-access_key => 'access key id',
+                        -secret_key => 'aws_secret_key',
+                        -endpoint   => 'http://ec2.amazonaws.com');
+
+ # fetch an image by its ID
+ my $image = $ec2->describe_images('ami-12345');
+
+ # get some information about the image
+ my $architecture = $image->architecture;
+ my $description  = $image->description;
+ my @devices      = $image->blockDeviceMapping;
+ for my $d (@devices) {
+    print $d->deviceName,"\n";
+    print $d->snapshotId,"\n";
+    print $d->volumeSize,"\n";
+ }
+
+ # run two instances
+ my @instances = $image->run_instances(-key_name      =>'My_key',
+                                       -security_group=>'default',
+                                       -min_count     =>2,
+                                       -instance_type => 't1.micro')
+           or die $ec2->error_str;
+
+ # wait for both instances to reach "running" or other terminal state
+ $ec2->wait_for_instances(@instances);
+
+ # print out both instance's current state and DNS name
+ for my $i (@instances) {
+    my $status = $i->current_status;
+    my $dns    = $i->dnsName;
+    print "$i: [$status] $dns\n";
+ }
+
+ # tag both instances with Role "server"
+ foreach (@instances) {$_->add_tag(Role=>'server');
+
+ # stop both instances
+ foreach (@instances) {$_->stop}
+
+ $ec2->wait_for_instances(@instances); # wait till they stop
+ 
+ # create an image from both instance, tag them, and make them public
+ for my $i (@instances) {
+     my $img = $i->create_image("Autoimage from $i","Test image");
+     $img->add_tags(Name  => "Autoimage from $i",
+                    Role  => 'Server',
+                    Status=> 'Production');
+     $img->make_public(1);
+ }
+
+Development and bug reports
+---------------------------
+
+This module is supported using GitHub at
+https://github.com/lstein/LibVM-EC2-Perl. To report a bug please open
+the Issues tag and file a bug report using the "New Issue" button.
+
+To contribute to development of this module, please obtain a github
+account for yourself and then either:
+ 
+ 1) Fork a copy of the repository, make your changes against this repository, 
+    and send a pull request to me to incorporate your changes.
+
+ 2) Contact me by email and ask for push privileges on the repository.
+
+See http://help.github.com/ for help getting started.
+
+Credits
+-------
+
+Many thanks to Lance Kinley, who contributed support for Network ACLs,
+VPC VPNs, Elastic Load Balancing, RDS, and many smaller feature
+enhancements as well as bug and documentation fixes.
+
+Author
+------
+
+Lincoln D. Stein <lincoln.stein@gmail.com>
+13 September 2012
+
+
+

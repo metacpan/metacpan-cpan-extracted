@@ -1,0 +1,41 @@
+#!/bin/perl
+#
+# Example script for using VBTK::Wrapper::Ping.  See the POD
+# documentation for each module for more details.
+
+use VBTK::Wrapper::Ping;
+
+# Setup a hash with host/vbobjname pairs for all machines to be pinged 
+# every minute.
+%pingList =
+    ('myhost1'	=> '.myhost1.ping',
+     'myhost2'	=> '.myhost2.ping',
+);
+
+# Now step through each host in the list and setup a Wrapper object
+foreach $host (keys %pingList)
+{
+    $obj = new VBTK::Wrapper::Ping(
+    	Host      => $host );
+
+    $obj->addVBObj(
+	VBObjName => $pingList{$host});
+}
+
+# Add one more for an external machine which has a high latency so can't
+# use the default settings
+$obj = new VBTK::Wrapper::Ping(
+    Host     => 'farAwayHost',
+    Interval => 60 * 5,
+    # Increase the timeout value
+    Timeout  => 40 );
+
+$obj->addVBObj(
+    VBObjName   => '.farAwayHost.ping',
+    # Increase the warning threshold to 400ms
+    Rules       => {
+        '($data[2] > 400 or $data[3] > 0)' => 'Warn' },
+);
+
+# Call this at the very end to start looping and checking everything
+VBTK::runAll;

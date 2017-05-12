@@ -1,0 +1,360 @@
+.\" $Header: sccsfile.4,v 80.1 96/10/15 15:25:19 ssa Exp $
+.TA s
+.TH sccsfile 4
+.ds )H Hewlett-Packard Company
+.ds ]W HP-UX Release 11.00: October 1997
+.SH NAME
+sccsfile \- format of \s-1SCCS\s0 file
+.SH DESCRIPTION
+An
+.SM SCCS
+file is an
+.SM ASCII
+file consisting of six logical parts:
+.RS
+.TP 15
+.I checksum
+Sum of all characters in the file except the first line.
+.PD 0
+.TP
+.I delta table
+Contains information about each delta.
+.TP
+.I user names
+Login names and/or numerical group
+.SM ID\s0s
+of users who are allowed to add deltas.
+.TP
+.I flags
+Definitions of internal keywords.
+.I comments
+Arbitrary descriptive information about the file.
+.TP
+.I body
+Actual text lines intermixed with control lines.
+.RE
+.PD
+.PP
+Throughout an
+.SM SCCS
+file there are lines beginning with the
+.SM ASCII
+.SM SOH
+(start of heading) character (octal 001).
+This character is hereafter referred to as the
+.GT "control character"
+and is represented graphically as
+.CR @ .
+Any line described below that is not depicted as beginning
+with the control character is prevented
+from beginning with the control character.
+All lines in the
+.SM SCCS
+file are limited to
+.C BUFSIZ
+(defined in
+.RC < stdio.h >)
+characters in length.
+.PP
+Entries of the form
+.I DDDDD
+represent a five-digit string (a number between 00000 and 99999).
+.PP
+The following describes each logical part of an
+.SM SCCS
+file detail:
+.RS
+.ift .TP 15
+.ifn .TP 5
+.I Checksum
+The checksum is the first line of an
+.SM SCCS
+file.
+The form of the line is:
+.ift .RS 20
+.ifn .RS 10
+.nf
+.P
+.CI @h DDDDD
+.fi
+.RE
+.IP
+The value of the checksum is the sum of all characters except
+those in the first line.
+The
+.C @h
+sequence provides a
+.GT "magic number"
+consisting of the two bytes 0x01 and 0x68.
+(Other versions of UNIX-like operating systems usually use this same value
+but it may be displayed or documented as a single number with a different
+byte order.)
+.TP
+.I "Delta table"
+The delta table consists of a variable number of entries of the form:
+.ift .RS 20
+.ifn .RS 10
+.nf
+.PP
+.CI "@s " " DDDDD/DDDDD/DDDDD"
+.CI "@d " "<type> <SID>  yr/mo/da hr:mi:se  <pgmr> DDDDD DDDDD"
+.CI "@i " "DDDDD .\|.\|."
+.CI "@x " "DDDDD .\|.\|."
+.CI "@g " "DDDDD .\|.\|."
+.CI "@m " "<MR number>"
+   \&.
+   \&.
+   \&.
+.CI "@c " "<comments> .\|.\|."
+   \&.
+   \&.
+   \&.
+.CI "@e"
+.fi
+.RE
+.IP
+The first line
+.RC ( @s )
+contains the number of lines
+inserted/deleted/unchanged, respectively.
+The second line
+.RC ( @d )
+contains the type of the delta
+(currently, normal:
+.CR D ,
+and
+removed:
+.CR R ),
+the
+.SM
+.I SID
+(\s-1SCCS ID\s+1) of the delta,
+the date and time when the delta was created,
+the login name corresponding to the real user
+.SM ID
+at the time the delta was created, and the serial numbers
+of the delta and its predecessor, respectively.
+.IP
+The
+.CR @i ,
+.CR @x ,
+and
+.CR @g
+lines
+contain the serial numbers of deltas included,
+excluded, and ignored, respectively.
+These lines are optional.
+.IP
+The
+.CR @m
+lines (optional) each contain one
+.SM MR
+(modification request)
+number associated with the delta;
+the
+.CR @c
+lines contain comments associated with the delta.
+.IP
+The
+.CR @e
+line ends the delta table entry.
+.TP
+.I "User names"
+The list of login names and/or numerical group
+.SM ID\s0s
+of users who are allowed to add deltas to the file, separated by new-lines.
+The lines containing these login names and/or numerical group
+.SM ID\s0s
+are surrounded by the bracketing lines
+.C @u
+and
+.CR @U .
+An empty list allows anyone to make a delta.
+Any line starting with a
+.C !
+prohibits the specified group or user from making deltas.
+.TP
+.I Flags
+Keywords used internally (see
+.IR admin (1)
+for more information on their use).
+Each flag line takes the form:
+.ift .RS 20
+.ifn .RS 10
+.nf
+.PP
+.CI "@f " "<flag>     <optional text>"
+.fi
+.RE
+.IP
+The following flags are defined:
+.ift .RS 20
+.ifn .RS 10
+.nf
+.PP
+.CI "@f t " "<type of program>"
+.CI "@f v " "<program name>"
+.CI "@f i " "<keyword string>"
+.CI "@f b"
+.CI "@f m " "<module name>"
+.CI "@f f " "<floor>"
+.CI "@f c " "<ceiling>"
+.CI "@f d " "<default-sid>"
+.CI "@f n"
+.CI "@f j"
+.CI "@f l " "<lock-releases>"
+.CI "@f q " "<user defined>"
+.CI "@f z " "<reserved for use in interfaces>"
+.fi
+.RE
+.IP
+The above flags function as follows:
+.ift .RS 20
+.ifn .RS 10
+.TP 5
+.C t
+Defines the replacement for the
+.SM
+.C %\&Y%
+identification keyword.
+.TP
+.C v
+Controls prompting for
+.SM MR
+numbers in addition to comments.
+If the optional text is present, it defines an
+.SM MR
+number-validity checking program.
+.TP
+.C i
+Controls the warning/error aspect of the ``No id keywords'' message.
+When the
+.C i
+flag is not present, the message is only a warning; when the
+.C i
+flag is present, this message causes a fatal error (a
+.I get
+on the file fails, or the delta is not made).
+.TP
+.C b
+When the
+.C b
+flag is present, the
+.C \-b
+keyletter can be used on the
+.I get
+command to cause a branch in the delta tree.
+.TP
+.C m
+Defines the first choice for the replacement text of the
+.SM
+.C %\&M%
+identification keyword.
+.TP
+.C f
+Defines the ``floor'' release;
+the release below which no deltas can be added.
+.TP
+.C c
+Defines the ``ceiling'' release;
+the release above which no deltas can be added.
+.TP
+.C d
+Defines the default
+.SM SID
+to be used when none is specified on a
+.I get
+command.
+.TP
+.C n
+Causes
+.I delta
+to insert a ``null'' delta (a delta that applies
+.I no
+changes) in those releases that are skipped when a delta is made in a
+.I new
+release (such as, when delta 5.1 is made after delta 2.7, releases 3 and
+4 are skipped).
+The absence of the
+.C n
+flag causes skipped releases to be completely empty.
+.TP
+.C j
+Causes
+.I get
+to allow
+concurrent edits of the same base
+.SM SID.
+See
+.IR admin (1)
+for restrictions.
+.TP
+.C l
+Defines a
+.I list
+of releases that are
+.I locked
+against editing (\c
+.IR get (1)
+with the
+.C \-e
+keyletter).
+.TP
+.C q
+Defines the replacement for the
+.SM
+.C %\&Q%
+identification keyword.
+.TP
+.C z
+Used in certain specialized interface programs.
+.RE
+.TP
+.I Comments
+Arbitrary text is surrounded by the bracketing lines
+.C @t
+and
+.CR @T .
+The comments section typically contains a description of the file's purpose.
+.TP
+.I Body
+Consists of text lines and control lines.
+Text lines do not begin with the control character;
+control lines do.
+There are three kinds of control lines:
+.ift .RS 20
+.ifn .RS 10
+.TP 10
+.EM "Type"
+.EM "Represented By:"
+.TP
+insert
+.CI "@I " DDDDD
+.PD 0
+.TP
+delete
+.CI "@D " DDDDD
+.TP
+end
+.CI "@E " DDDDD
+.RE
+.PD
+.IP
+The digit string is the serial number corresponding to the delta for the
+control line.
+.RE
+.SH WARNINGS
+.SM SCCS
+files can be any length, but the number of lines in the text file itself
+cannot exceed 99\|999 lines.
+.SH "SEE ALSO"
+admin(1),
+delta(1),
+get(1),
+prs(1).
+.\" index@\f2sccsfile\f1 \- format of \s-1SCCS\s+1 file@@@\f3sccsfile(4)\f1
+.\" index@file format: \s-1SCCS\s+1 file format@@@\f3sccsfile(4)\f1
+.\" index@\s-1SCCS\s+1 file format@@@\f3sccsfile(4)\f1
+.\"
+.\" toc@\f3sccsfile(4)\f1:\0\0\f2sccsfile\f1@@@format of \s-1SCCS\s+1 file
+.\"

@@ -1,0 +1,19 @@
+<!--#perl
+  # Get the list of graph group numbers so we'll know what tabs to show
+  my @graphGroupNums = $vbObj->getGraphGroupNumberList;
+
+  my @tabs = ( 'Current', 'History', 'Info');
+  my %tabUrls = (
+    Current  => "$statusUrl?name=$name",
+    History  => "$historyUrl?name=$name",
+    Info    => "$detailUrl?name=$name" );
+    
+  # Create a tab for each graph group number
+  foreach my $num (@graphGroupNums)
+  {
+    push(@tabs,"Graphs$num");
+    $tabUrls{"Graphs$num"} = "$graphsUrl?name=$name&groupNumber=$num";
+  }
+
+-->
+<!--#include virtual="/genTabs.phtml" -->

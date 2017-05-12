@@ -1,0 +1,18 @@
+<div id="poll_request" class="page_box">
+<p>Créer un nouveau vote:</p>
+
+<form action="[% c.uri_for() %]" method="POST">
+<center>
+<table border="0">
+<tbody align="center">
+<tr><th>votre mail:</th><td><input type="text" name="mail" tabindex="1" size="45" maxlength="150"></td></tr>
+<tr><th>nom du vote:</th><td><input type="text" name="label" tabindex="2" size="45" maxlength="150"></td></tr>
+<!-- Cf http://forge.ipsl.jussieu.fr/epoll/ticket/1
+<tr><th>mot de passe:</th><td><input type="password" name="vpasswd"></td></tr>
+-->
+<tr><td></td><td><input type="submit" tabindex="3"></td></tr>
+</tbody>
+</table>
+</center>
+</form>
+</div>

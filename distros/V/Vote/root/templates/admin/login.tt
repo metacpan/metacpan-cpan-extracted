@@ -1,0 +1,10 @@
+<!-- $Id: login.tt 72 2009-03-18 09:04:20Z nanardon $ -->
+[% vote = c.model('Vote') %]
+
+<div id="admin_login" class="login_box">
+<form action="[% c.uri_for('/admin', voteid) %]" method="POST">
+<p>Acc&egrave;s &agrave; l'interface d'administration du vote <b><i>[% vote.vote_info(voteid).label | html %]</i></b></p>
+<p>Veuillez saisir le mot de passe : <input type="password" name="vpassword">
+<input type="submit"></p>
+</form>
+</div>

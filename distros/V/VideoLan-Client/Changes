@@ -1,0 +1,13 @@
+Revision history for VideoLan-Client
+0.13
+	resolv a bug, that make the sud cmd slow	
+
+0.12	10/03/30022
+	bugs 65604 & 62456 corrected
+
+0.11    10/07/08
+        some install bugs (make test...) have been corrected. no news features
+
+0.1    Date/time
+        First version, released on an unsuspecting world.
+

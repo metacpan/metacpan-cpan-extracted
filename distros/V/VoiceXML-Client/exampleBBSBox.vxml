@@ -1,0 +1,318 @@
+<?xml version="1.0" ?>
+<!-- BBS box page, part of the VOCP voice messaging system, Copyright (C) 2007,2008 Pat Deegan. All Rights Reserved -->
+<vxml version="2.1">
+
+	<var name="box" />
+	<var name="msgstartindex" />
+	<var name="msgtoplay" />
+	<var name="nextdirection" />
+	<var name="currentmessage" />
+	<var name="haverecordedmessage" />
+	<var name="step" />
+	<var name="action" />
+	<var name="leavemsgfname" />
+	<var name="invalidcount" />
+	
+	
+	<assign name="step" expr="'guestbook'" />
+	<assign name="box" expr="'500'" />
+	<assign name="msgstartindex" expr="0" />
+	<assign name="msgmoreavailable" expr="1" />
+	<assign name="haverecordedmessage" expr="0" />
+	<assign name="currentmessage" expr="0" />
+		
+	<assign name="invalidcount" expr="0" />
+	
+	
+	
+	<form id="guestbox">
+		<field name="movetosel" type="digits" numdigits="1">
+		
+			<if cond="invalidcount &gt; 5">
+				<goto nextitem="notworkingout" />
+			</if>
+					
+		
+			<prompt timeout="5s">
+				
+				 <audio src="/path/to/vocpmessages/guestbox500.rmd" />
+				
+				 <audio src="/path/to/vocpmessages/system/guestinstructions.rmd" />
+			</prompt>
+			
+			
+			<noinput>
+				<audio src="/path/to/vocpmessages/system/entersomething.rmd" />
+				<reprompt />
+			</noinput>
+			<noinput count="3">
+				<goto nextitem="notworkingout" />
+			</noinput>
+			
+			
+			<filled>
+				<if cond="movetosel == 1">
+					<goto nextitem="listennext" />
+					
+				 <elseif cond="movetosel == 2" />
+					<goto nextitem="leaveyourown" />
+					
+				 <elseif cond="movetosel == 0" />
+					<goto next="http://voicexml.psychogenic.com/vocp.cgi" />
+				 <else />
+					<assign name="invalidcount" expr="invalidcount + 1" />
+					<audio src="/path/to/vocpmessages/system/invalidselection.rmd" />
+					<reprompt />
+				</if>
+			</filled>
+		</field>
+	</form>
+	
+	
+	
+	
+	<form id="leaveyourown">
+		
+		<block>
+			<if cond="haverecordedmessage">
+				<audio src="/path/to/vocpmessages/system/messagealreadyleft.rmd" />
+				<goto nextitem="guestbox" />
+			</if>
+		</block>
+		
+		<assign name="haverecordedmessage" expr="1" />
+		
+		<block>
+			<audio src="/path/to/vocpmessages/system/recordyourmessage.rmd" />
+		</block>
+			
+		<record beep="true" name="/path/to/vocpspool/500-tmp-ns3aUp4kQ.rmd" />
+			
+		
+		
+		<block>
+			<audio src="/path/to/vocpmessages/system/thanksformessage.rmd" />
+		</block>
+		
+		<assign name="leavemsgfname" expr="'/path/to/vocpspool/anewmessage.rmd'" />
+		<assign name="action" expr="'msgrecorded'" />
+		<submit next="http://voicexml.psychogenic.com/vocp.cgi" namelist="leavemsgfname action box step"/>
+	</form>
+	
+	
+	
+	
+	
+	
+	<form id="listentoothers">
+		
+		<assign name="invalidcount" expr="0" />
+		
+		<field name="listenselection" type="digits" numdigits="1">
+			
+			<prompt timeout="4s">
+				<audio expr="msgtoplay" />
+				<audio src="/path/to/vocpmessages/system/listenothersmenu.rmd" />
+			</prompt>
+			
+			<noinput>
+				<audio src="/path/to/vocpmessages/system/listenothersmenu.rmd" />
+				<reprompt />
+			</noinput>
+			<noinput count="3">
+				<goto nextitem="notworkingout" />
+			</noinput>
+			
+			<filled>
+			
+				<if cond="listenselection == 1">
+			
+				    <goto nextitem="listenprev" />
+		  
+
+			 	  <elseif cond="listenselection == 3" />
+			
+				    <goto nextitem="listennext" />
+		  
+			
+				    
+			 	  <elseif cond="listenselection == 4" />
+				
+				    <reprompt />
+				    
+			 	  <elseif cond="listenselection == 6" />
+			
+				    <goto nextitem="ratemessage" />
+				    
+				    
+			 	  <elseif cond="listenselection == 8" />
+			
+				    <goto nextitem="guestbox" />
+				
+		  
+				  <else />
+				    <audio src="/path/to/vocpmessages/system/invalidselection.rmd" />
+				    <assign name="msgtoplay" expr="''" />
+				    <reprompt />
+				 </if>
+			</filled>
+		</field>
+	</form>
+	
+	
+	
+	
+	
+	
+	
+	<form id="listennext">
+		<block>
+			<if cond="currentmessage &gt;= 5">
+				<if cond="msgmoreavailable" >
+					<assign name="nextdirection" expr="'next'" />
+					<goto nextitem="getmoremessages" />
+				<else />
+					<audio src="/path/to/vocpmessages/system/thisisthelastmessage.rmd" />
+					<assign name="msgtoplay" expr="" />
+					<goto nextitem="listentoothers" />
+				</if>
+			</if>
+		</block>
+		
+		<assign name="currentmessage" expr="currentmessage + 1" />
+		<goto nextitem="setmsgtoplay" />
+	</form>
+	
+	
+	
+	
+	
+	<form id="listenprev">
+		<block>
+			<if cond="currentmessage &lt;= 1">
+				
+				<if cond="msgstartindex &gt; 0">
+					<assign name="nextdirection" expr="'prev'" />
+					<goto nextitem="getmoremessages" />
+					
+				<else />	
+					
+					<audio src="/path/to/vocpmessages/system/thisisthefirstmessage.rmd" />
+					<assign name="msgtoplay" expr="''" />
+					<goto nextitem="listentoothers" />
+				</if>
+				
+			<else />
+				<assign name="currentmessage" expr="currentmessage - 1" />
+			</if>
+		</block>
+					
+		<goto nextitem="setmsgtoplay" />
+	</form>
+	
+	
+	
+	
+	
+	<form id="setmsgtoplay">
+		<block>
+			
+			  
+				
+				
+				
+					<if cond="currentmessage == 1">
+				
+						<assign name="msgtoplay" expr="'/path/to/vocpspool/message_1.rmd'" />
+					    
+			  
+				
+				
+					 <elseif cond="currentmessage == 2" />
+				
+						<assign name="msgtoplay" expr="'/path/to/vocpspool/message_2.rmd'" />
+					    
+			  
+				
+				
+					 <elseif cond="currentmessage == 3" />
+				
+						<assign name="msgtoplay" expr="'/path/to/vocpspool/message_3.rmd'" />
+					    
+			  
+				
+				
+					 <elseif cond="currentmessage == 4" />
+				
+						<assign name="msgtoplay" expr="'/path/to/vocpspool/message_4.rmd'" />
+					    
+			  
+				
+				
+					 <elseif cond="currentmessage == 5" />
+				
+						<assign name="msgtoplay" expr="'/path/to/vocpspool/message_5.rmd'" />
+					    
+			  
+			  		 <else />
+						<assign name="msgtoplay" expr="'/path/to/vocpmessages/system/error.rmd'" />
+					</if> 
+			
+		</block>
+		<goto nextitem="listentoothers" />
+	</form>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<form id="ratemessage">
+		<field name="rating" type="digits" numdigits="1">
+			<prompt timeout="5s">
+				<audio src="/path/to/vocpmessages/system/ratethemessage.rmd" />
+			</prompt>
+			
+			<filled>
+				<if cond="rating == 0">
+					<goto nextitem="listentoothers" />
+				<elseif cond="rating &gt; 9" />
+					<audio src="/path/to/vocpmessages/system/ratingbetween1and9.rmd" />
+					<reprompt />
+				<else />
+					<audio src="/path/to/vocpmessages/system/thanksformessage.rmd" />
+					<assign name="action" expr="'ratemessage'" />
+					<submit next="http://voicexml.psychogenic.com/vocp.cgi" namelist="box msgstartindex currentmessage rating action step" />
+				</if>
+			</filled>
+			
+		</field>
+	</form>
+				
+	
+	
+	
+	
+	
+	
+	<form id="getmoremessages">
+	
+		<block>
+			<audio src="/path/to/vocpmessages/system/onemomentplease.rmd" />
+		</block>
+			
+		<assign name="action" expr="'msgpage'" />
+		<submit next="http://voicexml.psychogenic.com/vocp.cgi" namelist="box msgstartindex nextdirection action step" />
+	</form>
+	
+	<form id="notworkingout">
+		<audio src="/path/to/vocpmessages/system/notworkingout.rmd" />
+		<disconnect />
+	</form>
+	
+	
+</vxml>
+

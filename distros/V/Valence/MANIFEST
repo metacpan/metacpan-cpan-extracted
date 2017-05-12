@@ -1,0 +1,15 @@
+.gitmodules
+Changes
+lib/Valence.pm
+lib/Valence/Object.pm
+Makefile.PL
+MANIFEST
+t/ipc.t
+t/load.t
+t/static/remote.html
+valence/app/package.json
+valence/app/valence.js
+valence/LICENSE
+valence/README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

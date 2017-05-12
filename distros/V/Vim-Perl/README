@@ -1,0 +1,13 @@
+
+Introduction
+
+Vim::Script is a module which provides an efficient interface
+for using perl in vimscript files. It is build upon basic VimScript
+perl functions such VIM::Msg, VIM::Eval etc.
+
+Installation 
+
+perl Build.PL
+./Build
+./Build test
+./Build install

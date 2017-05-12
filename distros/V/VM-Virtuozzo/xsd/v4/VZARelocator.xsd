@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzarelocator" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzarelocator" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzat="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns:vzlrelocator="http://www.swsoft.com/webservices/vzl/4.0.0/relocator" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzarelocator="http://www.swsoft.com/webservices/vza/4.0.0/vzarelocator" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" schemaLocation="VZACommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/relocator" schemaLocation="../../vzl/4.0.0/VZLRelocator.xsd"/>
+	<xs:element name="vzarelocator" type="vzarelocator:vzarelocatorType">
+		<xs:annotation>
+			<xs:documentation>Template Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzarelocatorType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlrelocator:relocatorType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="clone_optionsType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlrelocator:clone_optionsType">
+				<xs:sequence>
+					<xs:element name="fast" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Do fast (but not safe) Container clone</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="config" type="vzat:venv_configType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Paramters of created environments after clone. If you want that some parameters (VE_ROOT, VE_PRIVATE) will be depend on VEID, then specify $VEID in the part of path.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="veid" type="vzat:veid_type" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>CTID list. If you specify less  than "count" then remain CTIDs will be auto allocated.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="hw_notesTypes">
+		<xs:complexContent>
+			<xs:extension base="vzlrelocator:hw_notesTypes">
+				<xs:sequence>
+					<xs:element name="exclude" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Pathes that will be excluded during data transfer.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="path" type="xs:base64Binary"/>
+								<xs:element name="discardable" type="xs:boolean"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="warning" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>List of warning messages </xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="message" type="xs:string"/>
+								<xs:element name="code" type="xs:int"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

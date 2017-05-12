@@ -1,0 +1,96 @@
+2006-04-26  Ziya Suzen  <ziya@suzen.net>
+
+   * Version 0.07
+   * Covert to Module::Build
+   * Created test framework
+
+2001-10-09  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm:
+	remove globals, fixed 'parse deltatext into a struct'
+
+	* examples/RCS/Changes, examples/RCS/Deltatext.pm, examples/RCS/MANIFEST, examples/RCS/Makefile.PL, examples/RCS/Parser.pm, examples/RCS/YappRcsParser.pm, examples/RCS/YappRcsParser.yp, examples/RCS/test.pl:
+	have some files to test.
+
+	* examples/test.sh, examples/test_co_db.pl, examples/test_co_db_grep.pl, examples/test_co_db_grep.sh:
+	make tests usable.
+
+	* README, VCS-Rcs-Parser-0.04.readme, YappRcsParser.yp:
+	remove global vars.
+
+2001-10-04  Ziya Suzen  <ziya@ripe.net>
+
+	* VCS-Rcs-Parser-0.04.readme: Readme file added. (Not to MANIFEST Tho)
+
+2001-10-03  Ziya Suzen  <ziya@ripe.net>
+
+	* examples/t.pl, examples/test_co_db.pl, examples/test_co_db_grep.pl, test.pl:
+	reflecting namespace change on test.pl and examples.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	last modifications for namespace change.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, Makefile.PL, YappRcsParser.yp:
+	namespace changed from Rcs:: to VCS::Rcs::
+
+2001-10-02  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	Solved some 'undefined ...' warnings.
+
+2001-10-01  Ziya Suzen  <ziya@ripe.net>
+
+	* Changes: .
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm:
+	date co future added.
+
+	* YappRcsParser.yp: date co routine added.
+
+	* Changes: .
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	Fixed a bug in the lexer, causing strings ending without a new line to breake the syntax in the grammar.
+
+2001-09-27  Ziya Suzen  <ziya@ripe.net>
+
+	* examples/test.sh, examples/test_co_db.pl, examples/test_co_db.sh, examples/test_co_db_grep.pl:
+	.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm:
+	added copyright info.
+
+	* examples/test.sh, examples/test_co_db.pl, examples/test_co_db.sh, examples/test_co_db_grep.pl, examples/test_co_db_grep.sh:
+	added some new test.
+
+	* MANIFEST, YappRcsParser.yp:
+	added some new files to MANIFEST, Copyright to Yapp Grammar.
+
+2001-09-14  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Parser.pm:
+	a little nasty bug; do not use the time as the key in the hash; there may be some people doing a quick check in more then once less then a second!!!
+
+2001-09-12  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	sorted the problem of calling new more then onece in one program.
+
+	* lib/Rcs/Deltatext.pm, lib/Rcs/YappRcsParser.pm: version info added.
+	a smal fix to check emty text.
+
+	* YappRcsParser.yp: version info added.
+
+2001-09-11  Ziya Suzen  <ziya@ripe.net>
+
+	* lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, YappRcsParser.yp:
+	Last fixes.
+
+	* examples/t.pl, examples/test_rcs.bash, MANIFEST: Examples added.
+
+	* Changes, MANIFEST, Makefile.PL, YappRcsParser.yp, lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, test.pl:
+	Initial release.
+
+	* Changes, MANIFEST, Makefile.PL, YappRcsParser.yp, lib/Rcs/Deltatext.pm, lib/Rcs/Parser.pm, lib/Rcs/YappRcsParser.pm, test.pl:
+	New file.
+

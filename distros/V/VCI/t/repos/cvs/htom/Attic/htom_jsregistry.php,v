@@ -1,0 +1,87 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?php
+//! Class holds a collection of all JavaScripts files that may'd be used on the page.
+/*! The HTOM_Page object will read the JSRegistry in order to load all the necessary scripts
+ * on the page.
+ * The HTOM_JSRegistry searches for the registered file over all direcories registered in
+ * the HTOM_Autoloader module.
+ */
+class HTOM_JSRegistry implements Iterator
+{
+  //! This is a static method that mayd me used in order to register the script.
+  /*! The script is searches in all directories registered by the Htom_Autoloader class.
+   * \param a script name
+   * \return a full script path.
+   */
+  public function RegisterScript( $scriptName )
+  {
+    $scriptFileName = HTOM_Autoloader::GetFileName($scriptName);
+    if (isset($scriptFileName)) {
+      self::$scripts[$scriptName]=$scriptFileName;
+    }
+    return $scriptFileName;
+  }
+  public function rewind() {
+    reset(self::$scripts);
+  }
+
+  public function current() {
+    return current(self::$scripts);
+  }
+
+  public function key() {
+    $script = key(self::$scripts);
+    return $script;
+  }
+
+  public function next() {
+    $script = next(self::$scripts);
+    return $script;
+  }
+
+  public function valid() {
+    return true;
+  }
+  
+  public function GetList()
+  {
+    return self::$scripts;
+  }
+  static private $scripts=array();
+}
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

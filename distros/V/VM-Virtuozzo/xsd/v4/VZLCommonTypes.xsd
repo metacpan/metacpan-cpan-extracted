@@ -1,0 +1,1742 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Beheaded (MIPT) -->
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:simpleType name="guid_type">
+		<xs:annotation>
+			<xs:documentation>Globally unique identifier type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="eid_type">
+		<xs:annotation>
+			<xs:documentation>EID type.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="guid_type"/>
+	</xs:simpleType>
+	<xs:simpleType name="ip_type">
+		<xs:annotation>
+			<xs:documentation>IP address.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="datetime_type">
+		<xs:annotation>
+			<xs:documentation>Date Time format used in Messages. It complies with ISO-8601 standard:
+YYYY-MM-DDThh:mm:ss+####, 
+where 
+YYYY - year
+MM - month
+DD - day
+hh - hour
+mm - minutes
+ss - seconds
++ - plus (+) or minus (-)
+#### - GMT offset.
+</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d\d\d\d\-\d\d-\d\d[T]\d\d:\d\d:\d\d\+\d\d\d\d"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transport_type">
+		<xs:annotation>
+			<xs:documentation>TCP or UDP enumeration.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="tcp"/>
+			<xs:enumeration value="udp"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="yes_no_type">
+		<xs:annotation>
+			<xs:documentation>Boolean type, with "YES" or "NO" values.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="yes"/>
+			<xs:enumeration value="no"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="sidType">
+		<xs:restriction base="xs:base64Binary"/>
+	</xs:simpleType>
+	<xs:simpleType name="privilegeType">
+		<xs:annotation>
+			<xs:documentation>Priviledge name</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="osType">
+		<xs:sequence>
+			<xs:element name="platform" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Windows/Linux/...</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Windows XP/Red Hat 9/...</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string" minOccurs="0"/>
+			<xs:element name="kernel" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="env_statusType">
+		<xs:annotation>
+			<xs:documentation>Environment status information.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="state" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current state of Env.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transition" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current Env transition if present.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="qosType">
+		<xs:annotation>
+			<xs:documentation>"Quality Of Service" item.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>QOS ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="soft" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Soft limit</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hard" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Hard limit</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cur" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="env_configType">
+		<xs:annotation>
+			<xs:documentation>Environment configuration structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Computer name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Environment description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="domain" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Domain</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hostname" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Hostname</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="address" type="ip_addressType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List of IP addresses</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="architecture" type="xs:string" minOccurs="0"/>
+			<xs:element name="os" type="osType" minOccurs="0"/>
+			<xs:element name="type" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Possible types are described in Agent and its Virtualization Technologies Plug-ins vocabularies. Regular non-Virtual or unknown Environment has type "generic".</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="nameserver" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="search_domain" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="base_sample_id" type="guid_type" minOccurs="0"/>
+			<xs:element name="base_snapshot_id" type="guid_type" minOccurs="0"/>
+			<xs:element name="child_type" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List of possible child environments type names</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="venv_configType">
+		<xs:annotation>
+			<xs:documentation>Container configuration structure.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="env_configType">
+				<xs:sequence>
+					<xs:element name="qos" type="qosType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>List of QOS counters.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="native_configType">
+		<xs:annotation>
+			<xs:documentation>Native Container configuration structure.</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="envType">
+		<xs:annotation>
+			<xs:documentation>Environment information.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="parent_eid" type="eid_type"/>
+			<xs:element name="eid" type="eid_type"/>
+			<xs:element name="status" type="env_statusType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Environment status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="alert" type="xs:int" minOccurs="0"/>
+			<xs:element name="config" type="env_configType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Environment Configuration</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="virtual_config" type="venv_configType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Virtualization technology Environment Configuration (i.e. Virtuozzo config, XEN config)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="processesType">
+		<xs:annotation>
+			<xs:documentation>Processes information summary.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="run" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "running" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="zombie" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "zombie" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sleep" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "sleep" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uninterrupt" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in an "uninterrupted" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="stopped" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "stopped" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="total" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Total number of processes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="load_avgType">
+		<xs:annotation>
+			<xs:documentation>Load Average structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="l1" type="xs:double">
+				<xs:annotation>
+					<xs:documentation>1 minute Load Average value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="l2" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>5 minutes Load Average value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="l3" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>15 minutes Load Average value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cpu_loadType">
+		<xs:annotation>
+			<xs:documentation>CPU load statistics.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="system" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>CPU used by system processes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="user" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>CPU used by user processes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="nice" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>CPU used by "nice" processes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="idle" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>CPU idle.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="cpuType">
+		<xs:annotation>
+			<xs:documentation>CPU characteristics.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="mhz" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>CPU frequency.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the CPU.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="number" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of CPUs.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cores" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of cores per CPU.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hyperthreads" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of hyperthreads per CPU core (if no hyperthreading supported threads is set to 1).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="units" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>CPU units value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="family" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>CPU family.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="model" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>CPU model.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bogomips" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Bogomips.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="transferType">
+		<xs:annotation>
+			<xs:documentation>Network transfer statistics.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="input">
+				<xs:annotation>
+					<xs:documentation>Input transfer</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="bytes" type="xs:long">
+							<xs:annotation>
+								<xs:documentation>Number of bytes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="packets" type="xs:long" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Number of packets</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="output">
+				<xs:annotation>
+					<xs:documentation>Output transfer</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="bytes" type="xs:long">
+							<xs:annotation>
+								<xs:documentation>Number of bytes</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="packets" type="xs:long" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Number of packets</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="system_nodeType">
+		<xs:annotation>
+			<xs:documentation>System node access parameters.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="address">
+				<xs:annotation>
+					<xs:documentation>IP address.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ip_addressType">
+							<xs:sequence>
+								<xs:element name="ip" type="ip_type"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="login" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="user" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Login user name.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="password" type="xs:base64Binary">
+							<xs:annotation>
+								<xs:documentation>Base64 encoded user password.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="resourceType">
+		<xs:annotation>
+			<xs:documentation>General resource type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="total" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="used" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="free" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Free value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="avg" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Average value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="min" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Minimum value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="max" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Maximum value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="intervalType">
+		<xs:annotation>
+			<xs:documentation>Interval of measurements, specified by it's start and end times.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="start_time" type="datetime_type">
+				<xs:annotation>
+					<xs:documentation>Start time</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="end_time" type="datetime_type">
+				<xs:annotation>
+					<xs:documentation>End time</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="statsType">
+		<xs:annotation>
+			<xs:documentation>General statistics type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="avg" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Average value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="min" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Minimum value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="max" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Maximum value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="total" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cur" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="soft" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Soft limit</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hard" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Hard limit</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="net_addressType">
+		<xs:annotation>
+			<xs:documentation>Network pair Addr/Mask.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="host">
+				<xs:annotation>
+					<xs:documentation>Host/Net name or IP address.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:union memberTypes="xs:string ip_type"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="mask" type="ip_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>IP mask.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="net_classType">
+		<xs:annotation>
+			<xs:documentation>Network class information.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Class ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transfer" type="transferType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Transfer statistics for IPv4 traffic.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transfer_v6" type="transferType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Transfer statistics for IPv6 traffic.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ip_rangeType">
+		<xs:annotation>
+			<xs:documentation>Range of IP-addresses.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" minOccurs="0"/>
+			<xs:element name="start_ip" type="ip_type" minOccurs="0"/>
+			<xs:element name="subnet_mask" type="xs:int" minOccurs="0"/>
+			<xs:element name="comment" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sample_confType">
+		<xs:annotation>
+			<xs:documentation>Environment sample configuration.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="env_config" type="env_configType">
+				<xs:annotation>
+					<xs:documentation>Env configuration file.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>id of the sample configuration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>human-readable name of sample configuration.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="comment" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comment to insert.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="vt_version" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="platform" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Windows/Linux/...</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="architecture" type="xs:string"/>
+						<xs:element name="vt_technology" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="interfaceType">
+		<xs:annotation>
+			<xs:documentation>Network interface structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Interface name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bandwidth" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Bandwidth.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transfer" type="transferType" minOccurs="0"/>
+			<xs:element name="ipaddress" type="ip_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>IP address.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="flags" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Network adapter flags. Bit 0 - loopback flag. Bit 1 - no arp flag.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sys_infoType">
+		<xs:annotation>
+			<xs:documentation>System information structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="load_avg" type="load_avgType">
+				<xs:annotation>
+					<xs:documentation>Load averages</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="processes" type="processesType">
+				<xs:annotation>
+					<xs:documentation>Processes statistics</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cpu_load" type="cpu_loadType">
+				<xs:annotation>
+					<xs:documentation>CPU load statistics.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cpu_states" type="cpu_loadType">
+				<xs:annotation>
+					<xs:documentation>CPU load statistics (percentage).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="users" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of users.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uptime" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>Uptime</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="memory" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Memory statistics. Provided only for Hardware Node.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="resourceType">
+							<xs:sequence>
+								<xs:element name="total" type="xs:long" minOccurs="0"/>
+								<xs:element name="used" type="xs:long"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="swap" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Swap statistics. Provided only for Hardware Node.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="resourceType">
+							<xs:sequence>
+								<xs:element name="total" type="xs:long" minOccurs="0"/>
+								<xs:element name="used" type="xs:long"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ps_infoType">
+		<xs:annotation>
+			<xs:documentation>Process information structure</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="process" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Process information</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pid" type="xs:int">
+							<xs:annotation>
+								<xs:documentation>PID of process</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="param" type="xs:base64Binary" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of process parameters values in order, specified by "param_id".</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="param_id" type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List of process parameters in the same order, as the one, used for "process/param" values.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="run" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "running" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="idle" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "idle" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="zombie" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "zombie" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sleep" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "sleep" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uninterrupt" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in an "uninterrupted" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="stopped" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Number of processes in a "stopped" state.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="total" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Total number of processes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="load_avg_statsType">
+		<xs:annotation>
+			<xs:documentation>Load averages statistics.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="l1">
+				<xs:annotation>
+					<xs:documentation>1 minute Load Average values.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="statsType">
+							<xs:sequence>
+								<xs:element name="avg" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Average value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="min" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Minimum value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="max" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Maximum value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="cur" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Current value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="l2" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>5 minute Load Average values.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="statsType">
+							<xs:sequence>
+								<xs:element name="avg" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Average value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="min" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Minimum value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="max" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Maximum value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="cur" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Current value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="l3" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>15 minute Load Average values.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="statsType">
+							<xs:sequence>
+								<xs:element name="avg" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Average value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="min" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Minimum value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="max" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Maximum value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="cur" type="xs:long" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Current value</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="alert_dataType">
+		<xs:complexContent>
+			<xs:extension base="event_dataType">
+				<xs:sequence>
+					<xs:element name="type" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>GREEN_alert = 0; YELLOW_alert = 1; RED_alert = 2;  BLACK_alert = 3;</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ip_addressType">
+		<xs:sequence minOccurs="0">
+			<xs:element name="ip" type="ip_type"/>
+			<xs:element name="netmask" type="ip_type" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="env_resourceType">
+		<xs:sequence>
+			<xs:element name="eid" type="eid_type"/>
+			<xs:element name="ip_pool" type="ip_poolType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Allocated IP pool.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ip_poolType">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:annotation>
+				<xs:documentation>Either of</xs:documentation>
+			</xs:annotation>
+			<xs:element name="ip_range">
+				<xs:annotation>
+					<xs:documentation>Range of IPs.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="start_ip" type="ip_type">
+							<xs:annotation>
+								<xs:documentation>First IP.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="end_ip" type="ip_type">
+							<xs:annotation>
+								<xs:documentation>Last IP.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ip" type="ip_type">
+				<xs:annotation>
+					<xs:documentation>IP address.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="usageType">
+		<xs:sequence>
+			<xs:element name="total" type="xs:long" minOccurs="0"/>
+			<xs:element name="used" type="xs:long" minOccurs="0"/>
+			<xs:element name="free" type="xs:long" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="root_credentialType">
+		<xs:complexContent>
+			<xs:extension base="credentialType">
+				<xs:sequence>
+					<xs:element name="objects" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Objects this policy applies to.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="eid" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Environment identificators.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="credentialType">
+		<xs:annotation>
+			<xs:documentation>Credential structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Credential node identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="policy" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Policy of credentials, can be 1 - 'allow', 0 - 'deny'. Default - 'allow'.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Credential description.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cred" type="credentialType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Nested credentials.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tokenType">
+		<xs:annotation>
+			<xs:documentation>Token structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="user" type="sidType">
+				<xs:annotation>
+					<xs:documentation>Sid of the token user</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="groups" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>List of token group sids</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="sid" type="sidType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="deny_only_sids" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>List of deny-only SIDs.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="sid" type="sidType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="privileges" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>List of token privileges</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="privilege" type="privilegeType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="source" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="name" type="xs:string"/>
+						<xs:element name="id" type="guid_type"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="name" type="auth_nameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="connectivity_infoType">
+		<xs:annotation>
+			<xs:documentation>Connectivity information, network parameters</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="protocol" type="xs:string" minOccurs="0"/>
+			<xs:element name="address" type="xs:string"/>
+			<xs:element name="port" type="xs:unsignedInt" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="auth_nameType">
+		<xs:annotation>
+			<xs:documentation>Name/domain pair.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User/group name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="domain" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User/group domain.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="realm" type="guid_type">
+				<xs:annotation>
+					<xs:documentation>Realm identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="connection_infoType">
+		<xs:annotation>
+			<xs:documentation>Connection information, including login and password</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="connectivity_infoType">
+				<xs:sequence>
+					<xs:element name="login" type="auth_nameType" minOccurs="0"/>
+					<xs:element name="password" type="xs:base64Binary" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="eid_listType">
+		<xs:annotation>
+			<xs:documentation>EID list structure</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="eid" type="eid_type" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="vt_infoType">
+		<xs:annotation>
+			<xs:documentation>Virtualization technology-specific read-only settings.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="vt_settingsType">
+		<xs:annotation>
+			<xs:documentation>Virtualization technology-specific settings.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="default_sample_id" type="guid_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>default sample config used to create new environments</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ok"/>
+	<xs:complexType name="userType">
+		<xs:annotation>
+			<xs:documentation>User structure</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="initial_group" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Initial group</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="groupType">
+							<xs:sequence>
+								<xs:element name="name" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Group name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="gid" type="xs:int" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Group ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Other groups</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="groupType">
+							<xs:sequence>
+								<xs:element name="name" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Group name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="gid" type="xs:int" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Group ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="uid" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shell" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Shell</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="password" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Password</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="home_dir" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Home directory</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="comment" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="groupType">
+		<xs:annotation>
+			<xs:documentation>Group structure</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="user" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="userType">
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>User name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="member_group" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="groupType">
+							<xs:sequence>
+								<xs:element name="name" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Group name</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Group name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="gid" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Group ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="packageType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Package name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="summary" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Package summary</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="os" type="osType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Package OS and platform</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Package description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="arch" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Package architecture x86, x86_64, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Package version</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="event_dataType"/>
+	<xs:element name="event_data" type="event_dataType" abstract="true"/>
+	<xs:complexType name="named_listType">
+		<xs:annotation>
+			<xs:documentation>Named list type</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of the attribute.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="value" type="xs:base64Binary" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Value of attribute.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="modType">
+		<xs:complexContent>
+			<xs:extension base="named_listType">
+				<xs:sequence>
+					<xs:element name="op" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Modification operation: Add = 0; Delete = 1; Replace =2. Add is used by default</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:int">
+								<xs:minInclusive value="0"/>
+								<xs:maxInclusive value="2"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="realmType">
+		<xs:annotation>
+			<xs:documentation>Realm structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="guid_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Unique identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="type" type="xs:int"/>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Friendly name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="builtin" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="eventType" final="#all">
+		<xs:sequence>
+			<xs:element name="eid" type="eid_type">
+				<xs:annotation>
+					<xs:documentation>The eid is the id of the enviroment that generated the event.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="time" type="datetime_type">
+				<xs:annotation>
+					<xs:documentation>Time at which this event was generated.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="source" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>The source name is a  string that specifies the name of the event source. It should be plugin or operator name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="category" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Category of event: env_config, env_status, etc. It identifies data format.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sid" type="sidType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The user SID identifies the active user at the time this event was generated.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="count" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>The message counter counts all messages from one source from last enviroment restart. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="id" type="guid_type">
+				<xs:annotation>
+					<xs:documentation>The message id is the unique message identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="info" type="infoType">
+				<xs:annotation>
+					<xs:documentation>User visiable event description.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="data" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="event_data">
+							<xs:annotation>
+								<xs:documentation>Where should be childs of event_data, 'restart_event' for example.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="infoType">
+		<xs:annotation>
+			<xs:documentation>This type describes informational messages from agent to user. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="message" type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>String to display. It may contain referenses to parameters as %name1%, %name2%, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="translate" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This message should be translated to user language.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="parameter" type="infoType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Parameters to message.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name of parameter</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="aceType">
+		<xs:sequence>
+			<xs:element name="type" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Type of ACE: 0 - allow, 1 - deny</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sid" type="sidType">
+				<xs:annotation>
+					<xs:documentation>SID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="rights" type="xs:base64Binary"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="security_descriptorType">
+		<xs:sequence>
+			<xs:element name="owner" type="sidType">
+				<xs:annotation>
+					<xs:documentation>owner of object</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="group" type="sidType">
+				<xs:annotation>
+					<xs:documentation>primary group of object owner</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dacl" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>object DACL</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ace" type="aceType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="security_objectType" abstract="true"/>
+	<xs:complexType name="env_security_objectType">
+		<xs:complexContent>
+			<xs:extension base="security_objectType">
+				<xs:sequence>
+					<xs:element name="eid" type="eid_type"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="net_deviceType">
+		<xs:annotation>
+			<xs:documentation>Abstract ethernet network device like NIC, VLAN, Bridge etc.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Device ID (aka interface name eth0, eth0.1, br2)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ip_address" type="ip_addressType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>IP Addresses on a interface.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dhcp" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>DHCP flag.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="network_id" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Network id this device belongs to</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Network device status.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="up"/>
+						<xs:element name="down"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="dhcpv6" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="default_gateway" type="xs:string" minOccurs="0"/>
+			<xs:element name="default_gateway_v6" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="voc_parameterType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>ID of the parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="type" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type (int, string, etc...)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="min" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Minimum possible value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="max" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Maximum possible value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="long" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Long description.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="short" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Short description.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="category" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Category.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="complex" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Is used, when default or data is complex and shows the number of pieces contained in it and usually separated by semi-colons.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="default" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Default value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="measure" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type of the measure (pages, ikilobyes, etc... )</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="data" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Specific for each parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name of parameter. Used, for example, for state id-state name mapping.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="parameter" type="voc_parameterType">
+		<xs:annotation>
+			<xs:documentation>Content of the Parallels Agent Vocabulary.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="category" type="voc_parameterType">
+		<xs:annotation>
+			<xs:documentation>Content of the Parallels Agent Vocabulary.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vocabularyType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Plugin name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="category" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="net_nicType">
+		<xs:annotation>
+			<xs:documentation>Network Interface Card - hardware network device</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="net_deviceType">
+				<xs:sequence>
+					<xs:element name="mac_address" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>MAC address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="perf_statType">
+		<xs:sequence>
+			<xs:element name="cur" type="xs:anySimpleType"/>
+			<xs:element name="avg" type="xs:anySimpleType"/>
+			<xs:element name="max" type="xs:anySimpleType"/>
+			<xs:element name="min" type="xs:anySimpleType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="perf_dataType">
+		<xs:sequence>
+			<xs:element name="eid" type="eid_type"/>
+			<xs:element name="class" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Perfcounter's class (network, cpu, etc)</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="name" type="xs:string"/>
+						<xs:element name="instance" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of subobjects (for example network interfaces or partitions)</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="name" type="xs:string" minOccurs="0"/>
+									<xs:element name="counter" maxOccurs="unbounded">
+										<xs:annotation>
+											<xs:documentation>Counters List</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="name" type="xs:string"/>
+												<xs:element name="value" type="perf_statType"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="interval" type="intervalType">
+				<xs:annotation>
+					<xs:documentation>Measurement interval</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="log_options_baseType">
+		<xs:annotation>
+			<xs:documentation>Base type to make log_optionsType polymorphic</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="log_optionsType">
+		<xs:complexContent>
+			<xs:extension base="log_options_baseType">
+				<xs:sequence/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="env_sampleType">
+		<xs:annotation>
+			<xs:documentation>Base type for the environment sample</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="virtual_config" type="venv_configType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Virtual environment configuration</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="id" type="guid_type">
+				<xs:annotation>
+					<xs:documentation>Sample id</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="file_listType">
+		<xs:annotation>
+			<xs:documentation>List of file paths</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="file_path" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="policy_ruleType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Rule identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="value" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Rule value. If not specified - default value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="policy_rule" type="policy_ruleType">
+		<xs:annotation>
+			<xs:documentation>Policy rule.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

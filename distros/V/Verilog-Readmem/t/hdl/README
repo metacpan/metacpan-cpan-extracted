@@ -1,0 +1,39 @@
+
+This directory contains all the $readmem data files used by the Perl module
+test suite.
+
+Additionally, a Verilog testbench (tb.v) is provided so that a user can
+run Verilog simulations, if desired.  This testbench was used to check
+all the data files.
+
+The following two simulators were used by the developer on Linux:
+
+    ncverilog
+        05.70-p001
+        (c) Copyright 1995-2006 Cadence Design Systems, Inc.
+
+    vcs
+        Version Y-2006.06
+        Copyright (c) 1991-2006 by Synopsys Inc.
+
+
+Gain access to simulator executables:
+    module load ldv vcs
+
+Pick a hex data file:
+    ln -s just_data.hex in.dat
+
+Run hex simulations:
+    ncverilog tb.v
+    vcs -R    tb.v
+
+Pick a binary data file:
+    rm in.dat
+    ln -s data_z.bin in.dat
+
+Run binary simulations:
+    ncverilog tb.v +define+BIN
+    vcs -R    tb.v +define+BIN
+
+Clean up the directory:
+    ./clean

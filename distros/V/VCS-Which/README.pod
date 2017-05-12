@@ -1,0 +1,59 @@
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/VCS-Which"><img src="https://travis-ci.org/ivanwills/VCS-Which.png" alt="VCS-Which"></a>
+<a href="https://coveralls.io/r/ivanwills/VCS-Which?branch=master"><img src="https://coveralls.io/repos/ivanwills/VCS-Which/badge.svg?branch=master" alt="Coverage Status" /></a>
+
+=head1 VCS-Which
+
+This module lets you perform some basic operations with unknown version
+control systems on a directory. The interface is still only at an early
+stage but trys to harmonise differences between distributed and non-
+distributed VCS's eg calling pull on on a non-distributed VCS will call
+update instead.
+
+The currently supported VCS's are GIT, SVN, CVS and Bazzar.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VCS::Which
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=VCS-Which
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/VCS-Which
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/VCS-Which
+
+    Search CPAN
+        http://search.cpan.org/dist/VCS-Which/
+
+    Source Code
+        git://github.com/ivanwills/VCS-Which.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

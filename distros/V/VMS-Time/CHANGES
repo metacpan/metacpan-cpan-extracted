@@ -1,0 +1,6 @@
+Revision history for Perl extension VMS::Time.
+
+0.1	1-Jan-2013
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.6.0 -c -f -n VMS::Time --use-new-tests --skip-ppport -v 0.1
+

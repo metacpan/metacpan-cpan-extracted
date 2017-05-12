@@ -1,0 +1,57 @@
+#!/bin/perl
+#
+# This is a good place to define all the tests which test things locally
+# on the machine.  Just define everything you can think of.  Tests which
+# can't be run will be attempted the first time you start it, but will then
+# be disabled, so we might as well try to run every test on every host and
+# just see if it will work.
+#
+# See the POD documentation for the following modules for more details.
+
+use VBTK;
+use VBTK::Wrapper::Vmstat;
+use VBTK::Wrapper::DiskFree;
+use VBTK::Wrapper::Prtdiag;
+use VBTK::Wrapper::Metastat;
+use VBTK::Wrapper::Vxprint;
+use VBTK::Log;
+
+# Specify where to look for the various command line utilities.  That way we
+# don't have to worry about which platform we're on.
+&VBTK::prependToPath qw(/usr/bin /usr/sbin /usr/platform/sun4u/sbin/ /usr/opt/SUNWmd/sbin);
+
+# Vmstat cpu monitoring
+$obj = new VBTK::Wrapper::Vmstat;
+$obj->addVBObj if ($obj);
+
+# Diskspace monitoring with df
+$obj = new VBTK::Wrapper::DiskFree;
+$obj->addVBObj if ($obj);
+
+# Hardware status monitoring (Solaris)
+$obj = new VBTK::Wrapper::Prtdiag;
+$obj->addVBObj if ($obj);
+
+# DiskSuite disk volume monitoring (Solaris)
+$obj = new VBTK::Wrapper::Metastat;
+$obj->addVBObj if ($obj);
+
+# Veritas Volume manager monitoring (Solaris)
+$obj = new VBTK::Wrapper::Vxprint;
+$obj->addVBObj if ($obj);
+
+# Monitor /var/adm/messages, looking for warning or error messages.
+$obj = new VBTK::Log(
+    SourceList => '/var/adm/messages');
+$obj->addVBObj(
+    VBObjName => ".$::HOST.log.messages",
+    Rules     => {
+        '($data =~ /unix:|hardware error|panic/i)'      => 'Fail',
+        '($data =~ /fail|warning|refuse/i)' => 'Warn' } ) if ($obj);
+
+# If you have any other logs you want to monitor, just copy the code above and
+# alter it to look at the log file you want.
+
+# Call this at the very end to start monitoring everything.
+VBTK::runAll;
+

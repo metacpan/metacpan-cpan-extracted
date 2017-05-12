@@ -1,0 +1,40 @@
+Revision history for Video::Filename
+
+0.35    2009.01.13 16:46:05
+        Some filenames weren't parsed correctly, so regexes were fixed to do so.
+        Fix bug in _allnum2int() and _allrom2int()
+
+0.34    2008.12.20 12:16:25
+        Optimize code so undef values aren't added to the object
+        Add passing a hashref in to new()
+        Add tests for isXXXX() functions to test harness
+        Add option to replace spaces in name/epname/movie/title
+        Add isDVDshow/isTVshow
+
+0.33    2008.12.19 16:02:43
+        Add DxxExx parsing support for DVD episode numbering
+        Add IMDB number partsing support
+        Rewrite the tests and test engine so it can support DVD/IMDB testcases
+        Add support for english numbers for DVD/Season/Episode numbers
+        Add guess-name/guess-movie for names which span multiple directory/subs
+        Add seasonepisode support for DVDs
+        Add prefix support for _allnum2int()
+        Add _allroman2int()
+
+0.32    2008.11.16 10:32:46
+        Remove reliance on perl v5.10
+        Add regex patterns which don't rely on named groups
+        Add list of keys from new regex patterns
+        Take care of look-behind regex for roman numerals in perl <5.10
+        Approximate named groups in perl <5.10 using re_compat and re_keys
+        Fix code indentation
+        Add convenience SnnEnn entry as 'seasonepisode'
+        With contributions to the above from Justin Pulsipher
+
+0.31    2008.11.10 20:01:39
+        Add a final rule which assumes filenames not matched by the others is
+            considered a movie.
+
+0.30    2008.11.06 01:20:17
+        First version, released on an unsuspecting world.
+

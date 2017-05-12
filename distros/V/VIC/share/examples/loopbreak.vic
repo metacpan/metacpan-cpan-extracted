@@ -1,0 +1,40 @@
+PIC P16F690;
+
+Main {
+    digital_output PORTC;
+    Loop {
+        $dummy = 0xFF;
+        while $dummy != 0 {
+            $dummy >>= 1;
+            write PORTC, 1;
+            sim_assert $dummy > 0x0F, "dummy is > 0x0F";
+            if $dummy <= 0x0F {
+                break;
+            }
+        }
+        sim_assert $dummy == 0x0F, "dummy is 0x0F";
+        while $dummy > 1 {
+            $dummy >>= 1;
+            write PORTC, 3;
+            continue;
+        }
+        sim_assert $dummy == 1, "dummy is 1";
+        if $dummy == TRUE {
+            write PORTC, 2;
+            break;
+        } else {
+            write PORTC, 4;
+            continue;
+        }
+    }
+    sim_assert "we have exited the infinite loop 1";
+    # we have broken from the loop
+    while TRUE {
+        write PORTC, 0xFF;
+    }
+}
+
+Simulator {
+    attach_led PORTC, 8;
+    stop_after 3s;
+}

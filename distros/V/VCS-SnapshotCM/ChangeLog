@@ -1,0 +1,177 @@
+2004-09-03  Marcus Holland-Moritz  <mhx>
+
+	* MANIFEST@1, MANIFEST.SKIP@1, Makefile.PL@1, TODO@1:
+	  initial checkin
+
+	* bin@1:
+	  no comment
+
+	* bin/wannotate@1, bin/whistory@1:
+	  initial checkin
+
+	* lib@1, lib/VCS@1, lib/VCS/SnapshotCM@1:
+	  no comment
+
+	* lib/VCS/SnapshotCM/Tools.pm@1:
+	  initial checkin
+
+	* t@1:
+	  no comment
+
+	* t/load.t@1:
+	  initial checkin
+
+2004-09-04  Marcus Holland-Moritz  <mhx>
+
+	* bin/wannotate@2:
+	  add color support
+	  add guessing of defaults
+	  add configurable prefixes
+
+	* bin/whistory@2:
+	  adapt to new V:S:T interface
+	  cleanups
+
+	* lib/VCS/SnapshotCM/Tools.pm@2:
+	  complete overhaul with new interface
+
+	* Makefile.PL@2:
+	  remove Cwd, add Text::Tabs.
+
+2004-09-05  Marcus Holland-Moritz  <mhx>
+
+	* lib/VCS/SnapshotCM/Tools.pm@3:
+	  add -q option to wco command
+	  add open_file and open_diff methods
+
+	* bin/wannotate@3:
+	  make regex more forgiving
+
+	* bin/whistory@3:
+	  fix some minor bugs
+	  add function output
+
+	* bin/whistory@4:
+	  add changelog output
+
+	* Makefile.PL@3:
+	  add POSIX
+
+	* lib/VCS/SnapshotCM/Tools.pm@4:
+	  add time to output of get_history
+
+	* Makefile.PL@4:
+	  add Time::Local
+
+	* Makefile.PL@5:
+	  add File::Temp
+
+	* t/load.t@2:
+	  get rid of Test::More
+
+	* bin/whistory@5:
+	  add support for source snapshot to be '-'
+
+	* lib/VCS/SnapshotCM/Tools.pm@5:
+	  keep used_in in order
+
+	* bin/wannotate@4:
+	  add version
+	  add documentation
+	  add 'since' info category
+
+	* bin/whistory@6:
+	  add version
+	  add documentation
+
+	* bin/whistory@7:
+	  add --reverse
+
+	* TODO@2:
+	  no comment
+
+	* Changes@1, README@1:
+	  initial checkin
+
+	* MANIFEST@2:
+	  no comment
+
+	* lib/VCS/SnapshotCM/Tools.pm@6, bin/wannotate@5, bin/whistory@8:
+	  add header
+
+2004-09-06  Marcus Holland-Moritz  <mhx>
+
+	* bin/wannotate@6:
+	  fix some more problems with 'since'
+
+	* bin/wannotate@7:
+	  accept warnings in diff output
+
+2004-09-07  Marcus Holland-Moritz  <mhx>
+
+	* bin/whistory@9:
+	  handle comments and strings better
+
+	* TODO@3:
+	  no comment
+
+	* bin/whistory@10:
+	  fix matching of lines
+
+	* bin/whistory@11:
+	  rip out preprocessor stuff first
+
+2004-09-08  Marcus Holland-Moritz  <mhx>
+
+	* bin/whistory@12:
+	  add --warnings option
+	  don't return @ranges for asymmetric files
+	  more debug output
+
+	* bin/whistory@13:
+	  no comment
+
+	* bin/wannotate@8:
+	  add --warnings option
+
+	* bin/wannotate@9:
+	  remove 'since' from default info
+
+	* TODO@4:
+	  no comment
+
+2004-09-11  Marcus Holland-Moritz  <mhx>
+
+	* bin/whistory@14:
+	  be consistent with SnapshotCM tools
+
+	* bin/wannotate@10:
+	  'since' doesn't work. period.
+
+	* lib/VCS/SnapshotCM/Tools.pm@7:
+	  add project cache
+	  improve guess_server_hostname
+
+	* bin/whistory@15:
+	  compress changelog output even further
+
+	* TODO@5, Changes@2, MANIFEST@3:
+	  no comment
+
+2005-04-09  Marcus Holland-Moritz  <mhx>
+
+	* lib/VCS/SnapshotCM/Tools.pm@8:
+	  add guess_local()
+
+	* TODO@6:
+	  no comment
+
+	* bin/whistory@16:
+	  try to do better guessing
+
+	* lib/VCS/SnapshotCM/Tools.pm@9:
+	  improve debugging support
+
+	* Changes@3:
+	  no comment
+

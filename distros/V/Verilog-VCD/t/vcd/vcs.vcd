@@ -1,0 +1,119 @@
+$date
+	Thu Jun 10 14:44:41 2010
+$end
+
+$version
+	Synopsys VCS version B-2008.12-10
+$end
+
+$timescale
+	1ns
+$end
+
+$comment Csum: 1 7b69d620ab3de6ab $end
+
+
+$scope module tb $end
+$var reg 1 ! foo $end
+$var wire 1 " bar $end
+$var integer 32 # i $end
+$var reg 8 $ data [7:0] $end
+$var reg 1 % abc[foo  $end
+$var wire 1 & bufd $end
+$var real 64 ' fp $end
+$var wire 1 ( mxout $end
+$var wire 1 ) invtemp $end
+$var event 1 * ev1 $end
+
+$scope begin named_block $end
+$var integer 32 + j $end
+$upscope $end
+
+
+$scope module inv0 $end
+$var wire 1 " in $end
+$var wire 1 ) out $end
+$upscope $end
+
+
+$scope module inv1 $end
+$var wire 1 ) in $end
+$var wire 1 , out $end
+$upscope $end
+
+$upscope $end
+
+
+$scope module chip $end
+
+$scope module cpu $end
+
+$scope module alu $end
+
+$scope begin toggle $end
+$var reg 1 - sss $end
+$upscope $end
+
+$upscope $end
+
+$upscope $end
+
+$upscope $end
+
+$enddefinitions $end
+
+#0
+$dumpvars
+x%
+x"
+x&
+x*
+x!
+x,
+x(
+x)
+bxxxxxxxx $
+bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx #
+b00000000000000000000000000000101 +
+r0.000000000000000  '
+1-
+$end
+#2
+0!
+r3.145900000000000  '
+1"
+0)
+1,
+1&
+#3
+b00000000000000000000000000111001 #
+#8
+x*
+z!
+x"
+x)
+x,
+x&
+#9
+1!
+0"
+1)
+0,
+b0101xz00 $
+0&
+#12
+0-
+#24
+1-
+#36
+0-
+#48
+1-
+#60
+0-
+#72
+1-
+#84
+0-
+#86
+r-0.4600000000000000  '

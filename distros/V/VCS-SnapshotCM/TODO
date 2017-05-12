@@ -1,0 +1,8 @@
+
+mhx@r2d2 ~/src/perl/VCS-SnapshotCM/Current $ whistory /my-folder/subfolder/my-test-project/0.001 Current
+*** Cannot compare snapshots from different projects.
+
+* tests
+* more error checking
+* interface with VCS module
+* whistory/wannotate HTML output?

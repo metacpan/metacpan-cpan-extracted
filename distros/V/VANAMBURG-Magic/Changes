@@ -1,0 +1,14 @@
+Revision history for VANAMBURG-Magic
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03  Added packet factory class with test
+      Added additional stacks
+      Added documentation in VANAMBURG::Magic
+      Provide lookup in singleton classes by abbreviation
+      
+0.04  Improve documentation
+	  Deleting       VANAMBURG-Magic/lib/VANAMBURG/CHaSeDOrder.pm
+	  Deleting       VANAMBURG-Magic/lib/VANAMBURG/SHoCkeDPacket.pm
+	  renamed scripts and added additional decks to menu

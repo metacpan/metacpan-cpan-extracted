@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/authm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/authm" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="authm" type="authmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Authentication Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="authmType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Authentication Management.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="add_user"/>
+						<xs:element ref="add_group"/>
+						<xs:element ref="edit_user"/>
+						<xs:element ref="edit_group"/>
+						<xs:element ref="add_to_group"/>
+						<xs:element ref="del_from_group"/>
+						<xs:element ref="get_user"/>
+						<xs:element ref="get_group"/>
+						<xs:element ref="del_user"/>
+						<xs:element ref="del_group"/>
+						<xs:element ref="authenticate"/>
+						<xs:element ref="add_realm"/>
+						<xs:element ref="del_realm"/>
+						<xs:element ref="get_realm"/>
+						<xs:element ref="get_auth_name">
+							<xs:annotation>
+								<xs:documentation>Resolves sid into auth name. Returns auth_name and type.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="get_sid"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="group" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="id"/>
+						<xs:element ref="realms"/>
+						<xs:element ref="token"/>
+						<xs:element ref="auth_name"/>
+						<xs:element ref="sid"/>
+						<xs:element ref="type"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="security_principalType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Security principal structure.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:auth_nameType">
+				<xs:sequence>
+					<xs:element name="group" type="vzlt:auth_nameType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Groups.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="member_group" type="vzlt:auth_nameType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A list of member groups.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="member_user" type="vzlt:auth_nameType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A list of member users.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="data" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="attr" type="vzlt:named_listType" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Attributes</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="sp_modType">
+		<xs:annotation>
+			<xs:documentation>Security principal mod structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User/group name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="domain" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User/group domain.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="data" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="mod" type="vzlt:modType" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Attributes to modify.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="add_group">
+		<xs:annotation>
+			<xs:documentation>Adds new group. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="group"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_user">
+		<xs:annotation>
+			<xs:documentation>Adds new user. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="user"/>
+				<xs:element name="password" type="xs:base64Binary"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_group">
+		<xs:annotation>
+			<xs:documentation>Edits group. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="group" type="sp_modType"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_user">
+		<xs:annotation>
+			<xs:documentation>Edits user. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="user" type="sp_modType"/>
+						<xs:element name="password" type="xs:base64Binary" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_to_group">
+		<xs:annotation>
+			<xs:documentation>Adds user/group to groups. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="group" type="vzlt:auth_nameType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Groups.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_from_group">
+		<xs:annotation>
+			<xs:documentation>Deletes user/group from groups. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="group" type="vzlt:auth_nameType" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Groups.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_group">
+		<xs:annotation>
+			<xs:documentation>Gets group information. Returns "group"s or Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element name="group" type="vzlt:auth_nameType">
+						<xs:annotation>
+							<xs:documentation>The group to retrieve the information for.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="attr">
+						<xs:annotation>
+							<xs:documentation> The group's attribute to retrieve the information for the group.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Attribute name.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="value" type="xs:base64Binary">
+									<xs:annotation>
+										<xs:documentation>Attribute value.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="realm" type="vzlt:guid_type">
+									<xs:annotation>
+										<xs:documentation>Realm identifier.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:element name="attrs" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Skip "name" to get all of attributes. Skip "attrs" to get list of groups without "data".</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_user">
+		<xs:annotation>
+			<xs:documentation>Gets user information. Returns "user"s or Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element name="user" type="vzlt:auth_nameType">
+						<xs:annotation>
+							<xs:documentation>The user to retrieve the information for.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="attr">
+						<xs:annotation>
+							<xs:documentation> The user's attribute to retrieve the information for the user.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Attribute name.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="value" type="xs:base64Binary">
+									<xs:annotation>
+										<xs:documentation>Attribute value.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="realm" type="vzlt:guid_type">
+									<xs:annotation>
+										<xs:documentation>Identifier of realm to search in.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:element name="attrs" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Skip "name" to get all of attributes. Skip "attrs" to get list of users without "data".</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_group">
+		<xs:annotation>
+			<xs:documentation>Deletes group. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="group" type="vzlt:auth_nameType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_user">
+		<xs:annotation>
+			<xs:documentation>Deletes user. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="user" type="vzlt:auth_nameType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_realm">
+		<xs:annotation>
+			<xs:documentation>Adds realm. Returns id or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="realm" type="vzlt:realmType"/>
+				<xs:element name="password" type="xs:base64Binary" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_realm">
+		<xs:annotation>
+			<xs:documentation>Sets realm. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="realm" type="vzlt:realmType"/>
+				<xs:element name="password" type="xs:base64Binary" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_realm">
+		<xs:annotation>
+			<xs:documentation>Deletes realm. Returns OK/Errors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="id"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_realm">
+		<xs:annotation>
+			<xs:documentation>Gets realms. Returns realms or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="authenticate">
+		<xs:annotation>
+			<xs:documentation>Authenticates user. Returns token or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="password" type="xs:base64Binary"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_auth_name">
+		<xs:annotation>
+			<xs:documentation>Resolves sid into auth name. Returns auth_name.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="sid"/>
+				<xs:element name="realm" type="vzlt:guid_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Realm identifier.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="create_token">
+		<xs:annotation>
+			<xs:documentation>***INTERNAL*** Returns token by SID.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="sid"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_sid">
+		<xs:annotation>
+			<xs:documentation>Resolves auth name into sid. Returns "sid" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="auth_name"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="token" type="vzlt:tokenType">
+		<xs:annotation>
+			<xs:documentation>Result of the authenticate operation.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="group" type="security_principalType"/>
+	<xs:element name="user" type="security_principalType"/>
+	<xs:element name="sid" type="vzlt:sidType"/>
+	<xs:element name="id" type="vzlt:guid_type"/>
+	<xs:element name="realms">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="realm" type="vzlt:realmType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="auth_name" type="vzlt:auth_nameType">
+		<xs:annotation>
+			<xs:documentation>User/group name.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_groupResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="group" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_userResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="user" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="edit_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_to_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_from_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_userResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_groupResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="authenticateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="add_realmResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="id"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="del_realmResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_realmResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="realms"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_sidResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="sid"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="type" type="xs:int"/>
+	<xs:complexType name="authm_configurationType">
+		<xs:annotation>
+			<xs:documentation>Parallels Agent configuration parameters.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element ref="realms"/>
+					<xs:element name="builtin_realm" type="vzlt:guid_type">
+						<xs:annotation>
+							<xs:documentation>Builtin realm identifier.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="create_tokenResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="loginType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User/group name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="domain" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User/group domain.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="realm" type="vzlt:guid_type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Realm identifier.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="dir_realmType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Directory realm structure.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:realmType">
+				<xs:sequence>
+					<xs:element name="address" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>IP, hostname</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="port" type="xs:int"/>
+					<xs:element name="base_dn" type="xs:string"/>
+					<xs:element name="default_dn" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Default DN (example: "cn=*,cn=agent,dc=vzl")</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="login" type="loginType" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

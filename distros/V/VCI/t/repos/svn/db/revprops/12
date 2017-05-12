@@ -1,0 +1,15 @@
+K 10
+svn:author
+V 6
+mkanat
+K 8
+svn:date
+V 27
+2007-09-03T06:46:21.989948Z
+K 7
+svn:log
+V 67
+This is the commit for testing VCI.
+And it has a two-line message.
+
+END

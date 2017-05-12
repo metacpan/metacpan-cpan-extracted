@@ -1,0 +1,29 @@
+Revision history for Perl extension VCG.pm.
+
+0.1  Sun Feb  9 21:32:06 2003
+	- original version; created by h2xs 1.21 with options
+		-n VCG.pm
+
+0.2  Mon Feb 10 23:10:04 2003
+        - added more pod
+        - added support for vcg output
+        - made api more consistent with GraphViz
+
+0.3  Tues Feb 11 22:10:05 2003
+        - tidied and improved documentation
+        - some more functionality
+        - fixed bug in constructor that put the configuration somewhere it
+would never be used again
+        - added optional program name to constructor
+
+0.4  Tues Feb 18 23:29:01 2003
+	- fixed many bugs in output (now works when called by autodia)
+	- added scale option for constructor (needed by autodia)
+	- less tidyness more workingness
+
+0.5  Thur Feb 27 23:30:01 2003
+        - fixed mistakes in documentation
+        - added more examples to synopsis
+        - added support for spline, argument, paper, pages and landscape printing
+        - tidied code
+        - probably works better now

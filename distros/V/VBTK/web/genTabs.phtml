@@ -1,0 +1,31 @@
+<!--#perl   
+  my $tabLinkStyle = "text-decoration:none";
+
+-->
+<!-- Tab bar -->
+<table border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <!--#perl
+      foreach my $tab (@tabs)
+      {
+        my $tabPrefix = ($tab eq $currTab) ? "sel" : "unsel";
+    -->
+        <td width="11"><img src="/images/${tabPrefix}tabl.gif" width="11" height="23" border="0"></td>
+        <th height="23" background="/images/${tabPrefix}tabm.gif">
+           <a href="$tabUrls{$tab}" style="$tabLinkStyle">
+             <font color="black">
+               $tab</font></a>
+        </th>
+        <td width="11"><img src="/images/${tabPrefix}tabr.gif" width="11" height="23" border="0"></td>
+    <!--#perl
+      }
+    -->
+  </tr>
+</table>
+<table width="620" height="1" border="0" cellspacing="0" cellpadding="0">
+  <tr valign="TOP">
+    <td height="3" background="/images/seltabpt.gif" valign="TOP">
+      <img src="/images/hr.gif" width="620" height="3" border="0">
+    </td>
+  </tr>
+</table>

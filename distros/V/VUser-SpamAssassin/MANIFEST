@@ -1,0 +1,7 @@
+COPYING
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/VUser/SpamAssassin.pm
+META.yml                                 Module meta-data (added by MakeMaker)

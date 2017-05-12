@@ -1,0 +1,9 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Vi/QuickFix.pm
+t/001_basic.t
+Makefile.PL
+META.yml                                Module meta-data (added by MakeMaker)

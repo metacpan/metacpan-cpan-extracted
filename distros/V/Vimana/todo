@@ -1,0 +1,22 @@
+# vim:fdm=expr:fdl=1:foldexpr=getline(v\:lnum)=~'^=='?'>1'\:getline(v\:lnum)[0]=~'[*x(]'?'>2'\:getline(v\:lnum)=~'^--'?'<2'\:'='
+
+x support installing packages from git/svn/hg repository
+x support for vim::packager  
+x installation record
+    should record file content checksum too. (for removing plugins)
+    if the checksum of a file is mismatched , then we shouldn't unlink the file.
+* support pseudo-names: installed , all ... etc 
+    vimana list installed
+    vimana list all
+* support for bzip archive (need a wrapper class)
+        Archive::Any sucks.
+* force install option
+* documentation
+* command for upgrading packages
+* feature checking
+* option for force script type, for example:
+    $ vimana install xxxx --type plugin
+
+== issues ==
+* should prompt "package can not found." when query a info page of an unknown package.
+* package doensn't have a cname if you install from a git uti.

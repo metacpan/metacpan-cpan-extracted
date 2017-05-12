@@ -1,0 +1,149 @@
+NAME
+    Vim::Helper - Extended tools to assist working with perl in vim.
+
+DESCRIPTION
+    Vim::Helper is a framework intended to integrate with vim to make
+    working with perl easier. It is a collection of plugins controlled by a
+    config file that is written in perl. The framework provides a command
+    line tool intended to be interfaced by vim.
+
+    Every plugin provides its own options and arguments, as well as help and
+    vimrc generation. Once your config file is complete you can have the
+    tool generate vimrc content that you can pase into your existing vimrc.
+
+SYNOPSIS
+    The module is 'use'd in your config file, aside from that you do not
+    generally interact directly with the module.
+
+  EXAMPLE CONFIG FILE
+    See examples/* in the distribution for more.
+
+    ~/.config/vimph:
+
+        # use Vim::Helper with a list of plugins (Vim::Helper::[PLUGIN])
+        use Vim::Helper qw/
+            TidyFilter
+            Test
+            LoadMod
+        /;
+
+        # Each plugin is given a configuration function which is the plugin name,
+        # '::' is replaced with '_' for plugins with deeper paths.
+        # Each plugin config function takes a hashref of options. Options are plugin
+        # specific.
+
+        Test {
+            from_mod => sub {
+                my ( $filename, $modname, @modparts ) = @_;
+                return 't/' . join( "-" => @modparts ) . ".t";
+            },
+            from_test => sub {
+                my ( $filename, $modname, @modparts ) = @_;
+                $filename =~ s{^t/}{};
+                $filename =~ s{^.*/t/}{};
+                $filename =~ s{\.t$}{};
+                my ( @parts ) = split '-', $filename;
+                return join( '/' => @parts ) . '.pm';
+            },
+        };
+
+        TidyFilter {
+            save_rc => '~/.config/perltidysaverc',
+            load_rc => '~/.config/perltidyloadrc',
+        };
+
+        LoadMod {
+            search => [ "./lib", @INC ],
+        };
+
+  GENERATING VIMRC
+        $ scripts/vimph vimrc
+
+    The above command will output content that can be inserted directly into
+    a .vimrc file.
+
+PLUGINS
+    There are several plugins included with the Vim::Helper distribution.
+    Additional plugins are easy to write.
+
+  INCLUDED PLUGINS
+    Fennec
+        Vim::Helper::Fennec - For use with Fennec based test suites.
+
+    LoadMod
+        Vim::Helper::LoadMod - Used to load the perl module that the cursor
+        is sitting on. Move the cursor over the module name "... My::Module
+        ..." and hit the configured key, the module will be found and
+        opened.
+
+    Test
+        Vim::Helper::Test - Used to interact with tests. PRovides keys for
+        automatically finding and opening test files when you are in
+        modules, and vice-versa.
+
+    TidyFilter
+        Vim::Helper::TidyFilter - Used to run perltidy on your files
+        automatically when you open, save, or close them. You can use
+        seperate tidy configs for loading/saving.
+
+        A good use of this is if you are sane and prefer space for
+        indentation, but your team requires tabs be used. You can edit in
+        your style, and save to the teams style.
+
+    VimRC
+        Loaded automatically, no config options.
+
+        Vim::Helper::VimRC - Used to generate the vimrc content.
+
+    Help
+        Loaded automatically, no config options.
+
+        Vim::Helper::Help - Used to generate help output.
+
+  WRITING PLUGINS
+    See Vim::Helper::Plugin for more details.
+
+META MODEL
+    In your configuration file you will automatically be given an instance
+    of Vim::Helper accessable via the VH_META function/method. The
+    configuration functions provided to you act upon this meta object. Ths
+    object also stores all loaded plugins.
+
+  METHODS
+    $obj = Vim::Helper->new()
+        Create a new instance (You should never need to use this directly)
+
+    $cli_obj = $obj->cli()
+        Get the Declare::CLI object used to manage options and arguments.
+
+    $plugins = $obj->plugins()
+        Get the hashref of all the plugins.
+
+    $plugin = $obj->plugin( $plugin_name )
+        Get the instance of a specific plugin.
+
+    $command = $obj->command( $opts )
+        Reconstruct the command called to launch the program, including
+        config file if it was specified. No other options are reconstructed.
+
+    ( $content, $file ) = $obj->read_config( $opts )
+        Get the content of the config file, also returns the filename that
+        was read.
+
+    $result = $obj->run( @cli )
+        Run with the command line arguments specified in @cli. (Example:
+        @ARGV)
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2012 Chad Granum
+
+    Vim-Helper is free software; Standard perl licence.
+
+    Vim-Helper is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

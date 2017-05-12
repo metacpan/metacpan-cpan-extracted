@@ -1,0 +1,8 @@
+=head1 VM-JiffyBox
+
+Perl API for JiffyBox
+
+Development: L<https://github.com/borisdaeppen/VM-JiffyBox>
+
+Packaged: L<https://metacpan.org/module/VM::JiffyBox>
+

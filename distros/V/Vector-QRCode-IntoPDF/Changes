@@ -1,0 +1,9 @@
+Revision history for Perl extension Vector-QRCode-IntoPDF
+
+0.02 2014-04-09T06:38:02Z
+    - modify test. Now Digest::SHA isn't a dependent module.
+
+0.01 2014-02-28T08:55:56Z
+
+    - original version
+

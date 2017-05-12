@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:complexType name="virtuozzo_configType">
+		<xs:annotation>
+			<xs:documentation>Virtuozzo Native Container configuration structure.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="vzlt:native_configType">
+				<xs:sequence>
+					<xs:element name="body" type="xs:base64Binary">
+						<xs:annotation>
+							<xs:documentation>Bash-like configuration.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="log_optionsType">
+		<xs:complexContent>
+			<xs:extension base="vzlt:log_options_baseType">
+				<xs:sequence>
+					<xs:element name="type" type="xs:int" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="venv_configType">
+		<xs:complexContent>
+			<xs:extension base="vzlt:venv_configType">
+				<xs:sequence>
+					<xs:element name="veid" type="veid_type" minOccurs="0"/>
+					<xs:element name="ve_root" type="xs:string" minOccurs="0"/>
+					<xs:element name="ve_private" type="xs:string" minOccurs="0"/>
+					<xs:element name="on_boot" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="template" type="templateType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="disabled" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="offline_management" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="os_template" type="templateType" minOccurs="0"/>
+					<xs:element name="distribution" type="templateType" minOccurs="0"/>
+					<xs:element name="capability" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="id" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Capability ID. See vocabulary for list of capabilities.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="value" type="xs:boolean">
+									<xs:annotation>
+										<xs:documentation>Capability value. </xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="iptables" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="config_customized" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="class_id" type="xs:string" minOccurs="0"/>
+					<xs:element name="ve_type" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="veid" type="veid_type" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Repaired CTID, in case of Container is a repair Container.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="type" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Container type</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="offline_service" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Offline services.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="wins_server" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>IP address list for WINS configuration.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="net_device" type="net_vethType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Veth - virtual ethernet device</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ts_license_server" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Terminal server (TS) license servers list.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ts_mode" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Terminal server (TS) mode. APPLICATION= 0, ADMIN=1.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="uuid" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The Environment unique identifier.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="allow_reboot" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Allow reboot of Container</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="rate_bound" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="interface_rate" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="class_id" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Traffic shaping class ID.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="rate" type="xs:long">
+									<xs:annotation>
+										<xs:documentation>Traffic rate value in kbps.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="slm_mode" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>SLM memory mode (slm/ubc/all).</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="origin_sample" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Read only. Sample name with which container was creadted.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="vt_settingsType">
+		<xs:annotation>
+			<xs:documentation>Global xen plugin configuration</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="vzlt:vt_settingsType">
+				<xs:sequence>
+					<xs:element name="parameter" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Raw values, in the form of ID="VALUE".</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="id" type="xs:string"/>
+								<xs:element name="value" type="xs:string"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="service" type="redirect_serviceType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="qos" type="vzlt:qosType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="vt_infoType">
+		<xs:annotation>
+			<xs:documentation>Information about VZ</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="vzlt:vt_infoType">
+				<xs:sequence>
+					<xs:element name="sve_eid" type="vzlt:eid_type">
+						<xs:annotation>
+							<xs:documentation>Service Container EID</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="version" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>VZ version</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="release" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>VZ release</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="redirect_serviceType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Redirect ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="port" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Redirect port</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dst" type="vzlt:eid_type">
+				<xs:annotation>
+					<xs:documentation>Redirect EID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="default" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If set than this service will be added to list of default services.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="veid_type">
+		<xs:annotation>
+			<xs:documentation>CTID type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long"/>
+	</xs:simpleType>
+	<xs:complexType name="templateType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Template name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Template version</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="package_std_vztemplateType">
+		<xs:annotation>
+			<xs:documentation>Package type for vzapackagem/package</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="package_vztemplateType">
+				<xs:sequence>
+					<xs:element name="base" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Base version i.e. standalone.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="package_vztemplateType">
+		<xs:annotation>
+			<xs:documentation>Package type for vzapackagem/package</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="vzlt:packageType">
+				<xs:sequence>
+					<xs:element name="technology" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Required or supported technologies</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="os_template" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>is os template</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="cached" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>chached</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="path" type="xs:base64Binary" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Path to package</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="uptodate" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Flag means cash for OS template is up to date. Setted by "list" command.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="env_security_objectType">
+		<xs:complexContent>
+			<xs:extension base="vzlt:env_security_objectType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="net_vethType">
+		<xs:complexContent>
+			<xs:extension base="vzlt:net_nicType">
+				<xs:sequence>
+					<xs:element name="wins_server" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="nameserver" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="default_gateway" type="xs:string" minOccurs="0"/>
+					<xs:element name="host_routed" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="envType">
+		<xs:complexContent>
+			<xs:extension base="vzlt:envType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="interface_rate">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="class_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Traffic shaping class ID.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="net_device_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Network device ID.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="rate" type="xs:long">
+					<xs:annotation>
+						<xs:documentation>Traffic rate value in kbps.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

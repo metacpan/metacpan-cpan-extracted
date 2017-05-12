@@ -1,0 +1,86 @@
+VBTK version 0.01
+=================
+
+VBTK is a collection of modules which can be used to build a complex monitoring
+system completely written in perl.  It's system monitoring abilities are, at 
+the moment, mostly limited to unix servers.  But it also supports 
+monitoring through SNMP, HTTP, SMTP, TCP, POP3, etc., and the framework is
+easily expanded.  More modules will be added over time.  It provides a central
+server with a simple web interface which shows statuses, history, monitoring
+details, and graphs.
+
+Note that the VB toolkit is just a group of modules.  You write the final
+perl program which runs them yourself.  But don't let that deter you, everything
+is defaulted and quite simple, so the final perl program is usually very simple.
+Also, there are several examples and templates to copy from.
+
+Note also that I wrote most of this during my commute, while sitting on public
+transportation, so it's not my best work ever, but I think it's still useful.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl 5.6.0 or later
+Bundle::LWP
+Date::Manip
+Algorithm::Diff
+File::Find
+Storable
+Mail::Sendmail
+Mail::POP3Client
+
+The simplest way to install these is to just use 'perl -MCPAN -e shell'.  Once 
+in the shell, just type 'install Bundle::LWP', 'install Algorithm::Diff', etc.
+
+If you want SNMP monitoring, you'll need to install the SNMP module.  Note that
+the SNMP module requires the Net-SNMP toolkit library available
+from http://sourceforge.net/projects/net-snmp.
+
+If you want graphs, you'll also want to install rrdtool. 
+(See http://www.rrdtool.com/index.html)  I strongly recommend this!
+
+The VBServer doesn't run too well running directly on Windows.  The little 
+testing I've done has shown it to constantly lock up.  I'm not sure why.
+However, it runs great under Cygwin on Windows, so I strongly suggest using
+Cygwin if you want to run this on Windows.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+INITIAL CONFIGURATION
+
+The first step is to get the VBServer up and running.  They you can see how
+it looks and add monitoring processes a little at a time.  Also, once it's
+up and running, you will be able to view the VBTK POD documentation online,
+which gives further details on setting up your monitoring system.
+
+Follow the directions in the VBTK POD documentation under the 'Initial
+Configuration' section:
+
+    perldoc VBTK.pm
+
+BUG REPORTING
+
+Please report bugs to vbtoolkit@yahoo.com.  I can't promise I'll be responsive,
+but send away...
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 1996-2002 Brent Henry
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation available at:
+http://www.gnu.org/copyleft/gpl.html
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.

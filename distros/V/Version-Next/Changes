@@ -1,0 +1,36 @@
+Revision history for Version-Next
+
+1.000     2016-02-25 14:37:13-05:00 America/New_York
+
+    [!!! INCOMPATIBLE CHANGES !!!]
+
+    - Due to changes in the interpretation of dotted-decimal version
+      numbers with alpha elements in version.pm 0.9913 and later, the
+      notion of the 'next' dotted-decimal alpha is ill-defined.
+      Version::Next no longer supports dotted-decimals with alpha elements
+      and will throw an exception if one is passed to next_version.
+
+0.004     2014-03-07 06:24:03-05:00 America/New_York
+
+    [CHANGED]
+
+    - Now requires inputs to pass version::is_lax(), but does some
+      sanitization of excessivly lax inputs
+
+0.003     2014-03-06 10:11:34-05:00 America/New_York
+
+    [DOCUMENTED]
+
+    - Clarified SYNOPSIS to show explicit import (Grzegorz Rożniecki)
+
+    [CHANGED]
+
+    - Updated dist.ini and meta files
+
+0.002     2010-10-01 13:46:06 EST5EDT
+
+    - Don't specify minimum Carp version (fails on 5.6.x)
+
+0.001     2010-03-18 22:57:48 EST5EDT
+
+    - first draft

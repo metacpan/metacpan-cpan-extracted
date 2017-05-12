@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+use Vayne::Worker;
+
+$|=1;
+register 'benchmark' => sub {
+    my($workload, $step, $result, $status, $job) = @_;
+    $result->(time);
+    $status->(1);
+};
+Vayne::Worker->run;

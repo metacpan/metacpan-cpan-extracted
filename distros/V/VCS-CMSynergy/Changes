@@ -1,0 +1,816 @@
+1.51  2016-04-02 
+  
+  [Bug fixes]
+  - fix a syntax error with all perl versions < 5.22
+  - fix calls to _generic_show()
+
+1.50  2016-04-02
+
+  [Bug fixes]
+  - avoid problems with Log4perl calls in Perl global destruction phase;
+    symptoms are error messages like this:
+    
+      (in cleanup) Internal error: Root Logger not initialized. at /opt/perl5/perls/perl-5.20.2/lib/site_perl/5.20.2/VCS/CMSynergy/Client.pm line 277.
+      VCS::CMSynergy::Client::_ccm(VCS::CMSynergy=HASH(0x499b148), "stop") called at /opt/perl5/perls/perl-5.20.2/lib/site_perl/5.20.2/VCS/CMSynergy.pm line 346
+      VCS::CMSynergy::DESTROY(VCS::CMSynergy=HASH(0x499b148)) called at ./smint.pl line 0
+
+  [BEWARE - USER VISIBLE CHANGE]
+  - cat_object(): drop array ref and code ref as possible destinations
+
+  [Other changes]
+  - implement Object methods recursive_is_FOO_of() and recursive_has_FOO()
+    (the corresponding query functions appeared in Synergy 7.2)
+
+  - _ccm(): make it possible to read "ccm" stdout/stderr as UTF-8
+    
+  - use ccm() instead of _ccm() for AUTOLOADed methods so that we have 
+    the same behavior wrt exceptions: if you check the return values(s), 
+    no exception will be thrown
+
+  - add a new sub class of VCS::CMSynergy::Object for transfer sets
+
+  - modify *_object() methods to use corresponding query functions
+    - supported Synergy versions now start at 7.x
+    - add optional @keywords parameter
+    - add tset_object(): tset object from transferset name
+
+  - remove full_history* methods: they were never documented and are
+    unnecessary as of Synergy >= 7.2 (where "ccm history" already returns
+    the "full" history
+
+  - update Module::Install to 1.16
+
+  - add a note that show_reconfigure_properties() is obsolete
+    in Synergy 7.2 and up
+
+  - cat_object(): add TRACE message describing the destination
+
+  - fix some warnings from perlcritic
+
+1.49  2015-04-14
+
+  [Bug fixes]
+  - fix project_tree() when using omit_top_dir
+  - fix problem with get_attribute() of a non-existent attribute in web mode
+    (would throw an exception, but should just return undef)
+
+  [Other changes]
+  - add LICENSE file, convert README to markdown format
+  - upload to GitHub (https://github.com/rschupp/VCS-CMSynergy)
+    and add this repository to resources
+  - downgrade a Log::Log4perl message from INFO to DEBUG
+
+1.48  2015-04-02
+
+  [BEWARE - USER VISIBLE CHANGE]
+  - add optional @keywords parameter to VCS::CMSynergy::ls_object()
+    - makes syntax consistent with ls_{arrayref,hashref} and other
+      *_object methods
+    - make parameter $file_spec mandatory (otherwise parameters are ambiguous)
+
+  [Other changes]
+  - drop all references to obsolete get_member_info CLI command
+  - make VCS::CMsynergy->new(CCM_ADDR => ..., role => ..., ...) work
+  - make tests t/*t not fail when CCM_TEST_DB is not set
+
+1.47  2015-03-22
+
+  [New methods for baseline, process_rule, projects and project_grouping objects]
+  - add derived classes VCS::CMSynergy::{Baseline,ProcessRule,ProjectGrouping}
+  - add methods show_hashref(), show_object() that wrap 
+    "ccm baseline -show WHAT" etc
+  - add convenience methods project_grouping(), process_rules()
+    to VCS::CMSynergy::Project to quickly move from a project to its
+    project_grouping or process_rules, resp.
+
+  [Bug fixes]
+  - add workaround for with some Types:Standard expression 
+    in certain Perl versions
+
+      perl -MTypes::Standard=Str,ArrayRef,slurpy \
+        -e 'my @spec = ( [], Str | ArrayRef[Str], slurpy ArrayRef[Str] ); 
+            print scalar(@spec), "\n";'
+    
+    prints:
+    
+        2 (broken): Perl 5.8.9 5.10.1 5.12.4
+        3 (OK): Perl 5.14.4 5.16.3 5.20.1
+    
+    Adding superfluous parenthesis around complex Types::Standard expressions
+    like "Str | ArrayRef[Str]" makes all Perl versions print "3".
+
+1.46  2015-03-01
+
+  [BEWARE - USER VISIBLE CHANGE]
+  - rename VCS::CMSynergy::Project::object_from_proj_ref() to object_from_path()
+
+  [Bug fixes]
+  - work around a problem with Type::Params::validate() 
+    in certain Perl versions
+
+  [Other changes]
+  - make history commands in web mode more robust
+
+1.45  2015-02-21
+
+  [Bug fixes]
+  - fix a critical thinko with error handling in ccm():
+    ccm() erroneously reports an error when
+    - RaiseError or PrintError is on
+    - it is called in void context
+    - the actual "ccm" command exited with success
+    thanks to Jürgen Schorer for reporting this
+  - don't "remember" CCM_ADDR in $self until we've checked it
+  - if CCM_ADDR is bogus, don't croak(), use set_error() instead
+  
+  [Other changes]
+  - add documentaion about logging via Log::Log4perl;
+    remove reference to no longer existing trace() and trace_msg() methods
+  - add explicitly "provides" and drop "no_index: namespace";
+    hopefully this will make the documentation for
+    VCS::CMSynergy::{Client,Object,Project,Helper} show up on CPAN
+
+1.42  2015-02-01
+
+  [BEWARE - USER VISIBLE CHANGE]
+  - change error handling for ccm(): if the user checks the return value
+    of ccm() (ie. calls ccm() in non-void context) do NOT RaiseError etc
+  - users NOT using PrintError/RaiseError/HandleError should see no
+    change in behaviour
+  - users using PrintError/RaiseError/HandleError are now given a choice:
+    they can use try/catch semantics as before OR they can check
+    return codes
+
+  [Other changes]
+  - make starting a session in classic mode work again
+  - when re-using an existing session, fail early if CCM_ADDR is bogus
+  - actually allow undef in some arguments as per documentation
+    
+1.41  2015-01-26
+
+  [BEWARE - USER VISIBLE CHANGE]
+  - incompatible change: relations_arrayref() now returns objectnames
+    in the "from" and "to" slots of a result row; previously it returned
+    VCS::CMSynergy::Objects in these slots
+  - this makes it more consistent compared with relations_hashref().
+
+  [New methods for retrieving properties of several objects in one command]
+  - add properties_hashref(), properties_object() methods
+  - for getting multiple properties for a lsit of objects with
+    a single CLI command
+  - interface similar to query_{hashref,object}()
+
+  [Other changes]
+  - remove outdated "classic mode only" annotations for some methods from POD
+
+1.40  2014-12 25  Just when I thought I was out... they pull me back in.
+
+  [BEWARE - USER VISIBLE CHANGE]
+    - The internal structure if VCS::CMSynergy::Object has changed.
+    - This above breaks programs using $obj->{name} etc, but they shouldn't
+      rely on implementation details.
+    - $obj->objectname (or just the stringization of $obj) now uses
+      the "all colon" form. This should not matter when passing it back
+      to Synergy (for any still supported Synergy version), but could
+      cause problems for a program that parses these strings themself
+      (which it shouldn't do, use VCS::CMSynergy::Object methods instead).
+
+  [Use "Log::Log4perl enable" for logging]
+    - add a dependency on Log::Log4perl
+    - remove trace(), trace_msg() methods and $Debug, $Debugfh package variables
+    - instead use Log::Log4perl :easy functions INFO(), TRACE() etc where appropriate
+    - emulate the old environment variable CMSYNERGY_TRACE by easy_initializing
+      Log::Log4perl in a compatible manner
+      Note: CMSYNERGY_TRACE is only honored  if Log::Log4perl isn't initialized
+      already, so as not to interfere with an explicit initialization
+      outside of VCS::CMSynergy
+
+  [New shortcut query syntax]
+    - new syntax is 
+      $ccm->query_method([ key => value , ...], @keywords)
+    - key => value translates to "key = 'value'"
+    - omit quotes if value is "TRUE or "FALSE"
+    - use "match" instead of "=" if value contains wildcards
+    - key => \@values translates to ANY_OF(key, @values)
+    - combine same keys with "or"
+    - combine all others with "and"
+    - deprecate old style syntax
+      $ccm->query_method({ key => value , ...}, @keywords)
+
+  [VCS::CMSynergy::Users: make methods case insensitive wrt user names]
+    - newer Synergy version treat user name case insensitively:
+    - return a Tie::CPHash from users()
+    - add a dependeny on Tie::CPHash
+    - get rid of insertion order preserving hashes, the order of lines
+      in "ccm users" was never relevant
+    - make delete_roles() delete the user if it has no more roles left
+      (because users without roles aren't allowed by Synergy anyway).
+
+  [New methods full_history_hashref() and full_history_arrayref()]
+    When an object is renamed (probably also when its cvtype changed),
+    "ccm history" (and hence history_hashref()) doesn't show the full history.
+    Add new methods that will do that.
+
+  [Other changes]
+  - update for Synergy 7.2, make most methods work with web mode 
+
+  - drop support for Synergy versions older than 6.5
+
+  - normalize objectnames to "all colon separator" form
+
+  - VCS::CMSynergy::Project: add method has_child()
+
+  - upgrade to Module::Install 1.14
+
+  - add covenience functions ANY_OF() and NONE_OF(),
+    useful when building complex queries
+    
+  - always return "unique" objects, not only for :cached_attributes.
+    
+  - for :tied_objects make it possible to use
+    $obj->{objectname}, $obj->{name} etc (read-only, of course)
+    
+  - kwalitee fixes
+
+  - reformat Changes file according to CPAN::Changes::Spec
+
+  - Cygwin: get rid of obsolescent Filesys::CygwinPaths
+    - replace calls to fullwin32path() by running the cygpaths utility
+
+  - replace homegrown _usage() with Type::Params and
+    add a dependency on Type::Params and Types::Standard 
+
+  - move all tests in t/ requiring the "tutorial" database to xt/
+    and don't distribute them anymore
+
+  - VCS::CMSynergy::Project: add convenience methods project_tree(), top_dir()
+
+  - make VCS::CMSynergy::Object methods "displayname" and "cvid" cache
+    their result in the attribute cache (even if not using :cached_attributes)
+    and look there first; this makes the following work wrt caching
+  
+      use VCS::CMSynergy ':cached_attributes';
+      ...
+      my $result = $ccm->query_object("...", qw( displayname ));
+      foreach (@$result) {
+          ... $_->displayname ...; # look Ma: already cached
+      }
+  
+  - purge all references to the deprecated "query_object_with_attributes"
+
+1.35  2010-05-22
+
+  - Telelogic has been bought by IBM and "CM Synergy" is now called 
+    "IBM Rational Synergy":
+
+    - VCS::CMSynergy::Client: correctly parse output of "ccm version"
+    - use the same regex in Makefile.PL
+    - drop some text references to "Telelogic"
+    - small fixes to test suite for Synergy 7.1
+
+
+  - First crack at supporting Synergy 7.x "web mode"
+
+    - VCS::CMSynergy::_start, VCS::CMSynergy::new
+      - accept option "server => URL" ("ccm start -s URL ..")
+      - document "server" option
+      - don't supply empty ini file when this option is used 
+        (fixes "ccm start": "-f" is illegal when "-s" is specified)
+
+    - t/util.pm: accept URL (instead of hostname) in CCM_TEST_USER string,
+      put it in $test_session{server}
+
+    - t/01session.t: when using web mode there's a lag between "ccm stop" exiting
+      and the session disappearing from "ccm ps"; delay after 
+      closing a session before checking "ccm ps"
+
+    - adapt parsing of "ccm attribute -ls ...": web mode omits the
+      parentheses around type and origin
+
+    - ye olde editor trick: web mode renames placeholder %filename to %file
+
+  - Changes to project traversal and diff methods
+
+    - VCS::CMSynergy::Project::traverse
+      - add an option "pathsep" that will be "passed down" 
+        to VCS::CMSynergy::Traversal::path() 
+      - remove the (undocumented) optional $pathsep parameter from
+        VCS::CMSynergy::Traversal::path()
+      - speed up VCS::CMSynergy::Traversal::path() a bit by precomputing
+        the dirname part (as $_catdirs) and only recomputing this
+        when @_dirs actually changes
+      - fix inadvertent modification of passed-in "wanted" hash
+      - make robust against this by copying the hash as early as possible
+
+    - VCS::CMSynergy::project_tree
+      add option "omit_top_dir" 
+
+    - VCS::CMSynergy::project_diff
+      - new method
+      - driver for a "differ" class walking the tree returned 
+        by VCS::CMSynergy::project_tree()
+      - re-implement examples/ccm_project_diff using project_diff()
+
+  - Spring cleaning - remove deprecated stuff
+
+    - get_releases, set_releases: manipulation of stone-age "release table"
+    - _cat_binary, _attype_is_binary: workaround for "ccm cat" on binary objects
+      is not necessary anymore
+    - delete corresponding note in pod for VCS::CMSynergy::cat_object
+
+  - Don't use global filehandles.
+
+  - Document VCS::CMSynergy::user().
+
+  - Fix wrong documentation for some VCS::CMSynergy::Object methods
+    (spotted by Helge Sauer).
+
+1.34  2008-10-18
+
+  - Implement VCS::CMSynergy::Object method mydata(): associate arbitrary data 
+    with object.
+
+  - Implement (previously forgotten) VCS::CMSynergy::Object method cat_object().
+
+  - Fix bug: @VCS::CMSynergy::Traversal::dirs and
+    @VCS::CMSynergy::Traversal::projects are empty during
+    VCS::CMsynergy::Project::traverse() (reported by Andy Hassall).
+
+  - Fix a long standing problem: the record for process "router"
+    may be missing from the list returned by ps().
+
+  - Accept objectnames with ":" as the first delimiter
+    (instead of the database delimiter), as seen in recent Synergy versions
+    (e.g. "releasedef" objects) - Synergy accepts them, too.
+
+  - Move ccm_project_diff from examples/ to script/.
+
+  - Documentation updates:
+    - clarify behaviour of finduse() when an argument refers to a 
+      non-existing object
+    - when describing boolean options, use true/false instead of "on"/"off"
+
+1.33  2008-03-12
+
+  - Follow the advice in "How can I stop getting FAIL reports
+    for missing libraries or other non-Perl dependencies" from
+    http://cpantest.grango.org/wiki/CPANAuthorNotes: if no working Synergy
+    installation is found, make Makefile.PL exit(0), but without generating
+    Makefile.
+
+1.32  2008-02-01
+
+  - The CPAN indexer exposed a problem with extracting module VERSIONs
+    from SVN $Revision$ tags (which only shows with Perl 5.10). 
+    Otherwise no changes.
+
+1.31  2008-02-01
+
+  - Implemented show_reconfigure_properties() Project method.
+
+  - On Cygwin, make sure that path names that are passed down to Synergy
+    are in native Windows form.
+
+  - Added -ui_database_dir to session in test suite (bug 27260).
+    This should make the tests run with an out-of-the-box Synergy
+    client installation.
+
+  - Tested with Synergy 6.5 SP1 and Perl 5.10.
+
+1.30  2007-05-22
+
+  - Ported to CM/Synergy 6.5: the product is now called "Telelogic Synergy".
+    Also some changes to the test suite, but it still requires 
+    the "tutorial" database from CCM 6.4 before SP1 (upgraded, of course,
+    to your Synergy version).
+
+  - examples/project_diff in --terse mode will now mark ("~") items
+    that have different cvtypes (e.g. directory vs regular file)
+    or instances in both projects.
+
+  - Small cleanups. It is now checked that certain special keywords,
+    e.g. "task_objects", can only be used in query-type methods
+    when the result data structure is a hash or an array ref (i.e.
+    _not_ a VCS::CMSynergy::Object).
+
+1.29  2007-01-17
+
+  - Implemented get_member_info_hashref() and get_member_info_object() 
+    as wrappers for the optional command "get_member_info" (from
+    the "PC Integrations" package), cf. README.get_member_info.
+
+  - New class VCS::CMSynergy::Project (subclass of VCS::CMSynergy::Object)
+    for methods on Synergy projects. All VCS::CMSynergy::Object producing
+    methods will automatically return a VCS::CMSynergy::Project if the
+    the object's cvtype is "project".
+
+  - query_object() subsumes query_object_with_attributes() which 
+    is only kept as an alias for backward compatibility.
+
+  - object_from_cvid() now takes an optional list of keywords (to prime
+    the object's attributes when using :cached_attributes.).
+
+  - Implemented object_from_proj_ref().
+
+  - More special keywords recognized in query_* (and related) methods:
+    "cr_objects", "baseline_project", "baseline_object". These are similar
+    to "task_objects" (which splits the list of tasks returned from 
+    Synergy's pseudo attribute %task and objectifies the elements)
+    for the pseudo attributes %change_request, %baseline, %in_baseline.
+
+1.28  2006-04-09
+
+  - INCOMPATIBLE CHANGE: set_attribute() doesn't fail anymore when
+    you try to change the value of an inherited attribute. Instead, it
+    silently converts the inherited attribute to a local attribute
+    (using "ccm attribute -create -force ...").
+    This also works when using :tied_objects and assigning to
+    $obj->{attribute_name}.
+
+  - Implemented relations_hashref(), relations_object(), wrappers
+    for "ccm relate -show" similar to the query_*() family.
+
+  - Implemented V::C::Object methods recursive_is_member_of(), 
+    hierarchy_project_members().
+
+  - Add option "mark_projects" to project_tree(): list projects instead
+    of their top level directories.
+
+  - Add special handling of CM Synergy release objects 
+    (i.e. of cvtype "relasedef") to the query_*() functions because they
+    also have a non-standard objectname method.
+
+  - Don't cache the results of "ccm attr -la" in VCS::CMsynergy::Object anymore 
+    because it bloated V::C::Os for little gain.
+
+  - Convert VCS::CMSynergy::Object to use to Class::Accessor::Fast.
+
+  - Convert tests to use Test::Deep.
+
+  - Use Module::Install to bundle Test::* modules i(and others)
+    required for `make test' only. Change Makefile.PL accordingsly, add
+    MANIFEST.SKIP and generate MANIFEST and META.yml.
+
+  - Rewrote examples/project_diff.
+
+  - Finally got rid of the (undocumented) $OneArgFoo misfeature (and
+    corresponding first parameter of _ccm()).
+
+1.27  2005-11-08
+
+  - Fixed a bug where empty string attributes could be returned 
+    as undef in query_*() (depending on the order of %keywords 
+    in the actual query). Reason was the careless use of split()
+    without a limit (which strips trailing empty fields by default).
+
+  - INCOMPATIBLE CHANGE: Make attribute values returned from 
+    the query_*() family consistent with the return value of get_attribute()
+    w.r.t. a trailing newline: If the "real" attribute value is "foo\nbar\n"
+    then that's what query_hashref() would have returned. But get_attribute()
+    would have returned "foo\nbar" (i.e. stripped the trailing newline).
+    The reason is that get_attribute() uses "ccm attr -show" and
+    Synergy always appends a newline to the output of a command unless
+    one is already there. So there's no way of telling whether the "real"
+    value was "foo\nbar" or "foo\nbar\n". Therefore ccm() has always stripped
+    a trailing newline from the command's stdout. Now we return "foo\nbar"
+    in both cases.
+
+  - Users.pm: Always try to preserve the order of a user's roles.
+    If an insertion preserving order tied hash class (e.g. Tie::IxHash)
+    is available, also preserve the order of user lines.
+
+  - Implemented folder_object() (similar to task_object()).
+
+  - Make cat_object() work when destination is a filehandle or glob ref
+    (now that my fix has found its way into IPC::Run3).
+
+  - Implement V::C::Object methods is_RELATION_of and has_RELATION
+    (via AUTOLOAD): $obj->is_RELATION_of is short for
+
+  -   $obj->ccm->query_object("is_RELATION_of('$obj')")
+
+  - Add README.datetime about problems with CM Synergy when trying
+    to obtain predictable and consistent datetime values.
+
+  - Add tests for POD and POD coverage and all test failures.
+
+  - Drop README.IPC-Run3 as behaviour with fork is fixed with IPC::Run3 0.032.
+
+1.26  2005-07-05
+
+  - INCOMPATIBLE CHANGE: get_attribute() doesn't fail any more if the
+    attribute doesn't exist for the given object, it returns "undef"
+    instead.  This is more consistent with the behaviour of "ccm query
+    -f %foo ..."  when some returned object doesn't have attribute "foo":
+    "ccm query -f %foo ..."  puts "<void>" into the corresponding column
+    which all query_*() methods will translate to "undef". It also fits
+    better with the object-as-hash-of-its-attributes metapher when using
+    :tied_objects.
+
+  - INCOMPATIBLE CHANGE: The initial attribute value is now mandatory
+    (i.e. must be defined) for create_attribute().
+
+  - Added README.IPC-Run3 about problems when scripts using VCS::CMSynergy
+    do fork() and call VCS::CMSynergy methods both from parent and child.
+
+  - Make query_count() accept shortcut queries like the rest of query_*.
+
+  - Fix quoting of string values in shortcut queries: use double quotes
+    if the string contains single quotes. Fix the regex used to
+    sanitize the query string.
+
+  - The method to set an attribute to an empty string value used by 
+    set_attribute() doesn't work on Windows (and I don't know any that works),
+    so error out in this case.
+
+  - Fixed a bug where multi-line valued properties would be returned
+    as undef by property().
+
+  - Dont stop session in VCS::CMSynergy::DESTROY if the current process
+    is not the one that created the VCS::CMSynergy object (i.e. after a fork,
+    stop session only in the parent, never in the child).
+
+1.24  2005-01-07
+
+  - Fix for bug reported by Robert Kirchner:
+    If a session (i.e. VCS::CMSynergy object) is implicitly DESTROYed
+    at program termination the script always exits with status 0,
+    regardless of any explicit status set with exit(). 
+    This was caused by an unlocalized $? in VCS::CMSynergy::Client::exec().
+
+  - Implemented query_count().
+
+  - Implemented pseudo keyword "task_objects" (query_* and history_* methods).
+
+  - The query string in query_*() methods may now contain newlines
+    to improve legibility. These will be replaced by blanks in _query().
+
+  - Make set_attribute() work for empty string values.
+
+1.22  2004-08-16
+
+  - Fix breakage on Cygwin introduced in 1.20 - UseCoprocess
+    still doesn't work though.
+
+  - Restore VCS::CMSynergy::Helper.pm which was accidentally mangled in 1.20.
+
+  - Change documentation and usage of VCS::CMSynergy::Helper::GetOptions()
+    to use the returned value as a hash.
+
+1.20  2004-08-10
+
+  - WARNING: This version is known NOT to work on Cygwin 
+    (due to CRLF vs LF issues).
+
+  - IPC::Run3 is now a requisite module.
+
+  - Dropped support for CM Synergy 4.5.
+
+  - Implemented dcm_database_id(), dcm_delimiter(), dcm_enabled(), 
+    default_project_instance() and VCS::CMSynergy::Object::exists().
+
+  - Implemented "unique" VCS::CMSynergy::Objects when using :cached_attributes.
+
+  - Implemented project_tree(), made examples/project_diff use it.
+
+  - Replaced IPC::Open3 with IPC::Run3 in VCS::CMSynergy::Client::exec().
+
+  - Implemented object_from_cvid(), documentet object_other_version().
+
+  - Implemented VCS::CMSynergy::Object::copy_attribute().
+
+  - Reinstated types() because of popular demand (read the ACcent sources
+    if you really want to know what exactly is returned by "ccm show -types").
+    Added migrate_auto_rules().
+
+1.18  2004-05-13
+
+  - Removed types() - not useful.
+    Removed proj_vers(), use displayname() instead.
+
+  - Added attribute caching (optional feature, "use VCS::CMSynergy ':cached_attributes'").
+    Added query_object_with_attributes() and "attributes" option 
+    for traverse_project() that prime object caches with results from query.
+
+  - Documented VCS::CMSynergy::Client; reorganized PODs.
+
+  - Added example script project_tree (thanks to Anne Feldmeier
+    for the simplified itree building algorithm).
+
+  - Added example script project_diff.
+
+  - Fixed bug (typo) in update_users.pm spotted by Jürgen Schorer.
+
+  - Fixed t/07workarea.t so that it doesn't assume that the temporary
+    project work area path is of the form tempdir/name-version, 
+    use attribute wa_path instead.
+
+  - Implemented `postprocess' callback for traverse_project().
+
+  - Trace information for CM commands now includes the elpased time to
+    execute the command. Layout of trace information changed for debug
+    levels >= 8.
+
+1.16  2003-09-26
+
+  - BIG FAT WARNING: VERSION 1.5 INTRODUCED AN INCOMPATIBLE CHANGE 
+    wrt VCS::CMSynergy class methods (e.g. ps() or databases()), see below.
+
+  - INCOMPATIBLE CHANGE: The hash returned by finduse() and the "finduse" 
+    keyword for query_arrayref()/query_hashref() no longer has keys of the
+    form "project-version". The keys are now the full objectnames of the
+    projects (regardless which form is returned by CM Synergy). This was
+    necessary sincd CM Synergy 6.3 allows for projects with instance
+    other than '1'.
+
+  - Implemented traverse_project() (modelled on File::Find).
+
+  - Hacked up script examples/grep_attr: greps attribute values
+    for a list of objects (optionally determined by a query).
+
+  - Documented the fact that query_arrayref() and query_hashref() will
+    rewrite values for keyword "objectname" that CM Synergy returns
+    in deprecated fullname form.
+
+  - Tested on CM Synergy 6.3 SP1 (some tests needed adjustments).
+
+  - INCOMPATIBLE CHANGE: VCS::CMSynergy class methods are now
+    implemented differently and should not expect to use the value 
+    of $ENV{CCM_HOME} current at the time the method is called.
+    Code that doesn't manipulate $ENV{CCM_HOME} is unaffected,
+    but the following idiom (often seen in administrator scripts
+    in an environment with several CM Synergy installations) 
+    WILL NOT WORK ANYMORE:
+
+      # run "ccm ps" on all our installations
+      use VCS::CMSynergy;
+      ...
+      foreach my $ccm_home (qw(/usr/local/ccm51 /usr/local/ccm62))
+      {
+          local $ENV{CCM_HOME} = $ccm_home;
+          my $ps = VCS::CMSynergy->ps(...);
+          ...
+      }
+
+    That's because the very first invocation of any VCS::CMSynergy
+    (or VCS::CMSynergy::Client) class method "captures" the value
+    of $ENV{CCM_HOME} at that time. This value is then used for all
+    class method invocations.  Hence in the above example,
+    you will run "ccm ps" twice with CCM_HOME=/usr/local/ccm51.
+
+  - The correct way to rewrite the example is to make the setting of
+    CCM_HOME explicit by introducing a VCS::CMSynergy::Client object:
+
+      use VCS::CMSynergy;
+      use VCS::CMSynergy::Client;
+      ...
+      foreach my $ccm_home (qw(/usr/local/ccm51 /usr/local/ccm62))
+      {
+          my $installation = VCS::CMSynergy::Client->new(CCM_HOME => $ccm_home);
+          my $ps = $installation->ps(...);
+          ...
+      }
+
+  - Split out VCS::CMSynergy class methods (e.g. ps()) into their own class,
+    VCS::CMSynergy::Client. Basically, a V::C::Client object encapsulates 
+    a particular setting of CCM_HOME. Invoking these methods as class
+    methods (either on VCS::CMSynergy or VCS::CMSynergy::Client) still works,
+    but they are silently redirected to a "default" V::C::Client object.
+    This object is instantiated the first time it is needed and gets the
+    value of CCM_HOME valid in %ENV at that time. If you want to call
+    V::C::Client methods with different values of CCM_HOME in the
+    same program, you must explicitly instantiate different V::C::Client objects
+    and call the methods via these objects. In fact, the motivation for
+    this surgery were too many administrative programs that wanted to operate
+    on several installations in one invocation and had to resort to ugly
+    switcheroo of $ENV{CCM_HOME} to do that.
+
+  - Optional usage of Memoize has been dropped.
+
+  - Documented former private methods ccm_with_option() 
+    and ccm_with_text_editor().
+
+1.14  2003-07-22
+
+  - Implemented tied hash interface for VCS::CMSynergy::Object.
+    Now you can get/set attributes by treating an V::C::Object like a hash.
+    Since this requires every V::C::Object to hold a reference to the sesssion,
+    this is only available if Scalar::Util is detected at runtime (so we
+    can weaken the referemce).
+
+  - Implemented get_releases()/set_releases() for manipulating the release table.
+    Implement property().
+
+  - Fixed 'ye olde text_editor trick on Windows (checked on NT 4.0 and XP):
+    CM Synergy seems unable to execute "shell" builtins (like "copy"),
+    use "xcopy" instead.
+
+  - Made VCS::CMSynergy work on cygwin (even UseCoprocess works).
+    This requires Filesys::CygwinPaths to translate Cygwin path names 
+    (e.g. as returned by File::Temp::tempfile()) to Windows path names.
+
+  - Changed record/field separators (used internally by query/finduse/history)
+    from \cD/\cG to \cA/\cD, but someone will probably succeed in
+    entering these into some attribute. Anyway, avoid \x1C-\x1E as
+    they are used by Change Synergy in some attribute of "problem".
+
+  - Added a hint on the usage of new(ui_database_dir => ...).
+    Merge pod entries for query_arrayref/query_hashref and 
+    history_arrayref/history_hashref.
+
+  - Fixed brown paper bag errors in set_attribute (wrong usage check)
+    and set_error (handling of HandleError).
+
+1.12  2003-03-31
+
+  - INCOMPATIBLE CHANGE: attribute() has been replaced by two methods 
+    get_attribute() and set_attribute().
+    attributes() has been renamed to list_attributes().
+
+  - Move VCS::CMSynergy hash keys CCM_HOME, CCM_ADDR and CCM_INI_FILE
+    into sub hash env. Change ccmexec to pass it a hash ref with keys/values
+    to temporarily add to %ENV instead of passing CCM_HOME.
+    Factor ccm() into _ccm() (does all the work except error handling) and
+    make ccm() a simple wrapper for it. Get rid of IgnoreError and
+    use _ccm for all "internal" calls.
+    Document "HandleError" and set_errror().
+    Pod: change all method "=item"s to "=head2"; the man page looks slightly
+    worse, but the HTML rendering is much better.
+    CMSynergy/users.pl: renamed to CMSynergy/update_users.pm.
+    Implemented create_attribute(), delete_attribute(), and copy_attribute().
+
+1.10  2002-12-23
+
+  - Document types of options for new().
+    Document option `KeepSession' for new().
+    Mention correct way to explicity stop a session.
+    Implement ccm_addr().
+    Make database() lazy.
+
+  - Make it work for ancient Continuus 4.5 (fixes #1681):
+      - `ccm ps -rfc_address ADDR' doesn't find the process if host part of ADDR
+         is given as name (instead of an IP address); esp. this breaks
+         `ccm ps -rfc_address $ccm->{CCM_ADDR}' - used in new()
+      - different error messages from `ccm finduse' if object is not in use
+      - adjust test cases
+    Correctly handle (Raise|Print|Handle)Error when ps() in new() fails.
+    Add 'remote_client => 1' to options for new() (causes `-rc' for `ccm start').
+
+1.08  2002-10-10
+
+  - INCOMPATIBLE CHANGE: The pseudo keyword "finduse" in query_arrayref()
+      and query_hashref() does not return a list of project references
+      any more. It now returns a hash which maps proj_vers to relative_path. 
+      Similarly, the rows returned by finduse() have changed
+      from [ $description, @project_references ]
+      to [ $description, \%usage_map ].
+
+  - Converted findpath() to use new finduse(), adjusted t/04finduse.t.
+    Convert tests to use Test::More.
+    Makefile.PL: don't require Memoize anymore, just recommend it.
+    Windows: will sleep(2) _after_ "ccm stop" and _before_ unlinking 
+      files_to_unlink (because they may still be "busy" - probably "ccm stop"
+      returns _before_ CM Synergy really has ceased operation).
+    Fix problem with set_error() that's probably a perl bug 
+      (at least for 5.6.1, fixed in 5.8.1, cf #9998, #9739 on rt.perl.org):
+
+        sub foo
+        {
+           my @x = (2, 1, 0);     # last elem must be false
+           return @x if wantarray and @x;
+           print "OOPS\n";
+        }
+        my @foo = foo;
+
+      This will print "OOPS". Somehow wantarray seems to force list context
+      onto the right-hand side of "and" - @x will thus evaluate to its
+      last element.
+
+1.07  2002-08-30
+
+  - INCOMPATIBLE CHANGE: The 3-arg form of attribute() does not return
+      the old value any more.
+
+  - Document 3-arg form of attribute().
+
+  - When setting attributes, cope with arbitrary types by looking
+      up the super_type recursively until one of the well known types 
+      (for which we "just know" whether they need the "text_editor"
+      trick )is found.
+
+  - Kludge for annoying `Security violation...' warning on Windows
+      (thanks to Peter Kreuz for the explanation what's goin' on).
+
+  - Rewritten output parsing for history_*().
+
+  - Fix typo in types().
+
+  - Add error() and ccm_command() calss/instance methods, prefer
+      them in docs over explicit $ccm->{error} or $VCS::CMSynergy::error.
+
+  - Add "ui_database_dir" option to new().
+
+1.05  2002-08-06
+
+  - The Great Renaming: s/CMSyngery/VCS::CMSynergy/g.
+    First version uploaded to CPAN.

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzaprocessm" elementFormDefault="qualified" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzat="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzaprocessm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" schemaLocation="VZACommonTypes.xsd"/>
+	<xs:element name="vzaprocessm" type="vzaprocessmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Process and system information and Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzaprocessmType" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Process and system information and Management.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="kill" minOccurs="0"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="kill">
+		<xs:annotation>
+			<xs:documentation>LINUX ONLY
+Send a signal to the specified process. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="pid" type="xs:int" maxOccurs="unbounded"/>
+				<xs:element name="signal" type="xs:int"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="killResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

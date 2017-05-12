@@ -1,0 +1,52 @@
+{
+   "abstract" : "an OO interface to the 2Checkout.com Vendor API",
+   "author" : [
+      "Len Jaffe <lenjaffe@jaffesystems.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "VendorAPI-2Checkout-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON::Any" : 0,
+            "List::MoreUtils" : 0,
+            "Test::More" : "0.87",
+            "XML::Simple" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : 0,
+            "Moose" : 0,
+            "Moose::Util::TypeConstraints" : 0,
+            "MooseX::NonMoose" : 0,
+            "Params::Validate" : 0,
+            "UNIVERSAL::require" : 0,
+            "URI" : 0,
+            "URI::QueryParam" : 0,
+            "namespace::autoclean" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1502"
+}

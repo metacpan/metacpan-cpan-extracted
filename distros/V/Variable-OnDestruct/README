@@ -1,0 +1,42 @@
+Variable-OnDestruct
+
+Variable::OnDestruct allows you to add a destructor to any scalar, array or hash value.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Variable::OnDestruct
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Variable-OnDestruct
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Variable-OnDestruct
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Variable-OnDestruct
+
+    Search CPAN
+        http://search.cpan.org/dist/Variable-OnDestruct
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

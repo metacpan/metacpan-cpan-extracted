@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use VCS;
+
+die "Usage: $0 version-url\n" unless @ARGV == 1;
+
+my $version = VCS::Version->new(@ARGV);
+
+map {
+    print "\$version->$_ = " . join("\n\t", $version->$_()) . "\n";
+} qw(
+    url
+    path
+    version
+    author
+    date
+    reason
+    tags
+    text
+);

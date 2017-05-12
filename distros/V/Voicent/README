@@ -1,0 +1,48 @@
+Voicent version 0.01
+====================
+
+This is the perl interface module for Voicent Gateway, a VoiceXML 
+gateway. You can use this interface module to make telephone calls
+from your perl program, provided that the Voicent Gateway is
+installed and can be accessed through HTTP. There is a FREE version
+of Voicent Gateway program downloadable from:
+
+http://www.voicent.com/download
+
+The call_text function is used to make a phone call with a text
+message. The text message will be played over the phone using text-to-
+speech engine. 
+
+The call_audio function is used to make a telephone call with an audio
+file. The audio message will be played over the phone.
+
+The call_till_confirm is used to make a serious of phone calls. It
+will stop automatically if anyone press in a confirmation code. Please
+note that this feature requires you to have a professional version of
+Voicent BroadcastByPhone installed.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires you have Voicent Gateway installed on some machine
+accessible using HTTP protocol.
+
+
+COPYRIGHT AND LICENCE
+
+This library is provided AS-IS.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

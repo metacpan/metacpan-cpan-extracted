@@ -1,0 +1,70 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # Variables used in the commonHeader.phtml file
+  $refresh=120;
+  $title="System Monitor";
+  $bodySettings='bgcolor="#FFFFFF" TEXT="#FFFFFF" LINK="#00FFAA" VLINK="#00FFAA"';
+  my $remoteServer;
+
+-->  
+<!--#include virtual="/commonHeader.phtml" -->
+
+<!-- Create one master table to hold all the matrices -->
+<table width=620 border="0" cellspacing="0" cellpadding="0" bgcolor ="#000000">
+  <tr>
+    <td> 
+      <!--#include virtual="matrixRows.phtml" -->
+        
+      <!-- If no matrix was returned, or the specified name is blank, then gather
+           the matrices from any remote servers.  If the name is not blank, then
+           stop after you find the first match -->
+      <!--#perl 
+        my ($remoteHtml,$relayName);
+        my $allRemoteHtml = '';
+          
+        # If nothing was generated in the call to matrixRows.phtml above, or if the 
+        # passed 'name' is blank, then step through all remote servers, retrieving
+        # their matrices.  Note that @matrixList is set in the call to 
+        # 'matrixRows.phtml' above.
+        if ((@matrixList < 1)||(! $name)) 
+        {
+          foreach $remoteServer (@remoteServers)
+          {
+            $relayName = ($name) ? "name=$name" : "";
+            $remoteHtml = VBTK::Client::getUrl("$remoteServer/rmtMatrixRows.phtml?$relayName");
+            $allRemoteHtml .= $remoteHtml if (defined $remoteHtml);
+
+	    # If we're looking for a specific object, then break out if we got a result back.
+            last if (($remoteHtml)&&($name));
+            
+            # If the name is blank, but no HTML was returned, then we have an error
+            # with this remote server.
+            if((! $name)&&(! $remoteHtml))
+            {
+      -->
+              <h3>Error: Can't retrieve matrix from '$remoteServer'</h3>
+      <!--#perl
+            }
+	  }
+	  # If the name is not blank, and we don't have any HTML, then this object must
+	  # not exist on any remote server.
+	  if(($name)&&(! $allRemoteHtml))
+	  {
+      -->
+            <h3>Error: Invalid object name '$name'</h3>
+      <!--#perl
+          }
+        } 
+       -->
+      $allRemoteHtml
+      <br>
+      
+      <!-- Print out the legend last -->
+      <!--#include virtual="/matrixLegend.phtml" -->
+
+    </td>
+  </tr>
+</table><br>
+
+<!--#include virtual="commonFooter.phtml" -->

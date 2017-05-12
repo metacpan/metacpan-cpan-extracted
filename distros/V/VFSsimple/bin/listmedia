@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use VFSsimple;
+use MDV::Distribconf;
+use File::Temp qw(tempfile);
+
+my $url = $ARGV[0];
+
+my $d = MDV::Distribconf->new($ARGV[0]);
+my $vfs = VFSsimple->new($d->getpath(undef, 'root')) or exit(1);
+$d->settree('mandriva');
+
+my (undef, $filename) = tempfile();
+$vfs->copy($d->getpath(undef, 'infodir') . "/media.cfg", $filename) or die "can't get file: " . $vfs->error;
+$d->parse_mediacfg($filename);
+print join(', ', $d->listmedia()) . "\n";

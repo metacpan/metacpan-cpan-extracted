@@ -1,0 +1,238 @@
+VCS::PVCS - A Perl interface to the PVCS Version Manager
+
+Copyright (c) 1998  Bill Middleton
+
+This is the VCS::PVCS module, a suite of perl packages which provide
+an interface to the Intersolv PVCS Version Control tools, folders,
+files, archives, and access-control mechanisms. 
+
+DESCRIPTION
+
+  This module gives the PVCS user/admin a simple (hopefully), 
+object-oriented interface to the various components of a PVCS Project, 
+including the Project itself, it's folders, archives, and the 
+attributes for each of these members, as designated by the project's 
+administrator(s).
+
+  You can operate on existing projects and their members, or create 
+new projects, folders and archives using the methods defined in
+the interface.  Operations on archive objects, in particular, use the
+PVCS Command-Line tools, VCS, GET, PUT, VDIFF, and VLOG.  (others
+may be supported in the future).
+
+  The preferred method for operating within PVCS is to use Folders,
+and the interface provides you with the ability to perform command-line
+actions to some or all of a folder's members at once, simplifying the
+process of release-tagging and making releases, nightly builds, version
+history for metrics, and many other operations on the archives, which
+may be performed in an automated fashion using cron or some other
+time-scheduling tool.  You can also operate on entire projects at once,
+or individually on archive objects by themselves.  Additionally, the
+Commands.pm exports all of it's methods for a simple, if slightly more
+complicated, interface to the PVCS commands directly (you supply the
+file/archive names).
+
+Here's an example:
+
+
+use VCS::PVCS::Project;
+use Cwd;
+
+# Open a project
+my $proj = new VCS::PVCS::Project("Existing Project");
+
+# Open all of the "docs" folders and return ref to array
+@folders  = $proj->openFolders("docs");
+
+foreach $folder (@folders){
+    # Checkout all files in the folder
+    $folder->checkout("-l");  # Checkout all archives with lock
+
+    # Populate the attributes object for each file in the folder
+    $folder->getAttributes;
+
+    # Get a list of archive object members of the folder and ck for locks
+    @members = $folder->members;
+    foreach $member (@members){
+        $attributes = $member->attributes;  # Get the attributes object
+        print $attributes->Workfile," : ",$attributes->Locks,"\n";
+    }
+
+    $folder->checkin('-f','-M"Checked in from test"');  # Checkin all archives 
+
+    # Reload the attributes for all files  (with 1 as argument)
+    $folder->getAttributes(1);
+
+    foreach $member (@members){
+        $attributes = $member->attributes;  # Get the attributes hash
+        print $attributes->Workfile," : ",$attributes->Last_trunk_rev,"\n";
+    }
+
+    # Add/change/delete some version labels
+
+    # add foobar to the tip
+    $folder->addVersionLabel("foobar");
+
+    # Add a version label to an earlier version
+    $folder->addVersionLabel("bazbar:1.0");
+    
+    # Convert a version label to floating
+    $folder->transformVersionLabel("foobar");
+    
+    # delete a version label
+    $folder->deleteVersionLabel("foobar");
+
+    # Rename a version label
+    $folder->replaceVersionLabel("blahblek","bazbar");
+
+    # Promote all of the 1.0 revisions to the Prodtest group
+    $folder->addPromoGroup("Prodtest:1.0");
+
+    # take a diff on all members against the two versions (default)
+    foreach $member (@members){
+        $member->vdiff("-R1.0 -R1.1");
+        print $PVCSOUTPUT;
+    }
+}
+
+
+
+WARNING:
+
+    This is ALPHA SOFTWARE. You should consider the interface methods,
+inheritance heirarchy, parameters, and objects to be in a unfinis
+
+:-)
+
+QUICK START GUIDE
+
+  This VCS::PVCS module must make several assumptions about your
+PVCS environment.  You must have the following ENVIRONMENT variables
+set, in order for things to work "out of the box".
+
+$PVCS_BINDIR - this is where the PVCS binaries all live.  It can
+(and should) be hardwired in the VCS/PVCS.pm file before installation.
+
+$ISLVINI - this per-user environment variable is the location of
+the .islvrc (islv.ini on WINDOWS) file.  This file should specify
+locations for at least the following:
+
+    PVCSPROJ=/path/to/pvcs/projects/master/directory  # Master PVCS dir
+    NFSMAP=/path/to/directory/where/nfsmap/is/located  # unix dir for nfsmap
+
+Normally, this file is found in the HOME or C:\WINNT directory under
+unix/Win respectively.  If not, you'll have to hardwire it or set
+it in the environment.  The example script shows you how to do this.
+
+The other variable which may have to be hand configured is the location
+of the MASTER.CFG file, which has information about the default
+configuration for PVCS.  When we created our setup here, it was
+named MASTER.CFG, and found in $PVCSPROJ.  I've hardcoded this into
+the PVCS.pm module. If this convention is non-standard, or not the 
+way it works on UNIX-only environments, you'll need to change it, 
+and please let me know at wjm@metronet.com ASAP.  Just search PVCS.pm 
+for $PVCSMASTERCFG and change it in the locations you find.  You
+wont need to change it anywhere else.
+
+Once you've set these, you can install the package, and run the
+test scripts.  Note that the test scripts make attempts to configure
+themselves automatically and create and use a COMPLETELY SEPARATE
+PVCSPROJ directory.  Running the test scripts will, in no way affect
+your PVCS installation.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DOCUMENTATION
+
+  The documentation, except for this file, is embedded POD, and
+found in the .pm files themselves.  You can run pod2html against
+them to get HTML documentation, and the manpages are created automatically
+by the make.
+
+  The documentation can be found also at my web site,
+
+  http://www.metronet.com/~wjm/PVCS
+
+MORE INFORMATION - Mailing List, etc.
+
+While it doesn't actually exist yet, I plan to implement a mailing
+list for this module.  For more information and to keep informed 
+about new developments with this module suite, you can join the 
+a mailing list (pvcs-perl@w5.metronet.com) by sending a subscribe to 
+pvcs-perl-request@w5.metronet.com, or drop me a line at 
+wjm@metronet.com, and I'll add your name.
+
+IF YOU HAVE PROBLEMS
+
+I'm pretty busy.  You can drop me a line, or send a note to the
+mailing list (once it exists..) and I'll try to help when I can.  
+Patches are gratefully accepted.
+
+DESIGN
+
+  The components of PVCS, namely PROJECTS, FOLDERS, ARCHIVES,
+and ATTRIBUTES, lend nicely to an OO design.  e.g. - Archives
+inherit from Attributes, Folders inherit from Archives, and
+Projects inherit from both folders and archives.  I've tried to
+implement this in this package, so that you can operate on a
+given component and rely on the fact that all  of it's subcomponents
+will be properly handled.
+
+HOWEVER, and thats a BIG HOWEVER, IMHO, the best and only way
+to use PVCS is through folders.  Many of our projects here where
+I work have dozens of folders, some mapping to TEST directories,
+some mapping to DEVELOPMENT directories (sometimes on the local
+disk), and some designated for RELEASE folders as readonly checkouts.
+I recommend that you use the folder objects liberally,
+and possibly, exclusively, when operating on your PVCS project.
+
+See the test scripts for complete examples of how to use folder
+objects, and operate on folder members (archives) in a nice way.
+
+NOTES
+
+  The PVCS crossplatform capability gives rise to some interesting
+problems.  Namely, all paths in the config files and paths for documents,
+folders, etc, are stored as Windows paths, if the project was created
+on windows, or if the project was created on UNIX using an NFSMAP.
+(See the PVCS GUI documentation/README for details on the NFSMAP)
+Thus, when we find and NFSMAP, we assume that ALL output must be
+translated to WINDOWS format when creating new folders, archives,
+or doing queries using the SQL components.  
+
+
+SECURITY
+
+  I like PVCS. I've administered and used ClearCase, PVCS, CVS and
+SourceSafe, and PVCS seems to be the best choice for an environment
+of developers that aren't all kernel hackers, but are interested
+in establishing a sound CM process. It's easy to learn, without
+having to take courses, safe (NO DATABASE, YEA!), and relatively
+powerful, with triggers, promotion groups, and other features to
+help you implement your site policy. 
+
+ On the other hand, I'm not too fond of the PVCS GUI.  On the third hand,
+the GUI does keep the user at a (usually) safe distance from the
+filesystem, with some security mechanisms (depending on how you
+set it up).  This module lets the user get much closer to the filesystem,
+and doesn't give a whit (yet) about the access permissions, except to
+code in a default parameter for all commands which includes the access 
+permissions in (-C MASTER.CFG) if they are defined.  This, of course, 
+can be hacked around, and the user can perform any operation on an archive 
+that the filesystem will let him/her get away with. Caveat scriptor.
+
+Best regards, and happy CM'ing!
+
+Bill
+
+
+----
+Bill Middleton
+wjm@metronet.com
+
+
+

@@ -1,0 +1,8 @@
+Changes
+lib/Video/Capture/V4l/Imager.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

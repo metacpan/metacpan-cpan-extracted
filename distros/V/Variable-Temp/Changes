@@ -1,0 +1,21 @@
+Revision history for Variable-Temp
+
+0.03    2015-04-06 12:55 UTC
+        + Tst : t/13-magic.t will no longer fail with a 'planned twice' error
+                when Variable::Magic's version is not recent enough.
+        + Tst : Tests from t/10-base.t and t/20-lvalue.t that localize array
+                elements at the end of the array will now be skipped before
+                perl 5.12, as a bug in perl prevents the array length from
+                being reset at scope end.
+
+0.02    2015-04-01 22:55 UTC
+        + Add : temp() can now be applied to arrays and hashes.
+        + Add : The new set_temp() function is a non-lvalue alternative to
+                temp(). In particular, it can be used on perl 5.12.x and
+                below.
+        + Fix : 'temp $var;' now correctly sets $var to undef.
+        + Fix : The tests now pass correctly on perl 5.12.x and below.
+
+0.01    2015-03-09 13:55 UTC
+        First version, released on an unsuspecting world.
+

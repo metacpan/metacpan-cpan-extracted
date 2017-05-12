@@ -1,0 +1,201 @@
+#!/usr/bin/env perl
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+use Path::Tiny;
+use YAML;
+
+=head1 SYNOPSIS
+
+   $0 --dst vayne_home
+
+=cut
+
+my $conf = join '', <DATA>; $conf = Load $conf;
+
+my $vayne_home; GetOptions( 'dst=s' => \$vayne_home ) or pod2usage(2);
+$vayne_home ||='~/vayne';
+
+pod2usage(2) unless $vayne_home;
+
+die "$vayne_home exists" if -e $vayne_home;
+
+printf "\nGenerate Vayne Home!!\n\n";
+
+printf "+ dir \t%s\n", path($vayne_home)->mkpath;
+
+for my $file(sort keys %$conf)
+{
+    my $dst = path($vayne_home, $file);
+    $dst->parent->mkpath;
+    $dst->spew( $conf->{$file} );
+    $dst->chmod("a+x") if $dst =~ /\/worker\//;
+    printf "+ file\t%s\n", $dst;
+}
+
+printf "+ file\t%s\n", my $source = path($vayne_home, 'source');
+$source->spew("export VAYNE_HOME=$vayne_home");
+
+print "\nadd \"source $vayne_home/source\" to your ~/.bashrc \n";
+
+__DATA__
+---
+conf/logger: |
+  - level: INFO
+    layout: '%d [%p] [%C:%L]> %m%n'
+conf/mongo: |
+  host: mongodb://127.0.0.1:27017
+  db_name: vayne
+  #username: foo
+  #password: bar
+conf/redis: |
+  callback:
+    server: localhost:6379
+  #  password: foobar
+conf/socks: |
+  '\.foo\.':   'localhost:8800'
+  '\.bar\.':   'localhost:8801'
+conf/zookeeper: "hosts: 127.0.0.1:2181\n"
+strategy/random: |
+  #!/usr/bin/env perl
+  return sub
+  {
+      #could use $param  $job->workload;
+      my($param, $job, @regions) = @_;
+      my $order = int(rand( scalar @regions ));
+      $regions[$order];
+  }
+strategy/roundrobin: |
+  #!/usr/bin/env perl
+  my $count = -1;
+  return sub
+  {
+      my($param, $job, @regions) = @_;
+      $count+=1; $count = 0 if $count >= @regions;
+      $regions[$count];
+  }
+task/foo: |
+  - name: 'check ssh'
+    worker: tcp
+    param:
+      port: 22
+      input: ''
+      check: '^SSH-2.0-OpenSSH'
+  
+  - name: 'foo'
+    worker: dump
+    param:
+      bar: baz
+  
+  - name: 'only suc'
+    need:
+      - 'check ssh': 1
+    worker: dump
+    param:
+      - array
+      - key1: value1
+        key2: value2
+  
+  - name: 'tracker'
+    worker: track
+worker/gather/http: |
+  #!/usr/bin/env perl
+  use Vayne::Worker;
+  use FurlX::Coro;
+  
+  register 'http' => sub {
+      my($workload, $step, $result, $status) = @_;
+  
+      unless($step->{param}->{url})
+      {
+          $status->(0);
+          return;
+      }
+      my $url = sprintf $step->{param}->{url}, $workload;
+      my $ua  = FurlX::Coro->new();
+      my $res = $ua->get($url);
+      if($res->{code} eq '200')
+      {
+          $status->(1);
+          $result->($res->{content});
+      }else{
+          $status->(0);
+      }
+  
+  }, 100;
+  Vayne::Worker->run;
+worker/gather/tcp: |
+  #!/usr/bin/env perl
+  use Vayne::Socks;
+  use Vayne::Worker;
+  use Storable qw(thaw freeze);
+  use JSON::XS;
+  
+  register 'tcp' => sub {
+      my($workload, $step, $result, $status) = @_;
+  
+      my (%opt, %ret) = %{ $step->{param} };
+  
+      my($fh, $err) = Vayne::Socks::connect($workload => $opt{port}, 10);
+  
+      $ret{node} = $workload;
+  
+      if(!$err and $fh and my $output = <$fh>)
+      {
+          if($output =~ /$opt{check}/){
+              $ret{msg} = "check ok";
+              $status->($ret{stat} = 1);
+          }else{
+              $ret{msg} = "invalid response";
+              $status->($ret{stat} = 0);
+          }
+  
+      }else{
+          $err = "read timeout" if !$err and $!;
+          $ret{msg} = $err || "connect failed";
+          $status->($ret{stat} = 0);
+      }
+      $result->( lc $opt{serial} eq 'storable' ? freeze \%ret : encode_json \%ret );
+  
+  }, 100;
+  Vayne::Worker->run;
+worker/main/tracker: |
+  #!/usr/bin/env perl
+  use Vayne::Worker;
+  use Vayne::Tracker;
+  
+  
+  my $collection = Vayne::Tracker->new->collection_job;
+  
+  register 'track' => sub {
+      my($workload, $step, $result, $status, $job) = @_;
+      $collection->insert_one({ _id => $job->uuid, $job->to_hash, time => time });
+      $status->(1);
+  };
+  
+  Vayne::Worker->run;
+worker/test/dump: |
+  #!/usr/bin/env perl
+  use Vayne::Worker;
+  use Data::Printer;
+  
+  register 'dump' => sub {
+      my($workload, $step, $result, $status, $job) = @_;
+  
+      #Job's workload
+      p $workload;
+  
+      #Present step configuration contain params.
+      p $step;
+  
+      #The whole job structure contains previous step's result/status;
+      #You can get other step's name you want from step's param;
+      p $job;
+  
+      #Write back the result after process
+      $result->('dump ok');
+  
+      #Write back the status after process
+      $status->(1);
+  };
+  Vayne::Worker->run;

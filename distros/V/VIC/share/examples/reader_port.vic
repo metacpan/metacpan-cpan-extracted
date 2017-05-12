@@ -1,0 +1,32 @@
+PIC P16F690;
+
+Main {
+    digital_output PORTC;
+    digital_input PORTB;
+    read PORTB, ISR {
+        $value = shift;
+        write PORTC, $value;
+    };
+}
+
+Simulator {
+    attach_led PORTC, 8;
+    log RB4, RB5, RB6, RB7;
+    scope RB4, RB5, RB6, RB7;
+    log RC4, RC5, RC6, RC7;
+    scope RC4, RC5, RC6, RC7;
+    stimulate RB4, wave [
+        10001, 1, 20000, 0
+    ];
+    stimulate RB5, wave [
+        20001, 1, 30000, 0
+    ];
+    stimulate RB6, wave [
+        30001, 1, 40000, 0
+    ];
+    stimulate RB7, wave [
+        40001, 1, 50000, 0
+    ];
+    stop_after 100ms;
+    autorun;
+}

@@ -1,0 +1,8 @@
+Validate::Yubikey - Validate Yubikey OTPs
+
+The Yubikey is a hardware OTP token produced by Yubico (http://www.yubico.com).
+
+This module provides validation of Yubikey OTPs.  It relies on you to specify
+callback functions that handle retrieving token information from somewhere and
+updating the persistent information associated with each token.
+

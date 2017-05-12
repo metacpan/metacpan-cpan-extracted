@@ -1,0 +1,93 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+class HTOM_Persistant
+{
+  //! Initialize the persistan attributes managet.
+  /*! This method must be colled at the page initialization (befora any other action)
+   * \param $contextName name of the persistan object context. This name is used to set the 
+   * cookie on the client site.
+   * \param $expireTimeout number of seconds of the persistan cookie life.
+   */
+  public function Init($contextName,$expireTimeout=NULL)
+  {
+    self::$pageCookieName = $contextName;
+    if (isset($_COOKIE[self::$pageCookieName]))
+      {
+        self::$attributes = $_COOKIE[self::$pageCookieName];
+      }
+    if (isset($expireTimeout)){
+      self::$expireTimeout = $expireTimeout;
+    } else {
+      self::$expireTimeout = time()+60*60;
+    }
+  }
+  //! Set the value of persistant attribute.
+  public function SetAttribute( $name, $value )
+  {
+    self::$attributes[ $name ] = $value;
+    setcookie( self::$pageCookieName."[".$name."]", $value );
+  }
+  //! Get the persistant attribute by name.
+  public function GetAttribute( $name )
+  {
+    $rc=NULL;
+    if ( isset(self::$attributes[$name]))
+      $rc = self::$attributes[$name];
+         
+    return $rc;
+  }
+  //! Get the list of all persistant attributes.
+  public function GetAttributes()
+  {
+    return self::$attributes;
+  }
+  //! Remove the persistant attribute.
+  public function RemoveAttribute( $name )
+  {
+    self::$attributes[$name]=NULL;
+    setcookie( self::$pageCookieName."[".$name."]", NULL, self::$expireTimeout );
+  }
+
+  private static $pageCookieName="TheHTOMDefaultcookieName";
+  private static $expireTimeout;
+  private static $attributes=array();
+}
+
+?>
+@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

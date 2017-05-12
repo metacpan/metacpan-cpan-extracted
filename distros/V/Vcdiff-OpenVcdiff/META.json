@@ -1,0 +1,55 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Vcdiff-OpenVcdiff",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::OpenVcdiff" : 0,
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::OpenVcdiff" : 0,
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::OpenVcdiff" : 0,
+            "Carp" : 0,
+            "Guard" : 0,
+            "Sys::Mmap" : 0,
+            "Vcdiff" : "0.505"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoytech/Vcdiff-OpenVcdiff/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/hoytech/Vcdiff-OpenVcdiff.git"
+      }
+   },
+   "version" : "0.106"
+}

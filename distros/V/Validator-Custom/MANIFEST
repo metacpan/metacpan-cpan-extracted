@@ -1,0 +1,26 @@
+Changes
+lib/Validator/Custom.pm
+lib/Validator/Custom/CheckFunction.pm
+lib/Validator/Custom/Constraint.pm
+lib/Validator/Custom/Constraints.pm
+lib/Validator/Custom/Document/Version0.pod
+lib/Validator/Custom/FilterFunction.pm
+lib/Validator/Custom/Result.pm
+lib/Validator/Custom/Rule.pm
+lib/Validator/Custom/Validation.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/v0_test/validator-custom-required-json.t
+t/v0_test/validator-custom-required-timepiece.t
+t/v0_test/validator-custom.t
+t/v0_test/validator-custom/T1.pm
+t/v0_test/validator-custom/T2.pm
+t/v0_test/validator-custom/T3.pm
+t/v0_test/validator-custom/T4.pm
+t/v0_test/validator-custom/T5.pm
+t/v0_test/validator-custom/T6.pm
+t/validator-custom-validation.t
+t/validator-custom.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

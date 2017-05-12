@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/proc_info" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/proc_info" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="proc_info" type="proc_infoType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Reports information about processes ( like ps ).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="proc_infoType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice minOccurs="0">
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element name="start_monitor">
+							<xs:annotation>
+								<xs:documentation>Starts another monitoring facility. Messages will be sent to the requesting client with "period" intervals. Target should be the name of the client requested monitoring.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="period" type="xs:int">
+										<xs:annotation>
+											<xs:documentation>Reporting period.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="key" type="xs:string" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Parameter by which sorting will be done. List of such parameters can be found in Agent vocabulary. </xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="limit" type="xs:int" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Number of processes limitation.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="descending" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Order of sorting if present. Otherwise ascending.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="stop_monitor">
+							<xs:annotation>
+								<xs:documentation>Stops the monitoring facility, started previously by the same client.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType/>
+						</xs:element>
+						<xs:element ref="get"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="ps_info" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Processes information</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get">
+		<xs:annotation>
+			<xs:documentation>Gets processes list immediately. Returns ps_info or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="key" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Parameter by which sorting will be done. List of such parameters can be found in Agent vocabulary. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="limit" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of processes limitation.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="descending" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Order of sorting if present. Otherwise ascending.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ps_info" type="vzlt:ps_infoType">
+		<xs:annotation>
+			<xs:documentation>Processes information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="getResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ps_info"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="proc_info_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="priority" type="xs:int"/>
+					<xs:element name="min_monitor_period" type="xs:int"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

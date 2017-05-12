@@ -1,0 +1,44 @@
+Revision history for Perl module Validator::LIVR
+
+0.01 2013-02-02
+ - First version, released on an unsuspecting world.
+
+0.02 2013-08-12
+ - LIVR v0.2 support (not_empty_list)
+
+0.03 Not Released
+ - Fixed pipelining (now validator passes the modified
+   result to each next rule).
+
+0.04 2013-08-15
+ - LIVR v0.3 support (trim, to_lc, to_uc)
+
+0.05
+ - Fix bug with applying validation rule after filter
+
+0.06
+ - LIVR v0.4 support (remove, leave_only, url, iso_date, like with flags, rules aliasing)
+
+0.07
+ - Add version to every pm file
+
+0.08
+ - More detailed debug in tests
+
+0.09
+ - Fix typo in MANIFEST paths
+
+v2.0
+ - Switched to semver. New release version is 2.0
+ - Unified approach to types handling
+ - "Base rules" renamed to "Common rules".
+ - "Filter rules" renamed to "Modifiers". They do not validate anything, just modify data.
+ - "Helper rules" renamed to "Metarules" as this rules are for describing other rules
+ - Added common rule "any_object"
+ - Added string rule "string"
+ - Added string rule "eq"
+ - Added metarule "variable_object"
+ - Added metarule "or"
+ - Added modifier "default"
+ - Add more edge cases to test suite
+ - Add experimental status to the "like" rule

@@ -1,0 +1,58 @@
+VMware-LabManager
+
+This module provides a Perl API to utilize the VMware Lab Manager SOAP API for
+automation. It does not provide a one-to-one mapping of the Lab Manager SOAP API,
+but rather it provides an API wrapper, which combines certain SOAP calls as a
+meaningful single operation. Thus this module is heavily tailored for automation
+purposes. But, it should also cater to the broader audience as it still does 
+provide overall functionality that might be required.
+
+Using this module, you can checkout a config & deploy it in one single method call, 
+similarly undeploy & delete in a single method call. This module also provides a 
+method to get the list of all machines (and their details) that a deployed 
+configuration has. Apart from that the SOAP object & auth header methods are 
+exposed; So if need be, they can be used to access other SOAP calls available 
+through Lab Manager SOAP service. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VMware::LabManager
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=VMware-LabManager
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/VMware-LabManager
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/VMware-LabManager
+
+    Search CPAN
+        http://search.cpan.org/dist/VMware-LabManager/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 "Aditya Ivaturi"
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

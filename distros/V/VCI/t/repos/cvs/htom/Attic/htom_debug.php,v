@@ -1,0 +1,107 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+
+
+/*! \class HTOM_Debug 
+ * \brief The HTOM_Debug class enables the debuging engine.
+ *
+ * The HTOM_Debug module could be used in order 
+ * to expose some debug messages in the document output.
+ * The HTOM_Debug enables the user to choose the selected groups of
+ * debug messages to be printed out.
+ * \example htom_debug_example.php
+*/
+class HTOM_Debug
+{
+  //! \static Set the current debug level. All printouts (Out calls) that have equal or less debug level will be displayed
+  public function SetDebugLevel( $level )
+  {
+    self::$debugLevel=$level;
+  }
+  //! \static Enable the module printouts with the given name. 
+  public function EnableModuleDebug( $module )
+  {
+    self::$modules[$module]=$module;
+  }
+
+  //! \static Disable module printouts
+  public function DisableModuleDebug( $module )
+  {
+    self::$modules[$module]=NULL;
+  }
+
+  //! \static Send the debug message to the standard output. 
+  /*! The message will be protend only in case if the current debug level is greater or equal to the $level parameter,
+   * and the module with the giving $moduleMask is enabled.
+   * If the passed module mask is an empty sting, the printouts will be displayed independently to the module mask.
+   */
+  public function Out( $text, $level=3, $moduleMask="" )
+  {
+    if ($level<=self::$debugLevel && ( $moduleMask=="" || !empty(self::$modules[$moduleMask])) ) 
+      {
+	echo $text."<br>\r\n";
+      }
+  }
+
+
+
+  public function DumpRequest()
+  {
+    array_walk($_REQUEST,"HTOM_DEBUG_RequestDumper",NULL);
+  }
+
+  private static $debugLevel=0;
+  private static $modules=array();
+}
+
+function HTOM_DEBUG_RequestDumper( $value, $key, $p )
+{
+  if (is_array($value)) {
+    array_walk($value,"HTOM_DEBUG_RequestDumper",$key);
+  } else {
+    if (isset($p)) {
+      echo "ARRAY ".$p."[".$key."]=".$value."<br>";
+    } else {
+      echo $key."=".$value."<br>";
+    }
+  }
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

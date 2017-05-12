@@ -1,0 +1,78 @@
+Revision history for VSGDR-UnitTest-TestSet
+
+1.00    Date/time
+        First version, released on an unsuspecting world.  Broken.
+1.01    Date/time
+        Second version, released on an unsuspecting world.  Still Broken.
+1.02    22/10/2012
+        First version to include scripts and SQLServer modules.
+1.03    22/10/2012
+        Fixed VERSION declarations and pod tests.
+1.04    23/10/2012
+        Refixed Spreadsheet::WriteExcel dependency, and added minimal Pod to SqlServer::DataType module.
+1.05    23/10/2012
+        Removed obsolete statGDRTests.pl.  Enhanced functionality is in reportGDRTests.pl.
+1.06    23/10/2012
+        Updated MANIFEST for 1.05.
+1.07    24/10/2012
+        Fixed duplicate declaration of $VERSION.
+1.08    24/10/2012
+	Removed obsolete dependency on Time::HiRes.
+1.09    24/10/2012
+	Fixed Changes (this file).
+1.10    24/10/2012
+	Updated missing dependencies.
+1.11    24/10/2012
+	Missing use Carp added back.
+1.12    24/10/2012
+	Fix to VB Test Actions.
+1.13    04/12/2012
+	Fixed Representation::XLS.  Corrected typo in name of Spreadsheet::WriteExcel.
+1.14    04/12/2012
+	Fixed this file.
+1.15    04/12/2012
+	Added IPC::System::Simple as a prerequisite.
+1.16    12/12/2012
+	Expanded the README doc to give a flavour of how to use the main utility scripts.
+1.17    04/01/2013
+	Removed useless documentation for CPAN page.
+1.18    04/01/2013
+	Removed useless documentation for CPAN page.
+1.19    04/01/2013
+	Reinstating broken changes.
+1.20    17/01/2013
+	Tightened checking of file suffixes in scripts.
+1.21    28/01/2013
+	Bug fix to DumpGDRSql.pl.  Print filehandle needs a block around it.
+1.22_01 29/01/2013
+	Sql Server Data Tools 2010 unit test support.  Main scripts working.  Bugs still in others.
+1.22_02 07/03/2013
+	Fixed bug in detection of parsing failure for .NET version 1 attempt.
+1.23 	08/03/2013
+	Fixed enough of the main scripts to consider that the Sql Server Data Tools 2010 unit test support.
+	and VS2012 SQL projects unit test support to be complete and production ready.
+1.24 	12/03/2013
+	Updated TestSet docs.
+1.25 	12/03/2013
+	Updated MANIFEST.
+1.26 	28/05/2013
+	Added replaceGDRSql.pl
+1.27 	04/10/2013
+	Added namespace parameter to genGDRTests.pl and mergeGDRTests.pl  
+	Fixed delGDRTest.pl and disableGDRTestCondition.pl to retain existing namespace.
+1.28 	11/08/2014
+	Kwalitee counts.
+1.29 	11/08/2014
+	Kwalitee gaming.
+1.30 	02/09/2014
+	Kwalitee gaming.  Removed Version info from all but main .pm file.
+1.31 	09/03/2015
+	Defaulted output version to 2 where applicable.  Non-SSDT projects are dead.
+1.32 	16/03/2015
+	namespace no longer mandatory on mergeGDRTests.pl. Allows defaulting value from output file name.
+1.33 	10/11/2015
+	genGDRTests.pl now has new option which bypasses running the test and generates two default test conditions. A scalar value which says 'Passed' and a rowcount which check sjust one row is output.
+1.34 	10/11/2015
+	Bug fix.
+
+

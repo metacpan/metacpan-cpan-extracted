@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name: Video-ZVBI
+abstract: Interface to the Zapping VBI decoder library
+version: 0.2.6
+author:
+  - Tom Zoerner <tomzo@users.sourceforge.net>
+license: GPL
+distribution_type: module
+keywords:
+  - video
+  - VBI
+  - capture
+  - teletext
+  - closed caption
+  - VPS
+  - WSS
+  - libzvbi
+requires:
+  perl: 5.7.1
+recommends:
+  Tk: 800
+excludes_os: MSWin32
+no_index:
+  directory:
+    - examples
+resources:
+  license: http://www.gnu.org/licenses/
+  homepage: http://zapping.sourceforge.net/doc/libzvbi/index.html

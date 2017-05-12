@@ -1,0 +1,84 @@
+#VRML V1.0 ascii
+Group {
+	DEF Cameras Switch {
+	   whichChild 0
+		DEF Front
+		PerspectiveCamera {
+		      position        0 0 5
+		      orientation     0 0 1 0
+		}
+		DEF Right
+		PerspectiveCamera {
+		      position        5 0 0
+		      orientation     0 1 0 1.5707963
+		}
+		DEF Back
+		PerspectiveCamera {
+		      position        0 0 -5
+		      orientation     0 1 0 3.1415926
+		}
+		DEF Left
+		PerspectiveCamera {
+		      position        -5 0 0
+		      orientation     0 1 0 -1.5707963
+		}
+		DEF Top
+		PerspectiveCamera {
+		      position        0 5 0
+		      orientation     1 0 0 -1.5707963
+		}
+		DEF Bottom
+		PerspectiveCamera {
+		      position        0 -5 0
+		      orientation     1 0 0 1.5707963
+		}
+		DEF Red
+		PerspectiveCamera {
+		      position        0 0 -5
+		      orientation     0 1 0 3.1415926
+		}
+	}
+	WWWAnchor {
+	   name "#Red"
+	   description "To Red Side"
+		MaterialBinding {
+		   value   PER_FACE_INDEXED
+		}
+		Group {
+			Material {
+			       diffuseColor [
+					0 0 1,
+					0 1 0,
+					1 0 0,
+					1 1 0,
+					1 1 1
+				]
+			}
+			Coordinate3 {
+			   point [
+					-0.5 -0.5 0.5,
+					0.5 -0.5 0.5,
+					0.5 -0.5 -0.5,
+					-0.5 -0.5 -0.5,
+					0 0.5 0
+			      ]
+			}
+			IndexedFaceSet {
+			       coordIndex [
+					0, 1, 4, -1,
+					1, 2, 4, -1,
+					2, 3, 4, -1,
+					3, 0, 4, -1,
+					0, 3, 2, 1, -1
+			      ]
+			       materialIndex [
+					0,
+					1,
+					2,
+					3,
+					4
+			  ]
+			}
+		}
+	}
+}

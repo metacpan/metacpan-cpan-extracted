@@ -1,0 +1,113 @@
+NAME
+    VS::Chart - Simple module to create beautifully looking charts
+
+SYNOPSIS
+     use VS::Chart;
+
+     my $chart = VS::Chart->new;
+
+     .. Add data to $chart here ...
+     $chart->add(@row);
+
+     $chart->render( type => "line", as => "png", to => "my_chart.png" );
+
+PHILOSOPHY
+    *   Simple interface
+
+    *   Defaults should look great
+
+    *   DWIW
+
+    *   Extendable implementation
+
+DESCRIPTION
+    This module produces charts from data. Such charts might be line, pie
+    and boxes. Currently only linecharts are implemented. The renderer uses
+    Cairo Graphics (<http://www.cairographics/>), a graphics library for
+    creating vector graphics, to produce crisp and correct output. Currently
+    we limit output support to PNG, PDF and SVG altho Cairo may support
+    more.
+
+INTERFACE
+  CLASS METHODS
+    new ( %ATTRIBUTES, [ no_defaults => 1 ] )
+        Creates a new chart definition and sets any attributes passed in
+        *%ATTRIBUTES*. If *no_defaults* is specified the chart will not be
+        populated with default values when rendered.
+
+    supported_types
+        Returns a list of supported renderers.
+
+  INSTANCE METHODS
+    set ( %ATTRIBUTES )
+        Sets a number of attributes. It is possible to set an attribute for
+        a specific dataset by prepending the key with <column<gt>:. Columns
+        starts at 0.
+
+    get ( ATTRIBUTE )
+        Get the value of an attribute.
+
+    has ( ATTRIBUTE )
+        Check if an attribute exists.
+
+    add ( @ROW )
+        Adds the data in *@ROW* to the chart. If the first element is a
+        *Date::Simple* object the first column will be marked as the index
+        column provider and sorted accordingly when rendered.
+
+    render ( type => TYPE, to => PATH | CODE, [ as => FORMAT ] )
+        Renders the chart using the renderer specified by *TYPE* and saves
+        the output as *PATH*. By default the *FORMAT* is png but pdf or svg
+        may be used instead.
+
+        If the format is png it's possible to pass a CODE reference instead
+        of a path in *to*. This will be called with the reference itself as
+        the first argument and data as second. It may be called several
+        times during rendering.
+
+    dataset ( COLUMN )
+        Returns the "VS::Chart::Dataset"-instance representing the data for
+        the given column. Return undef if no such column has been added yet
+        via add.
+
+    rows
+        Returns the number of rows of data added to the chart.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-vs-chart@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+SUPPORT
+    Commercial support is available from Versed Solutions. Contact author
+    for details.
+
+AUTHOR
+    Claes Jakobsson, Versed Solutions "<claesjac@cpan.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2007-2008, Versed Solutions "<info@versed.se>". All rights
+    reserved.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

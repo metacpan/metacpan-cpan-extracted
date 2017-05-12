@@ -1,0 +1,7 @@
+$Id: README,v 1.1 2005/11/29 16:28:03 perlstalker Exp $
+
+VUser-SpamAssassin is an extension to vuser to manage SpamAssassin settings.
+
+AUTHOR
+
+Randy Smith <perlstalker@vuser.org>

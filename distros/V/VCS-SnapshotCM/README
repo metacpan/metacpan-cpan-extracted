@@ -1,0 +1,8 @@
+VCS::SnapshotCM is currently mainly a container for the whistory and
+wannotate scripts. It contains a module, VCS::SnapshotCM::Tools, but
+its interface is not considered stable.
+
+See the whistory and wannotate documentation for details.
+
+It would be nice to have VCS::SnapshotCM compatible with the other
+VCS:: modules. Patches welcome.

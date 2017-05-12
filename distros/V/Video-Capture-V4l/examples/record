@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+
+sub print_capability {
+   my $c=shift;
+   print "Device: ";
+   print "name ",$c->name;
+   print ", type";
+   for (qw(capture tuner teletext overlay chromakey clipping frameram scales monochrome subcapture)) {
+      print " $_" if eval "\$c->$_";
+   }
+   print ", channels ",$c->channels;
+   print ", audios ",$c->audios;
+   print ", sizes ",$c->minwidth,"x",$c->minheight,"-",$c->maxwidth,"x",$c->maxheight;
+   print "\n";
+}
+
+sub print_channel {
+   my $c=shift;
+   print "Channel ",$c->channel,": ";
+   print "name ",$c->name;
+   print ", tuners ",$c->tuners;
+   print ", flags";
+   for (qw(tuner audio)) {
+      print " $_" if eval "\$c->$_";
+   }
+   print ", type";
+   for (qw(tv camera)) {
+      print " $_" if eval "\$c->$_";
+   }
+   # PAL, NTSC, SECAM, PAL-NC, PAL-M, PAL-N, NTSC-Japan
+   print ", norm ",$c->norm;
+   print "\n";
+}
+
+sub print_tuner {
+   my $c=shift;
+   print "Tuner ",$c->tuner,": ";
+   print "name ",$c->name;
+   print ", range ",$c->rangelow,"-",$c->rangehigh;
+   print ", flags";
+   for (qw(pal ntsc secam low norm stereo_on rds_on mbs_on)) {
+      print " $_" if eval "\$c->$_";
+   }
+   print ", mode ",$c->mode;
+   print ", signal ",$c->signal;
+   print "\n";
+}
+
+sub print_audio {
+   my $c=shift;
+   print "Audio Channel ",$c->audio,": ";
+   print "volume ",$c->volume;
+   print ", bass ",$c->bass;
+   print ", treble ",$c->treble;
+   print ", flags";
+   for (qw(mute mutable volume bass treble)) {
+      print " $_" if eval "\$c->$_";
+   }
+   print ", name ",$c->name;
+   print ", mode ",$c->mode;
+   print ", balance ",$c->balance;
+   print ", step ",$c->step;
+   print "\n";
+}
+
+sub print_picture {
+   my $c=shift;
+   print "Picture Settings: ";
+   print "brightness ",$c->brightness;
+   print ", hue ",$c->hue;
+   print ", colour ",$c->colour;
+   print ", contrast ",$c->contrast;
+   print ", whiteness ",$c->whiteness;
+   print ", depth ",$c->depth;
+   print ", palette ",$c->palette;
+   print "\n";
+}
+
+$grab = new Video::Capture::V4l
+   or die "Unable to open Videodevice: $!";
+
+print_capability $grab->capability;
+for (0..$grab->capability->channels-1) {
+   print_channel $grab->channel($_);
+}
+
+for($_=0; my $tuner = $grab->tuner($_); $_++) {
+   last if $tuner->tuner != $_;
+   print_tuner $tuner;
+}
+
+for($_=0; my $audio = $grab->audio($_); $_++) {
+   last if $audio->audio != $_;
+   print_audio $audio;
+}
+
+print_picture $grab->picture;
+
+my $channel = $grab->channel (0);
+my $tuner = $grab->tuner (0);
+$tuner->mode(MODE_PAL);
+$channel->norm(MODE_PAL);
+$tuner->mode(8);
+$tuner->set;
+$channel->set;
+
+$RTL2 = 154250;
+$RTL2 = 196250;
+
+my $format = PALETTE_YUYV;
+
+print $grab->freq ($RTL2),"\n";
+
+$|=1;
+
+my($w,$h)=(576,432);
+
+my @dests = (
+      "stream1",
+      "stream2",
+      "stream3",
+      );
+
+my $frame=0;
+my $fr=$grab->capture($frame, $w, $h, $format);
+my $index=0;
+
+for(;;) {
+   my $nfr = $grab->capture(1-$frame, $w, $h, $format);
+   $grab->sync($frame) or print "unable to sync";
+
+   # save $fr now, as it contains the raw BGR data
+   use File::Sync qw/fsync/;
+   $index++;
+   print ".";
+   open FRAME, (sprintf ">%s/frame%08d", $dests[$index % @dests], $index) or die;
+   print FRAME $fr;
+   close FRAME;
+
+   $frame = 1-$frame;
+   $fr = $nfr;
+}
+

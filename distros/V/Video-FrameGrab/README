@@ -1,0 +1,146 @@
+######################################################################
+    Video::FrameGrab 0.07
+######################################################################
+
+NAME
+    Video::FrameGrab - Grab a frame or metadata from a video
+
+SYNOPSIS
+        use Video::FrameGrab;
+
+        my $grabber = Video::FrameGrab->new( video => "movie.avi" );
+
+        my $jpg_data = $grabber->snap( "00:00:10" );
+        $grabber->jpeg_save("snapshot.jpg");
+
+        print "This movie is ", 
+              $grabber->meta_data()->{length}, 
+              " seconds long\n";
+
+          # Snap 10 frames at constant intervals throughout the movie
+        for my $p ( $grabber->equidistant_snap_times(10) ) {
+            $grabber->snap( $p );
+            $grabber->jpeg_save("frame-at-$p.jpg");
+        }
+
+DESCRIPTION
+    Video::FrameGrab grabs a frame at the specified point in time from the
+    specified video file and returns its JPEG data.
+
+    It uses mplayer for the heavy lifting behind the scenes and therefore
+    requires it to be installed somewhere in the PATH. If mplayer is
+    somewhere else, its location can be provided to the constructor:
+
+        my $grabber = Video::FrameGrab->new( mplayer => "/path/to/mplayer",
+                                             video   => "movie.avi"
+                                           );
+
+  METHODS
+    snap( $time )
+        Grabs a frame from the movie at time $time. Time is given as
+        HH::MM::SS, just as mplayer likes it. Returns the raw jpeg data of
+        the captured frame on success and undef if an error occurs.
+
+    jpeg_save( $jpg_file_name )
+        Save a grabbed frame as a jpeg image in $file on disk.
+
+    meta_data()
+        Runs mplayer's identify() function and returns a reference to a hash
+        containing something like
+
+            demuxer          => MOV
+            video_format     => AVC1
+            video_bitrate    => 0
+            video_width      => 320
+            video_height     => 240
+            video_fps        => 29.970
+            video_aspect     => 0.0000
+            audio_format     => MP4A
+            audio_bitrate    => 0
+            audio_rate       => 48000
+            audio_nch        => 2
+            length           => 9515.94
+
+    equidistant_snap_times( $howmany, [$opts] )
+        If you want to snap N frames at constant intervals throughout the
+        movie, use equidistant_snap_times( $n ) to get a list of timestamps
+        you can use later pass to snap(). For example, on a two hour movie,
+        equidistant_snap_times( 5 ) will return
+
+            00:20:00
+            00:40:00
+            01:00:00
+            01:20:00
+            01:40:00
+
+        as a list of strings. The movie length is determined by a call to
+        meta data, but some formats don't allow retrieving the movie length
+        that way, therefore the optional options hash can set the
+        movie_length entry to the movie length (or the length of the overall
+        interval to perform the snapshots in) in seconds.
+
+            my @times =
+              $fg->equidistant_snap_times( $howmany, { movie_length => 3600 } );
+
+    cropdetect( $time, [$opts] )
+        If this is a 16:9 movie converted to 4:3 format, the black bars at
+        the bottom and the top of the screen should be cropped out. To help
+        with this task, "cropdetect" will return a list of ($width, $height,
+        $x, $y) to be passed to mplayer/mencoder in the form "-vf
+        crop=w:h:x:y" to accomplish the suggested cropping.
+
+        The default algorithm is a homegrown detection mechanism "{algorithm
+        => "schilli"}", which first blurs the image with the Gaussian Blur
+        algorithm with a radius of "$opts->{gaussian_blur_radius}" (which
+        defaults to 3), and then measures if any of the left, right, upper
+        or lower border pixel lines of the snapped frame average an
+        intensity of less than "$opts->{min_intensity_average}", which
+        defaults to 20.
+
+        Note that this is just a guess and might be incorrect at times. In a
+        dark scene, black pixels might protrude far into the video, making
+        it impossible to detect the border reliably. However, if you overlay
+        a number of frames, obtained at several times during the movie (e.g.
+        by using the equidistant_snap_times method described above), the
+        result is fairly predicatblye and accurate. "cropdetect_average",
+        described below, does exactly that.
+
+        The alternative algorithm, "mplayer", asks mplayer to come up with a
+        recommendation on how to crop the video. This technique delivers
+        incorrect results if there are sporadic white spots within the dark
+        bars.
+
+    cropdetect_average( $number_of_probes, [$opts] )
+        Takes $number_of_probes from the movie at equidistant intervals,
+        overlays the frames and performs a border detection on the resulting
+        images, which is almost white in the viewing area.
+
+        See "equidistant_snap_times" for setting the movie length in the
+        optional $opts parameter.
+
+    aspect_ratio_guess( ["16:9", "4:3"] )
+        This function will take the width and height of the video and map it
+        to the best matching aspect ratio given in a reference to an array.
+
+    dimensions()
+        Snaps a frame in the middle of the movie, determines its width and
+        height and returns them in a list:
+
+            my($width, $height) = $grabber->dimensions();
+
+        Dimensions are usually also available via the meta_data() call.
+        dimensions() works even in absence of meta data.
+
+CAVEATS
+        Note that the mplayer-based frame grabbing mechanism used in this
+        module allows you to snap a picture about every 10 seconds into the
+        movie, on shorter intervals, you'll get the same frame back.
+
+LEGALESE
+    Copyright 2009 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2009, Mike Schilli <cpan@perlmeister.com>
+

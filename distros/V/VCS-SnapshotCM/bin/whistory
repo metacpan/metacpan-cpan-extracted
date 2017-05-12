@@ -1,0 +1,650 @@
+#!/usr/bin/perl -w
+################################################################################
+#
+# $Project: /VCS-SnapshotCM $
+# $Author: mhx $
+# $Date: 2005/04/09 13:13:21 +0200 $
+# $Revision: 16 $
+# $Snapshot: /VCS-SnapshotCM/0.02 $
+# $Source: /bin/whistory $
+#
+################################################################################
+#
+# Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+################################################################################
+
+use strict;
+use VCS::SnapshotCM::Tools;
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use Term::ANSIColor qw(:constants);
+use Text::Wrap;
+use POSIX qw(strftime);
+
+my($NAME) = $0 =~ /([\w\.]+)$/;
+my $VERSION = ('$Snapshot: /VCS-SnapshotCM/0.02 $' =~ /([^\/\s]+)\s*\$$/)[0];
+
+my %OPT = (
+  'debug'          => 0,
+  'changelog'      => 0,
+  'reverse'        => 0,
+  'warnings'       => 0,
+  'color'          => (exists $ENV{TERM} && $ENV{TERM} =~ /^(dt|x)term$/),
+  'exclude'        => [],
+  'exclude-regexp' => [],
+);
+
+Getopt::Long::Configure('bundling');
+
+GetOptions(\%OPT, qw(
+  exclude|x=s@
+  exclude-regexp|X=s@
+  server|host|h=s
+  changelog|C
+  reverse|r
+  help|?
+  man
+  version
+  debug+
+  warnings+
+  color!
+)) or pod2usage(2);
+
+if ($OPT{version}) {
+  print <<VERSION;
+
+This is $NAME, v$VERSION ($0).
+
+Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+VERSION
+  exit 0;
+}
+
+pod2usage(-exitstatus => 0, -verbose => 0) if exists $OPT{help};
+pod2usage(-exitstatus => 0, -verbose => 2) if exists $OPT{man};
+
+if (@ARGV > 2) {
+  print "Too many arguments.\n\n";
+  pod2usage(2);
+}
+
+my $vcs = new VCS::SnapshotCM::Tools debug => $OPT{debug};
+my $mapping = $vcs->get_current_mapping;
+
+unless (@ARGV) {
+  # No arguments?
+  # If we're inside a mapped directory, present the user a list of
+  # available snapshots to compare against, plus some help.
+  if ($mapping) {
+    my @snapshots = $vcs->get_snapshots(server  => $mapping->{server},
+                                        project => $mapping->{project});
+
+    print "Available snapshots for project $mapping->{project}:\n\n",
+          wrap('', '', join(', ', sort @snapshots)), "\n", <<ENDHELP;
+
+Use '$NAME --help' for more options.
+
+ENDHELP
+
+    exit 0;
+  }
+  else {
+    pod2usage(2);
+  }
+}
+
+if (@ARGV < 2 and not defined $mapping) {
+  die <<END;
+*** You are not inside a mapped directory.
+Either go to a mapped directory, or specify two snapshots.
+END
+}
+
+my @snapshots = map { $vcs->guess_local(snapshot => $_) || $_ } @ARGV;
+
+if ($OPT{debug}) {
+  print Data::Dumper->Dump([\@snapshots], ['*snapshots']);
+}
+
+for my $ss1 (@snapshots) {
+  if (not ref $ss1) {
+    for my $ss2 (@snapshots) {
+      if (ref $ss2) {
+        my $ss = $ss1;
+        $ss1 = { %$ss2 };
+        $ss1->{snapshot} = $ss;
+        $ss1->{path}     = "$ss1->{project}/$ss";
+        last;
+      }
+    }
+  }
+}
+
+$OPT{server} ||= $snapshots[0]{server};
+
+my(%source, %target);
+($source{path}, $target{path}) = map { $_->{path} } @snapshots == 2
+                               ? @snapshots : (@snapshots, { path => $mapping->{snapshot} });
+
+@$_{qw( project snapshot )} = $vcs->split_snapshot_path($_->{path})
+    for \%source, \%target;
+
+if ($source{project} and $target{project} and
+    $source{project} ne  $target{project}) {
+  die <<END;
+*** Cannot compare snapshots from different projects.
+END
+}
+
+unless ($source{project}) {
+  if ($target{project}) {
+    $source{project} = $target{project};
+  }
+  elsif ($mapping) {
+    $source{project} = $mapping->{project};
+  }
+  else {
+    die <<END;
+*** No project specified.
+Specify the full snapshot path for one snapshot.
+END
+  }
+}
+
+if ($OPT{debug}) {
+  print Data::Dumper->Dump([\%OPT, \%source, \%target],
+                           [qw( *OPT *source *target )]);
+}
+
+$vcs->configure(server => $OPT{server}, project => $source{project});
+
+if ($target{snapshot} eq '.') {
+  die <<END;
+*** Target snapshot cannot be '.'.
+END
+}
+
+for ($source{snapshot}, $target{snapshot}) {
+  $_ eq '.' || $vcs->exists_snapshot(snapshot => $_) or die <<END;
+*** No snapshot '$_' in project '$source{project}'.
+END
+}
+
+# prepare regular expressions
+for (@{$OPT{'exclude-regexp'}}) {
+  my $re = m! ^/(.*)/(\w*)$ !x ? "qr/$1/$2" : "qr/$_/";
+  $re = eval $re;
+  if ($@) {
+    my $error = $@;
+    $error =~ s/\s+at\s+\(eval\s+\d+\).*//s;
+    die <<END;
+*** Invalid regular expression '$_':
+$error
+END
+  }
+  $_ = $re;
+}
+
+### all error checking is done, we should be safe now
+
+# get file list from both snapshots
+$_->{files} = $_->{snapshot} eq '.' ? {} : $vcs->get_files(snapshot => $_->{snapshot})
+    for \%source, \%target;
+
+my %files;
+
+EXCLUDE: for (keys %{$source{files}}, keys %{$target{files}}) {
+  my($base) = m! ([^/\\]+)$ !x;
+  for my $x (@{$OPT{exclude}}) {
+    $base eq $x and next EXCLUDE;
+  }
+  for my $x (@{$OPT{'exclude-regexp'}}) {
+    $_ =~ $x and next EXCLUDE;
+  }
+
+  my($s, $t) = ($source{files}{$_}, $target{files}{$_});
+  if (defined $s and defined $t) {
+    if ($s->{revision} != $t->{revision}) {
+      $files{changed}{$_} = { source => $s, target => $t };
+    }
+  }
+  elsif (defined $s) { $files{deleted}{$_} = $s }
+  elsif (defined $t) { $files{added}{$_}   = $t }
+  else { die "Huh?" }
+}
+
+if ($OPT{debug}) {
+  print Data::Dumper->Dump([\%source, \%target, \%files],
+                           [qw( *source *target *files )]);
+}
+
+my @changelog;
+my $indent = ' 'x8;
+
+for my $file (sort (keys %{$files{added}}, keys %{$files{deleted}}, keys %{$files{changed}})) {
+  my($ss, $r1, $r2, $action, $fref, $type);
+
+  if ($files{added}{$file}) {
+    $type = 'added';
+    $fref = $files{added}{$file};
+    $ss = $target{snapshot};
+    $r1 = '';
+    $r2 = $fref->{revision};
+    $action = colored('[NEW ITEM]', BOLD, GREEN);
+  }
+  elsif ($files{deleted}{$file}) {
+    $type = 'deleted';
+    $fref = $files{deleted}{$file};
+    $ss = $source{snapshot};
+    $r1 = $fref->{revision};
+    $r2 = '';
+    $action = colored('[DELETED ITEM]', BOLD, RED);
+  }
+  elsif ($files{changed}{$file}) {
+    $type = 'changed';
+    $fref = $files{changed}{$file};
+    $ss = $target{snapshot};
+    $r1 = $fref->{source}{revision};
+    $r2 = $fref->{target}{revision};
+    $action = '[change]';
+  }
+  else { die "Huh?" }
+
+  my $history = $vcs->get_history(snapshot => $ss, file => $file,
+                                  rev1 => $r1, rev2 => $r2, ancestors => 1);
+
+  my @revs = sort { $a <=> $b } keys %{$history->{revisions}};
+
+  $fref->{history} = $history;
+  $fref->{revisions} = \@revs;
+
+  $r1 ||= '0';
+  $r2 ||= $revs[-1];
+
+  my $derivation = "$file($r1)";
+  $derivation .= " --> $file($r2)" if defined $r2;
+
+  unless ($OPT{changelog}) {
+    print '-' x 72, "\n", colored($derivation, BOLD, BLUE), " $action\n\n";
+  }
+
+  @revs = reverse @revs if $OPT{reverse};
+
+  for my $r (@revs) {
+    my $rev = $history->{revisions}{$r};
+    my $comment = $rev->{comment};
+    my @functions;
+
+    if ($r > 1 and $type ne 'deleted' and $file =~ / \. (?: [cC] | cc | cpp ) $ /x) {
+      @functions = get_changed_function_names($vcs, $ss, $file, $r-1, $r);
+    }
+
+    if ($OPT{changelog}) {
+      $rev->{changed_functions} = \@functions;
+      push @changelog, [ $type, $file, $r, $rev->{time} ];
+    }
+    else {
+      $comment =~ s/^/$indent/gm;  # indent
+      print colored(sprintf("%d --> %d%s on %s by %s\n", $r-1, $r,
+                    (exists $rev->{change} ? " ($rev->{change})" : ''),
+                    $rev->{date}, $rev->{author}), BLUE);
+
+      if (@functions) {
+        print $indent, colored("Functions: ", BOLD),
+              wrap('', $indent . ' 'x11, join(', ', @functions), "\n");
+      }
+
+      print "$comment\n\n";
+    }
+  }
+}
+
+if ($OPT{changelog}) {
+  @changelog = sort { $a->[3] <=> $b->[3] } @changelog;
+
+  my %current = (
+    title   => '',
+    comment => '',
+    files   => [],
+  );
+
+  @changelog = reverse @changelog if $OPT{reverse};
+
+  for my $change (@changelog) {
+    my($type, $file, $rev, $time) = @$change;
+    my $c = $files{$type}{$file}{history}{revisions}{$rev};
+    my $date = strftime("%Y-%m-%d", localtime $time);
+    my $comment = $c->{comment};
+    my($login, $author) = $c->{author} =~ /^\s*(.*?)\s+\(([^)]+)\)/;
+    my $title = "$date  $author  <$login>";
+    if ($title   ne $current{title} or
+        $comment ne $current{comment}) {
+      write_changelog_entry(\%current);
+      if ($title ne $current{title}) {
+        write_changelog_title($title);
+      }
+      $current{files} = [];
+    }
+    $current{title}   = $title;
+    $current{comment} = $comment;
+    my $filespec = "$file\@$rev";
+    $filespec .= ' (' . join(', ', @{$c->{changed_functions}}) . ')'
+        if @{$c->{changed_functions}};
+    push @{$current{files}}, $filespec;
+  }
+  write_changelog_entry(\%current);
+}
+
+sub write_changelog_title
+{
+  my $title = shift;
+  print "$title\n\n";
+}
+
+sub write_changelog_entry
+{
+  my $log = shift;
+  return unless @{$log->{files}};
+  my $comment = $log->{comment};
+  $comment =~ s/^/\t  /mg;
+  print wrap("\t", "\t  ", "* " . join(", ", @{$log->{files}}) . ":\n"), $comment, "\n\n";
+}
+
+sub colored
+{
+  my($text, @spec) = @_;
+  $OPT{color} or return $text;
+  $OPT{changelog} and return $text;
+  return join '', @spec, $text, RESET;
+}
+
+sub get_changed_function_names
+{
+  my($vcs, $ss, $file, $r1, $r2) = @_;
+  local $_;
+
+  my $fh = $vcs->open_file(snapshot => $ss, file => $file, rev => $r2);
+  my @ranges = get_function_line_ranges($file, $fh);
+  @ranges or return ();
+
+  my @change_ranges;
+  $fh = $vcs->open_diff(snapshot => $ss, file => $file, rev1 => $r1, rev2 => $r2);
+  while (<$fh>) {
+    push @change_ranges, [ $1, $2 || $1 ]
+        if /^\d+(?:,\d+)?[acd](\d+)(?:,(\d+))?/;
+  }
+  if ($OPT{warnings} or $OPT{debug}) {
+    warn "$file: warning: no changes found\n" unless @change_ranges;
+  }
+
+  my @functions;
+  my @change_range = (0, 0);
+  push @change_ranges, [];
+
+  FUNCTION: for my $range (@ranges) {
+    # Advance to successive change ranges.
+    for (;; @change_range = @{shift @change_ranges}) {
+      last FUNCTION unless @change_range;
+
+      # If past this function, move on to the next one.
+      next FUNCTION if $change_range[0] > $range->[1];
+      
+      # If an overlap with this function range, record the function name.
+      if ($change_range[1] >= $range->[0]
+          and $change_range[0] <= $range->[1])
+        {
+          push @functions, $range->[2];
+          next FUNCTION;
+        }
+    }
+  }
+
+  return @functions;
+}
+
+# This function is adapted from a ChangeLog script by Darin Adler
+sub get_function_line_ranges
+{
+  my($file, $fh) = @_;
+  my @ranges;
+  my $in_parentheses = 0;
+  my $in_braces = 0;
+  my $word = "";
+  my $potential_start = 0;
+  my $potential_name = "";
+  my $start = 0;
+  my $name = "";
+  local $_;
+
+  my $content = do { local $/; <$fh> };
+
+  # get rid of preprocessor statements
+  $content =~ s{
+    ^ ( \s* \# (?: [^\r\n\\]* (?: \\[^\r\n] | \\(?:\r\n|[\r\n]) ) ) *
+                   [^\r\n]* )
+  }{
+    my $r = $1;
+    $r =~ s/.*//mg;
+    $r;
+  }egsmx;
+
+  # get rid of comments and strings
+  $content =~ s{
+    ([^"'/]+)
+    |
+    (
+      "[^"\\]*(?:\\.[^"\\]*)*"
+      |
+      '[^'\\]*(?:\\.[^'\\]*)*'
+      |
+      / (?:
+         \*[^*]*\*+(?:[^/*][^*]*\*+)* /
+         |
+         /[^\r\n]*
+        )
+    )
+  }{
+    my $r = $2;
+    $r =~ s/.*//mg if defined $r;
+    defined $1 ? $1 : $r;
+  }egsx;
+
+  my @lines = $content =~ /\G^(.*(?:\r\n|[\r\n]|\z))/mg;
+
+  for my $lineno (1 .. @lines) {
+    $_ = $lines[$lineno-1];
+
+    # Find function names.
+    while (m!(\w+|[(){};])!g) {
+      # Open parenthesis.
+      if ($1 eq "(") {
+        $potential_name = $word unless $in_parentheses;
+        $in_parentheses++;
+        next;
+      }
+
+      # Close parenthesis.
+      if ($1 eq ")") {
+        $in_parentheses--;
+        next;
+      }
+
+      # Open brace.
+      if ($1 eq "{") {
+        # Promote potiential name to real function name at the
+        # start of the outer level set of braces (function body?).
+        if (!$in_braces and $potential_start) {
+          $start = $potential_start;
+          $name = $potential_name;
+        }
+
+        $in_braces++;
+        next;
+      }
+
+      # Close brace.
+      if ($1 eq "}") {
+        $in_braces--;
+
+        # End of an outer level set of braces.
+        # This could be a function body.
+        if (!$in_braces and $name) {
+          push @ranges, [ $start, $lineno, $name ];
+          $name = "";
+        }
+
+        $potential_start = 0;
+        $potential_name = "";
+        next;
+      }
+
+      # Semicolon.
+      if ($1 eq ";") {
+        $potential_start = 0;
+        $potential_name = "";
+        next;
+      }
+
+      # Word.
+      $word = $1;
+      unless ($in_parentheses) {
+        $potential_start = 0;
+        $potential_name = "";
+      }
+      unless ($potential_start) {
+        $potential_start = $lineno;
+        $potential_name = "";
+      }
+    }
+  }
+
+  if ($OPT{warnings} or $OPT{debug}) {
+    warn "$file: warning: mismatched braces\n"      if $in_braces;
+    warn "$file: warning: mismatched parentheses\n" if $in_parentheses;
+  }
+
+  if ($OPT{debug} && @ranges) {
+    print STDERR "--- functions for $file ---\n";
+    print STDERR "  $_->[2] ($_->[0]-$_->[1])\n" for @ranges;
+  }
+
+  if ($in_braces or $in_parentheses) {
+    # we better don't risk returning crap...
+    return ();
+  }
+
+  return @ranges;
+}
+
+__END__
+
+=head1 NAME
+
+whistory - Show history between snapshots
+
+=head1 SYNOPSIS
+
+whistory {I<options>} I<source-snapshot> [I<target-snapshot>]
+
+I<options>:
+
+  -h, --host, --server=SERVER     server hostname
+  -x, --exclude=FILE              exclude files named FILE
+  -X, --exclude-regexp=PATTERN    exclude files matching PATTERN
+  -C, --changelog                 write history in changelog format
+  -r, --reverse                   reverse history output
+
+  --(no)color                     (don't) use colored output
+  --warnings                      print additional warnings
+
+  -?, --help                      show this help
+  --man                           show manpage
+  --version                       print version information
+
+Inside a mapped directory I<target-snapshot> is optional.
+Use '.' for I<source-snapshot> if there's no source snapshot.
+
+=head1 DESCRIPTION
+
+The C<whistory> tool can be used to display the history between
+different snapshots of a SnapshotCM project. 
+
+=head1 OPTIONS
+
+=head2 C<-h>, C<--host>, C<--server> hostname
+
+Specify the hostname of the SnapshotCM server. C<whistory> uses
+various heuristics to figure out which hostname to use, so you'll
+rarely have to specify this option.
+
+=head2 C<-x>, C<--exclude> file
+
+Exclude all files named I<file>. Can be given multiple times.
+
+=head2 C<-X>, C<--exclude-regexp> pattern
+
+Exclude all files matchin I<pattern>. Can be given multiple times.
+Patterns are Perl regular expressions (see L<perlre>).
+
+=head2 C<-C>, C<--changelog>
+
+Write output in changelog format. This output is never colored.
+
+=head2 C<-r>, C<--reverse>
+
+Write history output in reverse order, i.e. newest changes first.
+
+=head2 C<--(no)color>
+
+Use or don't use color in the output. The default is chosen
+depending on your terminal. When piping the colored output
+into C<less>, you may need to use C<less -R> to display the
+colors correctly.
+
+=head2 C<--warnings>
+
+Enable printing of additional warnings.
+
+=head1 EXAMPLES
+
+Display all changes that since snapshot 0.54 while being in a
+mapped directory:
+
+  whistory 0.54
+
+Display all changes between snapshots 0.40 and 0.42 of project
+I<foobar>, excluding all files named F<Makefile>:
+
+  whistory -x Makefile /foobar/0.40 0.42
+
+Display all changes since snapshot 0.50, excluding all I<*.h> files
+and all files matching I<readme> (case insensitive). Use changelog
+format:
+
+  whistory -X '\.h$' -X '/readme/i' --changelog 0.50
+
+Display all changes made between creating the project and snapshot
+0.01:
+
+  whistory - 0.01
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+SnapshotCM is copyright (c) 2000-2003 True Blue Software Company.
+
+=head1 SEE ALSO
+
+See L<whist>, L<wannotate>, L<VCS::SnapshotCM::Tools>.
+
+=cut

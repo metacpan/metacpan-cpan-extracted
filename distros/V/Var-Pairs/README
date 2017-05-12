@@ -1,0 +1,36 @@
+Var::Pairs version 0.003004
+
+This module exports a small number of subroutines that
+add some Perl 6 conveniences to Perl 5. Specifically,
+the module exports several subroutines that simplify
+interactions with key/value pairs in hashes and arrays.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

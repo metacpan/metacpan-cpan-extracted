@@ -1,0 +1,24 @@
+Build.PL
+examples/perltidyrc
+examples/vimph
+lib/Vim/Helper.pm
+lib/Vim/Helper/Fennec.pm
+lib/Vim/Helper/Help.pm
+lib/Vim/Helper/LoadMod.pm
+lib/Vim/Helper/Plugin.pm
+lib/Vim/Helper/Test.pm
+lib/Vim/Helper/TidyFilter.pm
+lib/Vim/Helper/VimRC.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+script/vimph
+t/Vim-Helper-Fennec.t
+t/Vim-Helper-Help.t
+t/Vim-Helper-LoadMod.t
+t/Vim-Helper-Plugin.t
+t/Vim-Helper-Test.t
+t/Vim-Helper-TidyFilter.t
+t/Vim-Helper-VimRC.t
+t/Vim-Helper.t

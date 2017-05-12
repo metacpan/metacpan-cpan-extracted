@@ -1,0 +1,182 @@
+<DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
+
+[% vote = c.model('Vote') %]
+
+[% IF vote.vote_status(voteid) == 'BEFORE' %]
+<table border="1">
+<tr><th>Vote</th><th>Possibilité de vote</th></tr>
+<tr>
+<td valign="TOP">
+<form action="[% c.uri_for(voteid) %]" method="POST">
+
+[% thisvote = vote.vote_info(voteid) %]
+
+Label: <input type="text" name="label" value="[% c.req.param('label') || thisvote.label | html %]">
+<br>
+Description:<br>
+<textarea name="description" cols="60" rows="4">[% c.req.param('description') || thisvote.description | html %]</textarea>
+<br>
+<br>
+<!-- http://www.mattkruse.com/javascript/calendarpopup/ -->
+<i>Les dates sont au format JJ/MM/AAAA HH:MM:SS</i><br>
+
+<SCRIPT LANGUAGE="JavaScript" ID="js13">
+var cal13 = new CalendarPopup();
+</SCRIPT>
+
+Debut du vote:<br>
+Date: <input type="text" name="dstart" value="[% c.req.param('dstart') || thisvote.dstart | html %]">
+<A HREF="#" onClick="cal13.select(document.forms[0].dstart,'anchor13','dd/MM/yyyy'); return false;" TITLE="cal13.select(document.forms[0].dstart,'anchor13','dd/MM/yyyy'); return false;" NAME="anchor13" ID="anchor13">select</A>
+Heure: <input type="text" name="hstart" value="[% c.req.param('hstart') || thisvote.hstart | html %]">
+<br>
+Fin du vote:<br>
+Date: <input type="text" name="dend" value="[% c.req.param('dend') || thisvote.dend | html %]">
+<A HREF="#" onClick="cal13.select(document.forms[0].dend,'anchor14','dd/MM/yyyy',(document.forms[0].dend.value=='')?document.forms[0].dstart.value:null); return false;" TITLE="cal13.select(document.forms[0].dend,'anchor14','dd/MM/yyyy',(document.forms[0].dend.value=='')?document.forms[0].dstart.value:null); return false;" NAME="anchor14" ID="anchor14">select</A>
+Heure: <input type="text" name="hend" value="[% c.req.param('hend') || thisvote.hend | html %]">
+<br>
+<br>
+Nombre de choix possible:
+<input type="text" name="choice_count" value="[% c.req.param('choice_count') || thisvote.choice_count | html %]">
+<br>
+Nombre de choix libres:
+<input type="text" name="free_choice" value="[% c.req.param('free_choice') || thisvote.free_choice || 0 | html %]">
+<br>
+<input type="submit" value="Enregistrer">
+</form>
+</td>
+<td valign="TOP">
+[% IF ! vote.vote_choices(voteid).size %]
+<p class="alert">Aucun choix configuré</p>
+[% ELSE %]
+[% FOREACH choice = vote.vote_choices(voteid) %]
+<form action="[% c.uri_for(voteid) %]" method="POST">
+[% loop.count %] - [% vote.choice_info(choice).label | html %]
+<input type="hidden" name="delch" value="[% vote.choice_info(choice).key %]">
+<input type="submit" name="del" value="Effacer">
+</form>
+<br>
+[% END %]
+[% END %]
+<form action="[% c.uri_for(voteid) %]" method="POST">
+Ajouter un choix:<br>
+<input type="text" name="addch">
+<input type="submit" value="Ajouter">
+</form>
+</td>
+</tr>
+</table>
+[% ELSE %]
+[% INCLUDE 'includes/poll.tt' %]
+[% END %]
+
+[% IF vote.vote_status(voteid) != 'AFTER' %]
+<table border="1">
+<tr><th colspan=2>Liste des votants</th></tr>
+<tr>
+<td valign="TOP">
+<p>Ajouter un votant</p>
+<form action="[% c.uri_for(voteid) %]" method="POST">
+Nom: <input type="text" name="id"><br>
+Mail: <input type="text" name="mail"><br>
+<input type="submit" value="Ajouter">
+</form>
+<hr>
+<p>Soumettre la liste via un fichier csv (le Nom est optionnel)</p>
+<p>Format: <i>Mail@domain;Nom</i></p>
+<form method="POST" ENCTYPE="multipart/form-data" action="[% c.uri_for(voteid) %]">
+<input type="file" name="votinglist"><br>
+[% IF vote.vote_status(voteid) == 'BEFORE' %]
+<input type="checkbox" name="delete">Effacer la liste des votants<br>
+[% END %]
+<input type="submit" value="Ajouter">
+</form>
+<hr>
+<p>Envoyer les mots de passes au nouveaux votants</p>
+<form action="[% c.uri_for(voteid) %]" method="POST">
+<input type="submit" name="mailpasswd" value="Envoyer les mot de passe">
+</form>
+</td>
+<td valign="TOP">
+[% IF NOT vote.vote_voting_count(voteid) %]
+<p class="alert">Aucun votant inscrit</p>
+[% ELSE %]
+[% signing = vote.vote_voting(voteid) %]
+[% FOREACH thisvoting = signing %]
+[% voting = vote.voting_info(thisvoting) %]
+[% IF NOT voting.date %]
+<form action="[% c.uri_for(voteid) %]" method="POST">
+<input type="hidden" name="delvoting" value="[% voting.vkey %]">
+[% END %]
+[% voting.label | html %] [% voting.mail | html %]
+[% IF voting.passwd %]<i>(pass envoyé)</i>[% END %]
+[% IF NOT voting.date %]
+<input type="submit" name="delete" value="delete"><br>
+</form>
+[% ELSE %]
+(<i>a voté</i>)
+[% END %]
+[% END %]
+[% END %]
+</td>
+</tr>
+</table>
+
+[% ELSE %]
+
+[% # INCLUDE 'includes/poll.tt' %]
+
+[% FOREACH untrusted = vote.vote_ballot_untrusted_values(voteid) %]
+[% IF loop.first %]
+<div id="map_ballot">
+<p>Remapper les valeurs des bulletins</p>
+<table border="1">
+<tr><th>Valeur saisie</th><th>Valeur à considérer</th></tr>
+[% END %]
+<tr>
+<td>[% untrusted | html %]</td>
+<td>
+    <form action="[% c.uri_for('/admin', voteid) %]" method="POST">
+    <input type="hidden" name="mapfrom" value="[% untrusted | html %]">
+    <select name="mapto">
+    [% FOREACH v = vote.vote_ballot_values(voteid) %]
+        [% NEXT IF v == untrusted %]
+        <option>[% v | html %]</options>
+    [% END %]
+    </select>
+    <input type="submit">
+    </form>
+</td>
+</tr>
+[% IF loop.last %]
+</table>
+</div>
+[% END %]
+[% END %]
+
+[% FOREACH bid = vote.list_vote_ballot_needvalid(voteid) %]
+    [% IF loop.first %]
+    <div id="ballot_to_valid">
+    <p>Bulletins à valider:</p>
+    <form action="[% c.uri_for(voteid) %]" method="POST">
+    <table border="1">
+    [% END %]
+<tr>
+<td>[% bid %]</td>
+<td>
+[% FOREACH item = vote.ballot_items(bid) %]
+[% loop.count %]- [% item.v %]<br>
+[% END %]
+</td>
+<td>
+<input type="radio" name="[% bid %]" value="valid">est valide<br>
+<input type="radio" name="[% bid %]" value="invalid">n'est pas valide<br>
+</td>
+</tr>
+    [% IF loop.last %]
+    </table>
+    <input type="submit">
+    </form>
+    </div>
+    [% END %]
+[% END %]
+[% END %]

@@ -1,0 +1,89 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.05.01.19.42.02;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@<?PHP
+
+/*! \class HTOM_DropDown 
+ * \brief The HTOM_DropDown class represents a SELECT HTML element.
+ */
+class HTOM_DropDown extends HTOM_Input
+{
+  /*! Initialize HTOM_Static object
+
+\param text the text that will be displayed in the static object.
+\param attributes a instance of HTOM_Attribute or a array of HTOM_Attribute objects.
+  */
+  public function __construct( $name, $multiselect=false, $attributes=NULL )
+  {
+    $this->SetAttributes($attributes);
+    if ($multiselect)
+      $this->SetAttributes(new HTOM_SimpleAttribute("MULTIPLE",""));
+    $this->SetAttributes( new HTOM_SimpleAttribute("name",$name) );
+    $this->Init();
+  }
+
+  //! Append a value to the dropdown.
+  public function Append( $value, $name, $selected=false )
+  {
+    $this->elements[$value]=array( "caption"=>$name, "selected"=>$selected) ;
+  }
+  
+  //! Get the html representation of the drop down menu (SELECT element).
+  public function Evaluate()
+  {
+    $rc = "<SELECT ".$this->Attributes().">\n";
+    while (current($this->elements))
+    {
+      $e=current($this->elements);
+      $selected = "";
+      if ($e["selected"])
+	$selected = "selected";
+      $rc.="<OPTION value='".key($this->elements)."' ".$selected.">".$e["caption"]."</OPTION>\n";
+      next($this->elements);
+    }
+    $rc.="</SELECT>\n";
+    return $rc;
+  }
+
+  
+  private $elements=array();
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d31 1
+a31 1
+    $rc = "<SELECT ".$this->ID()->Evaluate().$this->Attributes().">\n";
+@
+

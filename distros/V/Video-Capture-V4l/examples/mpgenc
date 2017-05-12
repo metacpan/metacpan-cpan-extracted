@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+use Video::RTjpeg;
+
+$|=1;
+$SIG{PIPE} = 'IGNORE';
+
+$stream = "/tmp/vstream";
+require $stream;
+
+$mpegencode = "/root/cvt/mpeg_movie-1.6.0/video_in/mpeg_encode";
+
+my $gop = 8;
+
+$tmpdir = "/tmp/encode$$/";
+$tmpdir = "/tmp/encode";
+mkdir $tmpdir, 0700;
+
+$fsize  = $w*$h*2;
+
+$partlen = $fps*60;
+$partlen = $gop*100;
+
+my @dec;
+
+sub new_vdecoder {
+   my $number = @dec;
+   my $decp = do { local *DECODER_READER };
+   my $decc = do { local *DECODER_WRITER };
+   pipe $decp, $decc;
+   if (fork==0) {
+      my ($buf, $tables);
+      open DATA, "<$outprefix.v$number" or die;
+
+      read DATA, $buf, 4;
+      my ($tlen) = unpack "N*", $buf;
+
+      read DATA, $tables, $tlen;
+      Video::RTjpeg::init_decompress($tables, $w, $h);
+
+      while (read DATA, $buf, 8) {
+         my ($time, $size) = unpack "N*", $buf;
+         print $decc pack "N", $time;
+         read DATA, $buf, $size;
+         print $decc Video::RTjpeg::decompress $buf;
+      }
+      exit;
+   }
+   push @dec, $decp;
+}
+
+my @nframeid;
+
+sub next_frame {
+   my $min = 1e30;
+   my $buf;
+   my $minid;
+   for (0..$#dec) {
+      unless (defined $nframeid[$_]) {
+         read $dec[$_], $buf, 4;
+         $nframeid[$_] = unpack "N", $buf;
+      }
+      ($min,$minid) = ($nframeid[$_],$_) if $nframeid[$_] < $min && defined $nframeid[$_];
+   }
+   read $dec[$minid], $buf, $fsize;
+   undef $nframeid[$minid];
+   ($buf, $min);
+}
+
+new_vdecoder for 1..$vencoders;
+
+my $part = 0;
+
+sub do_encode {
+   my ($pstart, $pframes) = @_;
+   $pframes = sprintf "%06d", $pframes-1;
+   $part = sprintf "%03d",  $part+1;
+
+   open TEMPLATE, ">$tmpdir/param" or die;
+   print TEMPLATE <<EOF;
+OUTPUT		$outprefix.$part.mpg
+
+#PATTERN		IBBBPBBB
+PATTERN		IBBBPBBBPBBBPBBBPBBBPBBBPBBBPBBB
+FORCE_ENCODE_LAST_FRAME
+
+# You must specify the type of the input files.  The choices are:
+#    YUV, PPM, JMOVIE, Y, JPEG, PNM
+#
+BASE_FILE_FORMAT	YUV
+
+# this option is ignored if BASE_FILE_FORMAT is not YUV and you're running
+YUV_SIZE	${w}x$h
+
+# EYUV or UCB are the same as previous versions of this encoder.
+# (All the Y's, then U's then V's, in 4:2:0 subsampling.)
+# Other formats, such as Abekas, Phillips, or a general format are
+# permissible, the general format is a string of Y's, U's, and V's
+# to specify the file order.
+
+INPUT_FORMAT EYUV
+
+INPUT_CONVERT	*
+
+# number of frames in a GOP.
+#
+# since each GOP must have at least one I-frame, the encoder will find the
+# the first I-frame after GOP_SIZE frames to start the next GOP
+#
+# later, will add more flexible GOP signalling
+#
+GOP_SIZE	$partlen
+
+# number of slices in a frame
+#
+# 1 is a good number.  another possibility is the number of macroblock rows
+# (which is the height divided by 16)
+#
+SLICES_PER_FRAME	$w
+
+# directory to get all input files from (makes this file easier to read)
+INPUT_DIR	$tmpdir
+
+# There are a bunch of ways to specify the input files.
+# from a simple one-per-line listing, to the following 
+# way of numbering them.  See the manual for more information.
+INPUT
+# '*' is replaced by the numbers 01, 02, 03, 04
+# if I instead do [01-11], it would be 01, 02, ..., 09, 10, 11
+# if I instead do [1-11], it would be 1, 2, 3, ..., 9, 10, 11
+# if I instead do [1-11+3], it would be 1, 4, 7, 10
+# the program assumes none of your input files has a name ending in ']'
+# if you do, too bad!!!
+#
+#
+frame*.yuv	[000000-$pframes]
+END_INPUT
+
+# Many of the remaining options have to do with the motion search and qscale
+
+# FULL or HALF -- must be upper case
+PIXEL		HALF
+
+# means +/- this many pixels for both P and B frame searches
+# specify two numbers if you wish to serc different ranges in the two.
+RANGE		10
+
+# this must be one of {EXHAUSTIVE, SUBSAMPLE, LOGARITHMIC}
+PSEARCH_ALG	LOGARITHMIC
+
+# this must be one of {SIMPLE, CROSS2, EXHAUSTIVE}
+#
+# note that EXHAUSTIVE is really, really, really slow
+#
+BSEARCH_ALG	CROSS2
+
+#
+# these specify the q-scale for I, P, and B frames
+# (values must be between 1 and 31)
+# These are the Qscale values for the entire frame in variable bit-rate
+# mode, and starting points (but not important) for constant bit rate
+#
+IQSCALE		8
+PQSCALE		10
+BQSCALE		25
+
+# this must be ORIGINAL or DECODED
+REFERENCE_FRAME	DECODED
+
+# for parallel parameters see parallel.param in the exmaples subdirectory
+
+# if you want constant bit-rate mode, specify it as follows (number is bits/sec):
+#BIT_RATE  2000000
+
+# To specify the buffer size (327680 is default, measused in bits, for 16bit words)
+#BUFFER_SIZE 800000
+
+# The frame rate is the number of frames/second (legal values:
+# 23.976, 24, 25, 29.97, 30, 50 ,59.94, 60
+FRAME_RATE $fps
+
+# There are many more options, see the users manual for examples....
+# ASPECT_RATIO, USER_DATA, GAMMA, IQTABLE, etc.
+
+#PARALLEL_TEST_FRAMES	3
+#PARALLEL_CHUNK_TAPER
+
+#PARALLEL
+#localhost1	root	$mpegencode
+#localhost2	root	$mpegencode
+#END_PARALLEL
+
+EOF
+
+   close TEMPLATE;
+
+   $ENV{HOST} = "localhost";
+   system $mpegencode, "-quiet", "10", "$tmpdir/param";
+}
+
+my ($frame, $pstart, $pframe) = (0, 0, 0);
+
+Video::RTjpeg::init_decompress("x" x (128*4), $w, $h);
+while (my ($buf, $framex) = next_frame) {
+   print ".";
+   while ($frame < $framex) {
+      if ($pframe == $partlen) {
+         do_encode $pstart, $pframe;
+         $pstart = $frame;
+         $pframe = 0;
+      }
+      #$buf2 = Video::RTjpeg::yuvrgb($buf); open DISPLAY, "| display -size ${w}x$h rgb:-" or die; print DISPLAY $buf2; close DISPLAY;
+      open FRAME, sprintf ">$tmpdir/frame%06d.yuv", $pframe;
+      print FRAME $buf;
+      close FRAME;
+      $frame++;
+      $pframe++;
+      print "s" if $frame != $framex;
+   }
+   last if $frame >= $nframe;
+}
+
+do_encode $pstart, $pframe;
+

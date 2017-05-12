@@ -1,0 +1,32 @@
+0a1,3
+> Here is the first part of Coleridge's "Rime of the Ancient Mariner"
+> There are no copyright issues as this text is in the public domain
+> 
+3c6
+< "By thy long grey beard and glittering eye,
+---
+> <<By thy long grey beard and glittering eye,
+6c9
+< "The Bridegroom's doors are opened wide,
+---
+> <<The Bridegroom's doors are opened wide,
+9c12
+< May'st hear the merry din."
+---
+> May'st hear the merry din.>>
+12,13c15,16
+< "There was a ship," quoth he.
+< "Hold off! unhand me, grey-beard loon!"
+---
+> <<There was a ship,>> quoth he.
+> <<Hold off! unhand me, grey-beard loon!>>
+98c101
+< "God save thee, ancient Mariner!
+---
+> <<God save thee, ancient Mariner!
+100,101c103,104
+< Why look'st thou so?"--With my cross-bow
+< I shot the ALBATROSS.
+---
+> Why look'st thou so?>>--With my cross-bow
+> I shot the B<ALBATROSS>.

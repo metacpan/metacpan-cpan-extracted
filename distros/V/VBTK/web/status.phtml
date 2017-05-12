@@ -1,0 +1,111 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # Setup variables used in the commonHeader.phtml file
+  $refresh=120;
+
+  my $histFile = $_parms->{histFile};
+  my $setBaseline = $_parms->{setBaseline};
+  
+  # Set the tab gif based on whether a timestamp was passed in
+  my $currTab = (! defined $histFile) ? "Current" : "History";
+-->
+  <!--#include virtual="/commonHeader.phtml" -->
+  <!--#include virtual="/checkRemoteServers.phtml -->
+  <!--#include virtual="/commonTabs.phtml" -->
+
+<!--#perl
+  # If we've mad it this far, then unload some values from the object.
+
+  # Lookup the history object for this timestamp
+  my ($histObj)          = $vbObj->getHistoryObjList($histFile);
+  my $baselineDiffStatus = $vbObj->getBaselineDiffStatus;
+  my ($status,$text,$statusColor,$header,$footer,$timestamp);
+  my ($timestampText,$baselineMsg);
+  
+  # If we find the history object, then unload some values.  Otherwise, it's been
+  # rolled up into another history entry, so just tell the user to refresh the 
+  # history list.
+  if (defined $histObj)
+  {
+    $status        = $histObj->getStatus;
+    $text          = $histObj->getText;
+    $header        = $histObj->getHeaderMsg;
+    $footer        = $histObj->getFooterMsg;
+    $timestamp     = $histObj->getTimestamp;
+    $timestampText = &Date::Manip::UnixDate("epoch $timestamp", "%C");
+    $statusColor   = $STATUS_FGCOLOR{$status};
+
+    # If the setBaseline parm was passed, then try to save this history object
+    # as the baseline.
+    if($setBaseline) {
+      if($vbObj->setBaselineText($histObj->getText)) {
+        $baselineMsg = &green("Successfully updated object baseline - Changes will " .
+            "take affect on next update\n\n");
+      } else {
+        $baselineMsg = &red("Error: Can't set as baseline\n\n");
+      }
+    }
+  }
+  else
+  {
+    $status      = undef;
+    $text        = "The entry for '$timestampText' has been removed.\nPlease " .
+      "click the 'Historical Results' tab to refresh the history list. <br>";
+    $statusColor = "#000000";
+  }
+
+-->  
+
+<!-- table of field and values -->
+<table width="620" border="0">
+  <tr valign="top">
+    <th width="195" align=right>Test:&nbsp</th>
+    <td width="425">&nbsp
+      <!--#perl 
+        my @segments = split(/\./,$name);
+        my $lastSegName = pop(@segments);
+        my ($segName,$fullName);
+        foreach my $pos (0..($#segments)) 
+        { 
+          $segName = $segments[$pos];
+          $fullName = join('.',@segments[0..$pos]);
+       -->
+        <A HREF="$matrixUrl?name=$fullName">$segName</A>.
+      <!--#perl } -->
+      <A HREF="$statusUrl?name=$name">$lastSegName</A>
+    </td>
+    <td align="RIGHT">
+      <!--#perl if ($baselineDiffStatus) { -->
+        <A HREF="$statusUrl?name=$name&histFile=$histFile&setBaseline=1">
+          [save&nbsp;as&nbsp;baseline]</A>
+      <!--#perl } -->
+    </td>
+  </tr>
+
+  <TR VALIGN="TOP">
+    <TH align="right">Status:&nbsp</TH>
+    <TD><FONT COLOR='$statusColor'>$status</FONT></TD>
+  </TR>
+
+  <TR VALIGN="TOP">
+    <TH align="right">TimeStamp:&nbsp</TH>
+    <TD>$timestampText</TD>
+  </TR>
+</TABLE>
+
+<!-- This is horizontal rule -->
+<img src="images/hr.gif" width="620" height="3" border="0">
+
+<!-- command output in a single cell table to control width -->
+<table width="620" border="0" cellspacing="0" cellpadding="10">
+  <tr>
+    <td>
+      <pre>
+$baselineMsg$header$text$footer
+      </pre>
+    </td>
+  </tr>
+</table>&nbsp<br>
+
+<!--#include virtual="/commonFooter.phtml" -->

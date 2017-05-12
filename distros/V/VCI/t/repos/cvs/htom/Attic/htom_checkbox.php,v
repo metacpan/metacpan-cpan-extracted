@@ -1,0 +1,83 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.02.23.41.38;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@This is the commit for testing VCI.
+And it has a two-line message.
+@
+text
+@<?PHP
+
+//!  Class represents a check-box object.
+class  HTOM_CheckBox extends HTOM_Input
+{
+  /*! \brief Initialize the HTOM_CheckBox object.
+
+  * \param $name a name of the object.
+  * \param $descr description of the checkbox.
+  * \param $checked specify if the checkbox in by defautl checked or not.
+  * \param attributes either the HTOM_Attribute or an array of HTOM_Attribute objects.
+  */
+  public function __construct($name, $descr="", $checked=FALSE, $attributes=NULL )
+  {
+    parent::__construct($name, "checkbox", $attributes);
+    if ($checked) {
+      $this->SetAttributes( new HTOM_SimpleAttribute("checked","true") );
+    }
+    $this->SetAttributes( new HTOM_SimpleAttribute("alt",$descr) );
+  }
+  
+  /*! \brief Set the default state of the checkbox. 
+   * \param $checked if set to TRUE checkbox will be checked by default.*/
+  public function SetChecked( $checked=TRUE )
+  {
+    if ($checked) {
+      $this->SetAttributes( new HTOM_SimpleAttribute("checked","true") );
+    } else {
+      $this->RemoveAttribute( "checked" );
+    }
+  }
+
+  /*! Returnd the default checkbox value. */
+  public function IsChecked()
+  {
+    $rc = FALSE;
+    $v = $this->GetAttribute( "checked" );
+    if (isset( $v ))
+      $rc=TRUE;
+    return $rc;
+  }
+
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

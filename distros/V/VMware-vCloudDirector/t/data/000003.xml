@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<OrgList xmlns="http://www.vmware.com/vcloud/v1.5" href="https://vcloud.example.com/api/org/" type="application/vnd.vmware.vcloud.orgList+xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vmware.com/vcloud/v1.5 http://vcloud.example.com/api/v1.5/schema/master.xsd">
+    <Org href="https://vcloud.example.com/api/org/342506a6-e7c8-11e6-9cfe-df67eba3672f" name="Example" type="application/vnd.vmware.vcloud.org+xml"/>
+    <Org href="https://vcloud.example.com/api/org/342507c9-e7c8-11e6-9cfe-a060ae628dc0" name="Thing" type="application/vnd.vmware.vcloud.org+xml"/>
+    <Org href="https://vcloud.example.com/api/org/34250869-e7c8-11e6-9cfe-ebd0713163c4" name="Object" type="application/vnd.vmware.vcloud.org+xml"/>
+    <Org href="https://vcloud.example.com/api/org/342508ec-e7c8-11e6-9cfe-88ab79a0f2cf" name="Blob" type="application/vnd.vmware.vcloud.org+xml"/>
+    <Org href="https://vcloud.example.com/api/org/3424de61-e7c8-11e6-9cfe-b2ce727b09b7" name="System" type="application/vnd.vmware.vcloud.org+xml"/>
+</OrgList>

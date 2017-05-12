@@ -1,0 +1,8 @@
+#VRML V1.0 ascii
+Separator {
+	Cube {
+		width	5
+		height	3
+		depth	2
+	}
+}

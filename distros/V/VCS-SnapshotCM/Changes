@@ -1,0 +1,19 @@
+-------------------------
+Version 0.02 (2005-04-09)
+-------------------------
+
+* new --warnings option for wannotate and whistory
+
+* improve changed functions code, and discard results
+  for asymmetric files
+
+* fix handling of development snapshots
+
+* other tiny bug fixes and improvements
+
+-------------------------
+Version 0.01 (2004-09-05)
+-------------------------
+
+* initial release
+

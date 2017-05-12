@@ -1,0 +1,70 @@
+{
+   "abstract" : "Generate perl tags for vim",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Vim-Tag",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Constructor" : 0,
+            "File::Find" : 0,
+            "File::Slurp" : 0,
+            "Getopt::Inherited" : 0,
+            "Hash::Rename" : 0,
+            "UNIVERSAL::require" : 0,
+            "constant" : 0,
+            "parent" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Vim::Tag" : {
+         "file" : "lib/Vim/Tag.pm",
+         "version" : "1.110690"
+      },
+      "Vim::Tag::Null" : {
+         "file" : "lib/Vim/Tag/Null.pm",
+         "version" : "1.110690"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-vim-tag at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Vim-Tag"
+      },
+      "homepage" : "http://search.cpan.org/dist/Vim-Tag/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/Vim-Tag.git",
+         "web" : "http://github.com/hanekomu/Vim-Tag"
+      }
+   },
+   "version" : "1.110690"
+}
+

@@ -1,0 +1,25 @@
+Vector::Object3D Version 0.01
+=============================
+
+Vector::Object3D is Perl module providing most basic procedures to facilitate
+handling of vector object calculations in the 3D space, including fundamental
+transformations as well as perspective 2D casting.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Pawel Krol.
+
+This library is free open source software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or, at your
+option, any later version of Perl 5 you may have available.
+
+PLEASE NOTE THAT IT COMES WITHOUT A WARRANTY OF ANY KIND!

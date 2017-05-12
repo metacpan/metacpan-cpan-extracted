@@ -1,0 +1,53 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl 
+
+  # Setup variables used in the commonHeader.phtml file
+  $refresh=120;
+
+  # Add a timestamp to the image references to keep them from being cached.
+  my $now=time;
+  
+  # Read in the passed graph group number or use the first in the list.
+  my $groupNumber=$_parms->{groupNumber} || 1;
+
+  # Setup variables used in the commonTabs.phtml file
+  my $currTab = "Graphs" . $groupNumber;
+-->
+<!--#include virtual="/commonHeader.phtml" -->
+<!--#include virtual="/checkRemoteServers.phtml -->
+<!--#include virtual="/commonTabs.phtml" -->
+
+<table border="0" cellspacing="0" cellpadding="0">
+
+<!--#perl
+  my($parmObj,@graphObjList,$imgUrlParms,$targetUrlParms);
+
+  # If no group number was specified, then contruct a graph group object
+  # using the passed parms, otherwise, lookup the graph group.
+  if (! defined $_parms->{groupNumber})
+  {
+    $parmObj = new VBTK::Objects::Graph (Parms => $_parms);
+    push(@graphObjList,$parmObj) if (defined $parmObj);
+  }
+  else
+  {
+    @graphObjList = $vbObj->getGraphGroupObjList($_parms->{groupNumber});
+  }
+
+  # Step through each graph group and generate table cells for it.
+  foreach my $obj (@graphObjList)
+  {
+    ($imgUrlParms,$targetUrlParms) = $obj->generateUrlParms($_parms);
+-->  
+      <tr>
+        <td>
+          <A HREF="$graphsUrl?name=$name&now=$now&$targetUrlParms">
+            <IMG SRC="$genGraphUrl?name=$name&now=$now&$imgUrlParms"></A>
+        </td>
+      </tr>
+<!--#perl
+  }
+-->  
+
+</table>
+<!--#include virtual="/commonFooter.phtml" -->

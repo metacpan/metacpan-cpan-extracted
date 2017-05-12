@@ -1,0 +1,55 @@
+Value-Object version 0.14
+
+This class serves as a base class for classes implementing the "Value Object"
+pattern. The core principles of a Value Object class are:
+
+ * The meaning of the object is solely its value.
+ * The value of the object is immutable.
+ * The object is validated on creation.
+
+Every Value::Object-derived object has a minimum of a "value" method that
+returns its value.  There is no mutator methods that allow for changing the
+value of the object. If you need an object with a new value, create a new
+object. The concept is that one of these objects is more like the integer 5,
+than the variable $v that contains the value. You cannot modify the value of
+5, but you can make a new integer that is the value of 5 changed by some
+amount.
+
+The core of this particular Value Object implementation is the validation on
+creation. Every subclass of Value::Object must override either the
+_is_valid or the _why_invalid method. The _is_valid method determines
+the validity of the supplied value. If the supplied value is not valid,
+_is_valid returns false and the constructor throws an exception. If you
+prefer to have control over the message of the exception, you can override
+_why_invalid which returns undef for a valid value and information about
+why the value is not valid otherwise. The result is that any Value::Object
+object is guaranteed to be validated by its constructor.
+
+There is a temptation when designing a Value object to include extra
+functionality into the class. The Value::Object class instead aims for the
+minimal function consistent with the requirements listed above. If a subclass
+needs more functionality it can be added to that subclass at the point of need.
+Valid extra functionality might be accessors for part of the value if it is
+made of smaller pieces. Any mutator methods would violate the fundamental
+design of the Value::Object base class and are, therefore, discouraged.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Moo, namespace::clean.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, G. Wade Johnson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

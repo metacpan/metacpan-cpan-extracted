@@ -1,0 +1,34 @@
+Verilog/CodeGen version 0.9.4
+=============================
+
+Provides an object-oriented environment to generate Verilog code for modules and testbenches. The Verilog::CodeGen module provides two functions, one to create a code template and another to create a Perl module which contains the device library. This module , DeviceLibs::YourDesign, provides the class methods and contains the objects for every Verilog module; the objects are created based on a fixed template.
+The purpose of this module is to allow the generation of customized Verilog modules. A Verilog module can have a large number of parameters like input and output bus width, buffer depth, signal delay etc. The code generator allows to create an object that will generate the Verilog module code for arbitraty values of the parameters.
+
+See the POD in CodeGen.pm and CodeGen/Gui.pm and http://www.comms.eee.strath.ac.uk/~wim/verilog_codegen.html for more info.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires ino other modules and libraries. However, if you want to use the GUI (strongly recommended), you'll need at least Perl-Tk.
+For the complete use experience, you'll also need:
+
+    * XEmacs with gnuserv enabled, i.e. put (gnuserv-start) in your .emacs. Without XEMacs, the GUI is rather useless. The Verilog-mode is very usefull too.
+    * If you want to inspect the generated code, you need the v2html Verilog to HTML convertor and a controllable browser, I use galeon.
+    * To run the testbench, I use Icarus Verilog, a great open source Verilog simulator.
+    * To plot the results, I use GTkWave, a great open source waveform viewer.
+
+see http://www.comms.eee.strath.ac.uk/~wim/gui.html for the URL's
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-2003 Wim Vanderbauwhede. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

@@ -1,0 +1,3 @@
+struct DATA1 *      T_PTROBJ
+entier              T_UV
+flottant            T_DOUBLE

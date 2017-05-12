@@ -1,0 +1,16 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-06-06T04:51:32.869294Z
+K 7
+svn:log
+V 182
+Fixed a warnings issue with the GameQuery::Monitor() factory method
+Fixed an issue with the GameQuery::supported_protocols() method
+Added the GameQuery::supported_templates() method
+
+END

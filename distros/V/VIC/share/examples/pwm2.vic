@@ -1,0 +1,14 @@
+PIC P16F690;
+
+Main {
+    pwm_single 1220Hz, 20%, CCP1;
+    delay 5s;
+    pwm_update 1220Hz, 30%; # update duty cycle
+    delay 5s;
+}
+
+Simulator {
+    scope CCP1;
+    log CCP1;
+    attach_led CCP1;
+}

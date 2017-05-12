@@ -1,0 +1,22 @@
+[Changes for 0.05 - 2008-01-01]
+
+* Renamed to VS-RuleEngine-Loader-XML
+* Allow instanceOf attribute on root engine node to define another engine class than Kvasir::Engine
+* Fixed README which looked a bit funny because missing -t switch when perldoc:ing it [DOC]
+
+[Changes for 0.04 - 2007-10-08]
+
+* Corrected broken MANIFEST
+
+[Changes for 0.03 - 2007-10-08]
+
+* Added support for defaults introduced in Kvasir 0.07
+
+[Changes for 0.02 - 2007-10-02]
+
+* Removed references to Test::Kvasir::* since these are not installed anymore
+* Doesn't require the non-existing Perl 5.6.20 (5.00602) anymore. Spotted by David Cantrell. [BUG]
+
+[Changes for 0.01 - 2007-10-01]
+
+* Initial release to CPAN

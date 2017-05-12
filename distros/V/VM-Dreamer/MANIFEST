@@ -1,0 +1,35 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+Makefile.PL
+README
+examples/grasshopper/grasshopper.pl
+examples/grasshopper/reference/instruction_set
+examples/grasshopper/sample_code/add
+examples/grasshopper/sample_code/io
+examples/grasshopper/sample_code/mult
+examples/grasshopper/sample_code/sub
+lib/VM/Dreamer.pm
+lib/VM/Dreamer/Dump.pm
+lib/VM/Dreamer/Environment.pm
+lib/VM/Dreamer/Error.pm
+lib/VM/Dreamer/IO.pm
+lib/VM/Dreamer/Init.pm
+lib/VM/Dreamer/Instructions.pm
+lib/VM/Dreamer/Languages/Grasshopper.pm
+lib/VM/Dreamer/Operation.pm
+lib/VM/Dreamer/Util.pm
+lib/VM/Dreamer/Validate.pm
+t/00-Init.t
+t/01-Operation.t
+t/files/empty.lmc
+t/files/invalid.lmc
+t/files/redundant_address.lmc
+t/files/valid.gmc
+t/files/valid.grasshopper
+t/files/valid.rmc
+t/lib/InvalidMachines.pm
+t/lib/TestMachines.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+---
+abstract: 'an OO interface to the 2Checkout.com Vendor API'
+author:
+  - 'Len Jaffe <lenjaffe@jaffesystems.com>'
+build_requires:
+  JSON::Any: 0
+  List::MoreUtils: 0
+  Test::More: 0.87
+  XML::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: VendorAPI-2Checkout-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::NonMoose: 0
+  Params::Validate: 0
+  UNIVERSAL::require: 0
+  URI: 0
+  URI::QueryParam: 0
+  namespace::autoclean: 0
+version: 0.1502

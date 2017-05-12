@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                VS-Chart
+version:             0.08
+abstract:            Simple module to create beautifully looking charts
+license:             mit
+author:              
+    - Claes Jakobsson <claes@versed.se>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Cairo:                         1.040
+    Date::Simple:                  0
+    List::MoreUtils:               0
+    List::Util:                    0
+    Module::Pluggable:             0
+    Scalar::Util:                  0
+    Test::Exception:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

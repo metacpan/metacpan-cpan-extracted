@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         VUser-Firewall
+version:      0.1.0
+version_from: lib/VUser/Firewall.pm
+installdirs:  site
+requires:
+    File::Temp:                    0
+    VUser::Extension:              0.2.0
+    VUser::ExtHandler:             0.2.1
+    VUser::ExtLib:                 0.2.1
+    VUser::Log:                    0.2.0
+    VUser::Meta:                   0.2.0
+    VUser::ResultSet:              0.2.0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

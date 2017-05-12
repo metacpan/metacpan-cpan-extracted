@@ -1,0 +1,103 @@
+#!/bin/ksh
+
+HOME=/usr/vbtk
+OWNER=vb
+ALL_SERVERS=''
+
+RSYNC=/usr/local/bin/rsync
+SSH=/opt/OBSDssh/bin/ssh
+BASENAME=/usr/bin/basename
+HOST=`/usr/bin/hostname`
+
+prog=`$BASENAME $0`
+
+# Determine who is running this script
+user=`/bin/id | cut -f2 -d'(' | cut -f1 -d')'`
+
+# Check to make sure we're the owner before we try to run this
+if [ "$user" != "$OWNER" ]
+then echo "Error: Must run as '$OWNER'"
+     exit 1
+fi 
+
+# Initialize variables
+testOnly=
+desc="Syncronizing from"
+delete=
+delDesc=
+
+# Check for command line params
+while getopts 'nd' opt
+do
+    case $opt in
+       n) testOnly='-n'
+          desc='Comparing';;
+       d) delete='--delete'
+          delDesc="with delete option";;
+    esac
+done
+
+# Now shift off the args
+shift `expr $OPTIND - 1`;
+
+# Check the usage
+if [ $# -lt 1 ]
+then echo "Usage: $prog [-nd] <dest1> [<dest2> ...]"
+     exit 1
+fi
+
+# If the server is listed as 'all', then set the server list to as
+# specified above, after removing the local hostname from the list
+if [ "$1" = "all" ]
+then serverList=`echo $ALL_SERVERS | sed "s/$HOST//g"`
+else serverList="$*"
+fi
+
+# Loop through all servers specified on the command line
+for destHost in $serverList
+do
+
+    # Change the functionality based on how the script was called
+    if [ $prog = 'syncTo' ]
+    then src=$HOME/
+         dest=$destHost:$HOME
+         linkCmd="$SSH $destHost"
+         linkDesc="on $destHost"
+    elif [ $prog = 'syncFrom' ]
+    then src=$destHost:$HOME/
+         dest=$HOME
+         linkCmd=
+         linkDesc=
+    else
+         echo "Error: Invalid calling name '$prog'"
+         exit 1
+    fi
+
+    # Execute the rsync
+    echo "\n$desc $src to $dest $delDesc"
+    $RSYNC -av $testOnly $delete -e "$SSH" \
+        --exclude=".ssh*" \
+        --exclude=".b*" \
+        --exclude=".h*" \
+        --exclude="/bin/trash" \
+        --exclude="/logs/*" \
+        --exclude="/vbobj*/*" \
+        --exclude="/conf/.*" \
+        --exclude="/perf/*" \
+        --exclude="/weblogs/test0" \
+        --exclude="/vbtk.*" \
+        --rsync-path=$RSYNC $src $dest
+
+    if [ $? -ne 0 ]
+    then echo " Error: Rsync returned non-zero exit code'"
+         exit 1
+    fi
+
+    # Only run the setupLinks script if not in test-only mode
+    #if [ -z "$testOnly" ]
+    #then echo "\nFixing links $linkDesc"
+    #     $linkCmd $HOME/iENG/bin/setupLinks
+    #fi
+
+done
+

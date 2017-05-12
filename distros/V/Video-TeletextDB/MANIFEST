@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Video-TeletextDB.t
+t/Input.pm
+lib/Video/TeletextDB.pm
+lib/Video/TeletextDB/Access.pm
+lib/Video/TeletextDB/Parameters.pm
+lib/Video/TeletextDB/Page.pm
+lib/Video/TeletextDB/Constants.pm
+bin/TeleCollect
+fcgi-bin/TeleFcgi
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,10 @@
+
+100 010 11
+
+// address wider than 32 bits
+// 32-bit: 2^32 = 4.3M --> this is really big!!
+// sim will fail unless I modify tb.
+@1_abcd_ef00
+
+001
+111

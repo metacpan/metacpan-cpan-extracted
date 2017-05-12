@@ -1,0 +1,68 @@
+NAME
+    Vcdiff::OpenVcdiff - open-vcdiff backend for Vcdiff
+
+SYNOPSIS
+        use Vcdiff::OpenVcdiff;
+
+        my $delta = Vcdiff::OpenVcdiff::diff($source, $target);
+
+        my $target2 = Vcdiff::OpenVcdiff::patch($source, $delta);
+
+        ## $target2 eq $target
+
+    This module is a backend to the Vcdiff module and isn't usually used
+    directly.
+
+DESCRIPTION
+    This module uses Alien::OpenVcdiff which is a module that configures,
+    builds, and installs Google's <open-vcdiff> library.
+
+    The alien package installs the "vcdiff" binary for your convenience but
+    this module uses the "libvcdenc.so" and "libvcddec.so" shared libraries
+    so that the diffing computation is done in-process instead of forking
+    processes.
+
+PROS
+    *   Apache licensed
+
+    *   open-vcdiff has a really cool feature that lets you re-use "hashed
+        dictionaries" for multiple diff operations (but this module doesn't
+        expose that yet).
+
+CONS
+    *   Even with the streaming API "open-vcdiff" has a hard upper-limit of
+        2G file sizes and the default (which this module hasn't changed) is
+        64M so be warned.
+
+    *   If the source argument is a file handle, Vcdiff::OpenVcdiff will try
+        to mmap(2) the entire file into memory with Sys::Mmap. As well as
+        adding a dependency, this means that source files must be able to
+        fit in your address space. Because of the file size limitation
+        described above, this shouldn't be an issue. See the "STREAMING API"
+        section of Vcdiff for more details.
+
+    *   The Alien::OpenVcdiff dependency takes a long time to compile
+        compared to Vcdiff::Xdelta3 although it's not a completely fair
+        comparison because the alien module also runs open-vcdiff's
+        test-suite (which is good).
+
+    *   The library writes to standard error in the event of errors and I
+        don't believe there is any way to silence these messages.
+
+SEE ALSO
+    <Vcdiff-OpenVcdiff github repo>
+
+    Vcdiff
+
+    Alien::OpenVcdiff
+
+    <Official open-vcdiff website>
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2013 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

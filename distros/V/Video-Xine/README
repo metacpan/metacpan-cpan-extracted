@@ -1,0 +1,40 @@
+Video-Xine version 0.17
+=======================
+
+This is an interface to the xine-lib library. It can be used to create
+a Perl-controlled instance of Xine. 
+
+Xine is a multimedia playback system. You can find more information
+about it at http://www.xine-project.org/.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+If you would like the tests to actually show video, set the environment variable VIDEO_XINE_SHOW to 1, like so:
+
+   VIDEO_XINE_SHOW=1 ./Build test
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  xine-lib, available from http://www.xine-project.org/
+  Module::Build
+  Test::More
+  DateTime
+  X11::FullScreen
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2013 by Stephen Nelson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+

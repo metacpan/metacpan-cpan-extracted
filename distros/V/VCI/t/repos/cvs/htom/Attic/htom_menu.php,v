@@ -1,0 +1,76 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?php
+
+
+class HTOM_Menu implements HTOM_Evaluable
+{
+  public function addItem( $title, $action )
+  {
+    if ($action instanceof HTOM_Evaluable)
+      {
+	$node = array();
+	$node['tittle']=$title;
+	$node['action']=$action;
+      }
+  }
+
+  public function Evaluate()
+  {
+    $result = "";
+    $result.= "<table style=\"background-color: #202020;color:white;font-family:Verdana\">";
+    $result.= "<tr>";
+
+    reset($menu); // reset the menu array
+    $node = current($menu); // get the current element of the array
+    while ($node)
+      {
+	$title=$node['tittle'];
+	$action=$node['action'];
+	if (
+	$node = next($menu); // get the subsequent menu of the menu
+      }
+      
+
+    $result.= "</tr>";
+    $result.= "</table>";
+    return $result;
+  }
+  private $menu=array();
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

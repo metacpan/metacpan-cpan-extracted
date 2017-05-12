@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a852d867194a715503d9610f5c79c3faa9515388 Changes
+SHA1 20f25e8572f550d73f134e218339f45f2c02c772 MANIFEST
+SHA1 ddb918d4e02cc06f4b9fe77adeca65403f8fdd56 MANIFEST.SKIP
+SHA1 e860bd26ade6c62fa5923ca59c5375288d3a4485 META.yml
+SHA1 8d5d95135012746d7a983b27b769b4379cce8aa6 Makefile.PL
+SHA1 0a38ba64a622cec3da81cc36e97405f016331e2e README
+SHA1 157030f33c3b4fca8df403900c6bfabf5a5087ad examples/module_builder.pl
+SHA1 9f7cd4d7ca7a5bbda515576c5398fcd075cb55c9 examples/mysql_load.pl
+SHA1 271cb08d885953f8336951fe48a4dbea0133eae1 examples/template.pl
+SHA1 d5492eb598819b7e6ada4c14881893670f870c9e lib/Verby.pm
+SHA1 5cd399032cf6cb12f35a8b7097fd1b81e530e750 lib/Verby/Action.pm
+SHA1 6d441ffc1f209c1bf2e5183a78bf2504397705af lib/Verby/Action/BuildTool.pm
+SHA1 49cd0f087bc2b9c88f37da1ae8e46169a796132c lib/Verby/Action/Make.pm
+SHA1 2bd28bbd1d769c5c6f9346fed78baad5b686014a lib/Verby/Action/MkPath.pm
+SHA1 203944dbbfcff53040ce52dcdfe949473a1f6a2e lib/Verby/Action/Run.pm
+SHA1 949befe2e4212b56357ba48a24cec2841bd1e4e6 lib/Verby/Action/Run/Unconditional.pm
+SHA1 c98f35bc6d2bc1ff851a6743dab6f0aa3b5d43fb lib/Verby/Action/Stub.pm
+SHA1 31081ad195c013ae25bd1a81af40e55ea84d619d lib/Verby/Config/Data.pm
+SHA1 2fb5c568d578f62e7d3ba62092ec8a829b7defa6 lib/Verby/Config/Data/Mutable.pm
+SHA1 44a8d75d84c9eac7ea5cf21e604b9f7713eb7f9d lib/Verby/Config/Source.pm
+SHA1 c619f558388bf7d179a939fc00a9d24c96efc727 lib/Verby/Config/Source/ARGV.pm
+SHA1 8660ca492c68c42d5886925313b04cd1c8d74d70 lib/Verby/Config/Source/Prompt.pm
+SHA1 e72d4b2a60ae7ee954a18739a5c6440bb96f2215 lib/Verby/Context.pm
+SHA1 bfab11ed1cbbb765cc43671d27bcae682d8ff5e7 lib/Verby/Dispatcher.pm
+SHA1 767027d2980ceead56e6c9b1d47c1cfea775f513 lib/Verby/Step.pm
+SHA1 9eb7f31a7482987758eae88484a6ff3f90245459 lib/Verby/Step/Closure.pm
+SHA1 8d20510b16996a57009811eeda6c8606f8948362 lib/Verby/Step/Simple.pm
+SHA1 36f5dabfe7545f52831bfafff3123963c01a40b3 t/00_use.t
+SHA1 90f14ec251bb3f07e99b2d397ed198b558b92a69 t/action.t
+SHA1 433b8a2b1a035ba52274af5902193e585a5b28fa t/action_buildtool.t
+SHA1 108064db15beecf60534a0d55b9d43e4e9ee9605 t/action_mkpath.t
+SHA1 d57cb63bb0f1068ac071ba07a1108f6be14989ca t/action_runcmd.t
+SHA1 910e40f33f773d93a054e1e258fe67a7afe660df t/config_data.t
+SHA1 6a143b6a637bcff00ba1928ad07a1bec8b1b24f2 t/config_data_mutable.t
+SHA1 e2fe2ee852dfa96e1cd7219c3de4e0ef2eaa357d t/dispatch_async.t
+SHA1 323ef23703ac2f17c7e4c7ad27aa3105f45a859d t/dispatch_async_stress.t
+SHA1 209e43422d14f1b8253b41cc28eba58bb370f871 t/dispatch_presatisfied.t
+SHA1 5f1a1839fc8cab211dc5390cd5c31ebc55668d2c t/dispatch_simple.t
+SHA1 a113859816da7fbd4500cdce1c99f2d1a6663939 t/resource_pool.t
+SHA1 c037c10b9c3cb31807db0f537fa4f331bc44f204 t/step_closure.t
+SHA1 2b8965881746682732bb28d7d5156f1853919ab6 verby_par.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFH8Mx9VCwRwOvSdBgRAh/uAJ0YIM2/CHzdaY4NylyXIRHamC+SkQCgkcLq
+Y5L660PqdZ8Geb4ULdByrH4=
+=Menf
+-----END PGP SIGNATURE-----

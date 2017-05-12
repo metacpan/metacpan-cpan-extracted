@@ -1,0 +1,10 @@
+Changes
+lib/Vcdiff.pm
+lib/Vcdiff/Test.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/loads.t
+extra-tests/cross-compat.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

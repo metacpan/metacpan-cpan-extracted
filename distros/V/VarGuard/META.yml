@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               VarGuard
+version:            0.03
+abstract:           safe clean blocks for variables
+author:
+    - Cindy Wang (CindyLinz)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:   0
+    Tie::Array:   0
+    Tie::Hash:    0
+    Tie::Scalar:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

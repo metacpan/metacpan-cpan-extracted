@@ -1,0 +1,284 @@
+Revision history for VCS-Which
+
+0.6.4   2017-03-26
+        Updating for release of version 0.6.4
+        Merge pull request #1 from manwar/fix-inconsisten-version (Ivan Wills)
+        Fix incosistent version as reported by CPANTS. (Mohammad S Anwar)
+
+0.6.3   2017-01-15
+        Updating for release of version 0.6.3
+        Updated licence (Ivan Wills)
+        Increasing minimum version due to dependencies now failing to install (Ivan Wills)
+        Adding option to add diffed files after finishing (Ivan Wills)
+        Added perl 5.24 to travis build list (Ivan Wills)
+
+0.6.2   2016-09-18
+        Updating for release of version 0.6.2
+        Fixed up documentation (Ivan Wills)
+        Simplified calling logic (Ivan Wills)
+        Split up main to smaller functions (Ivan Wills)
+        Added default file of current directory and removed the requirement for a parameter to be passed (Ivan Wills)
+
+0.6.1   2016-07-31
+        Updating for release of version 0.6.1
+        Added safty disabled patterns (Ivan Wills)
+
+0.6.0   2016-04-17
+        Updating for release of version 0.6.0
+        Added more tests (Ivan Wills)
+        Removed redundant check (Ivan Wills)
+        Restructuring code for better code coverage (Ivan Wills)
+        Adding more tests (Ivan Wills)
+        Made propper attributes (Ivan Wills)
+        Finishing Moo conversion (Ivan Wills)
+        Added Moo as a dependency (Ivan Wills)
+        Mooifying VCS::Which (Ivan Wills)
+        Added restart to bin files (Ivan Wills)
+        Update skip files (Ivan Wills)
+        License date update (Ivan Wills)
+        Updating config (Ivan Wills)
+        Fixed more newer/older git issues (Ivan Wills)
+        Added tracking added files to current HEAD (Ivan Wills)
+        diff doesn't cope with 3 file diffs (Ivan Wills)
+        VTide and editor configs (Ivan Wills)
+
+0.5.9   2015-10-27
+        Updating for release of version 0.5.9
+        Fixed more newer git issues (Ivan Wills)
+        Fixed tests as VCS::Which now defaults to current directory (Ivan Wills)
+        Fixed newer git's untracked file syntax (Ivan Wills)
+
+0.5.8   2015-09-03
+        Updating for release of version 0.5.8
+        Removed creation of makefile (Ivan Wills)
+
+0.5.7   2015-07-20
+        Updating for release of version 0.5.7
+        More work on documentation (Ivan Wills)
+        Tidied up description (Ivan Wills)
+        Fixed use of resolve which Path::Tiny doesn't support it (Ivan Wills)
+
+0.5.6   2015-07-17
+        Updating for release of version 0.5.6
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.5.5   2015-06-20
+        Updating for release of version 0.5.5
+        Fixed version number (Ivan Wills)
+
+0.5.4   2015-06-15
+        Updating for release of version 0.5.4
+        Fixed description to be on only one line (Ivan Wills)
+        Fixed incorrect version (Ivan Wills)
+
+0.5.3   2015-05-21
+        Updating for release of version 0.5.3
+        Added missing build requirement (Ivan Wills)
+        Updated license (Ivan Wills)
+        Fixed incorrect version numbers (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added tests for exec, log and cat (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Tests for uptodate (Ivan Wills)
+        Added coveralls build badge (Ivan Wills)
+        More tests (Ivan Wills)
+        Started testing capabilities (Ivan Wills)
+        Added new files to MANifEST (Ivan Wills)
+        New test for VCS::Which (Ivan Wills)
+        Fixed package name (Ivan Wills)
+        Starting to work on getting test coverage up (Ivan Wills)
+        Added protection for missing diff_options (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+        Added new option --diff-option to pass extra options to diff command (Ivan Wills)
+
+0.5.2   2014-12-13
+        Updating for release of version 0.5.2
+        More cleanups (Ivan Wills)
+        Updated dependencies (Ivan Wills)
+        Fixed up tests (Ivan Wills)
+        Never completed what I wanted to do (Ivan Wills)
+        Changed to test README.pod (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/VCS-Which (Ivan Wills)
+        Updated readme (Ivan Wills)
+        Fixed test count (Ivan Wills)
+        Fixed boilerplate test (Ivan Wills)
+        Fixed missing =cut (Ivan Wills)
+        Converted to POD syntax (Ivan Wills)
+        Moved to pod (Ivan Wills)
+
+0.5.1   2014-08-21
+        Added missing method documentation (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Added skipping tag files (Ivan Wills)
+        Cleaned tests (Ivan Wills)
+        moved to more common position (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/VCS-Which (Ivan Wills)
+        Updated for next release (Ivan Wills)
+
+0.5.0   2014-05-26
+        made log work on current directory (Ivan Wills)
+        Fixed status details issue (Ivan Wills)
+        Added documentation about --merge parameter (Ivan Wills)
+        Added "add" method (Ivan Wills)
+        Changed status to know about merge statuses (Ivan Wills)
+        Removed nunessesary warn (Ivan Wills)
+        Stopped overwriting internal directory if set (Ivan Wills)
+        Fixed not localizing directory changes (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/VCS-Which (Ivan Wills)
+        File cleanups (Ivan Wills)
+        Add a merge option for to show all files in a git merge (Ivan Wills)
+        Added ability to pass options to checkout (Ivan Wills)
+        Fixed executability (Ivan Wills)
+        Added checkout method (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        cleaned indentation (Ivan Wills)
+        Changed to create parent path if missing (Ivan Wills)
+
+0.4.3   2013-05-13
+        Fixed CSV library being not loaded
+
+0.4.2   2013-05-23
+        Updated the manifest files
+        Added --changed-only flag, so that files with no changes are skipped
+        Changed to allow for checking multiple files at once
+        Fixed file permissions
+
+0.4.1   2012-07-19
+        Updated version number
+        Fixed extra META.json declaration
+        Fixed handling directories with spaces in them
+        Fixed running vimdiff when their are no changes (only available in verbose mode)
+        Added helper for GIT where a revision is needed in some cases
+
+0.4.0   2011-12-09
+        Added prove save state file to be ignored / skipped
+        Added more words to ignore spelling of
+        Updated file versions and added entries to change log file for version 0.4
+        Updated licence file
+        Removed from repo generated files, added them to ignore list and added new generated file META.json to manifest
+        Added more files to skip
+        Added ignoring MYMETA.json
+        Better fix for non absolute files
+        Fixed handling absoluted catted files
+        Added die when no versions found, fixed warn when there is not last value
+        Fixed getting revision numbers for CVS files, fixed catting old revisions
+        Fixed GIT show not linking relative paths to files
+        Making more flexible
+        Fixed $first variable naming conflict
+        Changed vcsvimdiff so that it can use vimdiff's ability to diff more than two files
+        Worked on documentation
+        Factored out the git log parsing
+        Fixed getting log of directory rather that the file asked for
+        Did some reorganisation of versions to allow more options for retrieve file versions
+        Changed so that you can specify other diffing programs eg gvimdiff for diffing
+
+0.3.0   2011-06-27
+        Removed sub prototypes
+        Fixed log array ref returns
+        Fixed up not actually unused module removal
+        Fixed passing on directory to use
+        Fixed log's array ref return value
+        Started work on next release
+        Fixed issue with log not getting the proper directory
+        Added documentation about the status method
+        Added status command, which returns a hash with the files of various statuses
+        Fixed diffing after running out of file versions
+        Fixed copyright
+        More ignore sorting
+        Fixed update not working correctly
+        Fixed log to actually return a hash ref
+        Fixed log to explicitly pass in either a passed file or the repo directory
+        Added vcsw example file for getting log statistics
+        Added cleaning white space from the end of log descriptions
+        Fixed bad logic for BZR, CVS & SVN' plugin's checking weather a project is up to date
+        Added skipping vim files
+        Added default ignored files
+        Fixed missing info from help
+        Fixed kwalitee test failure when missing parts
+        Added to verbose output
+        Fixed problem when $dir is a deleted file
+        Improved docs
+        Added more verbose output
+        Removed references to SVK
+
+0.2.1   2010-07-20
+        Removed references to SVK that were left behind
+
+0.2.0   2010-07-20
+        Added push method documentation
+        Added exit for kwalitee test with out TEST_AUTHOR set
+        Added a push command, implemented it for GIT
+        Fixed issue when calling log outside of the subversion directory tree
+        Removed as SVK has been deprecated
+        Fixed issue when $dir is a symlink
+        Cleaned tests and package files
+        Fixed single quotes instead of double and sent out put of pull to /dev/null
+
+0.1.2   2010-02-18
+        Fixed up kwalitee issues
+
+0.1.1   2010-02-16
+        Added experimental test directory
+        Fixed revision regex
+        Added special handling of the cat command so that the Git module cat handle it properly
+        Fixed and issue with getting bzr repo revisions
+        Fixed issue when working with git via symlinked working copies
+        Fixed single quotes meant to be double quotes
+        Fixed log field extraction logic
+        Made Bazaar log able to return hashrefs and fixed missing module Contextual::Return
+        Fixed versions generation in default and in git and svn plugins
+        Added test mode
+        Added the ability for vcsvimdiff to replay changes to a file
+
+0.1.0   2009-10-30
+        Upped the version of all files
+        Fixed meta dir name and exists test instead of dir test
+        Updated the manifest and required modules
+        got more plugins fully working, Fixed POD
+        Fixed up POD
+        added log to subversion and made it possible to put revision numbers on all files in vcsvimdiff
+        Added pull command
+        started versions
+        Added uptodate method
+        fixed revision specification
+        Added cat and uptodate commands
+        Added missing use tests and added no warnings tests
+        Added missing required modules
+        Added changing to the directory being operated on before running commands
+
+    Initial import
+0.0.4   2009-07-13
+        Made spelling and pod-coverage tests author only
+        Made exec actually use back tics when not called in void context
+
+0.0.3   2009-07-06
+        Made kwalitee test be author only
+        Added new log method for getting change log info
+        Added new words to spelling list, removed taint mode form test
+        Added new command to run vimdiffs, added capibalities to plugins to cat the contents of a file/revision
+        Removed unused modules
+        Added missing modules
+
+0.0.2   2009-05-27
+        Updated version numbers
+        Fixed spelling issues
+        Fixed documentation and upped the version number
+        Fixed issue where Test::Spelling is installed but the spell command is not
+        Fixed build issues
+        Fixed spelling mistakes and critic errors
+        Fixed incorrect details
+        Missing standard tests
+        Fixed up some documentation
+        Added the ability to get the executable for each version control system as well as exec to the appropriate vcs
+        Renamed script to be more usable
+        Added actual code to execute the appropriate vcs command
+        Updated the plugins to use Path::Class instead of File::Path
+        Updated the plugins to use Path::Class instead of File::Path
+        Basic implementation of uptodate
+
+0.0.1   2009-05-17
+        First version, released on an unsuspecting world.
+

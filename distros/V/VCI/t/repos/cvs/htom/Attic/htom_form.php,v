@@ -1,0 +1,112 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.2;
+
+1.2
+date	2007.05.01.19.42.02;	author arturkeska;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \brief Class represents a HTML form object 
+* The form may contain only one HTOM_Evaluable object htat will be used to submit.
+* In order to build the form that contains a number of objects in the content one has to 
+* use one of the container object (HTOM_Table or HTOM_Static).
+*/
+class HTOM_Form extends HTOM_Element
+{
+
+  //! Initialize the HTOM_Form object
+  /*! \param url the url that will be used on submition to send a request to the server.
+   *  \param content a form content element
+   *  \param requestmethod either "POST" or "GET" submition method.
+   */
+  public function __construct( $url , HTOM_Element $content=NULL, $requestmethod="POST" )
+  {
+    $this->SetAttributes( new HTOM_SimpleAttribute("method",$requestmethod) );
+    $this->SetAttributes( new HTOM_SimpleAttribute("enctype","multipart/form-data") );
+    if (isset($url)) {
+      $this->SetAttributes( new HTOM_SimpleAttribute("action",$url) );
+    }
+    if ($content) 
+      {
+	$this->SetContent( $content );
+      }
+    $this->Init();
+  }
+
+  //! Ather the sumition method
+  /*! \param $requestmethod method either "POST" or "GET" submition method.
+   */
+  public function SetMethod( $requestmethod )
+  {
+    $this->SetAttributes( new HTOM_SimpleAttribute("method",$requestmethod) );
+  }
+
+  //! Set the form content object.
+  /*! \param $content - the content that will be used as a form content
+   */
+  public function SetContent( HTOM_Element $content )
+  {
+    $this->content = $content;
+  }
+
+
+  //! Evaluate to the HTML form tag.
+  public function Evaluate()
+  {
+    $rc = "\r\n<form ".
+    $this->Attributes().">".
+    $this->content->Evaluate()."\r\n</form>";
+    return $rc;
+  }
+ 
+  private $content;
+}
+
+?>
+@
+
+
+1.2
+log
+@ID evaluation moved to HTOM_Eelement, so there is no need to call it to particular elements.
+@
+text
+@@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@d50 1
+a50 1
+    $rc = "\r\n<form ".$this->ID()->Evaluate().
+@
+

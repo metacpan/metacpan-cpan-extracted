@@ -1,0 +1,19 @@
+Revision history for VM-Dreamer
+
+0.851 2013-08-11
+    [ RT #87542 ]
+    - Used updated Changes format provided by Neil Bowers
+
+    [ RT #87543 ]
+    - Made this version number greater than the first one
+
+0.087 2013-07-26
+    - Fixed CPANTS error by quoting 'greatest numbers' in t/lib/TestMachines.pm
+    - Expanded Documenation
+    - Changed format of this page
+
+0.086 2013-07-19
+    - Internal release - started using 3 digits after decimal point
+
+0.85 2013-06-30
+    - First CPAN upload - for complete history see changelog in repo at https://pikacode.com/skybluecircles/dreamer/log/

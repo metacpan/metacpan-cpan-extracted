@@ -1,0 +1,14 @@
+[% vote = c.model('Vote') %]
+
+[% voteids = vote.list_running_vote %]
+
+[% IF voteids.size %]
+
+[% FOREACH voteid = voteids %]
+<a href="[% c.uri_for('/ballot', voteid) %]">[% vote.vote_info(voteid).label | html %]</a>
+<br>
+[% END %]
+
+[% ELSE %]
+Pas de vote en cours
+[% END %]

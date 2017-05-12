@@ -1,0 +1,21 @@
+Revision history for Perl extension VoiceXML::Client.
+1.01  Mon Feb 04 02:23:00 2008
+	- included slightly modified test vxml from phpvoice
+	
+	- fixed subdialog: was looping, calling subdialog
+		again on return.  Now resolved.
+
+	- fixed minor bug with debug output in Util.pm
+
+	- incremented XML::Mini version used, to match
+		new release
+
+
+1.00  Sat Jan 26 16:41:48 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n VoiceXML::Client
+	- transfered all the VOCP files and set for new 
+		VoiceXML::Client namespace
+	- created VoiceXML::Client::Device::Dummy interface
+		as an example and for testing purposes
+

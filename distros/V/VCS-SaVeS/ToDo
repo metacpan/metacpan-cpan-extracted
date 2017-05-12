@@ -1,0 +1,12 @@
+- Add global -Cdirectory # to chdir to directory
+- svs remove -B  # set break points in subdirectories
+- svs status -c  # only show changed files
+- support saves Tags (like p4 change numbers)
+- don't squash file permissions (+w) on 'svs import' (or others).
+
+- restore:
+    - svs restore -d'date' file-list
+    - svs restore -r3h,15m file-list
+- Support warnings in general. And -q.
+- Help:
+    - Create superhelpful die messages.

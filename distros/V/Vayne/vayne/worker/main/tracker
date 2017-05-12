@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use Vayne::Worker;
+use Vayne::Tracker;
+
+
+my $collection = Vayne::Tracker->new->collection_job;
+
+register 'track' => sub {
+    my($workload, $step, $result, $status, $job) = @_;
+    $collection->insert_one({ _id => $job->uuid, $job->to_hash, time => time });
+    $status->(1);
+};
+
+Vayne::Worker->run;

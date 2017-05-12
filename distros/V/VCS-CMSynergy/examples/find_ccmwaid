@@ -1,0 +1,26 @@
+use Cwd qw/abs_path/;
+use File::Spec;
+use strict;
+
+my $ccmwaid = $^O eq "MSWin32" ? "_ccmwaid.inf" : ".ccmwaid.inf";
+
+# NOTE: Synergy baselib/src/base/wa_ext.ac:get_path_info()
+# tries to find the _topmost_ ccmwaid file instead (and returns the
+# relative path down to $dir from there, too)
+
+my $dir = shift @ARGV;
+
+my ($vol, $path) = File::Spec->splitpath(abs_path($dir), 1);
+my @dirs = File::Spec->splitdir($path);
+
+while (@dirs)
+{
+    my $try = File::Spec->catpath($vol, File::Spec->catdir(@dirs), $ccmwaid);
+    if (-e $try)
+    {
+	print "FOUND $try\n";
+	exit;
+    }
+    pop @dirs;
+}
+print "NO $ccmwaid FOUND\n";

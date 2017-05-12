@@ -1,0 +1,34 @@
+---
+abstract: 'Eject variables from hash to current namespace'
+author:
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::If: 0
+  Test::More: 0
+  lib::abs: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Variable-Eject
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Variable::Eject:
+    file: lib/Variable/Eject.pm
+    version: 0.02
+requires:
+  Devel::Declare: 0.005011
+  Lexical::Alias: 0.04
+  perl: 5.01
+  uni::perl: 0.03
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

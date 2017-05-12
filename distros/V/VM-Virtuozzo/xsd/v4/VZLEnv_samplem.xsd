@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/env_samplem" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/env_samplem" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="VZLCommonTypes.xsd" namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" />
+  <xs:import schemaLocation="VZLProtocol.xsd" namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" />
+  <xs:element name="env_samplem" substitutionGroup="vzlp:operator" type="env_samplemType" />
+  <xs:complexType name="env_samplemType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="vzlp:operator_functionalType">
+        <xs:choice>
+          <xs:choice minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Input</xs:documentation>
+            </xs:annotation>
+            <xs:element ref="get_sample_conf" />
+            <xs:element ref="set_sample_conf" />
+            <xs:element ref="del_sample_conf" />
+            <xs:element ref="get_env_by_sample" />
+          </xs:choice>
+          <xs:choice minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Output</xs:documentation>
+            </xs:annotation>
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="sample_conf" />
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="sample_env_list" />
+          </xs:choice>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="sample_env_list">
+    <xs:annotation>
+      <xs:documentation>List of Environments which are suitable for creation of child Environments based on the specified sample.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sample_id" type="xs:string" />
+        <xs:element name="eid_list" type="vzlt:eid_listType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sample_conf" type="vzlt:sample_confType">
+    <xs:annotation>
+      <xs:documentation>Env sample configuration.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="get_sample_conf">
+    <xs:annotation>
+      <xs:documentation>Gets Environments which are suitable for creation of child Environments based on the specified sample Or compatible with specified Hardware node. Returns "sample_conf"s or Error.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="sample_id" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Ids of of samples to return.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" name="eid" type="vzlt:eid_type">
+          <xs:annotation>
+            <xs:documentation>eid of hardware node to check compatibility for.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="set_sample_conf">
+    <xs:annotation>
+      <xs:documentation>Sets one of the Env sample configuration files or adds a new one. Returns id of created sample.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="force" />
+        <xs:element ref="sample_conf" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="get_env_by_sample">
+    <xs:annotation>
+      <xs:documentation>Gets EIDs of harware nodes that compatible with specified sample_id. No sample_id means all samples. Returns sample_env_list or Error.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="sample_id" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="del_sample_conf">
+    <xs:annotation>
+      <xs:documentation>Deletes Env sample configuration file. Returns OK/Error.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sample_id" type="vzlt:guid_type" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="get_sample_confResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="sample_conf" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="set_sample_confResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="vzlt:guid_type">
+          <xs:annotation>
+            <xs:documentation>id of created sample. equals input id if one is valid</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="del_sample_confResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="get_env_by_sampleResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="sample_env_list" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

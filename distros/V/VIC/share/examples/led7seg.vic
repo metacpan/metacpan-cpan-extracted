@@ -1,0 +1,25 @@
+PIC p16f690;
+
+pragma variable export;
+# enable gpsim as a simulator
+pragma simulator gpsim;
+
+Main {
+    $led7 = table [ 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D,
+              0x7D, 0x07, 0x7F, 0x67, 0x77, 0x7C, # this is gpsim specific
+              0x58, 0x5E, 0x79, 0x71 ];
+    $digit = 0;
+    digital_output PORTA;
+    digital_output PORTC;
+    write PORTA, 0;
+    Loop {
+        write PORTC, $led7[$digit];
+        $digit++;
+        $digit &= 0x0F; # bounds check
+    }
+}
+
+Simulator {
+    attach_led7seg RA0, PORTC;
+    stop_after 5s;
+}

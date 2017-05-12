@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/data_storagem" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/data_storagem" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="data_storagem" type="data_storagemType">
+		<xs:annotation>
+			<xs:documentation>Generic data storage interface</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="data_storagemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_storage_config"/>
+						<xs:element ref="set_storage_config"/>
+						<xs:element ref="get_metadata"/>
+						<xs:element ref="put_metadata"/>
+						<xs:element ref="get_object_info"/>
+						<xs:element ref="set_object_info"/>
+						<xs:element ref="remove_object"/>
+						<xs:element ref="get_list"/>
+					</xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="config"/>
+						<xs:element ref="data" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="info" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="id" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ds_object_path_type">
+		<xs:annotation>
+			<xs:documentation>Object identifier/path</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="ds_locationType">
+		<xs:annotation>
+			<xs:documentation>Data storage location configuration</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="type" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Data storage location type.
+0 - local
+1- windows share</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="path" type="xs:base64Binary">
+				<xs:annotation>
+					<xs:documentation>Root data storage path</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="login" type="vzlt:auth_nameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Login for remote storage</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="password" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Password for remote storage</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ds_configurationType">
+		<xs:annotation>
+			<xs:documentation>Data storage configuration</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="location" type="ds_locationType">
+				<xs:annotation>
+					<xs:documentation>Data storage location</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ds_object_infoType">
+		<xs:annotation>
+			<xs:documentation>Information about object in datastorage</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="time" type="vzlt:datetime_type">
+				<xs:annotation>
+					<xs:documentation>Object modification/creation time</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="size" type="xs:long">
+				<xs:annotation>
+					<xs:documentation>Object Size in storage</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="type" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Object type. Values depend on implementation.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="id" type="ds_object_path_type">
+				<xs:annotation>
+					<xs:documentation>Object ID/path</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="storage_eid" type="vzlt:eid_type">
+				<xs:annotation>
+					<xs:documentation>EID of data storage enviroment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="info" type="vzlt:infoType">
+				<xs:annotation>
+					<xs:documentation>Additional displayable information about object.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="get_storage_config">
+		<xs:annotation>
+			<xs:documentation>Gets Data Storage configuration.
+Returns "config" or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="set_storage_config">
+		<xs:annotation>
+			<xs:documentation>Set new Data Storage configuration.
+Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="config" type="ds_configurationType">
+					<xs:annotation>
+						<xs:documentation>New Data Storage configuration</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="config" type="ds_configurationType">
+		<xs:annotation>
+			<xs:documentation>Data Storage configuration</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_metadata">
+		<xs:annotation>
+			<xs:documentation>Gets object metadata. Returns "data" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="ds_object_path_type" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Object ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="put_metadata">
+		<xs:annotation>
+			<xs:documentation>Put Object metadata. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="ds_object_path_type">
+					<xs:annotation>
+						<xs:documentation>Object ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="data" type="xs:anyType">
+					<xs:annotation>
+						<xs:documentation>Object metadata</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="data" type="xs:anyType">
+		<xs:annotation>
+			<xs:documentation>Object metadata</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_object_info">
+		<xs:annotation>
+			<xs:documentation>Gets information about object in data storage.
+Returns "info" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="ds_object_path_type" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Object ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_object_info">
+		<xs:annotation>
+			<xs:documentation>Sets extended information about object in data storage. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="ds_object_path_type">
+					<xs:annotation>
+						<xs:documentation>Object ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="info" type="vzlt:infoType">
+					<xs:annotation>
+						<xs:documentation>Custom additional information about object.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="info" type="ds_object_infoType">
+		<xs:annotation>
+			<xs:documentation>Object Information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="remove_object">
+		<xs:annotation>
+			<xs:documentation>Remove object with given ID and all of its children. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="ds_object_path_type" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Object ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_list">
+		<xs:annotation>
+			<xs:documentation>Get children of specified object. Empty ID means root element.
+Returns "id" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="ds_object_path_type">
+					<xs:annotation>
+						<xs:documentation>Object ID</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="recursively" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Get List of all sub-objects.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="id" type="ds_object_path_type">
+		<xs:annotation>
+			<xs:documentation>Object ID list</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,30 @@
+PIC P16F690;
+
+pragma adc right_justify = 0;
+
+Main {
+    digital_output PORTC; # all pins
+    analog_input RA3;
+    adc_enable 500kHz, AN0;
+    $display = 0x08; # create a 8-bit register
+    Loop {
+        write PORTC, $display;
+        adc_read $userval;
+        $userval += 100;
+        delay_ms $userval;
+        ror $display, 1;
+    }
+}
+
+Simulator {
+    attach_led PORTC, 4, 'red';
+    #adc stimulus
+    stimulate AN0, every 3s, wave [
+        500000, 2.85, 1000000, 3.6,
+        1500000, 4.5, 2000000, 3.2,
+        2500000, 1.8
+    ];
+    scope AN0;
+    log AN0;
+    stop_after 10s;
+}

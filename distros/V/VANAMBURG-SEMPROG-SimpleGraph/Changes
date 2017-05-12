@@ -1,0 +1,11 @@
+Revision history for VANAMBURG-SEMPROG
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.007   Use MooseX::Declare for all class and method
+        declarations. and include NYTProf output
+        in POD.
+0.008   Rollback to 0.006 for performance reasons.
+0.009   * Added bin/graphtools.pl to generate DOT files for sue with Graphviz.
+        * Added method to load triples form a json file.  This required adding dependency to JSON module.
+0.010   added File::Slurp to prereqs to stop test failures

@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         VUser-SpamAssassin-SQL
+version:      0.1.0
+version_from: lib/VUser/SpamAssassin/SQL.pm
+installdirs:  site
+requires:
+    Config::IniFiles:              0
+    VUser::Extension:              0.2.0
+    VUser::ExtLib:                 0.2.0
+    VUser::ExtLib::SQL:            0.1.0
+    VUser::Meta:                   0.2.0
+    VUser::ResultSet:              0.2.0
+    VUser::SpamAssassin:           0.3.0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

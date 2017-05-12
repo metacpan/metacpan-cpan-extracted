@@ -1,0 +1,35 @@
+-----   4 Jan 2001     lane@duphy4.physics.drexel.edu
+        Some minor POD changes to make pod2man happy
+        (suggested by Sebastian Bazley)
+
+-----   2 Jan 2001     lane@duphy4.physics.drexel.edu
+        Perl complained about escaping underscore in regex,
+        so removed backslash
+
+-----   17 May 2000     lane@duphy4.physics.drexel.edu
+        problems when more than 7 directories in the "rooted"
+        directory...had thought the limit was 8! Fixed.
+
+-----   12 May 2000     lane@duphy4.physics.drexel.edu
+        had a test error when there's a "$" in device name; needed
+        to have it backslash escaped.
+
+-----   30 Mar 2000     lane@duphy4.physics.drexel.edu
+        add O_VMS option to VMS::FileUtils::Root::rooted and ::unrooted
+
+-----   23 Mar 2000     lane@duphy4.physics.drexel.edu
+        move SafeName stuff into VMS::FileUtils::SafeName, drop
+        "munge/unmunge" and add "safe_archive" instead,
+        for near-equivalent functionality
+
+-----   18 Mar 2000     lane@duphy4.physics.drexel.edu
+        VMS::FileUtils::Root stuff written, use internal
+        Unix->VMS conversion since any SYS$PARSE calls
+        with more than 8 levels will fail.
+
+-----   11 Mar 1998     lane@duphy4.physics.drexel.edu
+        add safepath and unsafepath, add :all tag to Exports
+
+-----   10 Mar 1998     lane@duphy4.physics.drexel.edu
+        initial version 0.01
+

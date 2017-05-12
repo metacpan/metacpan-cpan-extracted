@@ -1,0 +1,21 @@
+---
+name: VideoLan-Client
+version: 0.13
+author:
+  - 'Cyrille Hombecq <cyrille.hombecq@gmail.com>'
+abstract: interact with VideoLan Client using telnet connection
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Net::Telnet: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  VideoLan::Client:
+    file: lib/VideoLan/Client.pm
+    version: 0.13
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

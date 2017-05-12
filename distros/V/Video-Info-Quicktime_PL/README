@@ -1,0 +1,53 @@
+Video/Info/Quicktime_PL version 0.04
+=======================
+
+pure Perl implementation to extract header info from Quicktime (TM) files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test (optional)
+   make install
+
+DEPENDENCIES
+
+Video::Info
+Compress::Zlib
+Class::MakeMethods::Emulator::MethodMaker
+
+Digest::MD5 (only for the test scripts)
+
+
+COMMENTS
+
+This module is intended to extend the functionality of the Video::Info
+module by Allen Day.  In contrast with Video::Info::Quicktime, this is
+a pure perl implementation -- so the OpenQuicktime library is not
+needed.  This gives the information extraction functionality to any OS
+that runs perl, as well as avoiding additional module dependencies to
+install.
+
+To install Video::Info without the Video::OpenQuicktime module
+installed, just comment out the dependency to Video::OpenQuicktime in
+the Makefile.PL file for Video::Info and then proceed as usual.
+
+This release is compatable (and was tested) with version 0.991 of
+Video::Info.
+
+
+
+This code should be considered to be at an alpha stage of development
+with no implied warranty or fitness for a particular purpose.
+
+
+COPYRIGHT AND LICENSE
+
+Released under the Aladdin Free Public License,
+See the LICENSE file for details.
+
+
+Copyright (C) 2002-2003
+W S Hoge <shoge at perl dot org>

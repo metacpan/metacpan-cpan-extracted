@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:progress="http://www.swsoft.com/webservices/vzl/4.0.0/progress_event" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/res_log" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/res_log" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="res_log" type="res_logType">
+		<xs:annotation>
+			<xs:documentation>Log of Operations.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="data" type="vzlt:perf_dataType"/>
+	<xs:complexType name="res_logType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_log"/>
+						<xs:element ref="set_log"/>
+						<xs:element ref="get_log_info"/>
+						<xs:element ref="get_top"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="data" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="log_info" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="top" minOccurs="0"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="get_log">
+		<xs:annotation>
+			<xs:documentation>Gets log for the specified EID and parameters. Returns "data" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="class" type="classType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Log class information. Return  all logged data if empty</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="start_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Start time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="end_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>End time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:choice>
+					<xs:element name="records" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number of last records
+ to retrieve.Records will be presented in reverse order, i.e. oldest record is the last.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="period" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Period of logging, i.e. time in seconds between two neighbour points of the result ing log.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:element name="report_empty" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Absent data intervals will be reported explicitly</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="logType">
+		<xs:sequence>
+			<xs:element name="class" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Perfcounter's class (net, memory, cpu, etc)</xs:documentation>
+				</xs:annotation>
+				<xs:complexType mixed="false">
+					<xs:complexContent mixed="false">
+						<xs:restriction base="classType">
+							<xs:sequence>
+								<xs:element name="name" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>perfcounter's class (network, cpu, etc)</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="period" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Period of logging, i.e. time in seconds between two neighbour points of the result ing log.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="classType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>perfcounter's class (network, cpu, etc)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="instance" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>subobject (for example network interfaces or partitions)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="counter" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>counter</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="set_log" type="logType">
+		<xs:annotation>
+			<xs:documentation>Set logging period for specified classes. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_log_info">
+		<xs:annotation>
+			<xs:documentation>Provides information about current logging. Returns "log_info" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="log_info" type="logType">
+		<xs:annotation>
+			<xs:documentation>Current logging information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_top">
+		<xs:annotation>
+			<xs:documentation>Returns top of the EIDs by requested class for the requested time-range. Returns "top" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="parameter" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name of one of top counters ( see vocabulary topcounters.voc ).</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="count" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of records to retrieve.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="descending" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Records will be presented in reverse order, i.e. record with the smallest parameter  is the first.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="start_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Start time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="end_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>End time of the log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="eid_list" type="vzlt:eid_listType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>eid_list using in or excluded from calculation</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="exclude" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>eid_list is excluded from calculation</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="top">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="set" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>requested top information</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="eid" type="vzlt:eid_type"/>
+							<xs:element name="value" type="xs:anySimpleType">
+								<xs:annotation>
+									<xs:documentation>Value calculated using type of counter</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="total" type="xs:anySimpleType">
+					<xs:annotation>
+						<xs:documentation>sum of the values of all EIDs</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="compress">
+		<xs:annotation>
+			<xs:documentation>Compress data. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="configuration">
+					<xs:annotation>
+						<xs:documentation>Operator configuration</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="compress" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Compression period configuration.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="interval" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Interval, with which this compression period is applied.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="offset" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Offset from now, when to start applying this compression period.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="duration" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Duration of the compression period, for which it is applied.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="period" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Resulting minimal periods of data points, stored in database for this compression period.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="start_delay" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Delay, with which to start applying the compression, when the time comes.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="start_time" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>Time of day from which compress time is calculated. In the form hh:mm</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_logResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="data" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_logResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_log_infoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="log_info" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_topResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="top"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="res_log_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="compress" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Compression period configuration.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="interval" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Interval, with which this compression period is applied.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="offset" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Offset from now, when to start applying this compression period.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="duration" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Duration of the compression period, for which it is applied.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="period" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Resulting minimal periods of data points, stored in database for this compression period.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="start_delay" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Delay, with which to start applying the compression, when the time comes.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="start_time" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Time of day from which compress time is calculated. In the form hh:mm</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

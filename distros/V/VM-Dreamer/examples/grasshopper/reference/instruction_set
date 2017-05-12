@@ -1,0 +1,12 @@
+1 - INP - Input
+2 - OUT - Output
+
+3 - STR - Store
+4 - LDA - Load
+
+5 - ADD - Add
+6 - SUB - Subtract
+
+7 - BRA - Branch (always)
+8 - BRZ - Branch if Zero
+9 - BRP - Branch if Positive

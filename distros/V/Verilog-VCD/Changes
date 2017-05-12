@@ -1,0 +1,27 @@
+Revision history for Perl module Verilog::VCD
+
+
+0.07  Aug 27 2015 
+      - fixed typo in POD
+
+0.06  Aug 13 2015 
+      - parse all keywords now
+      - allow all keyword contents to be multi-line
+      - allow whitespace in timescale
+      - added tests to increase coverage
+      - improved error handling for non-VCD files
+
+0.05  Jun 12 2014
+      - strip cr-lf in timescale
+
+0.04  Sep 5 2013
+      - strip cr-lf (reported by Markus Nentwig)
+
+0.03  Jan 17 2012
+      - 'require' (not 'use') Exporter: avoid import error on old perl versions 
+
+0.02  Jan 13 2012
+      - skip stdout test on old versions of perl
+
+0.01  Jan 03 2012
+      - original version of module 'Verilog::VCD'

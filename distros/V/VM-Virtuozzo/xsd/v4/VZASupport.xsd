@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns:vzat="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzasupport" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzasupport" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vza/4.0.0/vzatypes" schemaLocation="VZACommonTypes.xsd"/>
+	<xs:element name="vzasupport" type="vzasupportType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Support and Maintenance</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzasupportType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="start_channel"/>
+						<xs:element ref="stop_channel"/>
+						<xs:element ref="get_channel_status">
+							<xs:annotation>
+								<xs:documentation>Get support tunnel status. Returns "channel_status" or Error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="set_key">
+							<xs:annotation>
+								<xs:documentation>Set certificate. Returns OK/Error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="get_key_status">
+							<xs:annotation>
+								<xs:documentation>Get certificate/key. Returns "key_status" or Error.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="remove_key"/>
+						<xs:element ref="problem_report"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="channel_status"/>
+						<xs:element ref="key_status">
+							<xs:annotation>
+								<xs:documentation>Certificates/key status:0 - Certificate/key is installed;1 - Certificate/key is not installed;2 - Certificate/key is invalid.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element ref="ticket"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="start_channel">
+		<xs:annotation>
+			<xs:documentation>Start Virtuozzo Support Tunnel. Returns OK/Error. (Linux only).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="start_channelResponse"/>
+	<xs:element name="stop_channel">
+		<xs:annotation>
+			<xs:documentation>Stop Virtuozzo Support Tunnel. Returns OK/Error. (Linux only).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="stop_channelResponse"/>
+	<xs:element name="get_channel_status">
+		<xs:annotation>
+			<xs:documentation>Get Support Tunnel status. Returns "status" or Error. (Linux only).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_channel_statusResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="channel_status"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_key_status">
+		<xs:annotation>
+			<xs:documentation>Get certificate/key. Returns "status" or Error. (Linux only). (Linux only).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_key_statusResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="key_status"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_key">
+		<xs:annotation>
+			<xs:documentation>Set certificate/key. Returns "ok" or "error". (Linux only).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="key"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_keyResponse"/>
+	<xs:element name="remove_key">
+		<xs:annotation>
+			<xs:documentation>Remove certificate/key. Returns "ok" or "error". (Linux only).</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="remove_keyResponse"/>
+	<xs:element name="problem_report">
+		<xs:annotation>
+			<xs:documentation>Reports about problem, returns Error/Ticket. Now ticket - empty string, because low level is not report it.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Reporter name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="company" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Reporter company.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="email" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Reported e-mail.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="subject" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Problem short name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="problem_description" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Full problem description.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="ticket" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="problem_reportResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ticket"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="channel_status" type="xs:int">
+		<xs:annotation>
+			<xs:documentation>Support tunnel status: 0 - support tunnel is available;1 - service is running but support tunnel is not available; 2 - support tunnel is not running.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="key_status" type="xs:int">
+		<xs:annotation>
+			<xs:documentation>Certificates/key status:0 - Certificates and key are installed;1 - Certificates and key are not installed;2 - Certificates and key are are invalid.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="key" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>Support certificate/key data.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ticket" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>If this problem report is based on previews - ticket id of previews problem report.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzasupport_configurationType">
+		<xs:annotation>
+			<xs:documentation>Configuration for vzasupport operator.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="timeouts">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="report" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>Timeout for problem_report operation.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="key">
+									<xs:annotation>
+										<xs:documentation>Timeout for set_key, remove_key operations.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="channel">
+									<xs:annotation>
+										<xs:documentation>Timeout for start_channel, stop_channel operations.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

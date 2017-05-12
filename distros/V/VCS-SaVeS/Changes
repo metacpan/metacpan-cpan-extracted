@@ -1,0 +1,45 @@
+# Revision history for Perl extension VCS::SaVeS.
+
+---
+version: 0.12
+date:    Tue Oct 29 22:46:21 PST 2002
+changes:
+  - Defeated RCS branching.
+  - Reversed sort order for history and restore and diff
+  - Show modified message in history.
+
+---
+version: 0.11
+date:    Thu Oct 17 19:44:51 PDT 2002
+changes:
+  - Bug fixes and refactoring
+  - Add more informative messages. Got file counts right
+  - Changed -n to -r for restore
+  - Added -r1.3 revision control to restore
+  - Enhanced help doc
+
+---
+version: 0.10
+date:    Thu Oct 17 11:46:48 PDT 2002
+changes:
+  - >
+    Support the following commands:
+      * saves
+      * svs add
+      * svs break
+      * svs diff
+      * svs find
+      * svs help
+      * svs history
+      * svs import [-m]
+      * svs manifest
+      * svs remove
+      * svs restore [-n]
+      * svs save [-m]
+      * svs status
+
+---
+version: 0.01
+date:    Sat Sep 28 13:47:15 2002
+changes:
+  - original version; created by h2xs 1.22 with options -PAXn VCS::SaVeS

@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2004,2005 Alexander Taler (dissent@0--0.org)
+#
+# All rights reserved. This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+#
+
+######################################################################
+### Fetch a revision of a file from a CVS Repository
+######################################################################
+
+use strict;
+
+use Getopt::Long;
+
+use VCS::LibCVS;
+
+# The root to fetch from
+my $root;
+
+# Name of file to get
+my $filename;
+
+# Revision of file to get
+my $revision_spec = "HEAD";
+
+# Other commands: help and version
+my $cmd_version = 0;
+my $cmd_help = 0;
+
+if (! GetOptions("help|h" => \$cmd_help,
+                 "version" => \$cmd_version,
+                 "root|r=s" => \$root,
+                 "filename|f=s" => \$filename,
+                 "revision|v=s" => \$revision_spec,
+                )) {
+  $cmd_help = 1;
+}
+
+if ((!defined $root) || (!defined $filename)) {
+  $cmd_help = 1;
+}
+
+# Name of the program
+my ($prog_name) = ($0 =~ /.*[\\\/](.*)/);
+
+# Handle other commands
+if ($cmd_version) {
+  print '$Header: /cvsroot/libcvs-perl/libcvs-perl/examples/lcvs-get,v 1.4 2005/10/10 12:52:12 dissent Exp $ ', "\n";
+  print "VCS::LibCVS::VERSION = $VCS::LibCVS::VERSION\n";
+  exit;
+}
+
+if ($cmd_help) {
+  print
+"Fetch a revision of a file from a CVS Repository
+
+  $prog_name [--version] [--help|-h]
+  $prog_name --root|-r <cvsroot> --filename|-f <filename>
+             [--revision|-v <revision>]
+
+Root and filename are required parameters.  Revision is optional, and
+defaults to \"HEAD\".
+
+Root is a standard CVS root specification.  Filename is the name of that file
+relative to the root of the specified repository.  Revision can be a tag or
+dotted numeric revision.
+"; exit; }
+
+######################################################################
+### Get the file contents
+
+# Find the repository
+
+my $repo = VCS::LibCVS::Repository->new($root);
+
+my $file = VCS::LibCVS::RepositoryFile->new($repo, $filename);
+
+my $revision = $file->get_revision($revision_spec);
+
+my $contents = $revision->get_contents();
+
+print $contents->as_string();

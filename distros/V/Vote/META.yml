@@ -1,0 +1,24 @@
+---
+abstract: 'Catalyst based application'
+author:
+  - 'Thauvin Olivier'
+distribution_type: module
+generated_by: 'Module::Install version 0.80'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vote
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.7015
+  Catalyst::Action::RenderView: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

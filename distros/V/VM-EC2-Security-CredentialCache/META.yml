@@ -1,0 +1,26 @@
+---
+abstract: 'Cache credentials respecting expiration time for IAM roles.'
+author:
+  - 'Rusty Conover <rusty@luckydinosaur.com>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VM-EC2-Security-CredentialCache
+requires:
+  DateTime::Format::ISO8601: '0'
+  VM::EC2::Instance::Metadata: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rustyconover/vm-ec2-security-credentialcache/issues
+  homepage: http://search.cpan.org/dist/VM-EC2-Security-CredentialCache/
+  repository: git://github.com/rustyconover/vm-ec2-security-credentialcache.git
+version: '0.25'

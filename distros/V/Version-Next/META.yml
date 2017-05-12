@@ -1,0 +1,47 @@
+---
+abstract: 'increment module version numbers simply and correctly'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Exception: '0.29'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Version-Next
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Version::Next:
+    file: lib/Version/Next.pm
+    version: '1.000'
+requires:
+  Carp: '0'
+  Sub::Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.81'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Version-Next/issues
+  homepage: https://github.com/dagolden/Version-Next
+  repository: https://github.com/dagolden/Version-Next.git
+version: '1.000'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Grzegorz Rożniecki <xaerxess@gmail.com>'

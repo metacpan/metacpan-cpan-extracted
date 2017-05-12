@@ -1,0 +1,23 @@
+<!--#include virtual="/commonVars.phtml" -->
+<!--#perl $_parms->{content_type} = "image/png"; -->
+<!--#include virtual="/checkRemoteServers.phtml" -->
+<!--#perl 
+  my ($pngData);
+  	
+  if($vbObj)
+  {
+    $pngData = $vbObj->generateGraph(
+      DataSourceList => $_parms->{dsl},
+      Labels         => $_parms->{l},
+      LineWidth      => $_parms->{lw},
+      Colors         => $_parms->{c},
+      CF             => $_parms->{cf},
+      VLabel         => $_parms->{vl},
+      Title          => $_parms->{t},
+      TimeWindow     => $_parms->{tw},
+      XSize          => $_parms->{xs},
+      YSize          => $_parms->{ys} );
+  }
+  
+  return $pngData;
+-->

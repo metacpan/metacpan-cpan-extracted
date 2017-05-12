@@ -1,0 +1,49 @@
+#! /bin/perl
+#
+# This structure defines the master VB server, slave VB servers, and the
+# groups of hosts on which you're going to run VBTK monitoring scripts.
+# It also indicates which scripts you'll run on each host.
+#
+# Once this structure is defined, you just use this 'vbc' program to start,
+# stop, or restart the other scripts.  
+# 
+# Usage: vbc <start|stop|restart|sync> [optional-list-of-scripts]
+#
+# If you don't specify which scripts to start/stop, then it will use the 
+# entire list from below
+
+use VBTK::Controller;
+
+# Define the MasterVBServer and a comma-separated list of SlaveVBServers
+$obj = new VBTK::Controller (
+    MasterVBServer => 'myhost1',
+    SlaveVBServers => 'myhost3'
+);
+
+# Define the host group which contains the master VBServer and any hosts which
+# will report directly to it.
+$obj->addHostGroup(
+    VBServerURI => "http://myhost1:$VBPORT",
+    HostList    => {
+        myhost1 => 'vbserver,vbcommon',
+        myhost2 => 'vbcommon,vbping,vbhttp',
+    },
+);
+
+# Define an additional host group for each slave VBServer and the hosts which
+# will report to them.
+$obj->addHostGroup(
+    VBServerURI => "http://myhost3:$VBPORT",
+    HostList    => {
+        myhost3 => 'vbserver,vbcommon',
+        myhost4 => 'vbcommon,vbtcp',
+    },
+);
+
+# Call 'run' at the very end to trigger the start/stop/restart/sync as specified
+# on the command line.
+$obj->run;
+
+
+
+

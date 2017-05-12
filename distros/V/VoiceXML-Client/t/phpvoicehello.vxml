@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml xml:lang="en" xmlns="http://www.w3.org/2001/vxml" version="2.0">
+  <form>
+  <block>
+  <audio src="hello.wav">
+   Hello World !
+ </audio>
+</block>
+ <exit />
+</form>
+</vxml>

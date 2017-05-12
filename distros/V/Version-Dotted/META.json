@@ -1,0 +1,119 @@
+{
+   "abstract" : "Bump a dotted version, check if version is trial",
+   "author" : [
+      "Van de Bugger <van.de.bugger@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Version-Dotted",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120920",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::VDB" : "0",
+            "Encode" : "0",
+            "English" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Module::Metadata" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::GPL_3::or_later" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0",
+            "warnings::register" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Builder" : "0",
+            "Test::DiagINC" : "0.002",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "blib" : "1.01",
+            "if" : "0",
+            "lib" : "0",
+            "ok" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Version::Dotted" : {
+         "file" : "lib/Version/Dotted.pm",
+         "version" : "v0.0.1"
+      },
+      "Version::Dotted::Odd" : {
+         "file" : "lib/Version/Dotted/Odd.pm",
+         "version" : "v0.0.1"
+      },
+      "Version::Dotted::Semantic" : {
+         "file" : "lib/Version/Dotted/Semantic.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "mailto:bug-Version-Dotted@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Version-Dotted"
+      },
+      "homepage" : "https://metacpan.org/release/Version-Dotted",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://vandebugger.fedorapeople.org/hg/perl-Version-Dotted"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

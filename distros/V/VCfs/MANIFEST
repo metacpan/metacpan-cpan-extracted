@@ -1,0 +1,12 @@
+bin/svn_logsincetag
+bin/svn_taglist
+bin/vc-checkup
+Build.PL
+Changes
+lib/VCfs.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+snippets/pull_times.pl
+t/00-load.t

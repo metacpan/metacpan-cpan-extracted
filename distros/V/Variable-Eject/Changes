@@ -1,0 +1,12 @@
+Revision history for Variable-Eject
+
+# TODO: integrate PPI parser to allow calls without brackets
+# TODO: allow to eject by using method
+
+0.02    2009-11-20
+        * Fix warning "Ambiguous use of ${...}"
+        * More tests, fix witespace handling in 'eject( $hash => $ { var } )'
+
+0.01    2009-10-19
+        First version
+

@@ -1,0 +1,16 @@
+
+	/* An address appears after some data */
+
+// some data at address 0x0
+0 1 2  
+
+// here is the address: 0x5
+// underscores allowed anywhere in addr
+@___5__
+
+// here is some data starting at address=0x5
+ 5 6 7
+1xz8_9x
+         xXzZ
+zxZX
+

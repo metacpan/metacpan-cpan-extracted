@@ -1,0 +1,168 @@
+Revision history for Perl extension VCS.
+
+0.25 2016-06-05
+  - no MYMETA in MANIFEST
+  - move to lib layout
+  - update Changes file
+
+0.24 2014-07-09
+  - Give more info in RCS _split_log.
+
+0.23 2014-07-08
+  - Required RCS tags in test data, don't do during test.
+
+0.22 2014-07-07
+  - Try to sidestep "init existing repo only if cvsadmin" test fails.
+
+0.21 2014-07-07
+  - CVS test: Fix test typo.
+  - RCS test for command "rcs" not "co".
+
+0.20 2014-07-04
+  - CVS tests avoid getlines for back-compat, more tolerant on date.
+
+0.19 2014-07-03
+  - simplify generation of "examples"
+  - simplify tests with File::Temp and IPC::Open3
+
+0.18 2014-05-02
+  - add MYMETA.* to MANIFEST
+
+0.17 2014-05-02
+  - update README
+  - fix RT-8440 (schwern)
+  - add GitHub repo info
+
+0.16  Sun Aug 22 10:04:00 PDT 2010
+	- Fix META.yml
+
+0.15  Sun Aug 22 01:37:00 PDT 2010
+	- VCS is obsolete, use VCI instead.
+
+0.14  Tue Sep 14 11:21:16 BST 2004
+	- Fixed a test, got shocked at how long this has been dormant.
+	  (thanks to richard for reporting the test failure on some
+	   new version of CVS)
+
+0.13  Fri Jan  2 10:18:44 GMT 2004
+ 	- Renamed the test files from ,v to ,v_for_testing as reports
+	  indicated this was causing problems.
+	- Added patch from Richard Clamp to handle directories with
+	  non-versioned files more gracefully.
+	- Moved CVS fully onto faith.mccarroll.org.uk away from
+	  sourceforge. Please contact me if you need access.
+	
+0.12  Sun Dec 21 20:39:45 GMT 2003
+	- Added POD for the changes to tags(), sorry folks forgot
+	  to do it earlier.  
+	- p.s. btw, this is now no longer hosted on SF's CVS, if you
+	  want CVS access let me know as i'm upping the pace dramatically
+	  on this module so it should at long last start to go somewhere.
+	
+0.11  Sun Dec 21 17:17:45 GMT 2003
+	- Applied patch from Pierre Denis (Thanks Leon!), which sorted
+          out a problem with testing Rcs from a CVS checkout.
+	- Started to split tags() into tags_hash and tags_array, the
+	  later maintaining order.
+
+0.10  Wed Feb  5 16:10:25 GMT 2003
+	- Applied patch from Leon Broacard (Thanks Leon!), which sorted
+	  out a problem with pservers and absolute paths.
+	- Updated my email address (word of wisdom, never change your
+	  email address its too painful)
+
+0.09  Sun Jan 19 13:12:39 GMT 2003
+	- Applied patch from Slaven Rezic (Thanks Slaven!), which ...
+		- cleaned up the _CMD variables making them global
+		- %LOG_CACHE also global (this allows a quick hack
+		  to invalidate the CACHE)
+		- use strict applied to VCS::Rcs::Version
+		- text() now uses PATH instead of NAME
+	- Broke out the tests into seperate files for General (00VCS.t),
+	  RCS (01Rcs.t) and CVS (01Cvs.t)
+	- Removed dependency on the UNIX command line tools for making
+	  a test directory. 
+	- Added skips for 01Rcs.t and 01Cvs.t if rcs or cvs are not
+	  available.
+	- Made the testing system a little more Win32 friendly.	 
+
+0.08  Thu Jan 16 16:19:37 GMT 2003
+	- Added a tags() method to VCS::Dir (see POD for more details), 
+	  there are currently only tests for this function in the CVS
+	  testsuite, this will change in the next version which should be
+	  an overhaul of the entire test suite. There should also be a 
+	  nice example of how powerful tags() on VCS::Dir can be in the
+	  next version.
+
+0.07  Tue Jan 14 UNKNOWN GMT 2003
+	- Removed dependencies on uudecode, gzip and tar in the tests in
+	  response to failed test report from CPAN testers (Thanks
+	  CPAN Testers!) This has been done by moving the test
+	  directory structure into t/.
+	- Moved test.pl to t/VCS.t
+
+0.06  Mon Jan 13 UNKNOWN GMT 2003
+	- Changed test.pl to use Test::More
+	- Added tags() method to VCS::File implementations in CVS, RCS, HMS.
+
+0.05  Sun Jul 28 01:09:44 BST 2002
+	- VCS URLs, eliminating problems with which kind of VCS to use.
+	- Exceptions on failed calls to "new" instead of returning undef. This
+	  enables calling code to assume it "just worked", and also when it
+	  fails, information is available (from the message) as to just what
+	  went wrong.
+	- An "init" method, callable by "new" in subclasses, cutting down on
+	  redundant code in subclasses.
+	- A "path" method to use instead of "name", which was potentially
+	  ambiguous. The data for this is setup in "init", so subclasses
+	  should not need to touch.
+	- Because of the above, subclasses like e.g. VCS::X::Dir must inherit
+	  from VCS::Dir. If they wish to inherit from VCS::X, they should set
+	  @ISA to qw(VCS::X VCS::Dir).
+
+0.04  Oct 28 2001
+        - [now in SourceForge CVS]
+        - Added VCS::Hms
+	- Added multitude of changes from Peter Prymmer:
+        - modified the MANIFEST to include the various Hms*
+          files as well as the new VCS_dev.pod doc and a Imp_pod.tpl
+          file
+	- added pod to VCS/Rcs.pm and similar pod to VCS/Hms.pm.
+          He turned the generalization of pod into the Imp_pod.tpl pod
+          template for other VCS::* developers to borrow from.
+        - touched up other pod to render it `podchecker -warnings
+          -warnings` using podchecker from a test installation of perl
+          5.7.2 (perl@12494 kit from jhi). This mostly entailed
+          s/\$object->method/\$object-E<gt>method/ in =head[12]
+          headings. He added gratuitous =cut's to most pods (even
+          though podchecker does not seem to mind their absence).
+        - He turned one of the example programs into a MakeMaker
+          extractable *.PL script.  Specifically he turned
+          examples/diff-hist into examples/diff-hist.PL and made
+          appropriate changes to the Makefile.PL. He has only touched
+          the one program and wanted to solicit comment on this
+          installation technique: note that by running `make install`
+          the blib/scripts/diff-hist script will be installed into
+          your @INC in such a way that `diff-hist` will lie in you
+          $PATH.  Is this something worth doing with the other
+          programs in the examples/* directory? Should the examples
+          be given other more distinctive names such as vcsdiff-hist,
+          i.e. with a leading 'vcs' name?
+
+0.03  Thu May 27 14:31:20 BST 1999
+        - more documentation
+	- a couple of bug fixes
+
+0.02  Mon Feb 22 17:11:06 1999
+        - lots of bugfixes and documentation
+	  updates and clarifications
+        - fixed bug in the caching which meant
+	  that we got almost no hits
+	- fixed bug which caused us to do nasty
+	  things if VCS::Rcs saw any locked files
+
+0.01  Mon Nov 16 12:41:10 1998
+	- first released version, with powerful
+          vcsweb.cgi tool
+
+

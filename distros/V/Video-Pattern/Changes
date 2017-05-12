@@ -1,0 +1,33 @@
+0.08 2015-09-18T14:49:39+02:00
+ - Add support for min (minute) and h (hour) duration.
+ - Fix author and test requires.
+ - Rewrite duration multiplicator constants to Readonly variables.
+ - Rewrite error message for duration to common text without concrete time
+   units.
+
+0.07 2015-09-16T11:10:02+02:00
+ - Improve 'duration' parameter to accept s/ms suffix.
+ - Move admin tests to xt/ directory.
+
+0.06 2015-09-15T22:00:51+02:00
+ - Add checks for 'fps' and 'duration' parameters.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.05 2014-11-07T05:13:14+01:00
+ - Fix copy, if doesn't exist Win32::Symlink on Window.
+ - Update examples.
+
+0.04 2014-11-06T07:28:45+01:00
+ - Add support for symlinks on Window. Or simple copy on Windows.
+
+0.03 2014-11-04T13:02:05+01:00
+ - Fix Image::Random api to new 0.06 version.
+
+0.02 2014-11-04T07:30:09+01:00
+ - Add tests.
+
+0.01 2014-11-01T13:46:29+01:00
+ - First version.

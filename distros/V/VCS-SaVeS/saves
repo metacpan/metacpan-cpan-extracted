@@ -1,0 +1,143 @@
+#!/usr/bin/perl -w
+use strict;
+
+my $cmd;
+my $args = @ARGV ? join(' ', @ARGV) : '';
+
+if (-d '.saves') {
+    if ($args) {
+        $cmd = "svs save $args";
+    }
+    else {
+        $cmd = "svs save -m'saves' .";
+    }
+}
+else {
+    if ($args) {
+        $cmd = "svs import $args";
+    }
+    else {
+        $cmd = "svs import -m'saves' .";
+    }
+}
+
+system($cmd) == 0
+  or die "Had problems with saves\n";
+
+__END__
+=head1 NAME
+
+SaVeS(tm) - The Standalone Version System
+
+=head1 SYNOPSIS
+
+    saves  # backup the current directory tree
+    svs restore  # restore any changed files
+
+=head1 DESCRIPTION
+
+This document describes SaVeS, the Standalone Version System. It is an
+overview of the philosophy and basic usage. For detailed information on
+system usage and command descriptions, please see the C<svs> manpage.
+
+SaVeS is a single user VCS (Version Control System) tool, that offers
+most of the functionality of CVS, with less of the hassle. The interface
+consists of two command line tools:
+
+=over 4
+
+=item * svs
+
+C<svs> is the main interface command. Use C<svs help> to get help with its functionality. Or use the C<svs> manpage.
+
+=item * saves
+
+C<saves> is a shortcut command for when you want to make sure everything
+is backed up, but you don't have the time to think about what to do. If
+the current directory has never been back up, do a C<svs import>,
+otherwise do a C<svs save>.
+
+=back
+
+Some of the key features of SaVeS are:
+
+=over 4
+
+=item * Simple
+
+C<svs> tries to do the right thing with a minimum of input.
+
+=item * Self contained
+
+All revision information is stored in a C<.saves> directory under the
+current directory. See L<The .saves Repository> below for more
+information.
+
+=item * Clean
+
+No C<CVS> directories sitting in every directory. Yes, there is a
+C<.saves> directory, but it's only at the root, and since it begins with
+a period, you don't see it as much.
+
+=item * Interoperable
+
+You can export the historical information inside a SaVeS repository to
+another VCS.
+
+=item * Portable
+
+Since SaVeS is self-contained, you can archive whatever directory you
+are working on, and move everything to another machine.
+
+=item * Disposable
+
+If you decide to scrap your revision history, simply delete the
+C<.saves> directory. That's it.
+
+=item * Extended
+
+Like CVS, SaVeS is a wrapper around RCS. This helps lend stability to
+the software. It also eases interoperability to other RCS based VCSs.
+
+=back
+
+=head1 SaVeS Configuration
+
+XXX SaVeS will eventually have a .savesrc file. For now it doesn't need one.
+
+=head1 The .saves Repository
+
+All revision information for a given directory tree is stored a
+C<.saves> directory at the root of that tree. This directory is known as
+a SaVeS repository. All SaVeS commands must be issued from the directory
+containing the repository.
+
+A repository is responsible for the entire tree below it. However, if
+any directory below the root, contains a C<.saves> directory itself,
+then that directory is not processed by the commands issued above it.
+
+=head1 SOFTWARE
+
+The SaVeS system is written in Perl. It is a wrapper around the standard
+Unix toolset RCS (Revision Control System). It is distributed as a Perl
+module called C<VCS::SaVeS> on the CPAN (Comprehesive Perl Archive
+Network). It installs the Perl scripts C<svs> and <saves> as command
+line programs. It also installs some Perl modules, but you probably
+won't use those directly.
+
+=head1 SEE
+
+The C<svs> manpage.
+
+C<http://search.cpan.org>
+
+C<svs help>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 Brian Ingerson. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

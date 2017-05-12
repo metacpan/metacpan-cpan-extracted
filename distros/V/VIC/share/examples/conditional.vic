@@ -1,0 +1,42 @@
+PIC P16F690;
+
+Main {
+    digital_output PORTC;
+    $var1 = TRUE;
+    $var2 = FALSE;
+    Loop {
+        if ($var1 != FALSE && $var2 != FALSE) {
+            $var1 = !$var2;
+            sim_assert $var1 == FALSE, "$var1 == FALSE. block 1";
+            write PORTC, 1;
+            sim_assert "pause. block 1";
+        } else if $var1 || $var2 {
+            $var2 = $var1;
+            write PORTC, 2;
+            sim_assert "pause. block 2";
+        } else if !$var1 {
+            $var2 = !$var1;
+            write PORTC, 4;
+            sim_assert "pause. block 3";
+        } else if $var2 {
+            $var2 = !$var1;
+            write PORTC, 4;
+            sim_assert "pause. block 4";
+        } else {
+            write PORTC, 8;
+            $var1 = !$var2;
+            sim_assert "pause. block 5";
+            break;
+        };
+        $var3 = 0xFF;
+        while $var3 != 0 {
+            $var3 >>= 1;
+        }
+    }
+    sim_assert "pause. end of main";
+}
+
+Simulator {
+    attach_led PORTC, 8;
+    stop_after 5s;
+}

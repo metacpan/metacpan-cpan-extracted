@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+my $count = -1;
+return sub
+{
+    my($param, $job, @regions) = @_;
+    $count+=1; $count = 0 if $count >= @regions;
+    $regions[$count];
+}

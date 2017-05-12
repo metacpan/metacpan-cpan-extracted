@@ -1,0 +1,25 @@
+
+use warnings;
+use strict;
+use diagnostics;
+use Data::Dumper;
+
+use Verilog::Readmem qw(parse_readmem);
+
+# Read memory file into Array-Of-Arrays data structure:
+my $mem_ref = parse_readmem({filename => 'ex1.hex'});
+
+my $num_blocks = scalar @{$mem_ref};
+print "num_blocks = $num_blocks\n";
+
+# It is typical to have only one data block.
+# Sum up all data values.
+if ($num_blocks == 1) {
+    my ($addr, @data) = @{ $mem_ref->[0] };
+    my $sum = 0;
+    for (@data) { $sum += $_ }
+    print "addr = $addr, data sum = $sum\n";
+}
+
+print Dumper($mem_ref);
+ 

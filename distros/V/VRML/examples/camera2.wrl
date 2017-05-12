@@ -1,0 +1,89 @@
+#VRML V2.0 utf8
+Group {
+    children [
+	Viewpoint {
+		description	"Front"
+		position	0 0 5
+		orientation	0 0 1 0
+	}
+	Viewpoint {
+		description	"Right"
+		position	5 0 0
+		orientation	0 1 0 1.5707963
+	}
+	Viewpoint {
+		description	"Back"
+		position	0 0 -5
+		orientation	0 1 0 3.1415926
+	}
+	Viewpoint {
+		description	"Left"
+		position	-5 0 0
+		orientation	0 1 0 -1.5707963
+	}
+	Viewpoint {
+		description	"Top"
+		position	0 5 0
+		orientation	1 0 0 -1.5707963
+	}
+	Viewpoint {
+		description	"Bottom"
+		position	0 -5 0
+		orientation	1 0 0 1.5707963
+	}
+	DEF Red
+	Viewpoint {
+		description	"Red"
+		position	0 0 -5
+		orientation	0 1 0 3.1415926
+	}
+	Anchor {
+	    url	"#Red"
+	    description	"To Red Side"
+	    children [
+		Shape {
+			appearance Appearance {
+				material Material {
+					diffuseColor	0 0 1
+				}
+			}
+			geometry IndexedFaceSet {
+				coord Coordinate {
+					point [
+						-0.5 -0.5 0.5,
+						0.5 -0.5 0.5,
+						0.5 -0.5 -0.5,
+						-0.5 -0.5 -0.5,
+						0 0.5 0
+					]
+				}
+				coordIndex [
+					0, 1, 4, -1,
+					1, 2, 4, -1,
+					2, 3, 4, -1,
+					3, 0, 4, -1,
+					0, 3, 2, 1, -1
+				]
+				color Color {
+					color [
+						0 0 1,
+						0 0.501960784313725 0,
+						1 0 0,
+						1 1 0,
+						1 1 1
+					]
+				}
+				colorIndex [
+					0,
+					1,
+					2,
+					3,
+					4
+				]
+				colorPerVertex	FALSE
+			}
+		}
+	    ]
+	}
+    ]
+}

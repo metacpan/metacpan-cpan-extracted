@@ -1,0 +1,15 @@
+Changes
+demo/venn.pl
+demo/VennChart.png
+demo/VennHistogram.png
+lib/Venn/Chart.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/count_regions.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

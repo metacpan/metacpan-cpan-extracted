@@ -1,0 +1,42 @@
+Changes
+examples/module_builder.pl
+examples/mysql_load.pl
+examples/template.pl
+lib/Verby.pm
+lib/Verby/Action.pm
+lib/Verby/Action/BuildTool.pm
+lib/Verby/Action/Make.pm
+lib/Verby/Action/MkPath.pm
+lib/Verby/Action/Run.pm
+lib/Verby/Action/Run/Unconditional.pm
+lib/Verby/Action/Stub.pm
+lib/Verby/Config/Data.pm
+lib/Verby/Config/Data/Mutable.pm
+lib/Verby/Config/Source.pm
+lib/Verby/Config/Source/ARGV.pm
+lib/Verby/Config/Source/Prompt.pm
+lib/Verby/Context.pm
+lib/Verby/Dispatcher.pm
+lib/Verby/Step.pm
+lib/Verby/Step/Closure.pm
+lib/Verby/Step/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_use.t
+t/action.t
+t/action_buildtool.t
+t/action_mkpath.t
+t/action_runcmd.t
+t/config_data.t
+t/config_data_mutable.t
+t/dispatch_async.t
+t/dispatch_async_stress.t
+t/dispatch_presatisfied.t
+t/dispatch_simple.t
+t/resource_pool.t
+t/step_closure.t
+verby_par.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

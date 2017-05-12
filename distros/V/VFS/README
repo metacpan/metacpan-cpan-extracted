@@ -1,0 +1,11 @@
+NAME
+    VFS - A virtual filesystem layer for Perl
+
+SYNOPSIS
+            Unimplemented.
+
+DESCRIPTION
+    An implementation of a virtual file system in Perl. It will allow
+    creation, reading and writing of files, mounting of systems in other
+    systems, ...
+

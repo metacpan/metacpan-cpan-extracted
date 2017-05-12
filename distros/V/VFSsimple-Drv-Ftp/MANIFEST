@@ -1,0 +1,4 @@
+lib/VFSsimple/Drv/Ftp.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

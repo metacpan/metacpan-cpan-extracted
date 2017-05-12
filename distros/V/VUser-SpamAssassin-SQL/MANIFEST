@@ -1,0 +1,10 @@
+COPYING
+INSTALL
+lib/VUser/SpamAssassin/SQL.pm
+lib/VUser/SpamAssassin/SQL/AWL.pm
+lib/VUser/SpamAssassin/SQL/Bayes.pm
+lib/VUser/SpamAssassin/SQL/Userprefs.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml                                 Module meta-data (added by MakeMaker)

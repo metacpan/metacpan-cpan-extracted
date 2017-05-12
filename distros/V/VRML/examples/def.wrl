@@ -1,0 +1,89 @@
+#VRML V1.0 ascii
+Group {
+	DEF Cameras Switch {
+		whichChild 0
+		DEF Front
+		PerspectiveCamera {
+			position	1.5 3 15
+			orientation	0 0 1 0
+		}
+		DEF Right
+		PerspectiveCamera {
+			position	16.5 3 0
+			orientation	0 1 0 1.5707963
+		}
+		DEF Back
+		PerspectiveCamera {
+			position	1.5 3 -15
+			orientation	0 1 0 3.1415926
+		}
+		DEF Left
+		PerspectiveCamera {
+			position	-13.5 3 0
+			orientation	0 1 0 -1.5707963
+		}
+		DEF Top
+		PerspectiveCamera {
+			position	1.5 18 0
+			orientation	1 0 0 -1.5707963
+		}
+		DEF Bottom
+		PerspectiveCamera {
+			position	1.5 -12 0
+			orientation	1 0 0 1.5707963
+		}
+	}
+	DEF blue_cube
+	Group {
+		Material {
+			diffuseColor	0 0 1
+		}
+		Cube {
+			width	1
+			height	1
+			depth	1
+		}
+	}
+	Separator {
+		Transform {
+			translation 3 0 0
+		}
+		Sphere {
+			radius	0.5
+		}
+	}
+	Separator {
+		Transform {
+			translation 0 2 0
+		}
+		USE blue_cube
+		Separator {
+			Transform {
+				translation 0 2 0
+			}
+			USE blue_cube
+			Separator {
+				Transform {
+					translation 0 2 0
+				}
+				USE blue_cube
+				Separator {
+					Transform {
+						translation 0 2 0
+					}
+					DEF red_cube
+					Group {
+						Material {
+							diffuseColor	1 0 0
+						}
+						Cube {
+							width	0.5
+							height	0.5
+							depth	0.5
+						}
+					}
+				}
+			}
+		}
+	}
+}

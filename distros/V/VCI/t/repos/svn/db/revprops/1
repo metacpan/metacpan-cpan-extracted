@@ -1,0 +1,18 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-04-28T03:00:11.829235Z
+K 7
+svn:log
+V 180
+Initial SVN Upload:
+
+Added base class (GameQuery.php)
+Added protocol class for Gamespy 2 (GameQueryProtocol_GS2.inc.php)
+Added driver class for FEAR (GameQueryDriver_FEAR.inc.php)
+
+END

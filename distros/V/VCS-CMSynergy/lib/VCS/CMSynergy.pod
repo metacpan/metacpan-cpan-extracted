@@ -1,0 +1,2006 @@
+=head1 NAME
+
+VCS::CMSynergy - Perl interface to IBM Rational Synergy
+
+=head1 SYNOPSIS
+
+  use VCS::CMSynergy;
+
+  $ccm = VCS::CMSynergy->new(%attr);
+
+  ($rc, $out, $err) = $ccm->ccm($ccm_command, @ccm_args);
+  ($rc, $out, $err) = $ccm->any_ccm_command(@ccm_args); 
+
+  $aref = $ccm->query(@ccm_args);
+  $aref = $ccm->query_arrayref($query, @keywords);
+  $aref = $ccm->query_hashref($query, @keywords);
+  $aref = $ccm->query_object($query, @keywords);
+
+  $aref = $ccm->finduse(@args);
+  $path = $ccm->findpath($file_spec, $proj_vers);
+
+  $aref = $ccm->history(@ccm_args);
+  $aref = $ccm->history_arrayref($file_spec, @keywords);
+  $aref = $ccm->history_hashref($file_spec, @keywords);
+
+  $aref = $ccm->ls(@ccm_args);
+  $aref = $ccm->ls_object($file_spec, @keywords);
+  $aref = $ccm->ls_arrayref($file_spec, @keywords);
+  $aref = $ccm->ls_hashref($file_spec, @keywords);
+
+  $value = $ccm->get_attribute($attr_name, $file_spec);
+  $ccm->set_attribute($attr_name, $file_spec, $value);
+  $hash_ref = $ccm->list_attributes($file_spec);
+
+  $delim = $ccm->delimiter;
+  $database = $ccm->database;
+  $ENV{CCM_ADDR} = $ccm->ccm_addr;
+
+This synopsis only lists the major methods.
+
+Methods that don't need a Synergy session are described
+in L<VCS::CMSynergy::Client>. In fact, C<VCS::CMSynergy>
+is derived from C<VCS::CMSynergy::Client>.
+
+Methods for administering users and their roles are
+described in L<VCS::CMSynergy::Users>. 
+
+=head1 DESCRIPTION
+
+  use VCS::CMSynergy;
+
+  my $ccm = VCS::CMSynergy->new(database => "/ccmdb/test/tut62/db");
+
+  $ccm->checkout(qw(foo/bar.c@foo~user -to test))
+    or die "checkout failed: ".$ccm->error;
+
+  my $csrcs = $ccm->query_hashref("type = 'csrc'",
+                                  qw(displayname modify_time));
+  if ($csrcs)
+  {
+    print "$_->{displayname} $_->{modify_time}\n" foreach (@$csrcs);
+  }
+
+=head1 OPTIONS
+
+The following optional features can be enabled at compile time
+with the notation
+
+  use VCS::CMSynergy ':option';
+
+=head2 :cached_attributes
+
+This causes L<VCS::CMSynergy::Object>s to keep a cache of 
+attribute names and values. The cache is only maintained for those
+attributes that are actually accessed by the program. See
+L<VCS::CMSynergy::Object/ATTRIBUTE METHODS> for a list of
+methods perusing this cache.
+
+Note that this cache
+is only maintained if you use L<VCS::CMSynergy::Object> methods
+(including the L<VCS::CMSynergy::Object/TIEHASH INTERFACE>) 
+and will get inconsistent if you
+mix C<VCS::CMSynergy::Object> and C<VCS::CMSynergy> calls
+on the same object.
+
+=head2 :tied_objects
+
+If this option is in effect.
+you can use a C<VCS::CMSynergy::Object> in the same way you
+would use a hash reference. The available keys are the underlying
+Synergy object's attributes. 
+See L<VCS::CMSynergy::Object/TIEHASH INTERFACE> for details.
+
+=head1 GENERAL METHODS
+
+=head2 new
+
+  my $ccm = VCS::CMSynergy->new( database => "/ccmdb/foo/db" )
+              or die VCS::CMSynergy->error;
+
+Starts a new Synergy session. Returns a session handle if it succeeds. 
+
+If it fails to start a session, it returns C<undef>. Use
+C<< VCS::CMSynergy->error >> to get the error string printed by Synergy.
+
+Multiple simultaneous sessions to multiple databases or with
+engines running on different hosts, even using different versions
+of Synergy, are supported.
+
+C<new> issues a B<ccm start> command and remembers the C<CCM_ADDR>
+in the session object (together with other session state).
+The session is stopped (B<ccm stop>) when the session object
+is destroyed (see L</DESTROY>).
+
+C<new> is called with an attribute hash. The following attributes
+are currently supported:
+
+=over 4
+
+=item C<database> (string)
+
+Synergy database path. 
+
+This is the only attribute required on Unix systems.
+
+=item C<host> (string)
+
+Synergy engine host to use.
+
+It defaults to the local host.
+
+=item C<role> (string)
+
+User's initial Synergy role.
+
+It defaults to C<developer>.
+
+=item C<user> (string)
+
+Synergy user. 
+
+This attribute is available and required on Windows systems only.
+
+=item C<password> (string)
+
+User's password. 
+
+This attribute is required on Windows systems or when using
+ESD to connect to the Synergy engine.
+
+=item C<server> (string)
+
+Synergy server URL (for Synergy 7.0 and above). Specifying this instead
+of C<host> will start your Synergy session in web mode.
+
+Note that support for web mode is incomplete and only lightly tested.
+
+=item C<ini_file> (string) B<(classic mode only)>
+
+Synergy ini file to use. 
+
+In contrast to the Synergy B<ccm start> command there is I<no>
+default ini file consulted. (On Unix systems this is achieved
+by executing B<ccm start> with the option C<-f /dev/null>.) The reason
+is that we want scripts to behave in a reproducible way. Otherwise
+the script might accidentally work with the current contents of
+the current user's ini file, but might fail when invoked by another user.
+Or it might fail when invoked by the same user at a later time because of
+changes to her ini file (e.g. because of another session between
+invocations of the script). So if you really want to rely on an ini file,
+you have to supply it explicitly.
+
+This option is only valid when using the classic mode to connect to Synergy.
+
+=item C<CCM_ADDR> (string)
+
+Specifies the RFC address of an established Synergy session.
+
+If you specify this attribut L</new> does not create a new session,
+but will attach to the one specified. Also, implicitly sets C<KeepSession>
+to true so that destruction of the new session
+handle will not cause a B<ccm stop>. However, setting C<KeepSession> 
+explicitly will take precedence.
+
+Note that there is no default value. In particular, L</new> ignores
+the environment variable of the same name.
+
+=item C<CCM_HOME> (string)
+
+Value of the C<CCM_HOME> environment variable to use for this session.
+
+It defaults from the environment variable of the same name,
+i.e. C<$ENV{CCM_HOME}>.
+
+This is only of interest if you have multiple version of Synergy
+installed. You can have simultaneous sessions using different
+Synergy versions (the module takes care of setting the C<CCM_HOME>
+variable appropriately before issuing any C<ccm> commands). 
+
+=item C<ui_database_dir> (string)
+
+Specifies the path name to which your database information is copied 
+when you are running a remote client session. This corresponds
+to the C<-u pathname> option for B<ccm start>.
+
+Note: This option is particularly useful for Windows clients. If L</new>
+fails with something like 
+
+  Server Database Path ... is not accessible from this Client.   
+  Please specify a Client Database Path
+
+you should specify this option with a local directory path, e.g.
+
+  my $ccm = VCS::CMSynergy->new(..., ui_database_dir => 'c:\\temp', ...);
+
+The value is  what you would enter under 
+"Client Information"/"Database Path" in the GUI's "Startup Info" window.
+Or you can set B<ui_database_dir> in the [Options] section of 
+the system ini file (note that setting it in your personal ini file
+won't do, as this file is I<not> read by L</new> by default).
+
+=item C<remote_client> (boolean)
+
+If the value is true, it specifies that you want to start the Synergy
+session as a remote client. This corresponds to the C<-rc> option for
+B<ccm start>. This option is only useful on Unix systems. It defaults
+to false.
+
+=item C<PrintError> (boolean)
+
+This attribute can be used to force errors to generate warnings (using
+L<carp|Carp/carp>) in addition to returning error codes in the normal way.  
+When set to true, any method which results in an error occurring will cause
+the corresponding C<< $ccm->error >> to be printed to stderr.
+
+It defaults to true.
+
+Note: L</PrintError> and L</RaiseError> below are stolen from the excellent
+L<DBI> module.
+
+=item C<RaiseError> (boolean)
+
+This attribute can be used to force errors to raise exceptions 
+(using L<croak|Carp/croak>) rather than simply return error codes in the normal way. 
+When set to true, any method which results in an error will cause
+effectively a C<die> with the actual C<< $ccm->error >>
+as the message. 
+
+It defaults to false.
+
+If you turn C<RaiseError> on then you'd normally turn C<PrintError> off.
+If C<PrintError> is also on, then the C<PrintError> is done first (naturally).
+
+Typically C<RaiseError> is used in conjunction with C<eval { ... }>
+to catch the exception that's been thrown and followed by an
+C<if ($@) { ... }> block to handle the caught exception. 
+
+If you want to temporarily turn C<RaiseError> off (inside a library function
+that is likely to fail, for example), the recommended way is like this:
+
+  {
+    local $ccm->{RaiseError};  # localize and turn off for this block
+    ...
+  }
+
+The original value will automatically and reliably be restored by Perl,
+regardless of how the block is exited.
+The same logic applies to other attributes, including C<PrintError>.
+
+=item C<HandleError> (code ref)
+
+This attribute can be used to provide your own
+alternative behavior in case of errors. If set to a
+reference to a subroutine then that subroutine is called
+when an error is detected (at the same point that
+L</RaiseError> and L</PrintError> are handled).
+
+The subroutine is called with three parameters: the
+error message string that L</RaiseError> and L</PrintError>
+would use, the C<VCS::CMSynergy> object being used, and the 
+value being returned by the method that failed (typically undef).
+
+If the subroutine returns a false value then the
+L</RaiseError> and/or L</PrintError> attributes are checked
+and acted upon as normal. Otherwise the error is considered "handled"
+and execution proceeds normally with a return from the method.
+
+For example, to "die" with a full stack trace for any error:
+
+  use Carp;
+  $ccm->{HandleError} = sub { confess(shift) };
+
+=item C<KeepSession> (boolean)
+
+If this attribute is true then destruction of the new session handle
+will not cause a B<ccm stop>. 
+
+This may be used if you want to
+create a new Synergy session in one program and then re-use it
+in another program (since session creation is a rather time consuming
+operation). In this case you should use C</ccm_addr> to extract
+the session's RFC address (after C</new> returns) and somehow pass it
+on to the other program.
+
+It defaults to false unless you also specify C<CCM_ADDR>.
+
+=item C<UseCoprocess> (boolean) B<(classic mode only)>
+
+This feature is highly experimental, B<use it at your own risk>.
+
+B<You must have the L<Expect> module installed to use this feature.>
+(Since L<Expect> is not available for Win32 systems, 
+C<UseCoprocess> is ignored there.)
+
+If C<UseCoprocess> is false, C<VCS::CMSynergy.pm> executes a separate
+C<ccm> process whenever it invokes the Synergy CLI, e.g.
+
+  $ccm->checkout('foo.c');
+  $ccm->set_attribute('color', 'foo.c', 'blue');
+  $csources = $ccm->query("name match '*.c'");
+
+results in the execution of the following three processes:
+
+  ccm checkout foo.c
+  ccm attribute -modify color -value blue foo.c
+  ccm query "name match '*.c'"
+
+In particular, we incur the startup overhead of B<ccm> three times.
+This overhead is noticable, esp. if you are doing 
+lots of Synergy operations.
+
+If C<UseCoprocess> is true, only one B<ccm> process per Synergy
+session ever gets executed. The way it works is that
+C<< VCS::CMSynergy->new >> starts an "interactive"
+(i.e. one invoked without arguments) B<ccm> process in the background.
+Later invocations of the Synergy CLI pipe their commands to its input and 
+read back the output (up to the next C<< "ccm>" >> prompt). 
+The actual command is then followed in the same way by C<set error>
+to retrieve the success status. Destruction  of the session object
+will cause termination of this "coprocess" (via "stop" or "exit" depending
+on the setting of L</KeepSession>).
+
+The "coprocess" method avoids the startup overhead, but may run into 
+other problems:
+
+=over 4
+
+=item *
+
+The "interactive" B<ccm> imposes stricter limits 
+on the length of one CLI command (experimentally put at ~2000 bytes)
+than the "batch" B<ccm> (where the limit on the arguments of a process
+is typically imposed by the operating system). Moreover, it will
+silently truncate the command and not signal an error (unless the
+truncation causes a syntax error).
+
+=item *
+
+The current method to communicate with the "coprocess" does not allow
+for separation of its stdout and stderr.
+
+=item *
+
+C<UseCoprocess> does not work under Win32 at all.
+
+=back
+
+The default value of C<UseCoprocess> is false.
+
+=back
+
+=head2 DESTROY
+
+  $ccm->DESTROY;
+
+Stops the Synergy session represented by the session handle
+by executing B<ccm stop> (unless the session has the C<KeepSession>
+attribut set).
+
+You should never call this method explicitly, as it
+is invoked by the Perl runtime when the Perl process exits
+(either by calling C<exit> or because of a C<die>).
+Hence, a script using the C<VCS::CMSynergy> module will not leave
+any Synergy sessions hanging around. 
+
+Actually, the Perl runtime will call C<DESTROY> when the last reference
+to a session handle goes out of scope, so in the following example
+each session will be stopped as soon as one loop through the C<foreach>
+body is completed, i.e. there is at most one session in progress
+at any one time:
+
+  my @databases = ...;          # a list of Synergy databases
+  foreach my $db (@databases)
+  {
+    my $ccm = VCS::CMSynergy->new( database => $db, ... );
+    ...
+    # perform some operation on $db
+    ...
+    # session is stopped as "my" variable $ccm is about to go out of scope
+  }
+
+Note: The correct way to explicitly stop a session is neither
+
+  $ccm->stop;
+
+nor is it
+
+  $ccm->DESTROY;
+
+Though both forms will execute B<ccm stop>,
+the first form makes C<$ccm> a C<VCS::CMSynergy> object with an invalid
+RFC address (i.e. attribute CCM_ADDR), while the second form leaves you with an
+"empty"  C<VCS::CMSynergy> object. Instead, you should rather say
+
+  $ccm = undef;
+
+=head2 ccm
+
+  ($rc, $out, $err) = $ccm->ccm($command, @args);
+  $ok = $ccm->ccm($command, @args);
+
+This is the workhorse of the VCS::CMSynergy module. It executes B<ccm> 
+with command C<$command> and (optional) parameters C<@args>.
+
+In array context (the first form above) C<ccm>
+returns a three-element array consisting of
+the (operating system) exit code of B<ccm>, and what B<ccm> printed
+on stdout and stderr. Note that the exit code is 0 if B<ccm>
+operated successfully. On DOSish operating systems the 
+(possibly multi-line) strings C<$out> and C<$err> have been read
+by Perl in "text" mode, i.e. contain LF characters instead of CRLF.
+In any case, C<$out> and C<$err> have been C<chomp>ed.
+
+In scalar context (the second form above) C<ccm> returns the
+"logical" exit code, i.e. C<$rc == 0>, so that you can write:
+
+  $ccm->ccm('checkout', $file_spec) 
+      or die "checkout failed: ".$ccm->error;
+
+If you B<do> check the return value (i.e. C<ccm> is called in non-void context)
+then B<no> automatic error handling 
+(cf.  L</RaiseError>, L</PrintError> and L</HandleError>) is done.
+
+Note that you must pass every C<ccm> argument or option as a single Perl 
+argument. For literal arguments the C<qw()> notation may come in handy, e.g.
+
+  ($rc, $out, $err) = $ccm->ccm(qw(finduse -state working));
+
+Most specialized methods in the VCS::CMSynergy module are ultimately implemented
+via the C<ccm> method. Using it directly is only recommended for
+commands that perform some action, e.g. B<ccm checkout>, as opposed to 
+query-like commands. For the latter, e.g. B<ccm query>, use one of the 
+methods that return the information in structured form, 
+e.g. L<query_arrayref|/"query_arrayref, query_hashref"> or
+L<query_hashref|/"query_arrayref, query_hashref">, instead of having 
+to parse C<$out> yourself.
+
+In fact, there is a shortcut for "action" commands: if you call
+a non-existent method on a C<VCS::CMSynergy> object, it tries to invoke
+the C<ccm> method with the original method name as the C<$command>
+followed by the parameters of the original call, i.e.
+
+  $ccm->checkout($file_spec);
+
+and 
+
+  $ccm->ccm('checkout', $file_spec);
+
+are equivalent (given that there is no real C<checkout> method).
+Return values are those of C<ccm> (depending on context).
+This is accomplished by a suitable C<AUTOLOAD> method.
+
+=head1 QUERY METHODS
+
+=head2 query
+
+  $aref = $ccm->query(@args);
+
+Executes the B<ccm query> command with the given C<@args> as parameters.
+The output (as formatted by the C<-format> option) is split into lines.
+These are L<chomp|perlfunc/chomp>ed and a reference to the resulting array
+of strings is returned. 
+
+If there a no hits, a reference to an empty
+array is returned. (Note that B<ccm query> considers this an error,
+but VCS::CMSynergy does not.) 
+
+If there was an error, C<undef> is returned.
+
+Note that you must pass every B<ccm query> argument or option as a single
+Perl argument. For literal arguments the C<qw()> notation may come in handy.
+Example:
+
+  $result = $ccm->query(qw(-t csrc -f), '%displayname %modify_time');
+  print "$_\n" foreach (@$result);
+
+If you are interested in the value of several attributes for the
+result set of the query, you should look at the 
+L<query_arrayref|/"query_arrayref, query_hashref"> and 
+L<query_hashref|/"query_arrayref, query_hashref"> methods that 
+return this information in 
+structured form. If you are only interested in the identity of
+objects in the result set, you should look at the 
+L<query_object|/"query_object"> method.
+
+Note that L</query> will probably produce
+unpredictable results when the C<-format> option references attributes
+that can have multi-line values, e.g. C<status_log>. 
+L<query_arrayref|/"query_arrayref, query_hashref"> and
+L<query_hashref|/"query_arrayref, query_hashref"> handle this case correctly.
+
+=head2 query_arrayref, query_hashref
+
+  $aref = $ccm->query_arrayref($query, @keywords);
+  print "@$_\n" foreach @$aref;
+
+  $aref = $ccm->query_hashref($query, @keywords);
+  print "@$_{@keywords}\n" foreach @$aref;
+
+C<query_arrayref> and C<query_hashref>
+execute B<ccm query> with the query expression C<$query> asking
+for the values of the built-in keywords or attributes supplied
+in C<@keywords>. They both return a reference to an array of references,
+one per result row. 
+
+C<query_arrayref> represents a row as an array containing
+the values of the keywords for that particular object in the result set
+(in the order given by C<@keywords>). 
+
+C<query_hashref> represents a row as a hash containing
+attribute and value pairs where the keys are the C<@keywords>.
+
+If the query returned no hits, both C<query_arrayref>
+and C<query_hashref> return a reference to an empty array.
+
+If there was an error, C<undef> is returned.
+
+If the value of a keyword or an attribute is undefined or
+the attribute is not present, the actual value of the corresponding
+array or hash element is C<undef> (whereas B<ccm query> would print it as
+the string C<< "<void>" >>).
+
+The following names may also be used as keywords though they
+are neither built-in nor attributes:
+
+=over 4
+
+=item C<object>
+
+The value is a C<VCS::CMSynergy::Object> representing 
+the object in the result set.
+
+=item C<finduse> B<(classic mode only)>
+
+The value is a reference to a hash identifying in what parts of what
+projects the object is used.  A key in the hash is the project's objectname.
+The hash value is the
+corresponding relative path (including the object's name) in the project.
+This information is the same as reported by B<ccm finduse>. In fact, if
+this keyword is given, L<query_arrayref|/"query_arrayref, query_hashref"> 
+and L<query_hashref|/"query_arrayref, query_hashref">
+invoke B<ccm finduse -query $query> rather than B<ccm query $query>.  
+Example:
+
+  my $result = $ccm->query_arrayref(
+    "name = 'main.c'", qw(objectname finduse));
+
+returns (as formatted by L<Data::Dumper>):
+
+  $result = [
+    [
+      'main.c-1:csrc:3',        # objectname
+      {                         # finduse
+         'guilib-1.0'   => 'guilib/sources/main.c',
+         'guilib-int'   => 'guilib/sources/main.c',
+         'guilib-darcy' => 'guilib/sources/main.c'
+      }
+    ],
+    ...
+  ];
+
+This keyword is only valid when using the classic mode to connect to Synergy.
+
+=item C<objectname>
+
+C<objectname> actually I<is> a built-in keyword. However, Synergy 
+B<ccm query -f %objectname> returns the deprecated I<fullname>
+(i.e. C<subsystem/cvtype/name/version>) for certain model objects
+(e.g. try B<ccm query -f %objectname -i base>) (but refuses to accept
+them as arguments later). Therefore C<VCS::CMSynergy> will rewrite
+these I<fullname>s to correct I<objectname>s before returning them
+from C<query_arrayref> or C<query_hashref>.
+
+=item C<task_objects>
+
+The value is a reference to an array of C<VCS::CMSynergy::Object> 
+representing the tasks associated with the object. The value is C<undef>
+if there are no associated tasks. This keyword is implemented using
+the Synergy built-in keyword "%task".
+
+=item C<cr_objects>
+
+The value is a reference to an array of C<VCS::CMSynergy::Object> 
+representing the change request associated with the object. 
+The value is C<undef> if there are no associated change requests.
+This keyword is implemented using 
+the Synergy built-in keyword "%change_request".
+
+=item C<baseline_project>
+
+The value is a C<VCS::CMSynergy::Project> 
+representing the object's baseline project. The value is C<undef>
+if no baseline project exists. This keyword is implemented using
+the Synergy built-in keyword "%baseline".
+
+=item C<baseline_object>
+
+The value is a C<VCS::CMSynergy::Object> 
+representing the object's baseline. The value is C<undef>
+if the object isn't in a baseline. This keyword is implemented using
+the Synergy built-in keyword "%in_baseline".
+
+=back 
+
+Note the following differences from B<ccm query>:
+
+=over 4
+
+=item *
+
+The keyword or attribute names given in C<@keywords> should I<not>
+contain a leading C<%>. Example:
+
+  my $result = $ccm->query_hashref("name match '*.c'", 
+                                    qw(displayname type modify_time);
+  foreach my $row (@$result)
+  {
+    print "$row->{displayname} last modified at $row->{modify_time}\n";
+    ...
+  }
+
+=item *
+
+These methods do I<not> support any of the
+shortcut query options of the B<ccm query> command, e.g.
+B<-o owner> or B<-n name>. However, a different shortcut syntax
+is supported, see L</"shortcut query notation">.
+
+=item *
+
+C<$query> may contain newlines to improve the legibility of 
+longish queries with whitespace and line breaks. Any whitespace
+in C<$query> will be replaced by a single blank before submitting
+it to B<ccm query>.
+
+=back
+
+=head2 query_object
+
+  $aref = $ccm->query_object($query, @keywords);
+
+Executes B<ccm query> with the query expression C<$query> 
+and returns a reference to an array of C<VCS::CMSynergy::Object>s 
+that satisfy the query.
+
+If there a no hits, a reference to an empty array is returned.  
+
+If there was an error, C<undef> is returned.
+
+Note: This is a convenience method. It might be implemented 
+using C<query_arrayref>:
+
+  sub query_object
+  {
+    my ($self, $query) = @_;
+    my $ary = $self->query_arrayref($query, 'object') or return;
+    [ map { $_->[0] } @$ary ];  # project onto first (and only) column
+  }
+
+Calling C<query_object> with an optional list of C<@keywords> 
+is only useful when L</:cached_attributes> is in effect. 
+It returns the same result as C<query_object>,
+but the returned C<VCS::CMSynergy::Object>s have their attribute caches
+primed for the attributes listed in C<@keywords>. You could also
+view it as a fancy form of C<query_hashref> where we don't store
+the attributes values of C<@keywords> in some anonymous hash,
+but rather in the corresponding object. Thus the loop
+
+  for my $obj (@{ $ccm->query_object("...", qw(foo)) })
+  {
+    print "$obj: foo=", $obj->get_attribute("foo"), "\n";
+  }
+
+issues a I<total of one> B<ccm> calls. Note: this example assumes 
+
+  use VCS::CMSynergy qw(:cached_attributes);
+
+Note: C<query_object_with_attributes> is a deprecated alias for
+C<query_object>.
+
+=head2 query_count
+
+  $n = $ccm->query_count($query);
+
+Returns the number of objects matched by C<$query>, 0 if nothing matched.
+This is the same as 
+
+  scalar @{ $ccm->query_object($query) }
+
+but it's implemented more efficiently (and also less prone to
+exhaust the 10 MB query result buffer in the Synergy engine).
+
+If there was an error, C<undef> is returned.
+
+=head2 shortcut query notation
+
+L<query_arrayref|/"query_arrayref, query_hashref">, 
+L<query_hashref|/"query_arrayref, query_hashref">,
+L<query_object|/"query_object">,
+L<query_object|/"query_object"> 
+and L</query_count>
+support a shortcut notation for their common C<$query> parameter. To use
+this shortcut, supply an array reference for C<$query>
+(instead of a simple string):
+
+  $result = $ccm->query_hashref(
+    [ type => 'csrc', name => '*.cpp' ], qw(objectname status));
+
+The array must have an even number of elements, shown here as a list of
+C<< $key => $value >> pairs. Each pair represents a simple query. 
+Simple queries with the same C<$key> are combined with "or"
+All other simple queries are combined with "and".
+
+Typically C<< $key => $value >>
+is translated to Synergy query syntax as C<$key = '$value'>.
+Note the quotes around C<$value>. However, quotes are omitted
+if C<$value> is either the string C<"TRUE"> or C<"FALSE">. 
+
+If C<$value> contains a wildcard character (C<*> or C<?>) the pair is
+translated as C<$key match '$value'>.
+
+If C<$value> is an array reference the translation is the alternative
+of the array elements, e.g.
+
+  stooge => [qw( larry curly moe )]
+
+is translated as
+
+  "(stooge='larry' or stooge='curly' or stooge='moe')"
+
+=head2 query convenience functions: ANY_OF, NONE_OF 
+
+  use VCS::CMSynergy qw( ANY_OF NONE_OF );
+  
+  $aref = $ccm->query_object(ANY_OF(status => qw( integrate released )), ...);
+
+C<< ANY_OF(key => @values >> and C<< NONE_OF(key => @values) >> 
+are convenience B<functions> returning B<strings> that can be used 
+to build queries. For example, the above is the same as
+
+  $aref = $ccm->query_object("(status='integrate' or status='released')", ...);
+
+The result of C<ANY_OF> and C<NONE_OF> can safely be used in a query
+where syntactically an expression is expected.
+
+Note that you must explicity import C<ANY_OF> and C<NONE_OF> too use
+them without the full module name.
+
+=head2 history
+
+  $aref = $ccm->history(@args);
+
+Executes the B<ccm history> command with the given C<@args> as parameters.
+The output (probably formatted by the C<-format> option) is split into 
+chunks at the divider line (a line consisting of lots of asterisks).
+A reference to the resulting array of (multi-line) strings is returned. 
+
+If there was an error, C<undef> is returned.
+
+Note that you must pass every B<ccm history> argument or option as a single
+Perl argument. For literal arguments the C<qw()> notation may come in handy.
+
+If you are interested in the successor or predecessor or 
+certain attributes of an object in the history,
+you should look at the 
+L<history_arrayref|/"history_arrayref, history_hashref">
+and L<history_hashref|/"history_arrayref, history_hashref">
+methods that return this information in structured form. 
+
+=head2 history_arrayref, history_hashref
+
+  $aref = $ccm->history_arrayref($file_spec, @keywords);
+  $aref = $ccm->history_hashref($file_spec, @keywords);
+
+C<history_arrayref> and C<history_hashref>
+execute B<ccm history> for C<$file_spec> asking
+for the values of the built-in keywords or attributes supplied
+in C<@keywords>. The both return a reference to an array of references,
+one per history entry. 
+
+C<history_arrayref> represents a history entry as an array containing
+the values of the keywords for that particular object in the history
+(in the order given by C<@keywords>). 
+
+C<history_hashref> represents a history entry as a hash
+containing attribute and value pairs where the keys are the C<@keywords>.
+
+If there was an error, C<undef> is returned.
+
+If the value of a keyword or an attribute is undefined or
+the attribute is not present, the actual value of the corresponding
+array or hash element is C<undef> (whereas B<ccm history> would print it as
+the string C<< "<void>" >>).
+
+The following names may also be used as keywords though they
+are neither built-in nor attributes:
+
+=over 4
+
+=item C<predecessors>
+
+The value returned is a reference to an array of C<VCS::CMSynergy::Object>s
+that represent the given object's predecessors.
+
+=item C<successors>
+
+The value returned is a reference to an array of C<VCS::CMSynergy::Object>s
+that represent the given object's successors.
+
+=item C<object>, C<objectname>, C<task_objects>
+
+For these pseudo keywords see the description
+of the  L<query_arrayref|/"query_arrayref, query_hashref"> 
+and  L<query_hashref|/"query_arrayref, query_hashref"> methods.
+
+=back
+
+Note the following differences from B<ccm history>:
+
+=over 4
+
+=item *
+
+Only one C<$file_spec> is allowed.
+
+=item *
+
+There is no C<-p> (project) option. If you want to get the history
+of a project use the full objectname of the project for C<$file_spec>.
+
+=item *
+
+The keyword or attribute names given in C<@keywords> should I<not>
+contain a leading C<%>. Example:
+
+  my $result = $ccm->history_hashref(
+    'math.h-1:incl:1', qw(displayname modify_time successors));
+
+  foreach my $row (@$result)
+  {
+    print "$row->{displayname}: last modified at $row->{modify_time}\n";
+    print "\t$_\n" foreach (@{ $row->{successors} });
+    ...
+  }
+
+=back
+
+=head2 finduse
+
+  $aref = $ccm->finduse(@args);
+
+Executes the B<ccm finduse> command with the given C<@args> as parameters.
+It returns a reference to an array of rows, one per C<file_spec> given
+in C<@args>, or one per query result if C<-query $query_expression>
+is present in C<@args>. 
+
+Each row is a reference to an array of two elements.  The first
+element is the description of the object.  The second element is a
+reference to a hash identifying in what parts of what projects the
+object is used. 
+A key in this hash is the project's objectname 
+and the value is the corresponding
+relative path in the project.  If there
+are no uses of the object in the given scope the hash is empty.  This
+usage information is in the same form as that for the pseudo keyword
+C<finduse>  of the  L<query_arrayref|/"query_arrayref, query_hashref"> 
+and  L<query_hashref|/"query_arrayref, query_hashref"> methods.
+
+If there was an error, C<undef> is returned. If an element of C<@args>
+refers to a non-existent object, the corresponding element in 
+the return value is C<undef>.
+
+Note that you must pass every B<ccm finduse> argument or option as a single
+Perl argument. For literal arguments the C<qw()> notation may come in handy.
+
+If you are interested in usage information for all objects matching a
+query you should look at the 
+L<query_arrayref|/"query_arrayref, query_hashref"> and
+L<query_hashref|/"query_arrayref, query_hashref">
+methods, esp. the C<finduse> keyword.
+
+Example (recreate the output of the B<ccm finduse> command):
+
+  foreach (@{ $ccm->finduse(@args) })
+  {
+    my ($desc, $uses) = @$_;
+    print "$desc\n";
+    if (keys %$uses)
+    {
+        while (my ($proj_vers, $path) = each %$uses)
+        {
+          print "\t$path\@$proj_vers\n"
+        }
+    }
+    else
+    {
+        print "\tObject is not used in scope.\n";
+    }
+  }
+
+=head2 findpath
+
+  $path = $ccm->findpath($file_spec, $proj_vers);
+
+This is a convenience function. It returns the relative pathname
+(including the objects's name) for the object C<$file_spec> within the
+project C<$proj_vers>.
+
+Returns C<undef> if C<$file_spec> is not used in C<$proj_vers>
+or if C<$file_spec> does not exist.
+
+Example:
+
+  $ccm->findpath("main.c-1:csrc:3", "guilib-darcy"); 
+
+returns 
+
+  "guilib/sources/main.c"
+
+=head2 relations_arrayref
+
+  $ccm->relations_arrayref(%options);
+
+  my $related = $ccm->relations_arrayref(to => "bufcolor.c-2:csrc:1");
+
+Executes B<ccm relate -show ...> where 
+C<%options> may contain any of the following keys:
+
+=over 4
+
+=item from => $file_spec, to => $file_spec
+
+Restricts one or both ends of the relation. The option value may
+be any C<$file_spec> accepted by Synergy including 
+a C<VCS::CMSynergy::Object>.
+
+=item name => $string
+
+Restricts the return value to relations of type C<$string>, 
+e.g. C<associated_cv> or C<successor>.
+
+=back
+
+The result is a reference to an array of 4-tuples
+
+  [ $from, $name, $to, $create_time ]
+
+=over 4
+
+=item $from, $to
+
+The value is the objectname of the "from" or "to", resp., 
+element of the relation.
+
+=item $name
+
+The value is name of the relation.
+
+=item $create_time
+
+The value is the time the relation was created.
+
+=back
+
+If there are no hits, a reference to an empty array is returned.  
+
+If there was an error, C<undef> is returned.
+
+=head2 relations_hashref
+
+  $ccm->relations_hashref(%options);
+
+  my $related = $ccm->relations_hashref(
+    to              => "bufcolor.c-2:csrc:1",
+    from_attributes => [ qw/objecctname status owner/ ]);
+
+Executes B<ccm relate -show ...> where 
+C<%options> may contain any of the following keys:
+
+=over 4
+
+=item from => $file_spec, to => $file_spec
+
+Restricts one or both ends of the relation. The option value may
+be any C<$file_spec> accepted by Synergy including 
+a C<VCS::CMSynergy::Object>.
+
+=item name => $string
+
+Restricts the return value to relations of type C<$string>, 
+e.g. C<associated_cv> or C<successor>.
+
+=item from_attributes => \@keywords, to_attributes => \@keywords
+
+The option value is a reference to an array of attributes
+that should be retrieved for the "from" and "to" objects
+of a relation, resp.
+
+=back
+
+The result is a reference to an array of hashes where each hash
+has exactly four keys describing a relation between two objects:
+
+=over 4
+
+=item from
+
+The value describes the "from" object of the relation.
+
+If C<from_attributes> was not specified the value is the
+I<objectname> of the "from" object.
+
+If C<from_attributes> was specified the value is a reference 
+to a I<hash of attribute names and values>, 
+its keys given by C<from_attributes>.
+
+The pseudo keywords C<object> and C<task_objects> (see 
+L</"query_arrayref, query_hashref">) may be used in C<from_attributes>.
+
+=item to
+
+The value describes the "to" object of the relation.
+
+The value depends on C<to_attributes> as described for the "from" key.
+
+=item name
+
+The value is name of the relation.
+
+=item create_time
+
+The value is the time the relation was created.
+
+=back
+
+If there are no hits, a reference to an empty array is returned.  
+
+If there was an error, C<undef> is returned.
+
+=head2 relations_object
+
+  my $related = $ccm->relations_object(%options);
+
+Executes B<ccm relate -show ...> where 
+C<%options> are the same as described for L</relations_hashref>. 
+
+The result is a reference to an array of hashes where each hash
+has exactly four keys describing a relation between two objects:
+
+=over 4
+
+=item from, to
+
+The value is a C<VCS::CMSynergy::Object>. 
+
+=item name
+
+The value is name of the relation.
+
+=item create_time
+
+The value is the time the relation was created.
+
+=back
+
+If there a no hits, a reference to an empty array is returned.  
+
+If there was an error, C<undef> is returned.
+
+If C<from_attributes> or C<to_attributes> are specified, these
+are used as hints to prime the attribute caches of the
+"from" or "to" C<VCS::CMSynergy::Object>s, resp., similar to
+the optional C<@keywords> argument for L</query_object>.
+This is only useful when L</:cached_attributes> is in effect. 
+
+=head2 project_tree
+
+  $hash = $ccm->project_tree(\%options, $project);
+  $hash = $ccm->project_tree(\%options, $project1, $project2 ...);
+
+C<project_tree> traverses the given project(s) and constructs a
+mapping of path names to project members. It doesn't need a workarea. 
+C<$project> may be any project specification (in project-version form,
+an objectname or a C<VCS::CMSynergy::Object>).
+C<project_tree> returns a reference to a hash where the keys 
+are the (relative workarea) path names of project members. 
+
+If given one project (the first form above),
+hash values are C<$project>'s members, given as C<VCS::CMSynergy::Object>s. 
+
+If given two or more
+projects (the second form), a hash value is an array of 
+C<VCS::CMSynergy::Object>s where the first element is the
+member of C<$project1> mapped to the path key, the second
+element is the member of C<$project2> etc. If there is no
+member mapped to a path in a particular project, the corresponding
+element in the array is C<undef>. This form of C<project_tree>
+may be useful for comparing projects, see below for an example.
+
+If there was an error, C<project_tree> returns C<undef>.
+
+The first argument, C<\%options>, is either C<undef> or a hash reference
+of options for project traversal:
+
+=over 4
+
+=item C<subprojects> (boolean)
+
+If this option is true, the mapping will recurse into
+subprojects. It is false by default.
+It corresponds to the option of the same name for
+L<VCS::CMSynergy::Project/traverse>.
+If this option is false and C<mark_projects> is also false,
+no indication of sub projects is present in the tree;
+if C<mark_projects> is true, then the tree will contain 
+just the sub project  C<VCS::CMSynergy::Object>s, but nothing
+"below" them.
+
+=item C<attributes> (array ref)
+
+This option is only useful if L</:cached_attributes> is in effect. 
+All returned C<VCS::CMSynergy::Object>s will have their attribute
+caches primed for the given attributes. See the description
+of the option of the same name for L<VCS::CMSynergy::Project/traverse>.
+
+=item C<pathsep> (string)
+
+Use C<pathsep> as the separator for the path names (the keys of
+the returned hash). If you do not specify this, 
+C<project_tree> uses the path separator appropriate 
+for the operating system the script is running on.
+
+=item C<mark_projects> (boolean)
+
+It decides what will be shown as the value for a path
+corresponding to a (sub) project. If false, the value
+refers to the (sub) project's top level directory 
+(a C<VCS::CMSynergy::Object> of cvtype "dir").
+If true, the value refers to the (sub) project itself
+(a C<VCS::CMSynergy::Object> with cvtype "project").
+
+This option is false by default.
+
+Note that if C<subprojects> is false, this option also decides
+whether a path corresponding to a sub project is present in the tree at all.
+
+=item C<omit_top_dir> (boolean)
+
+If true, strip the first component (which is the name
+of C<$project> and also its top level diretory) from all paths.
+Also omit the path corresponding to C<$project>'s
+top level directory) altogether.
+
+This option is false by default.
+
+=back
+
+The following example shows how to compute the "difference" between two
+projects expressed in the file system.
+
+  my $tree = $ccm->project_tree(undef, $proj1, $proj2);
+  foreach my $path (sort keys %$tree)
+  {
+    my ($obj1, $obj2) = @{ $tree->{$path} };
+
+    print("added $path: $obj2\n"), next      unless defined $obj1;
+    print("deleted $path: $obj1\n"), next    unless defined $obj2;
+    print("changed $path: $obj1 -> $obj2\n") unless $obj1 eq $obj2;
+  }
+
+=head2 project_diff
+
+  $ccm->project_diff(\%options, $old_project, $new_project, $differ);
+
+C<project_diff> first calls L</project_tree> on C<$old_project>, 
+C<$new_project> and then drives C<$differ> using the resulting map.
+This is a convenience method for computing the "difference" between
+two projects in various forms. See below for a simple example
+and L<ccm_project_diff> for a complete working program.
+
+C<$differ> must be an object supporting the following methods:
+
+=over 4
+
+=item C<added($path, $new)>
+
+This is called for every C<VCS::CMSynergy::Object> only in C<$new_project>;
+arguments are the path and the added object.
+
+=item C<deleted($path, $old)>
+
+This is called for every C<VCS::CMSynergy::Object> only in C<$old_project>;
+arguments are the path and the deleted object.
+
+=item C<changed($path, $old, $new)>
+
+This is called when the C<VCS::CMSynergy::Object>s in C<$old_project>
+and C<$new_project> at C<$path> are different;
+arguments are the path and both objects.
+
+=back
+
+The above methods are mandatory. The following methods are called
+when C<$differ> supports them:
+
+=over 4
+
+=item C<identical($path, $obj)>
+
+This is called when the C<VCS::CMSynergy::Object>s in C<$old_project>
+and C<$new_project> at C<$path> are identical;
+arguments are the path and the object.
+
+=item C<start($old_project, $new_project)>
+
+This is called before the traversal of the project tree starts; 
+arguments are the original C<VCS::CMSynergy::Project>s supplied
+to C<project_diff>.
+
+=item C<finish()>
+
+This is called after traversal of the project tree is completed;
+no arguments are supplied;
+C<project_diff> will return whatever this method returns
+(if C<$differ> doesn't support this method, C<project_diff> returns C<undef>).
+
+=back
+
+Methods with a C<$path> argument are called in ascending path sort order,
+esp. path children are processeed B<after> their parents.
+
+The first parameter, C<\%options>, is the same as the corresponding
+parameter for L</project_tree> and is passed through unchanged
+(except for option C<pathsep> which is currently hardwired to "/").
+Additionally the following option is recognized:
+
+=over 4
+
+=item C<hide_sub_trees> (boolean)
+
+This option controls the handling of whole added or deleted sub trees.
+If it is true, C<$differ>'s C<added> or C<deleted> methods
+will only be called for the root of an added or deleted sub tree,
+all other calls are suppressed. Otherwise, C<added> or C<deleted> will
+be called for any path in the sub tree.
+
+It defaults to false.
+
+=back
+
+The following example prints a simple list of changes between
+two projects. All objects are listed with their path in filesystem first;
+"deleted" objects are prefixed with "-", "added" objects are prefixed
+with "+", different objects at the same path are prefixed with "!",
+and ouput for identical objects is suppressed.
+
+  {
+    package SimpleDiffer;
+    sub new     { my ($class) = @_; bless {}, $class; }
+    sub added   { my ($self, $path, $new) = @_; 
+                  print "+ $path $new\n"; }
+    sub deleted { my ($self, $path, $old) = @_; 
+                  print "- $path $old\n"; }
+    sub changed { my ($self, $path, $old, $new) = @_; 
+                  print "! $path $old $new\n"; }
+  }
+  ...
+  $ccm->project_diff({ hide_sub_trees => 1 }, 
+                     $old_project, $new_project, SimpleDiffer->new);
+
+=head1 ATTRIBUTE METHODS
+
+=head2 get_attribute
+
+  $value = $ccm->get_attribute($attr_name, $file_spec);
+
+Get the value of the attribute C<$attr_name> for
+C<$file_spec> (using B<ccm attribute -show>). 
+
+If the attribute isn't defined for C<$file_spec>, C<undef> is returned.
+
+If C<RaiseError> is not
+set and an error occurs (e.g. object C<$file_spec> doesn't exist), 
+C<undef> will be returned.
+
+Note the following differences from B<ccm attribute -show>:
+
+=over 4
+
+=item *
+
+Only one C<$file_spec> is allowed.
+
+=item *
+
+There is no C<-p> (project) option. If you want to get an attribute 
+of a project use the full objectname of the project for C<$file_spec>.
+
+=item *
+
+It is I<not> an error to get the value of an attribute that isn't defined
+for the particular object. Instead, check the return value of L</get_attribute>
+with C<defined> as an attribute's value can never be C<undef>.
+
+=back
+
+=head2 set_attribute
+
+  $ccm->set_attribute($attr_name, $file_spec, $value);
+
+Set the value of the attribute C<$attr_name>
+for C<$file_spec> to C<$value> 
+(usually using B<ccm attribute -modify>, but see below).
+
+Returns C<$value> on success.  If C<RaiseError>
+is not set and an error occurs (e.g. attribute C<$attr_name> does not
+exist on object C<$file_spec>), C<undef> will be returned.
+
+This works for B<all> types of attributes, even those of type I<text>
+(or derived from I<text>) and with C<$value>s that consist of
+multiple lines, have arbitrary length or are empty strings.
+
+Note the following differences from B<ccm attribute -modify>:
+
+=over 4
+
+=item *
+
+If the attribute C<$attr_name>is inherited, 
+B<ccm attribute -modify $attr_name> will fail. But C<set_attribute> will
+retry with B<ccm attribute -create $attr_name -force> in this case
+(thereby converting the attribute to a local attribute). I.e. whenever
+L</get_attribute> indicates that an attribute exists (by returning something
+C<defined>), you can always set its value with C<set_attribute>
+(given you have necessary permissions).
+
+=item *
+
+Only one C<$file_spec> is allowed.
+
+=item *
+
+There is no C<-p> (project) option. If you want to set an attribute 
+of a project use the full objectname of the project for C<$file_spec>.
+
+=back
+
+=head2 create_attribute
+
+  $ccm->create_attribute($attr_name, $type, $value, @file_specs);
+
+Create attribute C<$attr_name> of type C<$type> on all objects
+given by C<@file_specs> (using B<ccm attribute -create>).
+You must specify an initial value (something other than C<undef>) as C<$value>.
+
+Returns true on success and C<undef> on failure.
+
+Note the following differences from B<ccm attribute -create>:
+
+=over 4
+
+=item *
+
+The initial value is mandatory.
+
+=item *
+
+There is no C<-p> (project) option. If you want to set an attribute 
+of a project use the full objectname of the project for C<$file_spec>.
+
+=back
+
+=head2 delete_attribute
+
+  $ccm->delete_attribute($attr_name, @file_specs);
+
+Delete attribute C<$attr_name> from all objects
+given by C<@file_specs> (using B<ccm attribute -delete>).
+
+Returns true on success and C<undef> on failure.
+
+Note the following differences from B<ccm attribute -create>:
+
+=over 4
+
+=item *
+
+There is no C<-p> (project) option. If you want to set an attribute 
+of a project use the full objectname of the project for C<$file_spec>.
+
+=back
+
+=head2 copy_attribute
+
+  $ccm->copy_attribute($attr_name, $from_file_spec, @to_file_specs);
+  $ccm->copy_attribute($attr_name, $flags, $from_file_spec, @to_file_specs);
+
+Copy attribute C<$attr_name> from C<$from_file_spec>
+by objects given by C<@to_file_specs> (using B<ccm attribute -copy>).
+
+Returns true on success and C<undef> on failure.
+
+You can specify multiple attributes to copy by passing
+a reference to an array of attribute names as C<$attr_name>.
+
+The optional C<$flags> must be reference to an array containing
+a subset of the following strings: C<"append">, C<"subproj">,
+C<"suball">, e.g.
+
+  $ccm->copy_attribute($attr_name, [ qw(subproj suball) ], 
+                       "proja-1.0:project:1", "projb-1.0:project:1");
+
+Cf. the Synergy documentation on the I<attribute command>
+for the meaning of these flags.
+
+Note the following differences from B<ccm attribute -copy>:
+
+=over 4
+
+=item *
+
+There is no C<-p> (project) option. If you want to set an attribute 
+of a project use the full objectname of the project for C<$file_spec>.
+
+=back
+
+=head2 list_attributes
+
+  $hash_ref = $ccm->list_attributes($file_spec);
+
+Lists all attributes for C<$file_spec> (using B<ccm attribute -la>).
+
+Returns a reference to a hash containing pairs of attribute name
+and attribute type (e.g. C<string>, C<time>).
+Returns C<undef> in case of error.
+
+Note the following differences from B<ccm attribute -la>:
+
+=over 4
+
+=item *
+
+Only one C<$file_spec> is allowed.
+
+=back
+
+=head2 properties_hashref, properties_object
+
+  $aref = $ccm->properties_hashref(\@files_specs, @keywords);
+  for (my $i; $i < @files_specs; $i++) {
+    print "$files_specs[$i]\n";
+    print "  $_ => $aref->[$i]{$_}\n" foreach @keywords;
+  }
+
+  $aref = $ccm->query_object(@file_specs, @keywords);
+
+C<properties_hashref> and C<properties_object>
+execute B<ccm property> with the list of C<@files_specs> asking
+for the values of the built-in keywords or attributes supplied
+in C<@keywords>. Note that C<@files_specs> is passed in as an array B<reference>.
+They both return a reference to an array of references,
+one per item in C<@files_specs> (and in the same order).
+
+For C<properties_hashref> an item is a hash containing
+attribute and value pairs where the keys are the C<@keywords>.
+This is similar to the result of 
+L<query_hashref|/"query_arrayref, query_hashref">.
+
+For C<properties_object> an item is the C<VCS::CMSynergy::Object> 
+corresponding to the item in C<@files_specs> at the same index.
+C<properties_object> is most useful when L</:cached_attributes> is in effect.
+In this case, the returned C<VCS::CMSynergy::Object>s 
+have their attribute caches
+primed for the attributes listed in C<@keywords>. You could also
+view it as a fancy form of C<properties_hashref> where we don't store
+the attributes values of C<@keywords> in some anonymous hash,
+but rather in the corresponding object.
+This is similar to the behavior of L<query_object>.
+
+For consistency, both C<property_hashref> 
+and C<properties_object> return a reference to an empty array
+when invoked with an empty list of C<@files_specs>.
+
+If there was an error, C<undef> is returned.
+
+If the value of a keyword or an attribute is undefined or
+the attribute is not present, the actual value of the corresponding
+hash element is C<undef>.
+
+For the pseudo keywords available in C<@keywords> see the description
+of the  L<query_arrayref|/"query_arrayref, query_hashref"> 
+and  L<query_hashref|/"query_arrayref, query_hashref"> methods.
+
+=head2 property
+
+  $value = $ccm->property($keyword, $file_spec);
+  $hash = $ccm->property(\@keywords, $file_spec);
+
+The first form returns the value of property C<$keyword> for C<$file_spec>
+(using B<ccm properties -f ...>). The second form returns the values
+of all properties in C<@keywords> as a hash reference.
+
+You can use any of the Synergy built-in keywords for C<$keyword> or
+C<@keywords>.  If the value of a keyword is undefined, C<undef> is returned
+(whereas B<ccm properties> would print it as the string C<< "<void>" >>).
+
+=head1 MISCELLANEOUS METHODS
+
+=head2 cat_object
+
+  $contents = $ccm->cat_object($object);
+  $ccm->cat_object($object, $destination);
+
+Retrieves the contents (the "source" in Synergy terminology)
+of an object without the need for a workarea using B<ccm cat>. 
+
+For both forms above, C<$object> must be a C<VCS::CMSynergy::Object>.
+The first form returns the object's contents as a string (and
+C<undef> on error). The second form "writes" the object's contents
+to C<$destination> which can be any of the following:
+
+=over 4
+
+=item scalar
+
+the contents will be written into a file named C<$destination>
+
+=item SCALAR reference
+
+the contents will be written into the buffer (string) C<$$destination> 
+
+=item file handle or GLOB reference
+
+the contents will be written (C<print>ed) onto the file handle
+
+=back
+
+Note the following difference from B<ccm cat>:
+
+=over 4
+
+=item *
+
+C<cat_object> only accepts a single C<VCS::CMSynergy::Object>
+as argument
+
+=back
+
+=head2 types
+
+  @types = $ccm->types;
+
+Returns an array of types using B<ccm show -types>.
+
+=head2 migrate_auto_rules
+
+  @mars = $ccm->migrate_auto_rules;
+
+Uses B<ccm show -migrate_auto_rules> to return an array
+of arrays (of three elements each), e.g.
+
+  @mars = (
+    [ 'MAP_FILE_TO_TYPE',   '.*\\.xml$',       'xml'             ],
+    [ 'MAP_FILE_TO_TYPE',   '.*\\.o$',         'relocatable_obj' ],
+    [ 'MAP_TYPE_TO_IGNORE', 'relocatable_obj', 'TRUE'            ],
+    ...);
+
+=head2 ls
+
+  $aref = $ccm->ls(@args);
+
+Executes the B<ccm ls> command with the given C<@args> as parameters.
+The output (as formatted by the C<-format> option) is split into lines.
+These are L<chomp|perlfunc/chomp>ed and a reference to the resulting array
+of strings is returned. 
+
+If there was an error, C<undef> is returned.
+
+Note that you must pass every B<ccm ls> argument or option as a single
+Perl argument. 
+
+If you are interested to obtain the value of several attributes,
+you should look at the L</ls_arrayref>
+and L</ls_hashref> methods that return this information in 
+structured form. If you are only interested in the identity of
+the listed objects, you should look at the L</ls_object> method.
+
+=head2 ls_object
+
+  $aref = $ccm->ls_object($file_spec, @keywords);
+
+Lists information about a file or the contents of a directory
+using the work area name C<$file_spec>.
+Returns a reference to an array of corresponding C<VCS::CMSynergy::Object>s.
+
+Calling C<ls_object> with an optional list of C<@keywords> 
+is only useful when L</:cached_attributes> is in effect. 
+In this case the returned C<VCS::CMSynergy::Object>s have their attribute caches
+primed for the attributes listed in C<@keywords>.
+
+=head2 ls_arrayref
+
+  $aref = $ccm->ls_arrayref($file_spec, @keywords);
+
+Lists the values of the built-in keywords or attributes supplied
+in C<@keywords> for a file or the contents of a directory
+Returns a reference to an array of references,
+one per result row. Each reference points to an array containing
+the values of the keywords for that particular object
+(in the order given by C<@keywords>). 
+
+If there was an error, C<undef> is returned.
+
+If the value of a keyword or an attribute is undefined or
+the attribute is not present, the actual value of the corresponding
+array element is C<undef> (whereas B<ccm ls> would print it as
+the string C<< "<void>" >>).
+
+Note that the keyword or attribute names given in C<@keywords> should I<not>
+contain a leading C<%>. Example:
+
+  my $result = $ccm->ls('foo', qw(displayname type modify_time);
+  foreach my $row (@$result)
+  {
+    my ($displayname, $type, $modify_time) = @$row;
+    print "$displayname ($type) last modified at $modify_time\n";
+    ...
+  }
+
+=head2 ls_hashref
+
+  $aref = $ccm->ls_hashref($file_spec, @keywords);
+
+Lists the values of the built-in keywords or attributes supplied
+in C<@keywords> for a file or the contents of a directory
+using the work area name C<$file_spec>.
+Returns a reference to an array of references,
+one per result row. Each reference points to hash containing
+attribute and value pairs where the keys are C<@keywords>.
+
+If there was an error, C<undef> is returned.
+
+If the value of a keyword or an attribute is undefined or
+the attribute is not present, the actual value of the corresponding
+hash element is C<undef> (whereas B<ccm ls> would print it as
+the string C<< "<void>" >>).
+
+Note that the keyword or attribute names given in C<@keywords> should I<not>
+contain a leading C<%>. Example:
+
+  my $result = $ccm->ls_hashref('foo', qw(displayname type modify_time);
+  foreach my $row (@$result)
+  {
+    print "$row->{displayname} last modified at $row->{modify_time}\n";
+    ...
+  }
+
+=head2 set
+
+  $value = $ccm->set($option);
+  $old_value = $ccm->set($option, $new_value);
+  $hash_ref = $ccm->set;
+
+Get or set the value of an option.
+
+In the first form, C<set> returns the value of C<$option>. 
+If the option is unset, C<undef> is returned 
+(whereas B<ccm set> would print C<"(unset)"> in this case).
+
+In the second form, the C<$option> is set to C<$new_value>, the previous
+value is returned. If C<$new_value> is C<undef>, C<$option> is unset.
+
+In the third form, a reference to a hash is returned. The hash consists
+of all currently defined options as keys and their respective values.
+
+=head2 ccm_with_text_editor
+
+  ($rc, $out, $err) = $ccm->ccm_with_text_editor($text_value, @cmd);
+
+This is a convenience functions for executing a command 
+that is sensitive to the value of the session option C<text_editor>.
+
+C<ccm_with_text_editor> is useful in scripting B<ccm> commands
+like B<ccm users>. These commands usually open a temporary file
+generated by Synergy in a user-specified editor. Then the user edits 
+the contents and save her changes. Finally, Synergy reads back 
+the temporary file and does something with the (changed) contents. 
+
+C<ccm_with_text_editor> does the following
+
+=over 4
+
+=item *
+
+creates a temporary file (using L<File::Temp::tempfile>), 
+say C</tmp/a5Xghd>, and writes the string C<$text_value> into it,
+
+=item *
+
+saves the old value of C<text_editor> and sets it to (on Unix)
+
+  "cp /tmp/a5Xghd %filename"
+
+=item *
+
+executes
+
+  $ccm->ccm(@cmd)
+
+which causes Synergy to accept C<$text_value> as the "updated value"
+w.r.t. to command C<@cmd>,
+
+=item *
+
+restores the value oc C<text_editor>
+
+=item *
+
+finally removes the temporary file.
+
+=back
+
+C<ccm_with_text_editor> returns the same
+value as the inner L</ccm> method, except when there is an error setting
+the new C<$value> of C<$option>.
+
+=head2 ccm_addr
+
+  print "CCM_ADDR=", $ccm->ccm_addr;
+
+Returns the session's RFC address.
+
+=head2 database
+
+  $database = $ccm->database;
+
+Returns the database path (as reported by B<ccm ps>).
+The path is in canonical form (i.e. with a trailing C<"/db">).
+
+=head2 delimiter
+
+  $delim = $ccm->delimiter;
+
+Returns the database delimiter.
+
+=head2 dcm_enabled
+
+Returns whether the database is DCM enabled.
+
+=head2 dcm_delimiter
+
+  $delim = $ccm->dcm_delimiter;
+
+Returns the DCM delimiter.
+
+=head2 dcm_database_id
+
+  $dcm_id = $ccm->dcm_database_id;
+
+Returns the DCM database id (B<ccm dcm -show -database_id>) or
+the empty string if the database isn't DCM enabled.
+
+=head2 user
+
+Returns the session user (as reported by B<ccm ps>).
+
+=head2 default_project_instance
+
+  $instance  = $ccm->default_project_instance;
+
+Returns the default instance for projects. Use it if you want to complete
+a project spec that only consists of the project's name and version:
+
+  $proj_spec .= ":project:" . $ccm->default_project_instance
+    unless $proj_spec =~ /:project:/;
+
+It is C<"1"> if the database isn't DCM enabled,
+otherwise it is 
+
+    $ccm->dcm_database_id . $ccm->dcm_delimiter . "1"
+
+=head2 ping
+
+  if ($ccm->ping) { ... }
+
+C<ping> tests whether session C<$ccm> is still alive 
+(without causing an exception if it fails).
+
+This could be used e.g. from a web application that keeps a pool
+of established Synergy sessions to deal with user requests:
+before invoking a command on a session the application must make
+sure that the session is still valid. If not, it will automatically
+create a new session.
+
+=head2 object
+
+  $obj1 = $ccm->object($objectname);
+  $obj2 = $ccm->object($name, $version, $cvtype, $instance);
+
+Create a C<VCS::CMSynergy::Object> from either an I<objectname>
+(sometimes called "object reference form" in Synergy documentation)
+in "name-version:cvtype:instance" format or the four parts specified
+separately. 
+
+This is just a wrapper for L<VCS::CMSynergy::Object/new>.
+However, C<new> requires the four parts of the I<objectname>
+to be specified as separate arguments.
+
+Note that no check is made whether the corresponding object really exists
+in the database, use L<VCS::CMSynergy::Object/exists> for that.
+
+=head2 baseline_object, cr_object, folder_object, project_object, task_object, tset_object
+
+  $baseline_obj = $ccm->baseline_object("toolkit_2.0_INT_1");
+  $cr_obj = $ccm->cr_object("42");              # when using Rational Change
+  $folder_obj = $ccm->folder_object("123");
+  $proj_obj = $ccm->project_object("toolkit-darcy");
+  $task_obj = $ccm->task_object("456#mydb");
+  $tset_obj = $ccm->tset_object("toolkit baselines");
+
+  # optional @keywords
+  $task_obj = $ccm->task_object("42", qw(status task_synopsis));
+
+Create a C<VCS::CMSynergy::Object> (with type "baseline",
+"probtrac", "folder", "project", "task" or "tset", resp.) from the I<displayname>
+of a baseline, change request (AKA problem), folder, project, task
+or transfer set, resp.
+
+If C<@keywords> are specified, they
+are used as hints to prime the attribute cache of the
+returned C<VCS::CMSynergy::Object> similar to
+the optional C<@keywords> argument for L</query_object>.
+This is only useful when L</:cached_attributes> is in effect. 
+
+=head2 object_other_version
+
+  $obj2 = $ccm->object_other_version($obj1, $version);
+
+Returns a new C<VCS::CMSynergy::Object> with the same
+name, cvtype and instance as C<$obj1> (which must be 
+C<VCS::CMSynergy::Object>), but with the version C<$version>.
+
+=head2 object_from_cvid
+
+  $obj = $ccm->object_from_cvid($cvid, @keywords);
+
+Returns the C<VCS::CMSynergy::Object> corresponding to the
+cvid C<$cvid> (the internal primary identifier of a Synergy object).
+If the cvid doesn't exist, C<undef> is returned. 
+
+This is handy, for example, when you're parsing certain Synergy 
+log files that contain only the cvid and you want to identify 
+the corresponding object.
+
+The optional list of C<@keywords> may be used to prime the
+attribute cache of the returned C<VCS::CMSynergy::Object>
+(similar to the L</query_object> method).
+
+Note: C<object_from_cvid> is implemented by something like
+
+  $ccm->property(objectname => "\@=$cvid")
+
+=head2 object_from_proj_ref
+
+  $obj = $ccm->object_from_proj_ref($path, $proj_spec, @keywords);
+
+Returns the C<VCS::CMSynergy::Object> identified by
+workarea path C<$path> in project C<$proj_spec>.
+If no such object exists, C<undef> is returned. 
+
+C<$proj_spec> can be either a string (a Synergy "proj_spec") or
+a C<VCS::CMSynergy::Object>.
+
+C<$path> can be either a string (a workarea-relative path, using the
+platforms native path separator) or an array ref of path components.
+
+The optional list of C<@keywords> may be used to prime the
+attribute cache of the returned C<VCS::CMSynergy::Object>
+(similar to the L</query_object> method).
+
+Note: C<object_from_proj_ref> is implemented by something like
+
+  $ccm->property(objectname => "$path\@$proj_spec")
+
+=head2 base_admin, base_model, cs_admin, dcm_admin, cvtype, attype
+
+    $model = $ccm->base_model;
+    $project_type = $ccm->cvtype("project");
+
+These are convenience methods for dealing with Synergy objects
+used to access the database model:
+
+=over 4
+
+=item C<base_admin>, C<base_model>, C<cs_admin>, C<dcm_admin>
+
+These return the C<VCS::CMSynergy::Object> corresponding to the model objects:
+
+  base-1:admin:base
+  base-1:model:base
+  cs-1:admin:1                  # SYNERGY/Change enabled databases only
+  dcm-1:admin:dcm
+
+=item C<cvtype>, C<attype>
+
+  $ccm->cvtype("foo")
+  $ccm->attype("foo")
+
+These return the C<VCS::CMSynergy::Object> corresponding to the model objects:
+
+  foo-1:cvtype:base
+  foo-1:attype:base
+
+=back
+
+=head1 METHODS INHERITED FROM C<VCS::CMSynergy::Client>
+
+C<VCS::CMSynergy> is derived from L<VCS::CMSynergy::Client>,
+hence the following methods are inherited from the latter:
+
+=over 4
+
+=item C<ccm_home>
+
+=item C<error>, C<set_error>
+
+=item C<ccm_command>, C<out>, C<err>
+
+=item C<version>
+
+=item C<ps>
+
+=item C<status>
+
+=back
+
+Note: All these methods can be invoked on a session object
+or as class methods.
+
+=head1 LOGGING
+
+C<VCS::CMSynergy> is "Log::Log4perl enabled". That means it logs via
+the L<Log::Log4perl> module. All you have to do to turn logging on is
+something like the following in your program:
+
+    use VCS::CMsynergy;
+    use Log::Log4perl ':easy';
+    ...
+    Log::Log4perl->easy_init($DEBUG);
+    ...
+
+This will turn on logging (to C<STDERR>) at the C<$DEBUG> level for B<all> 
+"Log::Log4perl enabled" modules used by your program. 
+To turn on logging for the C<VCS::CMSynergy> modules only use
+
+    Log::Log4perl->easy_init(
+        { level => $DEBUG, category => "VCS::CMSynergy" });
+
+See L<Log::Log4perl/Easy-Mode> and L<Log::Log4perl/Stealth-loggers>
+for more information.
+
+For log level C<$TRACE> B<all> calls to the Synergy CLI are logged in
+gory detail (arguments, output to stdout and stderr, exit code and 
+duration of execution).
+
+=head1 SEE ALSO
+
+L<VCS::CMSynergy::Client>,
+L<VCS::CMSynergy::Object>, 
+L<VCS::CMSynergy::Project>, 
+L<VCS::CMSynergy::Users> 
+
+=head1 AUTHOR
+
+Roderich Schupp, argumentum GmbH <schupp@argumentum.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+The VCS::CMSynergy modules are Copyright (c) 2001-2015 argumentum GmbH, 
+L<http://www.argumentum.de>.  All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

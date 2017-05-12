@@ -1,0 +1,316 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Term::ReadLine;
+use VCS::Lite::Shell qw(:all);
+use Parse::RecDescent;
+
+our $prompt = 'VCSLite> ';
+my $term = Term::ReadLine->new('VCS Lite');
+
+my $parser = Parse::RecDescent->new( q{
+	<autotree>
+
+	command: vcs {$return = $item[1]; }
+	|	shell {$return = $item[1]; }
+
+	vcs:	'prompt' arg
+	|	'cd' arg
+	|	'add' arg(s)
+	|	'remove' arg(s)
+	|	'ci' arg(s)
+	|	'check_in' arg(s)
+	|	/co\b/ arg
+	|	'check_out' arg
+	|	'commit'
+	|	'update'
+	|	'fetch' opt_ver redir_out(?)
+	|	'diff' opt_ver opt_ver2 redir_out(?)
+	|	'help'
+	|	'use' arg store_opt(s?)
+	|	'debug' 'off'
+
+	shell:	/.*/
+
+	opt_ver:	arg '@@' /\d+|latest/
+	|		arg
+
+	opt_ver2:	opt_ver	{ $return = $item[1]; }
+	|		'@@' /\d+|latest/ { $return = $item[2]; }
+	|
+	
+	redir_out:	/>>?/ arg
+
+	arg:	'"' /[^"]+/ '"' { $return = $item[2]; }
+	|	/[^@ ]+/ { $return = $item[1]; }
+
+	store_opt:	'--store' arg
+	|		'--user' arg
+	|		'--pass' arg
+	|		'--head' arg
+	|		'--root' arg
+} );
+
+if (@ARGV) {
+	execute_command(join(' ',@ARGV),$parser);
+	exit(0);
+}
+
+while (defined (my $input = $term->readline($prompt))) {
+	execute_command($input,$parser);
+}
+
+sub execute_command {
+    my ($cmd,$parser) = @_;
+
+    my $tree = $parser->command($cmd);
+
+    $tree->execute;
+}
+
+package shell;
+use strict;
+
+sub execute {
+    my $self = shift;
+
+    system($self->{__VALUE__});
+}
+
+package redir_out;
+use strict;
+use Carp;
+
+sub apply {
+    my ($self, $oldfh, $newfh) = @_;
+
+    my $arg = $self->{arg};
+    open $$newfh,$self->{__PATTERN1__},$arg 
+    	or croak "Failed to write to $arg\n$!";
+    $$oldfh = select $$newfh;
+}
+
+package opt_ver;
+use strict;
+
+sub decode {
+    my $self = shift;
+
+    my @out = ($self->{arg});
+    push @out, $self->{__PATTERN1__} if exists $self->{__PATTERN1__};
+    @out;
+}
+
+package store_opt;
+use strict;
+
+sub decode {
+    my $self = shift;
+
+    ($self->{__STRING1__} =~ /--(\w+)/, $self->{arg});
+}
+
+package vcs;
+use strict;
+use Data::Dumper;
+
+our %alias;
+BEGIN {
+    %alias = (
+	ci => 'check_in',
+	co => 'check_out',
+	);
+}
+
+sub execute {
+    my $self = shift;
+
+    my @arg = (exists($self->{arg}) ? $self->{arg} : '.');
+    @arg = map {glob $_} @{$self->{'arg(s)'}} if exists($self->{'arg(s)'});
+
+    my ($oldfh,$newfh);
+    if (exists $self->{'redir_out(?)'}) {
+        my @rd = @{$self->{'redir_out(?)'}};
+        $rd[0]->apply(\$oldfh,\$newfh) if @rd;
+    }
+
+  ACTION:
+  {
+    
+    for (qw/ __VALUE__ __STRING1__ __PATTERN1__ /) {
+	next unless exists $self->{$_};
+	my $meth = $self->{$_};
+	$meth = $alias{$meth} if exists $alias{$meth};
+	if ($self->can($meth)) {
+	    $self->$meth($_) for @arg;
+	    last ACTION;
+	}
+	if (VCS::Lite::Shell->can($meth)) {
+	    no strict 'refs';
+	    &{"VCS::Lite::Shell::$meth"}($_) for @arg;
+	    last ACTION;
+	}
+    }
+    print Dumper $self;
+  }
+  select($oldfh) if $oldfh;
+}
+
+sub cd {
+    my ($self,$dir) = @_;
+
+    chdir $dir;
+}
+
+sub prompt {
+    my ($self,$pmt) = @_;
+
+    $::prompt = $pmt;
+}
+
+
+sub help {
+    print <<HELP;
+    
+VCS::Lite::Repository Version $VCS::Lite::Repository::VERSION
+
+   add element|repository [element|repository...]
+   cd repository
+   ci name [name...]
+   commit name [name...]
+   diff file1[\@\@gen1] [file2[\@\@gen2]] [>outfile]
+   fetch name\@\@gen [>outfile]
+   remove name [name...]
+   update name [name...]
+
+   Anything else will be executed as a host operating system command.
+
+HELP
+}
+
+sub check_in {
+    my ($self,$elename) = @_;
+
+    print "Enter a description of the change made\n";
+    print "Terminate with a dot\n";
+    my $remark = '';
+    
+    while ((my $input = $term->readline) ne '.') {
+	$remark .= $input . "\n";
+    }
+
+    VCS::Lite::Shell::check_in($elename,$remark);
+}
+
+sub fetch {
+    my $self = shift;
+
+    print VCS::Lite::Shell::fetch($self->{opt_ver}->decode);
+}
+
+sub diff {
+    my $self = shift;
+
+    my @el1 = $self->{opt_ver}->decode;
+    my %par = ( file1 => shift @el1);
+    $par{gen1} = shift @el1 if @el1;
+    if (exists $self->{opt_ver2}) {
+    	my $ov2 = $self->{opt_ver2};
+    	if (ref($ov2) eq 'opt_ver') {
+	    my @el2 = $ov2->decode;
+	    $par{file2} = shift @el2;
+	    $par{gen2} = shift @el2 if @el2;
+	}
+	elsif (ref $ov2) {
+	    $par{gen2} = $ov2->{__PATTERN1__};
+	}
+    }
+    print VCS::Lite::Shell::diff(%par);
+}
+
+sub use {
+    my ($self,$store_id) = @_;
+
+    my %par = map { $_->decode } @{$self->{'store_opt(s?)'}};
+    my $store_type = $par{store} || VCS::Lite::Repository->default_store;
+    delete $par{store};
+
+    VCS::Lite::Shell::store($store_id, $store_type, %par);
+}
+
+=head1 NAME
+
+VCShell  - a command line interface for L<VCS::Lite::Repository>
+
+=head1 SYNOPSIS
+
+   B<add> element|repository [element|repository...]
+   B<remove> name [name...]
+   B<ci>|check_in name [name...]
+   B<co>|check_out parent_repository
+   B<commit>
+   B<update>
+   B<cd> repository
+   B<fetch> name@@gen [>outfile]
+   B<diff> file1[@@gen1] [file2[@@gen2]] [>outfile]
+
+=head1 DESCRIPTION
+
+VCShell provides a command line interface to the VCS Lite Repository. This
+aims to be usable by non-Perl programmers, as it provides a wrapper to the
+functionality in the module.
+
+=head1 COMMANDS
+
+=head2 add
+
+The C<add> command adds something to a repository: an element or a repository.
+If the parameter given is a directory, it makes it a repository, otherwise
+an element. An empty file is created for the element if none exists.
+
+=head2 remove
+
+Remove breaks the association between a repository and something it contains.
+It does not delete any files.
+
+=head2 ci
+
+This command is used to B<check in> changes to one or more elements and 
+repositories. Each repository checked in is also recursively checked in.
+
+=head2 clone
+
+This makes a B<clone> of one repository into another, and recursively for
+everything in it. The new repository contains a B<parent> link which points
+at the original.
+
+=head2 commit
+
+If the repository is a clone of a parent repository, this propagates any 
+changes to the parent. Note, a check in (B<ci>) is needed on the parent,
+for this change to be applied.
+
+=head2 update
+
+This command is used to apply any changes that have happened to the parent.
+Three way merging occurs for any change that has happened in the mean time.
+
+=head2 diff
+
+This command outputs a udiff listing for two generations of an element, or
+for two different elements. The default generation used is the latest, and the
+default generation for the "from" file is the predecessor to the "to" 
+generation if comparing the same element.
+
+The output is in diff -u format.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2004 Ivor Williams (IVORW (at) CPAN {dot} org)
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

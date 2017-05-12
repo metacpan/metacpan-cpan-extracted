@@ -1,0 +1,33 @@
+[% vote = c.model('Vote') %]
+[% thisvote = vote.vote_info(voteid) %]
+
+<div id="poll_summary" class="box" style="clear: both;">
+<div style="float: left; width: 70%;">
+<p id="poll_label">[% thisvote.label | html %]</p>
+<p>[% thisvote.description | html | html_line_break %]</p>
+[% IF thisvote.dstart && thisvote.dend %]
+<p>Scrutin ouvert du <b>[% thisvote.dstart _ ' ' _ thisvote.hstart | html %]</b> au
+<b>[% thisvote.dend _ ' ' _ thisvote.hend | html %]</b></p>
+[% END %]
+Ont voté: [% vote.vote_signing_count(voteid) %] / [% vote.vote_voting_count(voteid) %]<br>
+Bulletins: [% vote.vote_ballot_count(voteid) %]
+[% IF vote.vote_signing_count(voteid) != vote.vote_ballot_count(voteid) %]
+<p class="alert">Le nombre de bulletins et le nombre de personnes ayant voté divergent,
+suspicion de tricherie</p>
+[% END %]
+</div>
+[% FOREACH item = vote.vote_choices(voteid) %]
+[% IF loop.first %]
+<div style="float: right; width: 20%; top: 0px;" class="box">
+<p>Bulletin:</p>
+<ol style="padding-left:15px; margin:5px;">
+[% END %]
+<li>[% vote.choice_info(item).label | html %]</li>
+[% IF loop.last %]
+</ol>
+</div>
+[% END %]
+[% END %]
+<div style="clear: both;"></div>
+</div>
+

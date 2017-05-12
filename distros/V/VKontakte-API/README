@@ -1,0 +1,62 @@
+VKontakte-API
+
+	This module is made to send requests to vkontakte.ru, using its API.
+	See http://vkontakte.ru/developers.php?o=-1&p=%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5+%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2+API
+	First of all register you application at http://vkontakte.ru/apps.php?act=add
+	get api_id and secret_key to use it like this:
+
+    use VKontakte::API;
+ 
+    my $vk = VKontakte::API->new('api_id', 'secret_key');
+
+    #or
+    $vk = VKontakte::API->new(
+        $api_id,
+        $cgi_query->param('session[secret]'),
+        $cgi_query->param('session[mid]'),
+        $cgi_query->param('session[sid]')
+    );
+
+    my $data=$vk->sendRequest('getProfiles', {'domains'=>'deevaas'});
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VKontakte::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=VKontakte-API
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/VKontakte-API
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/VKontakte-API
+
+    Search CPAN
+        http://search.cpan.org/dist/VKontakte-API/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Anastasiya Deeva
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

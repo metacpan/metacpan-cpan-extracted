@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+#
+# This is a work in progress ie it hasn't been documented ;-)
+#
+# Shows files changed since a tag...
+
+use FindBin;
+use lib "$FindBin::Bin/../";
+use Getopt::Long;
+use File::Basename;
+use Text::Wrapper;
+use VCS;
+$| = 1;
+
+my($dir, $tag, $html, $latex, $verbose, $new);
+
+GetOptions(
+    "dir=s" => \$dir,
+    "tag=s" => \$tag,
+    "html" => \$html,
+    "latex" => \$latex,
+    "verbose" => \$verbose,
+    "new" => \$new,
+);
+
+unless ($dir || $tag) {
+    die qq|diff-releases usage:
+    -dir mydir # directory to start from
+    -tag mytag # tag to note changes from
+    -new       # also show files which aren't tagged mytag
+    -html      # output HTML instead of text
+    -latex     # output LaTeX instead of text
+    -verbose   # show progress to STDERR
+
+    eg diff-releases -dir ~/project/cool/ -tag RELEASE_1_5_5 -latex -new
+|;
+}
+
+die "Option dir required!\n" unless $dir;
+die "Option tag required!\n" unless $tag;
+
+my $bgcol;
+my @data;
+my @lengths;
+
+my $wrapper = Text::Wrapper->new(columns => 40);
+
+if ($html) {
+    print qq|<body bgcolor="#ffffff">
+<h3>Files in $dir changed since tag $tag</h3>
+<table cellspacing=0 cellpadding=4 border=0>
+<tr>
+<th valign=top>Name</th>
+<th valign=top>Version</th>
+<th valign=top>Date</th>
+<th valign=top>Author</th>
+<th valign=top>Reason</th>
+    </tr>|;
+} elsif ($latex) {
+    my $mytag = $tag;
+    $mytag =~ s|_|.|g;
+    print qq#
+\\documentclass[twoside]{rapport3}
+\\begin{document}
+Files in $dir changed since tag $mytag
+
+\\begin{tabular}[t]{|l|l|l|l|p{150pt}|}
+\\hline
+\\textbf{Name} & \\textbf{Version} & \\textbf{Date} & \\textbf{Author} & \\textbf{Reason} \\\\
+\\hline
+#;
+} else {
+    print "***Files in $dir changed since tag $tag***\n";
+}
+
+@titles = qw(Name Version Date Author Reason);
+foreach (@titles) {
+    $lengths[$i++] = length;
+}
+
+# Do all the work
+show($dir);
+
+if ($html) {
+    print '</table>';
+} elsif ($latex) {
+    print qq|
+\\hline
+\\end{tabular}
+\\end{document}
+    |;
+} else {
+    results();
+}
+ 
+sub show {
+    my($dir, $depth) = @_;
+    my $d = VCS::Dir->new($dir) || return;
+    foreach my $x ($d->content) {
+        warn $x->path .  "\n" if $verbose;
+        if (ref($x) =~ 'Dir') {
+            show($x->path);
+        } else {
+            disp($x, $depth+1);
+        }
+    }
+}
+
+sub disp {
+    my $obj = shift;
+    my $taggedreason, $taggedauthor, $taggedversion, $version, $taggeddate, $date;
+    next unless (ref($obj) =~ 'File');
+    my @versions = $obj->versions;
+    my @nextversions = @versions;
+    next unless @versions;
+    undef $taggedversion;
+    foreach $version (@versions) {
+        shift @nextversions unless $taggedversion;
+        next unless (grep { $tag eq $_} $version->tags);
+        $taggedversion = $version->version;
+    }
+#    next unless $taggedversion;
+    @nextversions = @versions if($new && !$taggedversion);
+    $version = ($versions[-1])->version;
+    return if ($taggedversion eq $version);
+
+    my $name = $obj->path;
+    $name =~ s|^$dir||;
+    $name =~ s|^/||;
+
+    foreach $vobj (@nextversions) {
+        $version = $vobj->version;
+        $date = $vobj->date;
+        $date =~ s| .*||;
+        $author = $vobj->author;
+        $reason = $vobj->reason;
+        add([$name, $version, $date, $author, $reason]);
+        $name = '';
+    }
+}
+
+sub add {
+    my $array = shift;
+    my $i = 0;
+    my($n, $v, $d, $a, $r) = @$array;
+    if ($html) { 
+        $bgcol = ($bgcol eq "#ddddff") ? "#ffffff" : "#ddddff" if $n;
+        $n = quote_html($n);
+        $v = quote_html($v);
+        $d = quote_html($d);
+        $a = quote_html($a);
+        $r = quote_html($r);
+        print qq|
+<tr bgcolor="$bgcol">
+<td valign=top><b>$n&nbsp;</b></td>
+<td valign=top>$v</td>
+<td valign=top>$d</td>
+<td valign=top><i>$a</i></td>
+<td valign=top>$r</td>
+  </tr>|;
+    } elsif ($latex) {
+        print qq#\\hline\n# if $n;
+        $r =~ s|([/_>\&{}])|\\verb-$1-|g;
+        $r =~ s|(['])|\$$1\$|g;
+        $n =~ s|([/_>\&{}])|\\verb-$1-|g;
+        print qq#\\small{\\tt{$n}} & $v & $d & \\emph{$a} & $r \\\\#;
+    } else {
+        $r = $wrapper->wrap($r);
+        my @lines = split "\n", $r;
+        foreach (@lines) {
+            $lengths[4] = length if (length > $lengths[4]);
+        }
+        push @data, [$n, $v, $d, $a, $lines[0]];
+        shift @lines;
+        foreach (@lines) {
+            push @data, ['', '', '', '', $_];
+        }
+        foreach (@$array) {
+            last if ($i == 4);
+            $lengths[$i] = length if (length > $lengths[$i] );
+            $i++;
+        }
+    }
+}
+
+sub results {
+    my $array, $format, $sep, $len;
+    $format = '| ';
+    $sep = '+';
+    foreach $len (@lengths) {
+        $format .= '%-' . ($len) . 's' . ' | ';
+        my $sep2 = '-' x ($len + 3);
+        $sep2 =~ s|-$|+|;
+        $sep .= $sep2;
+    }
+    $format .= "\n";
+    $sep .= "\n";
+    print $sep;
+    print sprintf($format, @titles);
+    print $sep;
+    foreach (@data) {
+        print sprintf($format, @$_);
+    }
+    print $sep;
+}
+
+        
+sub quote_html {
+    my $in = shift;
+    $in =~ s/\&/\&amp\;/g;
+    $in =~ s/\</\&lt\;/g;
+    $in =~ s/\>/\&gt\;/g;
+    $in;
+}

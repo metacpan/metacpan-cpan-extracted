@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README.mkd
+lib/VIM/Uploader.pm
+t/00-load.t
+bin/vim-upload
+META.yml                                 Module meta-data (added by MakeMaker)

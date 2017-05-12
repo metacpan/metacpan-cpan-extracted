@@ -1,0 +1,16 @@
+0.505   2013-06-22
+  * Do required lseek()s in the test-suite since backends no longer
+    do undocumented lseek()s on the target/delta file descriptor
+  * When trying to load backends, only try loading known backends.
+    The old way was a hacky attempt at loading any possible backend
+    in the Vcdiff namespace.
+  * Doc updates
+
+0.504   2013-06-18
+  * Improve test output
+  * VCDIFF cross-implementation format compatibility tests
+  * which_backend() feature
+  * Much improved docs
+
+0.100   2013-06-15
+  * Initial release

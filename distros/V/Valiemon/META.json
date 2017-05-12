@@ -1,0 +1,177 @@
+{
+   "abstract" : "data validator based on json schema",
+   "author" : [
+      "pokutuna <popopopopokutuna@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Valiemon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Class::Load" : "0",
+            "Clone" : "0",
+            "Data::Validate::URI" : "0",
+            "JSON::PP" : "0",
+            "JSON::XS" : "0",
+            "List::MoreUtils" : "0.407",
+            "Scalar::Util" : "0",
+            "Test::Deep" : "0",
+            "Types::Serialiser" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Valiemon" : {
+         "file" : "lib/Valiemon.pm",
+         "version" : "0.04"
+      },
+      "Valiemon::Attributes" : {
+         "file" : "lib/Valiemon/Attributes.pm"
+      },
+      "Valiemon::Attributes::AdditionalItems" : {
+         "file" : "lib/Valiemon/Attributes/AdditionalItems.pm"
+      },
+      "Valiemon::Attributes::AdditionalProperties" : {
+         "file" : "lib/Valiemon/Attributes/AdditionalProperties.pm"
+      },
+      "Valiemon::Attributes::AllOf" : {
+         "file" : "lib/Valiemon/Attributes/AllOf.pm"
+      },
+      "Valiemon::Attributes::AnyOf" : {
+         "file" : "lib/Valiemon/Attributes/AnyOf.pm"
+      },
+      "Valiemon::Attributes::Dependencies" : {
+         "file" : "lib/Valiemon/Attributes/Dependencies.pm"
+      },
+      "Valiemon::Attributes::Enum" : {
+         "file" : "lib/Valiemon/Attributes/Enum.pm"
+      },
+      "Valiemon::Attributes::Format" : {
+         "file" : "lib/Valiemon/Attributes/Format.pm"
+      },
+      "Valiemon::Attributes::Items" : {
+         "file" : "lib/Valiemon/Attributes/Items.pm"
+      },
+      "Valiemon::Attributes::MaxItems" : {
+         "file" : "lib/Valiemon/Attributes/MaxItems.pm"
+      },
+      "Valiemon::Attributes::MaxLength" : {
+         "file" : "lib/Valiemon/Attributes/MaxLength.pm"
+      },
+      "Valiemon::Attributes::MaxProperties" : {
+         "file" : "lib/Valiemon/Attributes/MaxProperties.pm"
+      },
+      "Valiemon::Attributes::Maximum" : {
+         "file" : "lib/Valiemon/Attributes/Maximum.pm"
+      },
+      "Valiemon::Attributes::MinItems" : {
+         "file" : "lib/Valiemon/Attributes/MinItems.pm"
+      },
+      "Valiemon::Attributes::MinLength" : {
+         "file" : "lib/Valiemon/Attributes/MinLength.pm"
+      },
+      "Valiemon::Attributes::MinProperties" : {
+         "file" : "lib/Valiemon/Attributes/MinProperties.pm"
+      },
+      "Valiemon::Attributes::Minimum" : {
+         "file" : "lib/Valiemon/Attributes/Minimum.pm"
+      },
+      "Valiemon::Attributes::MultipleOf" : {
+         "file" : "lib/Valiemon/Attributes/MultipleOf.pm"
+      },
+      "Valiemon::Attributes::Not" : {
+         "file" : "lib/Valiemon/Attributes/Not.pm"
+      },
+      "Valiemon::Attributes::OneOf" : {
+         "file" : "lib/Valiemon/Attributes/OneOf.pm"
+      },
+      "Valiemon::Attributes::Pattern" : {
+         "file" : "lib/Valiemon/Attributes/Pattern.pm"
+      },
+      "Valiemon::Attributes::Properties" : {
+         "file" : "lib/Valiemon/Attributes/Properties.pm"
+      },
+      "Valiemon::Attributes::Ref" : {
+         "file" : "lib/Valiemon/Attributes/Ref.pm"
+      },
+      "Valiemon::Attributes::Required" : {
+         "file" : "lib/Valiemon/Attributes/Required.pm"
+      },
+      "Valiemon::Attributes::Type" : {
+         "file" : "lib/Valiemon/Attributes/Type.pm"
+      },
+      "Valiemon::Attributes::UniqueItems" : {
+         "file" : "lib/Valiemon/Attributes/UniqueItems.pm"
+      },
+      "Valiemon::Context" : {
+         "file" : "lib/Valiemon/Context.pm"
+      },
+      "Valiemon::Primitives" : {
+         "file" : "lib/Valiemon/Primitives.pm"
+      },
+      "Valiemon::ValidationError" : {
+         "file" : "lib/Valiemon/ValidationError.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pokutuna/p5-Valiemon/issues"
+      },
+      "homepage" : "https://github.com/pokutuna/p5-Valiemon",
+      "repository" : {
+         "url" : "git://github.com/pokutuna/p5-Valiemon.git",
+         "web" : "https://github.com/pokutuna/p5-Valiemon"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "tarao <tarao.gnn@gmail.com>",
+      "aereal <aereal@aereal.org>",
+      "hitode909 <hitode909@gmail.com>",
+      "astj <asato.wakisaka@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

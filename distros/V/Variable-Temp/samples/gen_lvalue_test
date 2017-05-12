@@ -1,0 +1,33 @@
+#!perl
+
+use strict;
+use warnings;
+use autodie;
+
+open my $in,  '<', 't/10-base.t';
+open my $out, '>', 't/20-lvalue.t';
+
+while (<$in>) {
+ if (/use Variable::Temp/) {
+  print $out "use Variable::Temp 'temp';\n";
+ } elsif (/use +Test::More +(tests *=>.*); *$/) {
+  print $out <<"  HEAD";
+use Test::More;
+
+BEGIN {
+ if ("\$]" < 5.014) {
+  plan skip_all => 'perl 5.14 required to use lvalue temp()';
+ } else {
+  plan $1;
+ }
+}
+  HEAD
+ } else {
+  s/set_temp(.*?)=>/temp$1=/g;
+  s/set_temp(.*?);/temp$1;/g;
+  print $out $_;
+ }
+}
+
+close $out;
+close $in;

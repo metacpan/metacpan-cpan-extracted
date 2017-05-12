@@ -1,0 +1,194 @@
+1.28 (23 October 2014)
+    - $snapshot->authorized_users() was returning duplicate user IDs due to an apparent AWS bug. Change
+      behavior to return unique user list.
+    - Security policy JSON string returned by VM::EC2::Security::Policy is now canonicalized so that
+      regression tests succeed.
+
+1.26
+    - Use AnyEvent::CacheDNS to reduce latency of asynchronous calls. This introduces a new module
+      dependency.
+    - Compliant to 2014-05-01 API.
+    - Volume and snapshot encryption supported.
+    - AWS Signature Version 4 supported.
+    - RDS support added.
+    - VPC peering support added.
+    - ParmParser support added for elastic load balancer, RDS, VPN, VPC and customer gateway modules.
+    - Documentation updated.
+
+1.25
+    - Change behavior of create_network_acl_entry() so that -egress option defaults to false as originally
+      documented.
+    - Change way that async_post() works to (hopefully) handle RequestLimitExceeded errors in a way
+      that works.
+    - Fix incompatibility with Amazon Gov cloud.
+    - Fix incompatibilities with Open Stack.
+    - Compliant to 2013-07-15 API.
+    - Implement exponential backoff for RequestLimitExceeded. Will throttle back requests and keep 
+      retrying when Amazon reports too many requests.
+
+1.24
+    - Big code reorganization -- moved all REST calls into their own dynamically-loaded
+       modules.
+    - Fix bug that popped up when creating security group rules with -port=>0.
+  
+1.23 Thu Jan 24 12:51:07 EST 2013
+    - migrate-ebs-image.pl now supports HVM images, including 
+      Microsoft Windows and Linux Cluster instances.
+
+1.22 Mon Jan  7 09:43:50 EST 2013
+     - Allow arbitrary arguments to be passed to rsync in VM::EC2::Staging::Manager.
+     - Add support for autoscaling groups and launch configs (Patch from Miguel Ruiz;
+       see https://github.com/miquelruiz/LibVM-EC2-Perl).
+     - Implement CopySnapshot API call
+     - Take advantage of CopySnapshot API in migrate_ebs_image.pl script.
+     - Implement placement group API calls
+     - Update to API 2012-12-01
+
+1.21 Tue Dec 11 11:29:57 EST 2012
+     - fix BadParameterValue when passing -private_ip_address to run_instances().
+       (thanks to Makoto Milda for bug report and patch).
+     - Distinguish current_state() from current_status() in VM::EC2::Spot::InstanceRequest.
+     - Report errors encountered while committing firewall rules to security groups.
+     - URI unescape fields in VM::EC2::Instance::Metadata (not documented to be needed, but apparently so
+       for at least some fields).
+     - Support for retrieving IAM temporary security token from instance metadata from those instances
+       that have an IAM role.
+
+1.20 Wed Nov 28 07:07:10 EST 2012
+     - better detection of corresponding kernels when transferring images among zones
+       (requires String::Approx).
+     - fix staging manager pv support (patch from Misha Dragojevic)
+     - fix broken staging volume mount command when staging server uses /dev/xvd* device names.
+     - add progress reporting to rsync-based file transfers in staging server.
+     - correctly transfer images with ephemeral block devices.
+     - documentation fixes to Snapshot.pm
+
+1.19 Tue Sep 25 21:32:02 EDT 2012
+     - fix Instance.pm valid_fields():  add groupSet, 
+     - fix typo in instanceLifeCycle, put in same order as docs
+     - Add back robust ramdisk matching in staging manager (commit apparently lost during VPN patch)
+
+1.18 Thu Sep 13 06:14:59 EDT 2012
+   - Lance Kinley <lkinley@loyaltymethods.com> contributed major update to support
+     Network ACL, VPN and all Elastic Load Balancing functions.
+   - Added status reporting when performing dd() between staging manager volumes.
+
+   FEATURE ENHANCEMENTS
+   - Add -volume_type, -iops arguments to create_volume()
+   - Update API version to 2012-07-20 now that all provisioned IO functions
+     appear complete
+   - Add Network ACL functions
+   - Add VPC VPN functions
+   - Add all Elastic Load Balancing functions (API 2012-06-01)
+
+   FIXES
+   - References to 'iol' volume type corrected to 'io1' in EC2.pm and Volume.pm
+   - Add missing object methods to to valid_fields() in Instance.pm
+   - Fix minor documentation errors in Instance.pm
+   - Add up_time() function to Instance.pm as it is used in documentation
+     but did not exist (alias to upTime)
+   - Fix minor documentation error in SecurityGroup.pm
+   - Fix minor documentation error in VPC/RouteTable/Association.pm
+   - Fix missing semicolon in VPC/Subnet.pm
+
+1.17 Wed Sep  5 21:34:50 EDT 2012
+    - Add missing library files to MANIFEST.
+    - Fixed error message reporting in migrate-ebs-image.pl to give informative
+      messages rather than obscure "Can't use string as HASH".
+  
+1.16 Tue Aug 21 07:34:35 EDT 2012
+    - Added support for most VPC-related calls (VPCs, subnets, routes, network interfaces).
+    - Added support for elastic network interfaces.
+    - Added support for high-IOPS volumes.
+    - Update requirements to indicate that File::Path 2.08 is needed.
+
+1.15 Tue Aug 14 07:18:04 EDT 2012
+    - Allow ephemeral storage to be specified in migrate-ebs-image.pl using the -b argument.
+    - Add -block_device_mapping option to create_image().
+    - Add volumeType() and iops() methods to VM::EC2::Volume.
+
+1.14 Fri Aug 10 07:19:44 EDT 2012
+    - Fix bug in snapshot creation that was causing migrate-ebs-image.pl to fail on
+      last step.
+    - Make ascertainment of filesystem type more robust.
+
+1.13 Mon Aug  6 10:31:42 EDT 2012
+    - Fix API version in perldoc DESCRIPTION.
+    - Fix bugs that occurred when working with staging volumes that were attached
+      to stopped server instances.
+    - No longer assign automatic labels to new staging volumes.
+
+1.12 Fri Aug  3 23:48:46 EDT 2012
+    - Tests no longer prompt for input when running under smoker.
+
+1.11 Thu Aug  2 07:03:12 EDT 2012
+    - API supported updated to AWS 2012-06-15
+    - Add support for DescribeInstanceStatus call.
+    - Add support for DescribeVolumeStatus, DescribeVolumeAttribute and ModifyVolumeAttribute calls.
+    - Add support for product codes in Instance, Image and Snapshot.
+    - Add support for enabling volume I/O on degraded volumes and auto enabling I/O.
+    - Add support for temporary security tokens (see VM::EC2->get_federation_user())
+    - Add support for IAM security policies for restricting EC2 actions that federation
+          users can perform (see VM::EC2::Security::Policy).
+
+1.10  Sat Jul 28 15:59:41 EDT 2012
+     - Add new high level framework for managing servers and volumes (see
+       VM::EC2::Staging::Manager).
+     - Add missing documentation, including removing spot instance methods from
+        "unsupported" list.
+     - Document fact that VM::EC2->instance_metadata() can be called as a class
+       method.
+     - Add "platform" to valid_fields function in Instance.pm
+     - Fix SignatureDoesNotMatch breakage under HTTP::Request::Common version 6.03
+       (see https://rt.cpan.org/Ticket/Display.html?id=75359).
+     - Automatically base64 encode userdata passed to spot instance
+       requests (see
+       https://rt.cpan.org/Public/Bug/Display.html?id=77116).
+
+1.09   Tue Oct  4 19:04:52 EDT 2011
+     - Fixed return value from delete_security_group().
+     - Added a detailed example script, bin/sync_to_snapshot.pl
+
+1.08 
+     - Fix broken call to VM::EC2::Snapshot->register_image(), which was failing with a message
+       about not providing all required arguments.
+     - Add VM::EC2::Snapshot->size() as an alias to volumeSize().
+     - Fix documentation formatting bugs in VM::EC2::Instance::Metadata.
+
+1.07   Wed Sep 21 11:54:22 EDT 2011
+     - Add full support for spot instances.
+     - wait_for_attachments(), wait_for_instances(), and wait_for_volumes() will now timeout
+       after a set interval, which can be adjusted with wait_for_timeout().
+
+1.06  Wed Sep 14 15:53:55 EDT 2011
+      - Added ability to change deleteOnTerminate flag for volumes attached on instances
+        after instance launch. Facility is provided through VM::EC2, 
+	VM::EC2::BlockDevice::Mapping, VM::EC2::Volume, and VM::EC2::BlockDevice::Attachment.
+      - Add timeouts to VM::EC2->wait_for_*() methods so that methods won't wait forever.
+
+1.05  Sun Sep  4 22:17:33 EDT 2011
+      - Add wait_for_snapshots(), wait_for_volumes(), and wait_for_attachments() methods,
+       as well as a generic wait_for_terminal_state() method.
+
+1.04  Wed Aug 10 15:56:36 EDT 2011
+      - Document -availability_zone argument to run_instances(). Was formerly
+        misdocumented as -placement_zone. Both work now, and -zone works as
+	well.
+
+1.03  Tue Aug  2 16:55:15 EDT 2011
+      - Tests will skip rather than fail if user fails to provide
+        Amazon credentials.
+
+1.02  Thu Jul 28 17:23:51 EDT 2011
+      - Added support for filters with multiple values.
+      - Improved subclassing documentation.
+
+1.01  Thu Jul 28 10:32:52 EDT 2011
+      - Add -print_error argument to VM::EC2->new.
+      - Support for reserved instances.
+      - Fix test 05 to avoid leaving dangling 1 GB snapshots.
+
+1.00   Tue Jul 26 23:07:47 EDT 2011
+       -Core API fully implemented
+
+0.10  -Partial implementation of API.

@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<VApp xmlns="http://www.vmware.com/vcloud/v1.5" xmlns:rasd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData" xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1" xmlns:vssd="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData" xmlns:vmw="http://www.vmware.com/schema/ovf" xmlns:vmext="http://www.vmware.com/vcloud/extension/v1.5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ovfDescriptorUploaded="true" deployed="false" status="8" name="CentOS Linux 6.6 x64 (Minimal Install)" id="urn:vcloud:vapp:3425823f-e7c8-11e6-9cfe-d0dcae80ccca" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca" type="application/vnd.vmware.vcloud.vApp+xml" xsi:schemaLocation="http://www.vmware.com/vcloud/extension/v1.5 http://vcloud.example.com/api/v1.5/schema/vmwextensions.xsd http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2.22.0/CIM_VirtualSystemSettingData.xsd http://www.vmware.com/schema/ovf http://www.vmware.com/schema/ovf http://schemas.dmtf.org/ovf/envelope/1 http://schemas.dmtf.org/ovf/envelope/1/dsp8023_1.1.0.xsd http://www.vmware.com/vcloud/v1.5 http://vcloud.example.com/api/v1.5/schema/master.xsd http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2.22.0/CIM_ResourceAllocationSettingData.xsd">
+    <Link rel="power:powerOn" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/power/action/powerOn"/>
+    <Link rel="deploy" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/deploy" type="application/vnd.vmware.vcloud.deployVAppParams+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/controlAccess/" type="application/vnd.vmware.vcloud.controlAccess+xml"/>
+    <Link rel="controlAccess" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/controlAccess" type="application/vnd.vmware.vcloud.controlAccess+xml"/>
+    <Link rel="recompose" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/recomposeVApp" type="application/vnd.vmware.vcloud.recomposeVAppParams+xml"/>
+    <Link rel="enterMaintenanceMode" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/enterMaintenanceMode"/>
+    <Link rel="up" href="https://vcloud.example.com/api/vdc/3425485b-e7c8-11e6-9cfe-a71fcbe754fd" type="application/vnd.vmware.vcloud.vdc+xml"/>
+    <Link rel="edit" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca" type="application/vnd.vmware.vcloud.vApp+xml"/>
+    <Link rel="remove" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca"/>
+    <Link rel="enable" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/enableDownload"/>
+    <Link rel="disable" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/disableDownload"/>
+    <Link rel="down" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/owner" type="application/vnd.vmware.vcloud.owner+xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/metadata" type="application/vnd.vmware.vcloud.metadata+xml"/>
+    <Link rel="ovf" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/ovf" type="text/xml"/>
+    <Link rel="down" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/productSections/" type="application/vnd.vmware.vcloud.productSections+xml"/>
+    <Link rel="snapshot:create" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/action/createSnapshot" type="application/vnd.vmware.vcloud.createSnapshotParams+xml"/>
+    <Description/>
+    <LeaseSettingsSection href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/leaseSettingsSection/" type="application/vnd.vmware.vcloud.leaseSettingsSection+xml" ovf:required="false">
+        <ovf:Info>Lease settings section</ovf:Info>
+        <Link rel="edit" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/leaseSettingsSection/" type="application/vnd.vmware.vcloud.leaseSettingsSection+xml"/>
+        <DeploymentLeaseInSeconds>0</DeploymentLeaseInSeconds>
+        <StorageLeaseInSeconds>0</StorageLeaseInSeconds>
+    </LeaseSettingsSection>
+    <ovf:StartupSection xmlns:vcloud="http://www.vmware.com/vcloud/v1.5" vcloud:href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/startupSection/" vcloud:type="application/vnd.vmware.vcloud.startupSection+xml">
+        <ovf:Info>VApp startup section</ovf:Info>
+        <ovf:Item ovf:id="CentOS-66-x64" ovf:order="0" ovf:startAction="powerOn" ovf:startDelay="0" ovf:stopAction="powerOff" ovf:stopDelay="0"/>
+        <Link rel="edit" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/startupSection/" type="application/vnd.vmware.vcloud.startupSection+xml"/>
+    </ovf:StartupSection>
+    <ovf:NetworkSection xmlns:vcloud="http://www.vmware.com/vcloud/v1.5" vcloud:href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/networkSection/" vcloud:type="application/vnd.vmware.vcloud.networkSection+xml">
+        <ovf:Info>The list of logical networks</ovf:Info>
+    </ovf:NetworkSection>
+    <NetworkConfigSection href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/networkConfigSection/" type="application/vnd.vmware.vcloud.networkConfigSection+xml" ovf:required="false">
+        <ovf:Info>The configuration parameters for logical networks</ovf:Info>
+        <Link rel="edit" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/networkConfigSection/" type="application/vnd.vmware.vcloud.networkConfigSection+xml"/>
+    </NetworkConfigSection>
+    <SnapshotSection href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca/snapshotSection" type="application/vnd.vmware.vcloud.snapshotSection+xml" ovf:required="false">
+        <ovf:Info>Snapshot information section</ovf:Info>
+    </SnapshotSection>
+    <DateCreated>2016-06-24T12:48:14.377+01:00</DateCreated>
+    <Owner type="application/vnd.vmware.vcloud.owner+xml">
+        <User href="https://vcloud.example.com/api/admin/user/3425ce2f-e7c8-11e6-9cfe-e282a73f6b17" name="system" type="application/vnd.vmware.admin.user+xml"/>
+    </Owner>
+    <InMaintenanceMode>false</InMaintenanceMode>
+    <Children>
+        <Vm needsCustomization="false" nestedHypervisorEnabled="false" deployed="false" status="8" name="CentOS-66-x64" id="urn:vcloud:vm:3425cf3d-e7c8-11e6-9cfe-adf3a17437cb" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb" type="application/vnd.vmware.vcloud.vm+xml">
+            <VCloudExtension required="false">
+                <vmext:VmVimInfo>
+                    <vmext:VmVimObjectRef>
+                        <vmext:VimServerRef href="https://vcloud.example.com/api/admin/extension/vimServer/34257f3d-e7c8-11e6-9cfe-ef15b30bb456" name="HG1-VCD-RCVC01" type="application/vnd.vmware.admin.vmwvirtualcenter+xml"/>
+                        <vmext:MoRef>vm-2043</vmext:MoRef>
+                        <vmext:VimObjectType>VIRTUAL_MACHINE</vmext:VimObjectType>
+                    </vmext:VmVimObjectRef>
+                    <vmext:DatastoreVimObjectRef>
+                        <vmext:VimServerRef href="https://vcloud.example.com/api/admin/extension/vimServer/34257f3d-e7c8-11e6-9cfe-ef15b30bb456" name="HG1-VCD-RCVC01" type="application/vnd.vmware.admin.vmwvirtualcenter+xml"/>
+                        <vmext:MoRef>datastore-16</vmext:MoRef>
+                        <vmext:VimObjectType>DATASTORE</vmext:VimObjectType>
+                    </vmext:DatastoreVimObjectRef>
+                    <vmext:VmDiskDatastores instanceId="2000">
+                        <vmext:VimServerRef href="https://vcloud.example.com/api/admin/extension/vimServer/34257f3d-e7c8-11e6-9cfe-ef15b30bb456" name="HG1-VCD-RCVC01" type="application/vnd.vmware.admin.vmwvirtualcenter+xml"/>
+                        <vmext:MoRef>datastore-16</vmext:MoRef>
+                        <vmext:VimObjectType>DATASTORE</vmext:VimObjectType>
+                    </vmext:VmDiskDatastores>
+                    <vmext:HostVimObjectRef>
+                        <vmext:VimServerRef href="https://vcloud.example.com/api/admin/extension/vimServer/34257f3d-e7c8-11e6-9cfe-ef15b30bb456" name="HG1-VCD-RCVC01" type="application/vnd.vmware.admin.vmwvirtualcenter+xml"/>
+                        <vmext:MoRef>host-10</vmext:MoRef>
+                        <vmext:VimObjectType>HOST</vmext:VimObjectType>
+                    </vmext:HostVimObjectRef>
+                    <vmext:VirtualDisksMaxChainLength>1</vmext:VirtualDisksMaxChainLength>
+                </vmext:VmVimInfo>
+            </VCloudExtension>
+            <Link rel="power:powerOn" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/power/action/powerOn"/>
+            <Link rel="deploy" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/deploy" type="application/vnd.vmware.vcloud.deployVAppParams+xml"/>
+            <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb" type="application/vnd.vmware.vcloud.vm+xml"/>
+            <Link rel="remove" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb"/>
+            <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/metadata" type="application/vnd.vmware.vcloud.metadata+xml"/>
+            <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/complianceResult" type="application/vnd.vmware.vm.complianceResult+xml"/>
+            <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/productSections/" type="application/vnd.vmware.vcloud.productSections+xml"/>
+            <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/metrics/historic" type="application/vnd.vmware.vcloud.metrics.historicUsageSpec+xml"/>
+            <Link rel="metrics" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/metrics/historic" type="application/vnd.vmware.vcloud.metrics.historicUsageSpec+xml"/>
+            <Link rel="screen:thumbnail" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/screen"/>
+            <Link rel="media:insertMedia" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/media/action/insertMedia" type="application/vnd.vmware.vcloud.mediaInsertOrEjectParams+xml"/>
+            <Link rel="media:ejectMedia" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/media/action/ejectMedia" type="application/vnd.vmware.vcloud.mediaInsertOrEjectParams+xml"/>
+            <Link rel="disk:attach" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/disk/action/attach" type="application/vnd.vmware.vcloud.diskAttachOrDetachParams+xml"/>
+            <Link rel="disk:detach" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/disk/action/detach" type="application/vnd.vmware.vcloud.diskAttachOrDetachParams+xml"/>
+            <Link rel="consolidate" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/consolidate"/>
+            <Link rel="relocate" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/relocate" type="application/vnd.vmware.vcloud.relocateVmParams+xml"/>
+            <Link rel="enable" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/enableNestedHypervisor"/>
+            <Link rel="customizeAtNextPowerOn" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/customizeAtNextPowerOn"/>
+            <Link rel="reloadFromVc" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/reloadFromVc"/>
+            <Link rel="checkCompliance" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/checkCompliance"/>
+            <Link rel="snapshot:create" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/createSnapshot" type="application/vnd.vmware.vcloud.createSnapshotParams+xml"/>
+            <Link rel="reconfigureVm" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/action/reconfigureVm" name="CentOS-66-x64" type="application/vnd.vmware.vcloud.vm+xml"/>
+            <Link rel="up" href="https://vcloud.example.com/api/vApp/vapp-3425823f-e7c8-11e6-9cfe-d0dcae80ccca" type="application/vnd.vmware.vcloud.vApp+xml"/>
+            <Description>CentOS 6.6 x64 with Minimal group-install.Updates installed as of 05-Mar-2015.</Description>
+            <ovf:VirtualHardwareSection xmlns:vcloud="http://www.vmware.com/vcloud/v1.5" ovf:transport="" vcloud:href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/" vcloud:type="application/vnd.vmware.vcloud.virtualHardwareSection+xml">
+                <ovf:Info>Virtual hardware requirements</ovf:Info>
+                <ovf:System>
+                    <vssd:ElementName>Virtual Hardware Family</vssd:ElementName>
+                    <vssd:InstanceID>0</vssd:InstanceID>
+                    <vssd:VirtualSystemIdentifier>CentOS-66-x64</vssd:VirtualSystemIdentifier>
+                    <vssd:VirtualSystemType>vmx-09</vssd:VirtualSystemType>
+                </ovf:System>
+                <ovf:Item>
+                    <rasd:Address>0</rasd:Address>
+                    <rasd:Description>SCSI Controller</rasd:Description>
+                    <rasd:ElementName>SCSI Controller 0</rasd:ElementName>
+                    <rasd:InstanceID>1</rasd:InstanceID>
+                    <rasd:ResourceSubType>lsilogic</rasd:ResourceSubType>
+                    <rasd:ResourceType>6</rasd:ResourceType>
+                </ovf:Item>
+                <ovf:Item>
+                    <rasd:AddressOnParent>0</rasd:AddressOnParent>
+                    <rasd:Description>Hard disk</rasd:Description>
+                    <rasd:ElementName>Hard disk 1</rasd:ElementName>
+                    <rasd:HostResource vcloud:capacity="8192" vcloud:storageProfileOverrideVmDefault="false" vcloud:busSubType="lsilogic" vcloud:storageProfileHref="https://vcloud.example.com/api/vdcStorageProfile/3425842a-e7c8-11e6-9cfe-96d1601c41e2" vcloud:busType="6"/>
+                    <rasd:InstanceID>2000</rasd:InstanceID>
+                    <rasd:Parent>1</rasd:Parent>
+                    <rasd:ResourceType>17</rasd:ResourceType>
+                </ovf:Item>
+                <ovf:Item>
+                    <rasd:Address>0</rasd:Address>
+                    <rasd:Description>IDE Controller</rasd:Description>
+                    <rasd:ElementName>IDE Controller 0</rasd:ElementName>
+                    <rasd:InstanceID>2</rasd:InstanceID>
+                    <rasd:ResourceType>5</rasd:ResourceType>
+                </ovf:Item>
+                <ovf:Item>
+                    <rasd:AddressOnParent>0</rasd:AddressOnParent>
+                    <rasd:AutomaticAllocation>false</rasd:AutomaticAllocation>
+                    <rasd:Description>CD/DVD Drive</rasd:Description>
+                    <rasd:ElementName>CD/DVD Drive 1</rasd:ElementName>
+                    <rasd:HostResource/>
+                    <rasd:InstanceID>3000</rasd:InstanceID>
+                    <rasd:Parent>2</rasd:Parent>
+                    <rasd:ResourceType>15</rasd:ResourceType>
+                </ovf:Item>
+                <ovf:Item>
+                    <rasd:AddressOnParent>0</rasd:AddressOnParent>
+                    <rasd:AutomaticAllocation>false</rasd:AutomaticAllocation>
+                    <rasd:Description>Floppy Drive</rasd:Description>
+                    <rasd:ElementName>Floppy Drive 1</rasd:ElementName>
+                    <rasd:HostResource/>
+                    <rasd:InstanceID>8000</rasd:InstanceID>
+                    <rasd:ResourceType>14</rasd:ResourceType>
+                </ovf:Item>
+                <ovf:Item vcloud:href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/cpu" vcloud:type="application/vnd.vmware.vcloud.rasdItem+xml">
+                    <rasd:AllocationUnits>hertz * 10^6</rasd:AllocationUnits>
+                    <rasd:Description>Number of Virtual CPUs</rasd:Description>
+                    <rasd:ElementName>1 virtual CPU(s)</rasd:ElementName>
+                    <rasd:InstanceID>3</rasd:InstanceID>
+                    <rasd:Reservation>0</rasd:Reservation>
+                    <rasd:ResourceType>3</rasd:ResourceType>
+                    <rasd:VirtualQuantity>1</rasd:VirtualQuantity>
+                    <rasd:Weight>0</rasd:Weight>
+                    <vmw:CoresPerSocket ovf:required="false">1</vmw:CoresPerSocket>
+                    <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/cpu" type="application/vnd.vmware.vcloud.rasdItem+xml"/>
+                </ovf:Item>
+                <ovf:Item vcloud:href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/memory" vcloud:type="application/vnd.vmware.vcloud.rasdItem+xml">
+                    <rasd:AllocationUnits>byte * 2^20</rasd:AllocationUnits>
+                    <rasd:Description>Memory Size</rasd:Description>
+                    <rasd:ElementName>2048 MB of memory</rasd:ElementName>
+                    <rasd:InstanceID>4</rasd:InstanceID>
+                    <rasd:Reservation>0</rasd:Reservation>
+                    <rasd:ResourceType>4</rasd:ResourceType>
+                    <rasd:VirtualQuantity>2048</rasd:VirtualQuantity>
+                    <rasd:Weight>0</rasd:Weight>
+                    <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/memory" type="application/vnd.vmware.vcloud.rasdItem+xml"/>
+                </ovf:Item>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/" type="application/vnd.vmware.vcloud.virtualHardwareSection+xml"/>
+                <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/cpu" type="application/vnd.vmware.vcloud.rasdItem+xml"/>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/cpu" type="application/vnd.vmware.vcloud.rasdItem+xml"/>
+                <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/memory" type="application/vnd.vmware.vcloud.rasdItem+xml"/>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/memory" type="application/vnd.vmware.vcloud.rasdItem+xml"/>
+                <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/disks" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/disks" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+                <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/media" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+                <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/networkCards" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/networkCards" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+                <Link rel="down" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/serialPorts" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/virtualHardwareSection/serialPorts" type="application/vnd.vmware.vcloud.rasdItemsList+xml"/>
+            </ovf:VirtualHardwareSection>
+            <ovf:OperatingSystemSection xmlns:vcloud="http://www.vmware.com/vcloud/v1.5" ovf:id="101" vcloud:href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/operatingSystemSection/" vcloud:type="application/vnd.vmware.vcloud.operatingSystemSection+xml" vmw:osType="centos64Guest">
+                <ovf:Info>Specifies the operating system installed</ovf:Info>
+                <ovf:Description>CentOS 4/5/6/7 (64-bit)</ovf:Description>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/operatingSystemSection/" type="application/vnd.vmware.vcloud.operatingSystemSection+xml"/>
+            </ovf:OperatingSystemSection>
+            <NetworkConnectionSection href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/networkConnectionSection/" type="application/vnd.vmware.vcloud.networkConnectionSection+xml" ovf:required="false">
+                <ovf:Info>Specifies the available VM network connections</ovf:Info>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/networkConnectionSection/" type="application/vnd.vmware.vcloud.networkConnectionSection+xml"/>
+            </NetworkConnectionSection>
+            <GuestCustomizationSection href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/guestCustomizationSection/" type="application/vnd.vmware.vcloud.guestCustomizationSection+xml" ovf:required="false">
+                <ovf:Info>Specifies Guest OS Customization Settings</ovf:Info>
+                <Enabled>true</Enabled>
+                <ChangeSid>false</ChangeSid>
+                <VirtualMachineId>3425cf3d-e7c8-11e6-9cfe-adf3a17437cb</VirtualMachineId>
+                <JoinDomainEnabled>false</JoinDomainEnabled>
+                <UseOrgSettings>false</UseOrgSettings>
+                <AdminPasswordEnabled>true</AdminPasswordEnabled>
+                <AdminPasswordAuto>false</AdminPasswordAuto>
+                <AdminPassword>Example123</AdminPassword>
+                <AdminAutoLogonEnabled>false</AdminAutoLogonEnabled>
+                <AdminAutoLogonCount>0</AdminAutoLogonCount>
+                <ResetPasswordRequired>false</ResetPasswordRequired>
+                <ComputerName>CentOS-66-x64</ComputerName>
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/guestCustomizationSection/" type="application/vnd.vmware.vcloud.guestCustomizationSection+xml"/>
+            </GuestCustomizationSection>
+            <RuntimeInfoSection xmlns:vcloud="http://www.vmware.com/vcloud/v1.5" vcloud:href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/runtimeInfoSection" vcloud:type="application/vnd.vmware.vcloud.virtualHardwareSection+xml">
+                <ovf:Info>Specifies Runtime info</ovf:Info>
+                <VMWareTools version="9354"/>
+            </RuntimeInfoSection>
+            <SnapshotSection href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/snapshotSection" type="application/vnd.vmware.vcloud.snapshotSection+xml" ovf:required="false">
+                <ovf:Info>Snapshot information section</ovf:Info>
+            </SnapshotSection>
+            <VAppScopedLocalId>CentOS-66-x64</VAppScopedLocalId>
+            <VmCapabilities href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/vmCapabilities/" type="application/vnd.vmware.vcloud.vmCapabilitiesSection+xml">
+                <Link rel="edit" href="https://vcloud.example.com/api/vApp/vm-3425cf3d-e7c8-11e6-9cfe-adf3a17437cb/vmCapabilities/" type="application/vnd.vmware.vcloud.vmCapabilitiesSection+xml"/>
+                <MemoryHotAddEnabled>false</MemoryHotAddEnabled>
+                <CpuHotAddEnabled>false</CpuHotAddEnabled>
+            </VmCapabilities>
+            <StorageProfile href="https://vcloud.example.com/api/vdcStorageProfile/3425842a-e7c8-11e6-9cfe-96d1601c41e2" name="Standard Disk" type="application/vnd.vmware.vcloud.vdcStorageProfile+xml"/>
+        </Vm>
+    </Children>
+</VApp>

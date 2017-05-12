@@ -1,0 +1,251 @@
+Vimana
+======
+
+Vimana is an easy-to-use system for searching, installing, and downloading vim
+script.
+
+Vimana provides a command-line interface such like aptitude program on
+Debian linux, for you to search, download, install, upgrade scripts from
+<http://www.vim.org> (vim online site).
+
+Vimana can install a vim script package to your vim runtime path automatically
+by inspecting the content of archive file or vim script. for example, if an
+archive file contains 'syntax', 'plugin', 'indent' directory, then these files
+should be installed to ~/.vim/ directory. if it is a vim color scheme, then it
+should be put into ~/.vim/colors/ and prompt for setting the installed
+colorscheme as default.
+
+Rakefile, makefile, vimball installation are supported.
+
+For scripts have their own docs, Vimana will try to update helptags after the
+installations.
+
+NOTE: Vimana only provides search, info, and install commmands currently.
+
+INSTALLATION
+===============
+
+For First Time CPAN Users:
+
+Install miyagawa's cpanminus , which doesnt require any complex configurations. 
+It's easy, clean and faster than the old CPAN shell:
+
+    $ mkdir ~/bin
+    $ wget http://xrl.us/cpanm -O ~/bin/cpanm
+    $ chmod +x ~/bin/cpanm
+
+Run cpanminus to install Vimana from CPAN:
+
+    $ cpanm -n Vimana
+
+Or git clone from github:
+
+    $ cpanm -n http://github.com/c9s/Vimana/tarball/master
+
+**For non-root permission users**, cpanm will install modules into `~/perl5` directory.
+so you will need to export PERL5LIB, add below line in your `.bashrc` or `.zshrc`:
+
+    export PERL5LIB=~/perl5/lib/perl5;$PERL5LIB
+
+
+USAGE
+========
+
+
+INSTALL
+-------
+To install snipmate.vim package:
+
+    $ vimana install snipmate
+
+To install from git or svn:
+
+    $ vimana install git:git://github.com/c9s/hypergit.vim.git
+    $ vimana install git:git@github.com:c9s/hypgergit.vim.git
+    $ vimana install svn:svn+ssh://path/to/your/repo
+
+To install from GitHub:
+
+    $ vimana install gh:c9s/perlomni.vim
+    $ vimana install gh:Shougo/vimfiler.vim
+
+To install snipmate.vim package to the other runtime path:
+
+    $ vimana i snipmate -r ~/.vim-other-rtp
+
+    # or
+
+    $ vimana install snipmate --runtime-path ~/.vim-other-rtp
+
+To install rails.vim package:
+
+    $ vimana install rails.vim
+
+SEARCH
+------
+to search rails
+
+    $ vimana search rails
+
+to search colorscheme:
+
+    $ vimana search -t color
+
+to search ftplugin:
+
+    $ vimana search -t ftplugin
+
+to search ftplugin and "abc" keyword:
+
+    $ vimana search -t ftplugin abc
+
+UPDATE
+------
+
+to update index
+
+    $ vimana update
+
+
+DOWNLOAD
+--------
+
+to download:
+
+    $ vimana download markdown-syntax.vim
+
+to remove a package:
+
+    $ vimana remove fuzzyfinder
+
+to force remove a package:
+
+    $ vimana remove -f fuzzyfinder
+
+to list installed packages:
+
+    $ vimana installed
+
+to list installed package content:
+
+    $ vimana installed snipmate
+
+to rate plugin:
+
+    $ vimana rate snipmate 2  # rate life changing
+
+COMMAND ALIAS
+=============
+
+    $ vimana i   # alias of install command.
+    $ vimana s   # alias of search command.
+    $ vimana d   # alias of download command.
+
+TESTED CASES
+============
+
+    $ vimana i hypergit.vim
+    $ vimana i the-nerd-tree
+    $ vimana i autocomplpop
+    $ vimaan i gsession.vim
+    $ vimana i snipmate
+    $ vimana i svg.vim
+    $ vimana i railscasts-theme
+    $ vimana i dark-ruby
+    $ vimana i bufexplorer.zip
+    $ vimana i xml.vim
+    $ vimana i cctree
+    $ vimana i markdown-syntax
+    $ vimana i gist.vim
+    $ vimana i googlereader.vim
+
+
+    $ vimana i jslint.vim
+    $ vimana i fakeclip
+
+    $ vimana remove fakeclip
+
+    $ cd snipmate.git
+    $ vimana install .    # install from current path.
+
+    $ vimana installed   # list installed scripts
+
+    $ vimana installed gist.vim  # list installed content of gist.vim
+
+    $ vimana upgrade gist.vim
+
+MAKE YOUR PLUGIN INSTALLABLE
+============================
+
+1. use vim runtime directory structure like this:
+
+        foo.tar.gz:
+            plugin/foo.vim
+            syntax/foo.vim
+            doc/foo.txt
+
+2. add type info in your vim script file:
+
+        " script type: plugin
+
+uppercase also available:
+
+        " Script Type: plugin
+
+then the script will be installed into `~/.vim/plugin/`.
+
+SUPPORT AND DOCUMENTATION
+==========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Vimana
+
+IRC Channel:
+
+    #vimana on irc.freenode.net
+
+You can also look for information at:
+
+    vim-addon-manager : another vim script manager (which is written in VimL).
+        http://github.com/MarcWeber/vim-addon-manager
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Vimana
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Vimana
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Vimana
+
+    Search CPAN
+        http://search.cpan.org/dist/Vimana
+
+AUTHORS
+=======
+
+- c9s (Cornelius)  <cornelius.howl@gmail.com>
+
+
+Contributors
+============
+
+Ordered by alphabet (sort)
+
+- arowla
+- drbean
+- mattn
+- tokuhirom
+- ujihisa
+- zentooo
+
+
+COPYRIGHT AND LICENCE
+=========================
+
+Copyright (C) 2007 You-An Lin 林佑安 ( Cornelius / c9s )
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

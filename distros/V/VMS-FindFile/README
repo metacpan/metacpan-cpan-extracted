@@ -1,0 +1,33 @@
+VMS/FindFile version 0.91
+=========================
+
+VMS::FindFile is a VMS-specific module which returns all file names
+matching a VMS-style wildcard specification.  It acts almost exactly
+like the f$search() function in DCL, except that instead of using
+context numbers to do multiple concurrent searches, you create
+multiple VMS::FindFile objects.
+
+While it is VMS-specific, it's a lot faster than the system-
+independent File::Find.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   mmk
+   mmk test
+   mmk install
+
+You could also use mms instead of mmk.
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Forrest Cahoon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

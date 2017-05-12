@@ -1,0 +1,61 @@
+==================================================
+Changes from 2014-10-21 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version 7.900057 at 2015-10-21 13:40:51 +0000
+---------------------------------------------
+
+  Change: 375335b9d8536dde1bd1d0c737f96280fc0046b1
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2015-10-21 13:39:58 +0000
+
+    updated the dist.ini and build 
+
+  Change: 48df1c550f42c45ce91ec54f823d8bf371ee0ed8
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2015-10-21 13:35:14 +0000
+
+    added object param sharing test 
+
+  Change: cb38e53433a09309f6d4c638ff83c621243ece29
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2015-10-21 13:35:06 +0000
+
+    removed Class::Forward dependency 
+
+  Change: 0e4c25dabe100c8c12efcaa3b38c83145c736a24
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2015-05-22 00:54:48 +0000
+
+    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
+
+  Change: 513e06cc4a53ef53e570305efa1c789860d6a286
+  Author: Yanick Champoux <yanick@babyl.dyndns.org>
+  Date : 2015-05-16 23:01:08 +0000
+
+    Makes 'evaluate' idempotent.
+
+    Deals with #37. The optimization was making it such that calling
+    `validate` a second time would cause a stack trace. 
+
+  Change: 2487096d709955875dc85dc48b738c766e10c13f
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2015-05-16 19:00:43 +0000
+
+    Merge pull request #39 from yanick/validate-idempotent
+
+    Makes 'evaluate' idempotent. 
+
+  Change: e368e5bb42a09dd8a7984da5fe49a30053f55847
+  Author: Yanick Champoux <yanick@babyl.dyndns.org>
+  Date : 2015-04-25 12:49:20 +0000
+
+    makes 'evaluate' idempotent
+
+    Deals with #37. The optimization was making it such that calling
+    `validate` a second time would cause a stack trace. 
+
+=================================================
+Plus 57 releases after 2014-10-21 00:00:00 +0000.
+=================================================

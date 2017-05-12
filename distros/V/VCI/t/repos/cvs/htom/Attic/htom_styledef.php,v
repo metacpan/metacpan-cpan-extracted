@@ -1,0 +1,80 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! HTOM_StyleDef
+ * \brief This class manages the page styles list.
+*/
+class HTOM_StyleDef implements HTOM_Evaluable
+{
+  //! Construct the style definition using a style from a file.
+  public function __construct( $styleFileName="" )
+  {
+    $this->styleFileName = $styleFileName;
+    $this->id = HTOM_IDManager::ID();
+  }
+
+
+  //! Add a style definition direct to the HTML content.
+  public function AddStyle($styleName,$definition)
+  {
+    $this->content.="    ".$styleName. "{".$definition."}\r\n";
+  }
+
+  //! Evaluate a style definition content.
+  public function Evaluate()
+  {
+    $result="";
+    if ($this->styleFileName!="")
+      {
+	$result.="<link rel=\"stylesheet\" type=\"text/css\" href=\"".$this->styleFileName."\" media=\"screen, handheld\" />\r\n";
+      }
+    if ($this->content!="")
+      {
+	$result.="<style type=\"text/css\"> <!-- \r\n";
+	$result.=$this->content;
+	$result.="--></style>\r\n";
+      }
+    $result.="\r\n";
+    return $result;
+  }
+  private $content="";
+  private $styleFileName="";
+  private $ID;
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

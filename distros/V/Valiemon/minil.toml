@@ -1,0 +1,3 @@
+name = 'Valiemon'
+license = "mit"
+badges = ["travis"]

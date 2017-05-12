@@ -1,0 +1,223 @@
+Revision history for Perl extension VOMS::Lite.
+
+0.01
+	- original version; created by h2xs 1.23 with options
+		-AXc -b 5.4.0 -n VOMS::Lite
+
+0.02  Wed Jan 24 17:55:20 2007
+	- Enable access to VOs with FQDNs as names (ie '.' seperated DNS)
+		Changes to VOMS/Lite.pm's GetDBAttribs to obtain 
+		VO -> DB mapping from voms.config.  Changes also to 
+		VOMS/Lite/Attribs/DBHelper.pm to print errors from eval calls
+		to STDERR.
+
+0.03  Mon Feb 19 18:48:00 2007
+	- bugfix: hex serial returned by VOMS DB now converted to decimal
+        - bugfix: Authority Key ID fixed in X509.pm
+        - Added REQ.pm to parse and create certificate requests
+        - Rearranged the Libtaries.  PROXY X509 REQ AC now have
+          ::Create and ::Examine to reduce the size of CertKeyHelper.
+          AC::Examine not yet implemented.
+
+0.04  Wed May 23 17:35:15 2007
+        - created lib/VOMS/Lite/MyProxy.pm
+        - bin/cert-req.pl:
+              REQ::REQ is now REQ::Create
+              Format of usage documentation
+              Fixed $CACert is actually $Cert
+        - bin/verifycert.pl
+              Just get buildchain from VOMS::Lite::CertKeyHelper
+              @Refs is now a hash %Chain (change of buildchain)
+        - bin/voms-ac-issue.pl
+              @Chain is now %Chain (change of buildchain)
+        - lib/VOMS/Lite/AC.pm
+              removed VOMS::Lite::PEMHelper qw(encodeAC) -- not used, don't load it!
+        - lib/VOMS/Lite/CertKeyHelper.pm:
+              buildchain now returns a hash not an array
+        - lib/VOMS/Lite/PEMHelper.pm:
+              removed extronious openssl compatability
+              decodeCert is more efficient
+              encodeAC uses new &encodeCert
+              writeCertKey now uses &encodeCert
+              readAC now uses &readCert
+              readCert generalised now takes two arguments $filepath and $type
+              encodeCert generalised now takes N+1 arguments @ders $type
+        - lib/VOMS/Lite/PROXY.pm:
+              bugfix -Subject name (Limited is a type of legacy proxy)
+        - lib/VOMS/Lite/REQ.pm:
+              Added subjectAltName extension to REQ::Create options
+        - lib/VOMS/Lite/X509.pm:
+              bugfix - SKID Public Key Digest
+        - lib/VOMS/Lite.pm
+              buildchain is now a hash.
+        - example/ProxyChain.pl
+              Just get buildchain from VOMS::Lite::CertKeyHelper
+              @Chain is now %Chain (change of buildchain)
+
+0.05  Tue Jun 24 18:20:00 2008
+        - Updated MyProxy.pm:
+              implemented the Get function
+              changed return values allowing to bring them into line with
+                other VOMS::Lite functions
+              Updated Documentation
+        - Created myproxy-init.pl
+        - Created myproxy-get.pl
+       
+0.06  Wed Oct 1 15:50:00 2008
+        - Added Optional SSL certificate authentication to MyProxy.pm's Get routine
+        - fixed MyProxy.pm @warning typos
+
+0.07  Thu Jun 20 10:45:00 2009
+        - Various fixes in POD files
+        - Added VOMS.pm - a library to talk to gLite VOMS server 
+        - voms-proxy-init.pl now can get VOMS AC from gLite VOMS server
+        - MyProxy.pm - various fixes:
+            Opened allowed username and passwords - spec doesn't care what 
+              chars a username is made up of
+            Fixed Cert/Key check
+            Put in bail out for MyProxy server not responding correctly
+            Added option to expolit verbose Proxy creation
+            Cert patterns now using //s modifier to handle all chars as 
+              DER encoding may contain \n etc.
+            Added exception handelling when MyProxy response is not found
+        - REQ.pm
+            Added quiet mode
+        - AC.pm
+            Returned AC is now only wrapped in one ASN1Sequence c.f. gLite 
+        - PROXY.pm
+            Ajusted to deal with AC as produced by modified AC.pm
+        - Corrected Integer parser in PROXYINFO.pl example
+
+0.08  Wed Nov 18 20:09:00 2009 
+        - Fixed "multiline" search replace (binary data presenting \n) 
+          in VOMS communications VOMS.pm adding the trailing modifier 
+          to s/// => s///s
+
+0.09  Thu Jan 14 14:20:00 2010
+        - Added RSAKey library - due to issues of Crypt::RSA::Key 
+          or some of its dependencied not being relocatable.
+        - Removed dependency upon Crypt::RSA::Key
+        - Some minor fixes ( Errors should be an array reference in REQ.pm )
+        - Fixed myproxy scripts ARGV input checker 
+            (server address cannot start with '-').
+        - Fixed occasional error in PEM encoded data where 64 divides
+          base64 number of chars.
+
+0.10  Wed Apr  7 17:51:31 2010
+        - Added library to create Audit extensions for proxy certificates
+        - Added option to allow Proxy Bitlength manipulation
+        - Added option to allow Proxy to start any time after 01 Jan 1970
+        - Corrected embarrasing smelling pistake "Legasy" -> "Legacy"
+        - Added AC examination and verification
+        - MyProxy uses better temp files, cleans theses up after use,
+            MyProxy::Init now returns ProxyCert as well.
+        - PEMHelper - minor changes to die statement in readCert()
+        - VOMS::Get now checks server against Subject Alt Name if necessary 
+            (warning returned if DN doesn't Match but Subject Alt Name does)
+        - VOMS improved Base64 handling: some VOMS servers return the encoding 
+            they wish despite B value in <base64>B</base64> message.
+            VOMS::Get Now examines message to determine which 
+            alphabet is being used.
+        - gLite's VOMS server no longer sends SSL Certificate Request
+            with acceptable CA list VOMS::Get: Changed unsupported CA error 
+            into a warning unless the data is available.
+        - Fixed ASN1Helper::ASNLenStr: boundary between single byte length 
+            encoding and multi byte length encoding now behaves correctly
+        - RSAkey now searches for character device at $DefaultRandom
+        - Removed Regexp dependency from AC::Create
+
+0.11 Tue Apr 20 04:49:00 2010
+        - voms-proxy-init.pl now only loads HTTP::Request and LWP::UserAgent if required
+        - RSAKey::Create Now respects the Quiet option
+            allowing primality searching/testing progress to be shown
+        - Added bin/examineAC.pl to EXE_FILES so that it gets installed!
+        - Fixed use of Lifetime array in bin/verifycert.pl
+        - Fixed Bug for negative integer encoding ASN1Helper::DecToHex
+        - Fixed bug introduced in "VOMS improved Base64 handling"
+            Base64 now has own .pm file
+        - Many enhancements to VOMS::Lite::VOMS
+        - Experimental VOMS::Server - no docs as yet
+        - Experimental vomsserver.pl, ditto
+        - AC::Create now includes Issuing Certificate in extension.
+
+0.12 Tue Mar 15 13:32:15 2011
+        - VOMS.pm read now continues to pull from socket until it has 
+            the expected ammount of data; a timeout also put in place
+          - Insert extra padding in records where CBC::Decrypt chomps 
+              trailing \0's.
+          - Allow 0 lenght padding where record length is a multiple of 8
+          - Added VOMS::List function
+          - Fixed array syntax @Errors[] -> $Errors[]
+        - Fixed Base64 type guessing algorithm
+        - Added more verbose error message propagation for make test
+
+0.13 Thu Mar 17 09:50:00 2011
+        - Removed a debugging print statement in voms-proxy-init.pl
+        - Modified PEMHelper to allow lowercase hex chars in SALT
+          - see https://rt.cpan.org/Public/Bug/Display.html?id=62049
+            Thank you Bart Heupers for the bug report.
+        - $VERSION now only exported by in Lite.pm
+
+0.14 Thu Mar 17 10:50:00 2011
+        - PAUSE didn't like me removing $VERSION from library files.
+          - humph! Reverted versioning changes
+          - added a script to keep versions in alignment with Lite.pm
+
+0.15 Thu Feb 14 16:10:00 2012
+        - Problem with build on PPC, tests can't generate a CA certificate
+          - Added more checks in test script
+        - Added extra lurve
+        - VOMS servers updated to EMI release caused VOMS.pm to break
+          - This was due to expecting a single encrypted record from server
+            The server's move to using vanilla OpenSSL based sockets meant
+            that VOMS.pm received a record with zero data before the record with
+            the AC or List result.
+            VOMS.pm can now handle multiple encrypted records per payload.
+0.16 Tue Feb 28 01:48:00 2012
+        - Removed umask in PEMHelper.pm for Win32.* OS which doesn't do umask
+        - X509::Create
+          - Added check: does parse CA return reference to Error Array?
+          - Change unnecessarily strict check on dNSName and rfc822Name
+        - Added Explicit dependency on Crypt::DES as MacOSX required double complilation
+          - not sure if this will work as cannot install CPAN::Mini::Inject
+        - removed Umask in VOMS::Lite.pm
+        - Added fake DNS entry if Sys::Hostname doesn't provide a FQDN in tests
+        - Added some extra test info
+0.17 Fri Jun 29 13:00:00 2012
+        - Added VOMS::Lite::SAMLHelper library in anticipation of 
+          mainstream SAML VOMS services
+        - Fixed error handling in VOMS::Lite::X509::Examine for 
+          ["Unable to parse certificate"]
+        - Fixed CA certificate check in X509::Examine.  When $CertInfoRef->{'Errors'} 
+          is undefined.
+        - Added ability to parse unencrypted RSA private key in PKCS#8 format.
+          - Changes in VOMS::Lite::PEMHelper::readPrivateKey to also accept
+           "-----BEGIN PRIVATE KEY-----" .. "-----END PRIVATE KEY-----" blocks
+          - Changes in VOMS::Lite::KEY::Examine to locate internal octet string 
+            and re-index to start of key data allowing key to be parsed with the
+            existing algorithm.
+        - Added RPM spec file (originally written by Steve Traylen)
+          - Added unwin32.patch to aid automatic perl library exclusions in rpm
+          - Added voms.config sample as required by spec file
+        - Updated the updateversion.pl script to update version in RPM spec file
+0.18 Mon Jul 02 12:05:00 2012
+        - VOMS::Lite::REQ::Create
+          - Checks input to identify whether request is for a host or not
+          - Fixed SubjectAltName Extension request
+          - Fixed Key used to sign request if pre-generated
+          - Added Basic Constraints, Key usage and Extended Key Usage Extensions.
+        - VOMS::Lite::PEMHelper: fixed a number of formatting issues in PEM encoding.
+        - cert-req.pl
+          - added -host option to force subjectAltName dnsName:...
+          - add value in -email to any subjectAltName extension (if not a host cert)
+        - Moved example directory to misc directory
+        - Added buildRPM.sh to build rpms
+        - Created 'rpm' and 'version' targets in MakeMaker generated Makefile
+          - version runs updateversion.pl
+          - rpm runs buildRPM.sh (creates rpms in rpm directory) 
+            and depends on 'dist' and 'verstion'
+        - voms-proxy-init.pl handles no Attribute Certificate scenario more gracefully.
+0.19 Mon Jul 02 12:50:00 2012
+        - Fixed bug in updateversion.pl
+0.20 Mon Jul 02 13:25:00 2012
+        - cert-req.pl -pass option fixed

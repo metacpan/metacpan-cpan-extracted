@@ -1,0 +1,588 @@
+{
+   "abstract" : "Perl interface to Amazon EC2, Virtual Private Cloud, Elastic Load Balancing, Autoscaling, and Relational Database services",
+   "author" : [
+      "Lincoln Stein <lincoln.stein@oicr.on.ca>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "VM-EC2",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "AWS::Signature4" : "1.00"
+         },
+         "requires" : {
+            "AnyEvent" : "7.04",
+            "AnyEvent::CacheDNS" : "0.08",
+            "AnyEvent::HTTP" : "2.15",
+            "Digest::SHA" : "5.47",
+            "File::Path" : "2.08",
+            "JSON" : "0",
+            "LWP" : "5.835",
+            "MIME::Base64" : "3.08",
+            "String::Approx" : "3.26",
+            "URI::URL" : "5.03",
+            "XML::Simple" : "2.18"
+         }
+      }
+   },
+   "provides" : {
+      "RetryTimer" : {
+         "file" : "lib/VM/EC2.pm"
+      },
+      "VM::EC2" : {
+         "file" : "lib/VM/EC2.pm",
+         "version" : "1.28"
+      },
+      "VM::EC2::ASG" : {
+         "file" : "lib/VM/EC2/ASG.pm"
+      },
+      "VM::EC2::AccountAttributes" : {
+         "file" : "lib/VM/EC2/AccountAttributes.pm"
+      },
+      "VM::EC2::AvailabilityZone" : {
+         "file" : "lib/VM/EC2/AvailabilityZone.pm"
+      },
+      "VM::EC2::BlockDevice" : {
+         "file" : "lib/VM/EC2/BlockDevice.pm"
+      },
+      "VM::EC2::BlockDevice::Attachment" : {
+         "file" : "lib/VM/EC2/BlockDevice/Attachment.pm"
+      },
+      "VM::EC2::BlockDevice::EBS" : {
+         "file" : "lib/VM/EC2/BlockDevice/EBS.pm"
+      },
+      "VM::EC2::BlockDevice::Mapping" : {
+         "file" : "lib/VM/EC2/BlockDevice/Mapping.pm"
+      },
+      "VM::EC2::BlockDevice::Mapping::EBS" : {
+         "file" : "lib/VM/EC2/BlockDevice/Mapping/EBS.pm"
+      },
+      "VM::EC2::CondVar" : {
+         "file" : "lib/VM/EC2.pm"
+      },
+      "VM::EC2::DB::AvailabilityZone" : {
+         "file" : "lib/VM/EC2/DB/AvailabilityZone.pm"
+      },
+      "VM::EC2::DB::CharacterSet" : {
+         "file" : "lib/VM/EC2/DB/CharacterSet.pm"
+      },
+      "VM::EC2::DB::EC2SecurityGroup" : {
+         "file" : "lib/VM/EC2/DB/EC2SecurityGroup.pm"
+      },
+      "VM::EC2::DB::Endpoint" : {
+         "file" : "lib/VM/EC2/DB/Endpoint.pm"
+      },
+      "VM::EC2::DB::Engine::Defaults" : {
+         "file" : "lib/VM/EC2/DB/Engine/Defaults.pm"
+      },
+      "VM::EC2::DB::Engine::Version" : {
+         "file" : "lib/VM/EC2/DB/Engine/Version.pm"
+      },
+      "VM::EC2::DB::Event" : {
+         "file" : "lib/VM/EC2/DB/Event.pm"
+      },
+      "VM::EC2::DB::Event::Category" : {
+         "file" : "lib/VM/EC2/DB/Event/Category.pm"
+      },
+      "VM::EC2::DB::Event::Subscription" : {
+         "file" : "lib/VM/EC2/DB/Event/Subscription.pm"
+      },
+      "VM::EC2::DB::IPRange" : {
+         "file" : "lib/VM/EC2/DB/IPRange.pm"
+      },
+      "VM::EC2::DB::Instance" : {
+         "file" : "lib/VM/EC2/DB/Instance.pm"
+      },
+      "VM::EC2::DB::Instance::OrderableOption" : {
+         "file" : "lib/VM/EC2/DB/Instance/OrderableOption.pm"
+      },
+      "VM::EC2::DB::Option" : {
+         "file" : "lib/VM/EC2/DB/Option.pm"
+      },
+      "VM::EC2::DB::Option::Group" : {
+         "file" : "lib/VM/EC2/DB/Option/Group.pm"
+      },
+      "VM::EC2::DB::Option::Group::Membership" : {
+         "file" : "lib/VM/EC2/DB/Option/Group/Membership.pm"
+      },
+      "VM::EC2::DB::Option::Group::Option" : {
+         "file" : "lib/VM/EC2/DB/Option/Group/Option.pm"
+      },
+      "VM::EC2::DB::Option::Group::Option::Setting" : {
+         "file" : "lib/VM/EC2/DB/Option/Group/Option/Setting.pm"
+      },
+      "VM::EC2::DB::Parameter" : {
+         "file" : "lib/VM/EC2/DB/Parameter.pm"
+      },
+      "VM::EC2::DB::Parameter::Group" : {
+         "file" : "lib/VM/EC2/DB/Parameter/Group.pm"
+      },
+      "VM::EC2::DB::Parameter::Group::Status" : {
+         "file" : "lib/VM/EC2/DB/Parameter/Group/Status.pm"
+      },
+      "VM::EC2::DB::PendingModifiedValues" : {
+         "file" : "lib/VM/EC2/DB/PendingModifiedValues.pm"
+      },
+      "VM::EC2::DB::Reserved::Instance" : {
+         "file" : "lib/VM/EC2/DB/Reserved/Instance.pm"
+      },
+      "VM::EC2::DB::Reserved::Instance::Offering" : {
+         "file" : "lib/VM/EC2/DB/Reserved/Instance/Offering.pm"
+      },
+      "VM::EC2::DB::Reserved::RecurringCharge" : {
+         "file" : "lib/VM/EC2/DB/Reserved/RecurringCharge.pm"
+      },
+      "VM::EC2::DB::SecurityGroup" : {
+         "file" : "lib/VM/EC2/DB/SecurityGroup.pm"
+      },
+      "VM::EC2::DB::SecurityGroup::Membership" : {
+         "file" : "lib/VM/EC2/DB/SecurityGroup/Membership.pm"
+      },
+      "VM::EC2::DB::Snapshot" : {
+         "file" : "lib/VM/EC2/DB/Snapshot.pm"
+      },
+      "VM::EC2::DB::Subnet" : {
+         "file" : "lib/VM/EC2/DB/Subnet.pm"
+      },
+      "VM::EC2::DB::Subnet::Group" : {
+         "file" : "lib/VM/EC2/DB/Subnet/Group.pm"
+      },
+      "VM::EC2::DB::VpcSecurityGroup::Membership" : {
+         "file" : "lib/VM/EC2/DB/VpcSecurityGroup/Membership.pm"
+      },
+      "VM::EC2::Dispatch" : {
+         "file" : "lib/VM/EC2/Dispatch.pm"
+      },
+      "VM::EC2::ELB" : {
+         "file" : "lib/VM/EC2/ELB.pm"
+      },
+      "VM::EC2::ELB::Attributes" : {
+         "file" : "lib/VM/EC2/ELB/Attributes.pm"
+      },
+      "VM::EC2::ELB::Attributes::AccessLog" : {
+         "file" : "lib/VM/EC2/ELB/Attributes/AccessLog.pm"
+      },
+      "VM::EC2::ELB::Attributes::ConnectionDraining" : {
+         "file" : "lib/VM/EC2/ELB/Attributes/ConnectionDraining.pm"
+      },
+      "VM::EC2::ELB::Attributes::ConnectionSettings" : {
+         "file" : "lib/VM/EC2/ELB/Attributes/ConnectionSettings.pm"
+      },
+      "VM::EC2::ELB::Attributes::CrossZoneLoadBalancing" : {
+         "file" : "lib/VM/EC2/ELB/Attributes/CrossZoneLoadBalancing.pm"
+      },
+      "VM::EC2::ELB::BackendServerDescription" : {
+         "file" : "lib/VM/EC2/ELB/BackendServerDescription.pm"
+      },
+      "VM::EC2::ELB::HealthCheck" : {
+         "file" : "lib/VM/EC2/ELB/HealthCheck.pm"
+      },
+      "VM::EC2::ELB::InstanceState" : {
+         "file" : "lib/VM/EC2/ELB/InstanceState.pm"
+      },
+      "VM::EC2::ELB::Listener" : {
+         "file" : "lib/VM/EC2/ELB/Listener.pm"
+      },
+      "VM::EC2::ELB::ListenerDescription" : {
+         "file" : "lib/VM/EC2/ELB/ListenerDescription.pm"
+      },
+      "VM::EC2::ELB::ParmParser" : {
+         "file" : "lib/VM/EC2/ELB/ParmParser.pm"
+      },
+      "VM::EC2::ELB::Policies" : {
+         "file" : "lib/VM/EC2/ELB/Policies.pm"
+      },
+      "VM::EC2::ELB::Policies::AppCookieStickinessPolicy" : {
+         "file" : "lib/VM/EC2/ELB/Policies/AppCookieStickinessPolicy.pm"
+      },
+      "VM::EC2::ELB::Policies::LBCookieStickinessPolicy" : {
+         "file" : "lib/VM/EC2/ELB/Policies/LBCookieStickinessPolicy.pm"
+      },
+      "VM::EC2::ELB::PolicyAttribute" : {
+         "file" : "lib/VM/EC2/ELB/PolicyAttribute.pm"
+      },
+      "VM::EC2::ELB::PolicyAttributeType" : {
+         "file" : "lib/VM/EC2/ELB/PolicyAttributeType.pm"
+      },
+      "VM::EC2::ELB::PolicyDescription" : {
+         "file" : "lib/VM/EC2/ELB/PolicyDescription.pm"
+      },
+      "VM::EC2::ELB::PolicyTypeDescription" : {
+         "file" : "lib/VM/EC2/ELB/PolicyTypeDescription.pm"
+      },
+      "VM::EC2::ELB::TagDescription" : {
+         "file" : "lib/VM/EC2/ELB/TagDescription.pm"
+      },
+      "VM::EC2::ElasticAddress" : {
+         "file" : "lib/VM/EC2/ElasticAddress.pm"
+      },
+      "VM::EC2::Error" : {
+         "file" : "lib/VM/EC2/Error.pm"
+      },
+      "VM::EC2::Generic" : {
+         "file" : "lib/VM/EC2/Generic.pm"
+      },
+      "VM::EC2::Group" : {
+         "file" : "lib/VM/EC2/Group.pm"
+      },
+      "VM::EC2::Image" : {
+         "file" : "lib/VM/EC2/Image.pm"
+      },
+      "VM::EC2::Image::LaunchPermission" : {
+         "file" : "lib/VM/EC2/Image/LaunchPermission.pm"
+      },
+      "VM::EC2::Instance" : {
+         "file" : "lib/VM/EC2/Instance.pm"
+      },
+      "VM::EC2::Instance::ConsoleOutput" : {
+         "file" : "lib/VM/EC2/Instance/ConsoleOutput.pm"
+      },
+      "VM::EC2::Instance::IamProfile" : {
+         "file" : "lib/VM/EC2/Instance/IamProfile.pm"
+      },
+      "VM::EC2::Instance::Metadata" : {
+         "file" : "lib/VM/EC2/Instance/Metadata.pm"
+      },
+      "VM::EC2::Instance::MonitoringState" : {
+         "file" : "lib/VM/EC2/Instance/MonitoringState.pm"
+      },
+      "VM::EC2::Instance::PasswordData" : {
+         "file" : "lib/VM/EC2/Instance/PasswordData.pm"
+      },
+      "VM::EC2::Instance::Placement" : {
+         "file" : "lib/VM/EC2/Instance/Placement.pm"
+      },
+      "VM::EC2::Instance::Set" : {
+         "file" : "lib/VM/EC2/Instance/Set.pm"
+      },
+      "VM::EC2::Instance::State" : {
+         "file" : "lib/VM/EC2/Instance/State.pm"
+      },
+      "VM::EC2::Instance::State::Change" : {
+         "file" : "lib/VM/EC2/Instance/State/Change.pm"
+      },
+      "VM::EC2::Instance::State::Reason" : {
+         "file" : "lib/VM/EC2/Instance/State/Reason.pm"
+      },
+      "VM::EC2::Instance::Status" : {
+         "file" : "lib/VM/EC2/Instance/Status.pm"
+      },
+      "VM::EC2::Instance::Status::Details" : {
+         "file" : "lib/VM/EC2/Instance/Status/Details.pm"
+      },
+      "VM::EC2::Instance::Status::Event" : {
+         "file" : "lib/VM/EC2/Instance/Status/Event.pm"
+      },
+      "VM::EC2::Instance::StatusItem" : {
+         "file" : "lib/VM/EC2/Instance/StatusItem.pm"
+      },
+      "VM::EC2::KeyPair" : {
+         "file" : "lib/VM/EC2/KeyPair.pm"
+      },
+      "VM::EC2::LaunchConfiguration" : {
+         "file" : "lib/VM/EC2/LaunchConfiguration.pm"
+      },
+      "VM::EC2::NetworkInterface" : {
+         "file" : "lib/VM/EC2/NetworkInterface.pm"
+      },
+      "VM::EC2::NetworkInterface::Association" : {
+         "file" : "lib/VM/EC2/NetworkInterface/Association.pm"
+      },
+      "VM::EC2::NetworkInterface::Attachment" : {
+         "file" : "lib/VM/EC2/NetworkInterface/Attachment.pm"
+      },
+      "VM::EC2::NetworkInterface::PrivateIpAddress" : {
+         "file" : "lib/VM/EC2/NetworkInterface/PrivateIpAddress.pm"
+      },
+      "VM::EC2::ParmParser" : {
+         "file" : "lib/VM/EC2/ParmParser.pm"
+      },
+      "VM::EC2::PlacementGroup" : {
+         "file" : "lib/VM/EC2/PlacementGroup.pm"
+      },
+      "VM::EC2::ProductCode" : {
+         "file" : "lib/VM/EC2/ProductCode.pm"
+      },
+      "VM::EC2::REST::ami" : {
+         "file" : "lib/VM/EC2/REST/ami.pm"
+      },
+      "VM::EC2::REST::autoscaling" : {
+         "file" : "lib/VM/EC2/REST/autoscaling.pm"
+      },
+      "VM::EC2::REST::customer_gateway" : {
+         "file" : "lib/VM/EC2/REST/customer_gateway.pm"
+      },
+      "VM::EC2::REST::devpay" : {
+         "file" : "lib/VM/EC2/REST/devpay.pm"
+      },
+      "VM::EC2::REST::dhcp" : {
+         "file" : "lib/VM/EC2/REST/dhcp.pm"
+      },
+      "VM::EC2::REST::ebs" : {
+         "file" : "lib/VM/EC2/REST/ebs.pm"
+      },
+      "VM::EC2::REST::elastic_ip" : {
+         "file" : "lib/VM/EC2/REST/elastic_ip.pm"
+      },
+      "VM::EC2::REST::elastic_load_balancer" : {
+         "file" : "lib/VM/EC2/REST/elastic_load_balancer.pm"
+      },
+      "VM::EC2::REST::elastic_network_interface" : {
+         "file" : "lib/VM/EC2/REST/elastic_network_interface.pm"
+      },
+      "VM::EC2::REST::general" : {
+         "file" : "lib/VM/EC2/REST/general.pm"
+      },
+      "VM::EC2::REST::instance" : {
+         "file" : "lib/VM/EC2/REST/instance.pm"
+      },
+      "VM::EC2::REST::internet_gateway" : {
+         "file" : "lib/VM/EC2/REST/internet_gateway.pm"
+      },
+      "VM::EC2::REST::keys" : {
+         "file" : "lib/VM/EC2/REST/keys.pm"
+      },
+      "VM::EC2::REST::monitoring" : {
+         "file" : "lib/VM/EC2/REST/monitoring.pm"
+      },
+      "VM::EC2::REST::network_acl" : {
+         "file" : "lib/VM/EC2/REST/network_acl.pm"
+      },
+      "VM::EC2::REST::placement_group" : {
+         "file" : "lib/VM/EC2/REST/placement_group.pm"
+      },
+      "VM::EC2::REST::private_ip" : {
+         "file" : "lib/VM/EC2/REST/private_ip.pm"
+      },
+      "VM::EC2::REST::relational_database_service" : {
+         "file" : "lib/VM/EC2/REST/relational_database_service.pm"
+      },
+      "VM::EC2::REST::reserved_instance" : {
+         "file" : "lib/VM/EC2/REST/reserved_instance.pm"
+      },
+      "VM::EC2::REST::route_table" : {
+         "file" : "lib/VM/EC2/REST/route_table.pm"
+      },
+      "VM::EC2::REST::security_group" : {
+         "file" : "lib/VM/EC2/REST/security_group.pm"
+      },
+      "VM::EC2::REST::security_token" : {
+         "file" : "lib/VM/EC2/REST/security_token.pm"
+      },
+      "VM::EC2::REST::spot_instance" : {
+         "file" : "lib/VM/EC2/REST/spot_instance.pm"
+      },
+      "VM::EC2::REST::subnet" : {
+         "file" : "lib/VM/EC2/REST/subnet.pm"
+      },
+      "VM::EC2::REST::tag" : {
+         "file" : "lib/VM/EC2/REST/tag.pm"
+      },
+      "VM::EC2::REST::vm_export" : {
+         "file" : "lib/VM/EC2/REST/vm_export.pm"
+      },
+      "VM::EC2::REST::vm_import" : {
+         "file" : "lib/VM/EC2/REST/vm_import.pm"
+      },
+      "VM::EC2::REST::vpc" : {
+         "file" : "lib/VM/EC2/REST/vpc.pm"
+      },
+      "VM::EC2::REST::vpn" : {
+         "file" : "lib/VM/EC2/REST/vpn.pm"
+      },
+      "VM::EC2::REST::vpn_gateway" : {
+         "file" : "lib/VM/EC2/REST/vpn_gateway.pm"
+      },
+      "VM::EC2::REST::windows" : {
+         "file" : "lib/VM/EC2/REST/windows.pm"
+      },
+      "VM::EC2::REST::zone" : {
+         "file" : "lib/VM/EC2/REST/zone.pm"
+      },
+      "VM::EC2::Region" : {
+         "file" : "lib/VM/EC2/Region.pm"
+      },
+      "VM::EC2::ReservationSet" : {
+         "file" : "lib/VM/EC2/ReservationSet.pm"
+      },
+      "VM::EC2::ReservedInstance" : {
+         "file" : "lib/VM/EC2/ReservedInstance.pm"
+      },
+      "VM::EC2::ReservedInstance::Listing" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Listing.pm"
+      },
+      "VM::EC2::ReservedInstance::Listing::InstanceCounts" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Listing/InstanceCount.pm"
+      },
+      "VM::EC2::ReservedInstance::Listing::PriceSchedule" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Listing/PriceSchedule.pm"
+      },
+      "VM::EC2::ReservedInstance::Modification" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Modification.pm"
+      },
+      "VM::EC2::ReservedInstance::Modification::Configuration" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Modification/Configuration.pm"
+      },
+      "VM::EC2::ReservedInstance::Modification::Result" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Modification/Result.pm"
+      },
+      "VM::EC2::ReservedInstance::Offering" : {
+         "file" : "lib/VM/EC2/ReservedInstance/Offering.pm"
+      },
+      "VM::EC2::ReservedInstance::ParmParser" : {
+         "file" : "lib/VM/EC2/ReservedInstance/ParmParser.pm"
+      },
+      "VM::EC2::ScalingPolicy" : {
+         "file" : "lib/VM/EC2/ScalingPolicy.pm"
+      },
+      "VM::EC2::Security::Credentials" : {
+         "file" : "lib/VM/EC2/Security/Credentials.pm"
+      },
+      "VM::EC2::Security::FederatedUser" : {
+         "file" : "lib/VM/EC2/Security/FederatedUser.pm"
+      },
+      "VM::EC2::Security::Policy" : {
+         "file" : "lib/VM/EC2/Security/Policy.pm"
+      },
+      "VM::EC2::Security::Token" : {
+         "file" : "lib/VM/EC2/Security/Token.pm"
+      },
+      "VM::EC2::SecurityGroup" : {
+         "file" : "lib/VM/EC2/SecurityGroup.pm"
+      },
+      "VM::EC2::SecurityGroup::GroupPermission" : {
+         "file" : "lib/VM/EC2/SecurityGroup/GroupPermission.pm"
+      },
+      "VM::EC2::SecurityGroup::IpPermission" : {
+         "file" : "lib/VM/EC2/SecurityGroup/IpPermission.pm"
+      },
+      "VM::EC2::Snapshot" : {
+         "file" : "lib/VM/EC2/Snapshot.pm"
+      },
+      "VM::EC2::Snapshot::CreateVolumePermission" : {
+         "file" : "lib/VM/EC2/Snapshot/CreateVolumePermission.pm"
+      },
+      "VM::EC2::Spot::DatafeedSubscription" : {
+         "file" : "lib/VM/EC2/Spot/DatafeedSubscription.pm"
+      },
+      "VM::EC2::Spot::InstanceRequest" : {
+         "file" : "lib/VM/EC2/Spot/InstanceRequest.pm"
+      },
+      "VM::EC2::Spot::LaunchSpecification" : {
+         "file" : "lib/VM/EC2/Spot/LaunchSpecification.pm"
+      },
+      "VM::EC2::Spot::PriceHistory" : {
+         "file" : "lib/VM/EC2/Spot/PriceHistory.pm"
+      },
+      "VM::EC2::Spot::Status" : {
+         "file" : "lib/VM/EC2/Spot/Status.pm"
+      },
+      "VM::EC2::Staging::Manager" : {
+         "file" : "lib/VM/EC2/Staging/Manager.pm"
+      },
+      "VM::EC2::Staging::Server" : {
+         "file" : "lib/VM/EC2/Staging/Server.pm"
+      },
+      "VM::EC2::Staging::Volume" : {
+         "file" : "lib/VM/EC2/Staging/Volume.pm"
+      },
+      "VM::EC2::Tag" : {
+         "file" : "lib/VM/EC2/Tag.pm"
+      },
+      "VM::EC2::VPC" : {
+         "file" : "lib/VM/EC2/VPC.pm"
+      },
+      "VM::EC2::VPC::CustomerGateway" : {
+         "file" : "lib/VM/EC2/VPC/CustomerGateway.pm"
+      },
+      "VM::EC2::VPC::DhcpOptions" : {
+         "file" : "lib/VM/EC2/VPC/DhcpOptions.pm"
+      },
+      "VM::EC2::VPC::InternetGateway" : {
+         "file" : "lib/VM/EC2/VPC/InternetGateway.pm"
+      },
+      "VM::EC2::VPC::InternetGateway::Attachment" : {
+         "file" : "lib/VM/EC2/VPC/InternetGateway/Attachment.pm"
+      },
+      "VM::EC2::VPC::NetworkAcl" : {
+         "file" : "lib/VM/EC2/VPC/NetworkAcl.pm"
+      },
+      "VM::EC2::VPC::NetworkAcl::Association" : {
+         "file" : "lib/VM/EC2/VPC/NetworkAcl/Association.pm"
+      },
+      "VM::EC2::VPC::NetworkAcl::Entry" : {
+         "file" : "lib/VM/EC2/VPC/NetworkAcl/Entry.pm"
+      },
+      "VM::EC2::VPC::PeeringConnection" : {
+         "file" : "lib/VM/EC2/VPC/PeeringConnection.pm"
+      },
+      "VM::EC2::VPC::PeeringConnection::StateReason" : {
+         "file" : "lib/VM/EC2/VPC/PeeringConnection/StateReason.pm"
+      },
+      "VM::EC2::VPC::PeeringConnection::VpcInfo" : {
+         "file" : "lib/VM/EC2/VPC/PeeringConnection/VpcInfo.pm"
+      },
+      "VM::EC2::VPC::Route" : {
+         "file" : "lib/VM/EC2/VPC/Route.pm"
+      },
+      "VM::EC2::VPC::RouteTable" : {
+         "file" : "lib/VM/EC2/VPC/RouteTable.pm"
+      },
+      "VM::EC2::VPC::RouteTable::Association" : {
+         "file" : "lib/VM/EC2/VPC/RouteTable/Association.pm"
+      },
+      "VM::EC2::VPC::Subnet" : {
+         "file" : "lib/VM/EC2/VPC/Subnet.pm"
+      },
+      "VM::EC2::VPC::VpnConnection" : {
+         "file" : "lib/VM/EC2/VPC/VpnConnection.pm"
+      },
+      "VM::EC2::VPC::VpnGateway" : {
+         "file" : "lib/VM/EC2/VPC/VpnGateway.pm"
+      },
+      "VM::EC2::VPC::VpnGateway::Attachment" : {
+         "file" : "lib/VM/EC2/VPC/VpnGateway/Attachment.pm"
+      },
+      "VM::EC2::VPC::VpnTunnelTelemetry" : {
+         "file" : "lib/VM/EC2/VPC/VpnTunnelTelemetry.pm"
+      },
+      "VM::EC2::Volume" : {
+         "file" : "lib/VM/EC2/Volume.pm"
+      },
+      "VM::EC2::Volume::Status" : {
+         "file" : "lib/VM/EC2/Volume/Status.pm"
+      },
+      "VM::EC2::Volume::Status::Action" : {
+         "file" : "lib/VM/EC2/Volume/Status/Action.pm"
+      },
+      "VM::EC2::Volume::Status::Details" : {
+         "file" : "lib/VM/EC2/Volume/Status/Details.pm"
+      },
+      "VM::EC2::Volume::Status::Event" : {
+         "file" : "lib/VM/EC2/Volume/Status/Event.pm"
+      },
+      "VM::EC2::Volume::StatusItem" : {
+         "file" : "lib/VM/EC2/Volume/StatusItem.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.28"
+}

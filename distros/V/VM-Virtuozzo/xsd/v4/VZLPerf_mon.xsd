@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/perf_mon" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/perf_mon" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="perf_mon">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="perf_monType"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="perf_monType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice minOccurs="0">
+					<xs:choice>
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="start_monitor"/>
+						<xs:element ref="stop_monitor"/>
+						<xs:element ref="get"/>
+					</xs:choice>
+					<xs:choice>
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="data" maxOccurs="unbounded"/>
+						<xs:element ref="id"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="classType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="instance" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Instance list to monitor.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="name" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If name is absent report data on all instances with selected counters. In this case no other instances are allowed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="counter" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Per instance list of counters to report. If absent report all  counters</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="start_monitor">
+		<xs:annotation>
+			<xs:documentation>Start monitoring specified list of envs. returns monitor id</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid_list" type="vzlt:eid_listType">
+					<xs:annotation>
+						<xs:documentation>List of environment IDs to monitor. If empty, report data on all avalible environments.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="filter" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Environments filter (use with empty eid_list to monitor all environments)</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Environment type</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="class" type="classType" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Periodic classes to monitor (net, memory, cpu, etc).</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="report_period" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Reporting period</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="collect_period" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Adjust collecting period</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stop_monitor">
+		<xs:annotation>
+			<xs:documentation>Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="vzlt:guid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="data" type="vzlt:perf_dataType"/>
+	<xs:element name="id" type="vzlt:guid_type"/>
+	<xs:element name="get">
+		<xs:annotation>
+			<xs:documentation>Get performance data immediately. Retreives freshest available data. Returns Error if no data available.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid_list" type="vzlt:eid_listType">
+					<xs:annotation>
+						<xs:documentation>if empty, report data on all avalible envs</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="class" type="classType" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>periodic classes (net, memory, cpu, etc). all class names must correspond to same environment type</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="start_monitorResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="id"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stop_monitorResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="getResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="data" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="perf_mon_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="priority" type="xs:int"/>
+					<xs:element name="min_monitor_period" type="xs:int"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

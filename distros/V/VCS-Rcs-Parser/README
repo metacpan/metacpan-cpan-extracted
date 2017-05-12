@@ -1,0 +1,49 @@
+
+This is VCS::Rcs::Parser Package. 
+
+RCSfile parsing with Parse::Yapp and Rcs 'co' implimentation in Perl.
+
+To install the package as root:
+
+   $ perl Makefile.PL
+   $ make
+   $ make test
+   ( try the tests in the examples/ directory as well )
+   # make install
+
+if you do not have privilages to install it system wide: (like me)
+
+   $ perl Makefile.PL PREFIX=/home/user   (or wherever you can write to)
+   $ make
+   $ make test
+   ( try the tests in the examples/ directory as well )
+   $ make install
+
+ The tests are in shell script for now. I know its bad.
+ I will put them in test.pl as soon as I can. 
+
+WARNING:
+THIS IS A BETA SOFTWARE.
+DONT USE IT FOR PRODUCTION UNLESS YOU HAVE DONE THE
+TESTS ON THE FILES YOU ARE WORKING WITH.
+* 0.04 has a memory leak!!! upgrade
+
+BUGS:
+
+* 'CO' algoritm does not follow branches, or even 'next's. 
+  It only follows the order deltatext is written to the ,v 
+  revision file.
+
+* Probably more!
+
+
+TESTS:
+
+* There is a examples/test.sh script fro comparing the results 
+  with standart 'co'. Run this to see if it diffs OK.
+
+* If you want to check your ,v revision files, -if it works with your files-
+  stick them in the examples/RCS directory, and try form there.
+
+* There is a co.pl script you can use instead of 'co'. Don't forget. It
+  is very limited.

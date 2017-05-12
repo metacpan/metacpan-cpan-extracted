@@ -1,0 +1,3 @@
+[submodule "valence"]
+	path = valence
+	url = https://github.com/hoytech/valence.git

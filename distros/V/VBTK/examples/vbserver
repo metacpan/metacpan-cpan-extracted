@@ -1,0 +1,76 @@
+#!/bin/perl
+#
+# Example script for using VBTK::Server.  This will be your most complicated
+# script, but just follow the comments and it should make sense.  See the
+# VBTK::Server pod documentation for more details - 'perldoc VBTK::Server'
+
+use VBTK::Server;
+
+# Set some host-specific defaults.  This allows us to use the same script
+# on both vbserver machines and just vary the things which need to be different.
+my ($prefix,$remoteURI,$mailHost);
+if($HOST eq 'sfoServer') {
+    $prefix    = 'sfo';                      # String to prepend to object names
+    $remoteURI = "http://nycServer:$VBPORT"; # URI of remote slave/master server
+    $mailHost  = 'sfosmtp';                  # SMTP host to send alerts through
+} elsif ($HOST eq 'nycServer') {
+    $prefix    = 'nyc';                      # String to prepend to object names
+    $remoteURI = "http://sfoServer:$VBPORT"; # URI of remote slave/master server
+    $mailHost  = 'nycsmtp';                  # SMTP host to send alerts through
+} else {
+    die("Not supposed to run vbserver on this machine");
+};
+
+# Setup email actions
+new VBTK::Actions::Email ( Name => 'emailMe',  To => 'me@mydomain.com' );
+new VBTK::Actions::Email ( Name => 'emailBob', To => 'bob@mydomain.com' );
+
+# Setup paging actions
+new VBTK::Actions::Email::Page ( Name => 'pageMe',  To => 'page.me@mydomain.com');
+new VBTK::Actions::Email::Page ( Name => 'pageBob', To => 'page.bob@mydomain.com');
+
+# Setup some action groups
+new VBTK::Actions ( Name => 'emailSA', SubActionList => 'emailMe,emailBob' );
+new VBTK::Actions ( Name => 'pageSA',  SubActionList => 'pageMe,pageBob,emailSA' );
+
+# Initialize a server object.
+$server = new VBTK::Server (
+     ObjectPrefix	  => $prefix,
+     SmtpHost             => $mailHost,
+     EmailFrom            => 'vbtk@settomydomain.com',
+     CompanyName          => 'My Company',
+     AdminEmail           => 'sysop@settomydomain.com',
+);
+
+# Setup heartbeat connections to another VB server    
+#$server->addRemoteServer (
+#    RemoteURI  => $remoteURI );
+    
+# Create templates to match up status change actions with objects
+
+# DBA-related objects
+#$server->addTemplate (
+#    Pattern             => 'db\.dbspace|db\.logins',
+#    StatusChangeActions => {
+#    	Failed  => 'pageDBA,emailDBA',
+#    	Expired => 'pageDBA,emailDBA',
+#    	Warning => 'emailDBA' } );
+
+# Critical objects, page and email
+#$server->addTemplate (
+#    Pattern 		=> 'nyc.*http|mainserver.*ping',
+#    StatusChangeActions => { 
+#        Failed  => 'pageSA',
+#        Expired => 'pageSA',
+#        Warning => 'emailSA' } );
+
+# Everything else, just email
+$server->addTemplate (
+    Pattern 		=> '.*',
+    StatusChangeActions => { 
+        Failed  => 'emailSA',
+        Expired => 'emailSA',
+    	Warning => 'emailSA' } );
+
+# Start the server listening and handling requests.
+$server->run;

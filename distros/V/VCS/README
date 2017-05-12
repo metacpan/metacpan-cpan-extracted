@@ -1,0 +1,98 @@
+NAME
+    VCS - Version Control System access in Perl
+
+SYNOPSIS
+        use VCS;
+        $file = VCS::File->new($ARGV[0]);
+        print $file->url, ":\n";
+        for $version ($file->versions) {
+            print $version->version,
+                  ' was checked in by ',
+                  $version->author,
+                  "\n";
+        }
+
+DESCRIPTION
+    "VCS" is an API for abstracting access to all version control systems
+    from Perl code. This is achieved in a similar fashion to the "DBI" suite
+    of modules. There are "container" classes, "VCS::Dir", "VCS::File", and
+    "VCS::Version", and "implementation" classes, such as "VCS::Cvs::Dir",
+    "VCS::Cvs::File", and "VCS::Cvs::Version", which are subclasses of their
+    respective "container" classes.
+
+    The container classes are instantiated with URLs. There is a URL scheme
+    for entities under version control. The format is as follows:
+
+        vcs://localhost/VCS::Cvs/fs/path/?query=1
+
+    The "query" part is ignored for now. The path must be an absolute path,
+    meaningful to the given class. The class is an implementation class,
+    such as "VCS::Cvs".
+
+    The "container" classes work as follows: when the "new" method of a
+    container class is called, it will parse the given URL, using the
+    "VCS->parse_url" method. It will then call the "new" of the
+    implementation's appropriate container subclass, and return the result.
+    For example,
+
+        VCS::Version->new('vcs://localhost/VCS::Cvs/fs/path/file/1.2');
+
+    will return a "VCS::Cvs::Version".
+
+    An implementation class is recognised as follows: its name starts with
+    "VCS::", and "require "VCS/Classname.pm"" will load the appropriate
+    implementation classes corresponding to the container classes.
+
+VCS METHODS
+  VCS->parse_url
+    This returns a four-element list:
+
+        ($hostname, $classname, $path, $query)
+
+    For example,
+
+        VCS->parse_url('vcs://localhost/VCS::Cvs/fs/path/file/1.2');
+
+    will return
+
+        (
+            'localhost',
+            'VCS::Cvs',
+            '/fs/path/file/1.2',
+            ''
+        )
+
+    This is mostly intended for use by the container classes, and its
+    interface is subject to change.
+
+  VCS->class_load
+    This loads its given implementation class.
+
+    This is mostly intended for use by the container classes, and its
+    interface is subject to change.
+
+VCS::* METHODS
+    Please refer to the documentation for VCS::Dir, VCS::File, and
+    VCS::Version; as well as the implementation specific documentation as in
+    VCS::Cvs, VCS::Rcs.
+
+AUTHORS
+      Greg McCarroll <greg@mccarroll.org.uk>
+      Leon Brocard
+      Ed J
+
+KUDOS
+    Thanks to the following for patches,
+
+        Richard Clamp
+        Pierre Denis
+        Slaven Rezic
+
+COPYRIGHT
+    Copyright (c) 1998-2003 Leon Brocard & Greg McCarroll. All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    VCS::Cvs, VCS::Dir, VCS::File, VCS::Rcs, VCS::Version.
+

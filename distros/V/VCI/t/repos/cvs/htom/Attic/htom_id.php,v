@@ -1,0 +1,71 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \class HTOM_ID
+ * \brief HTOM_ID represents an HTML object identifier. 
+ *
+ * The identifier may be used to identify HTML objects.
+ * In order to get the new HTOM_ID one have to call HTOM_IDManager::ID static method.
+ * It is possible to use another ID manager. The only requrement is that generated ID objects
+ *must be unique over the document.
+*/
+abstract class HTOM_ID implements HTOM_Attribute
+{
+  //! Get the value of ID.
+  public abstract function getValue(); 
+  
+  public function Name()
+  {
+    return "ID";
+  }
+  
+  //! Evaluate to the HTML ID tag argument.
+  public function Evaluate()
+  {
+    return " ID='".$this->getValue()."' ";
+  }
+  
+  //! return selfs
+  public function ID()
+  {
+    return $this;
+  }
+}
+
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/envm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/envm" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:element name="envm" type="envmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Environment Management</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="envmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="create"/>
+						<xs:element ref="repair"/>
+						<xs:element ref="stop_repair"/>
+						<xs:element ref="start"/>
+						<xs:element ref="stop"/>
+						<xs:element ref="restart"/>
+						<xs:element ref="destroy"/>
+						<xs:element ref="suspend"/>
+						<xs:element ref="resume"/>
+						<xs:element ref="get_info"/>
+						<xs:element ref="get_list"/>
+						<xs:element ref="set"/>
+						<xs:element ref="put_private"/>
+						<xs:element ref="get_private"/>
+						<xs:element ref="get_vt_settings"/>
+						<xs:element ref="set_vt_settings"/>
+						<xs:element ref="get_vt_info"/>
+						<xs:element ref="get_log"/>
+						<xs:element ref="get_native_config"/>
+						<xs:element ref="get_virtual_config"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="env" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="eid" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="value"/>
+						<xs:element ref="vt_settings" minOccurs="0"/>
+						<xs:element ref="vt_info" minOccurs="0"/>
+						<xs:element ref="env_config" minOccurs="0"/>
+						<xs:element ref="virtual_config" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="native_config" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="log" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Virtualization technology-specific log</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="create">
+		<xs:annotation>
+			<xs:documentation>Creates Environment with specified ID and OS template. Returns OK/Error in case of specified "eid", and env/Error otherwise.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="force" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Ignore pool problem, and forcibly create Environment.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:sequence>
+					<xs:annotation>
+						<xs:documentation>You can create on sample specifiing 'base_sample_id' .</xs:documentation>
+					</xs:annotation>
+					<xs:element name="config" type="vzlt:env_configType"/>
+					<xs:element name="default" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="parameter" type="xs:string" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Configuration parameter to set.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="repair">
+		<xs:annotation>
+			<xs:documentation>Creates repair Environment for specified eid, stops the initial Environment and starts the repair one. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stop_repair">
+		<xs:annotation>
+			<xs:documentation>Stops and destroys repair Environment. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="start">
+		<xs:annotation>
+			<xs:documentation>Starts Environment with specified ID. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="suspend">
+		<xs:annotation>
+			<xs:documentation>Suspends Environment with specified ID. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resume">
+		<xs:annotation>
+			<xs:documentation>Resumes Environment with specified ID. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stop">
+		<xs:annotation>
+			<xs:documentation>Stops Environment with specified ID. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="force" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Force Environment stop.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="restart">
+		<xs:annotation>
+			<xs:documentation>Restart Environment with specified ID. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+					<down/>
+					<mounted/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="destroy">
+		<xs:annotation>
+			<xs:documentation>Destroys Environment with specified ID. Returns OK/Error</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_info">
+		<xs:annotation>
+			<xs:documentation>Returns information about Environment with specified ID's or about all of Environment's, when eid is absent. Returns list of "env"s  or Error. NOTE: no error returns if you specified unexistent Environment, its simply will not be included to returned list.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="config" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Returns Environment configuration file data. Returns only selected parts if filter_config with any childs is present.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType/>
+				</xs:element>
+				<xs:element name="filter_config" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:any/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_list">
+		<xs:annotation>
+			<xs:documentation>Gets list of existing Environments. Specified parameters allow narrowing of the selection. Returns "eid"s or Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="count" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of Environments to list.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="type" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Types of Environments to list.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="status" type="vzlt:env_statusType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>If present the only the Environments with the specified status will be returned</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set">
+		<xs:annotation>
+			<xs:documentation>Sets Environment parameters. They are stored in configuration file and affect the current active Environment settings. Returns  end_config or Error</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+					<running/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:sequence>
+					<xs:annotation>
+						<xs:documentation>This is a choice really. Sequence is used for compatibility with SOAP.</xs:documentation>
+					</xs:annotation>
+					<xs:sequence minOccurs="0">
+						<xs:element name="config" type="vzlt:env_configType"/>
+						<xs:element name="force" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Ignore pool problem, and forcibly assign IP to Env.</xs:documentation>
+							</xs:annotation>
+							<xs:complexType/>
+						</xs:element>
+						<xs:element name="default" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="parameter" type="xs:string" maxOccurs="unbounded">
+										<xs:annotation>
+											<xs:documentation>Configuration parameter to set.</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:element name="apply_config" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Read parameters from Environment sample configuration file and apply them. The template and network specific parameters are not changed(TEMPLATE, OS_TEMPLATE, VE_ROOT, VE_PRIVATE, HOSTNAME, IP_ADDRESS).</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="sample_conf" type="vzlt:guid_type">
+									<xs:annotation>
+										<xs:documentation>Sample configuration ID.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="parameter" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Name of sample parameters to set.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="category" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Category of sample parameters to set.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="config_customized" type="xs:boolean" minOccurs="0"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:element name="set_mode" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>--setmode values:
+'restart' - restart Environment while setiing of pareameters required restart
+'ignore'  - set such parameters, but ignore error on apply on running Environment 
+default behavior - fail if it is not possible to appy such parameters</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="put_private">
+		<xs:annotation>
+			<xs:documentation>Creates or replaces a file in Environment's private area. Empty value removes the file. Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+					<running/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Private file name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="value" type="xs:base64Binary">
+					<xs:annotation>
+						<xs:documentation>Private file content</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_private">
+		<xs:annotation>
+			<xs:documentation>Retrieves content of the file from Environment's private area. Returns "value" or Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<down/>
+					<mounted/>
+					<running/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type"/>
+				<xs:element name="name" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Private file name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="env" type="vzlt:envType">
+		<xs:annotation>
+			<xs:documentation>Environment information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="virtual_config" type="vzlt:venv_configType">
+		<xs:annotation>
+			<xs:documentation>Container information</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="native_config" type="vzlt:native_configType">
+		<xs:annotation>
+			<xs:documentation>Native Container configuration</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="eid" type="vzlt:eid_type"/>
+	<xs:element name="value" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>Private file content</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="log" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>Virtualization technology specific log</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_native_config">
+		<xs:annotation>
+			<xs:documentation>Gets native configuration by provided virtual configuration. Returns "native_config" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="virtual_config" type="vzlt:venv_configType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_virtual_config">
+		<xs:annotation>
+			<xs:documentation>Gets virtual configuration by provided native configuration. Returns "virtual_config" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="native_config" type="vzlt:native_configType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_vt_settings">
+		<xs:annotation>
+			<xs:documentation>Gets Virtualization technology-specific settings. Returns "settings" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType/>
+	</xs:element>
+	<xs:element name="set_vt_settings">
+		<xs:annotation>
+			<xs:documentation>Sets Virtualization technology-specific settings. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="vt_settings"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_vt_info">
+		<xs:annotation>
+			<xs:documentation>return read-only information about Virtualization technology</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_native_configResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="native_config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_virtual_configResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="virtual_config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_log">
+		<xs:annotation>
+			<xs:documentation>Gets Virtuallization technology specific logs. Returns "log" or Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="start_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Start time of the Log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="end_time" type="vzlt:datetime_type" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>End time of the Log.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="records" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Number of last records to retrieve. "records" can be used along with "start_time" and "end_time" only for action logs.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="options" type="vzlt:log_optionsType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Log options</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="vt_info" type="vzlt:vt_infoType">
+		<xs:annotation>
+			<xs:documentation>Virtualization technology-specific read-only information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="vt_settings" type="vzlt:vt_settingsType">
+		<xs:annotation>
+			<xs:documentation>Virtualization technology-specific settings.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="env_config" type="vzlt:env_configType"/>
+	<xs:element name="createResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="env"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="repairResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stop_repairResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="startResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="stopResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="restartResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="destroyResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_infoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="env" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_listResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="setResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="env_config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="put_privateResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_privateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="value"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_vt_settingsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="vt_settings"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="set_vt_settingsResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_vt_infoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="vt_info"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_logResponse">
+		<xs:annotation>
+			<xs:documentation>Get Log response, Virtuallization technology specific log</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="log"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="envm_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="timeouts">
+						<xs:annotation>
+							<xs:documentation>Timeouts values.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="create" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"create" timeout</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="operate" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>"start", "stop", "mount", "umount",  "destroy", "stop_repair" timeouts. In case quota is dirty "start" and "mount" use "init" timeout. </xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

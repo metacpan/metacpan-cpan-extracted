@@ -1,0 +1,9 @@
+CHANGES
+Makefile.PL
+MANIFEST
+priv.pm
+priv.xs
+README
+disppriv.com
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

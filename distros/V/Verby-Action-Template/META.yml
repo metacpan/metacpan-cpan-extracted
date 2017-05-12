@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Verby-Action-Template
+version:             0.04
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Template:                      0
+    Test::Exception:               0
+    Test::MockObject:              0
+    Test::use::ok:                 0
+    Verby:                         0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

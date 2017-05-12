@@ -1,0 +1,90 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \brief Class represents a JavaScript body.
+ */
+class HTOM_JScript implements HTOM_Evaluable
+{
+  //! Initialize the JavaScript object. 
+  /*! The JavaScript object may contain a JS ordinary script that will 
+   * be rendered on the page.
+   * \param $script a JS script text or HTOM_JScript object.
+   */
+  public function __construct( $script )
+  {
+    if ($script instanceof HTOM_JScript)
+      {
+	$this->script=$script->script;
+	$this->keywords=$script->keywords;
+      } else {
+	$this->script = $script;
+      }
+  }
+  //! Set the keyword to be rendered while evaluating the script on the page.
+  /*! One can use a number of keywords on the page in order to customise script.
+   * Keywords in the script must be passed in the form {KEYWORD}. During evaluating 
+   * the script all registered keywords will be replaced by it's value.
+   * In order to use the keyword syntax in the script use pass a backslask (\) before the 
+   * keyword-like string.
+   * \param $keyword a keyword name (for instance ID - all {ID} strings will be replaced by the value).
+   * \param $value a value of the keyword.
+   */
+  public function SetKeywordValue( $keyword, $value )
+  {
+    $this->keywords[$keyword]=$value;
+  }
+
+  //! Evaluate to the script body.
+  public function Evaluate()
+  {
+    reset($this->keywords);
+    $text = $this->script;
+    while ( current($this->keywords) )
+      {
+	$key = key($this->keywords);
+	$value = current($this->keywords);
+	$text = preg_replace( "/{".$key."}/",$value, $text );
+	next($this->keywords);
+      }
+    return $text;
+  }
+  private $script="";
+  private $keywords=array();
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

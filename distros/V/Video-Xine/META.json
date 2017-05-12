@@ -1,0 +1,65 @@
+{
+   "abstract" : "xine movie player interface",
+   "author" : [
+      "Stephen Nelson <stephenenelson@mac.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Video-Xine",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "1.01",
+            "ExtUtils::PkgConfig" : "1.14",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "X11::FullScreen" : "0",
+            "XSLoader" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "v5.8.3",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "X11::FullScreen" : "0.993"
+         },
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stephenenelson/video-xine"
+      }
+   },
+   "version" : "0.26"
+}
+

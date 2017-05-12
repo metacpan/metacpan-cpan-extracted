@@ -1,0 +1,890 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/system" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/system" elementFormDefault="qualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="system" type="systemType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>System requests. No targets should be specified in these.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="systemType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice minOccurs="0">
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="subscribe"/>
+						<xs:element ref="unsubscribe"/>
+						<xs:element ref="broadcast"/>
+						<xs:element ref="cancel"/>
+						<xs:element ref="get_state"/>
+						<xs:element ref="get_configuration"/>
+						<xs:element ref="get_version"/>
+						<xs:element ref="register_client"/>
+						<xs:element ref="count_registered"/>
+						<xs:element ref="get_vocabulary"/>
+						<xs:element ref="ping"/>
+						<xs:element ref="connect"/>
+						<xs:element ref="close"/>
+						<xs:element ref="distribute"/>
+						<xs:element ref="uninstall"/>
+						<xs:element ref="read_block"/>
+						<xs:element ref="write_block"/>
+						<xs:element ref="get_size"/>
+						<xs:element ref="get_plugins"/>
+						<xs:element ref="get_eid"/>
+						<xs:element ref="login"/>
+						<xs:element ref="generate_pass"/>
+						<xs:element ref="get_realm"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="state" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="registered" minOccurs="0"/>
+						<xs:element ref="version" minOccurs="0"/>
+						<xs:element ref="id" minOccurs="0"/>
+						<xs:element ref="read"/>
+						<xs:element ref="write"/>
+						<xs:element ref="size"/>
+						<xs:element ref="plugin" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="vocabulary" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="eid"/>
+						<xs:element ref="pass"/>
+						<xs:element ref="token"/>
+						<xs:element ref="realms"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="restart_event_dataType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:event_dataType">
+				<xs:sequence>
+					<xs:element name="eid" type="vzlt:eid_type"/>
+					<xs:element name="operator" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="startup_event_dataType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlt:event_dataType">
+				<xs:sequence>
+					<xs:element name="eid" type="vzlt:eid_type"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="voc_opType">
+		<xs:sequence>
+			<xs:element name="creds" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="user" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="states" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="nonexistent" type="xs:string" minOccurs="0"/>
+						<xs:element name="down" type="xs:string" minOccurs="0"/>
+						<xs:element name="mounted" type="xs:string" minOccurs="0"/>
+						<xs:element name="running" type="xs:string" minOccurs="0"/>
+						<xs:element name="repairing" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:sequence>
+				<xs:element name="op" type="voc_opType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="login">
+		<xs:annotation>
+			<xs:documentation>Logs user in. It's used to open permanent connection. Returns "token" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="vzlt:auth_nameType">
+					<xs:sequence>
+						<xs:element name="password" type="xs:base64Binary" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="generate_pass">
+		<xs:annotation>
+			<xs:documentation>Generates one time password. Returns "pass" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="subscribe">
+		<xs:annotation>
+			<xs:documentation>Subscribes for the messages with the target, specified by "name". Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Name of the event to subscribe for: available names are in the "events" group members annotations.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="unsubscribe">
+		<xs:annotation>
+			<xs:documentation>Unsubscribe for the messages with the target, specified by "name". Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Name of the event to subscribe for: available names are in the "events" group members annotations.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_eid">
+		<xs:annotation>
+			<xs:documentation>Returns node id.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="broadcast">
+		<xs:annotation>
+			<xs:documentation>***INTERNAL*** Broadcast messages. Delivered to all of the internal operators.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element name="disconnected">
+					<xs:annotation>
+						<xs:documentation>Disconnectection notification.  Origin should contain the disconnected requisits.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType/>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cancel">
+		<xs:annotation>
+			<xs:documentation>Cancels processing of the Message, specified by "message_id" and optionally "target". Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="message_id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>ID of the initial request message, which processing now should be cancelled.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="target" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Target which was specified in initial message.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="global" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Ignore cancelled message origin (supposed that message_id is unique over agent).</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_state">
+		<xs:annotation>
+			<xs:documentation>Gets states of all of the Directors, supporting this feature. Returns "state" or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_configuration">
+		<xs:annotation>
+			<xs:documentation>Returns current Parallels Agent configuration.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_version">
+		<xs:annotation>
+			<xs:documentation>Returns current Parallels Agent version (not protocol, but the Parallels Agent's code).</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="register_client">
+		<xs:annotation>
+			<xs:documentation>Registers a new client with the given ID. Used for clients licensing along with the function "count_registered". Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="count_registered">
+		<xs:annotation>
+			<xs:documentation>Gets number of clients registered with the given ID.  If ID is absend, returns all of the clients. Returns "registered" or Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_plugins">
+		<xs:annotation>
+			<xs:documentation>Returns "plugin"s or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_vocabulary">
+		<xs:annotation>
+			<xs:documentation>Returns Parallels Agent Vocabulary. "parameter" or "category" can be specify to narrow the selection. Returns "parameter"s or Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Plugin name</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="parameter" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Name of the parameter in Vocabulary.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="category" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Name of the category in Vocabulary.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ping">
+		<xs:annotation>
+			<xs:documentation>Simple ping. Returns OK.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="connect">
+		<xs:annotation>
+			<xs:documentation>Creates a new exclusive connection to some remote node. Returns "id" or Error. </xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element name="conn_info" type="vzlt:connection_infoType">
+					<xs:annotation>
+						<xs:documentation>Address of the host to connect to.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="distribute">
+		<xs:annotation>
+			<xs:documentation>Distribute agent to another node. Returns "eid" of node with distributed agent or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="dst" type="vzlt:connection_infoType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="uninstall">
+		<xs:annotation>
+			<xs:documentation>Uninstall agent from node. Note: now it works for vzagent only. Returns Ok/Error. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="shutdown" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>After uninstall shutdown node.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="read_block">
+		<xs:annotation>
+			<xs:documentation>Reads a block from file. Returns "read" or Error. The block itself is sent right after the binary zero, delimiting the response and contain exactly the "size" of bytes, specified in response.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="path" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Path to file in uploads directory.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="offset" type="xs:long">
+					<xs:annotation>
+						<xs:documentation>Offset in file.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="size" type="xs:long">
+					<xs:annotation>
+						<xs:documentation>Size of the block.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="write_block">
+		<xs:annotation>
+			<xs:documentation>Writes a block to file. Returns "write" or Error. The block itself should be sent right after this message and contain exactly the "size" of bytes, specified in the parameters. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="path" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Path to file in uploads directory.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="offset" type="xs:long">
+					<xs:annotation>
+						<xs:documentation>Offset in file.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="size" type="xs:long">
+					<xs:annotation>
+						<xs:documentation>Size of the block.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_realm">
+		<xs:annotation>
+			<xs:documentation>Gets realms. Returns realms or Error.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="get_size">
+		<xs:annotation>
+			<xs:documentation>Gets size of the file. Returns "size" or Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="path" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Path to file in uploads directory.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="close">
+		<xs:annotation>
+			<xs:documentation>Closes the exclusive connection, previously opened by "connect". Returns OK/Error.</xs:documentation>
+			<xs:appinfo>
+				<creds>
+					<user/>
+				</creds>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name of the exclusive connection to close. Same one, which is returned by "connect".</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="state">
+		<xs:annotation>
+			<xs:documentation>State of the Directors.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="operator" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Operator's name. It shows, stated of Accessor connected to which Operator, is reported below.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="queue_size" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Size of the queue.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="queue_limit" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Limit of the queue.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="pool_total" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Size of the Pool.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="pool_free" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Free Opeators amount.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="pool_busy" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Busy Operators amount</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="pool_heavy" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Operators, busy with heavy messages, amount.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="normal_dyn_limit" type="xs:float" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Normal messages dynamic limit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="heavy_dyn_limit" type="xs:float" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Heavy messages dynamic limit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="urgent_dyn_limit" type="xs:float" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Urgent messages dynamic limit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="normal_limit" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Normal messages total limit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="heavy_limit" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Heavy messages total limit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="urgent_limit" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Urgent messages total limit.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="timeout" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Default timeout for this Operator.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="kill_timeout" type="xs:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Timeout after which the Operator's process will be killed if the normal timeout has already happened.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="timings" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Performance monitoring data, available only when flag in configuration is not set.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence minOccurs="0">
+							<xs:element name="timing" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="operation" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>Operation name ('list', 'check' etc.)</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="count" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Total count of function call</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="avg" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Average processing time (milliseconds)</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="min" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Minimum processing time (milliseconds)</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="max" type="xs:int">
+											<xs:annotation>
+												<xs:documentation>Maximum processing time (milliseconds)</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="time" type="xs:long">
+											<xs:annotation>
+												<xs:documentation>Total time spent processing this function</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="registered">
+		<xs:annotation>
+			<xs:documentation>Number of registered clients.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string"/>
+				<xs:element name="count" type="xs:int"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="version" type="xs:string"/>
+	<xs:element name="read">
+		<xs:annotation>
+			<xs:documentation>Size of bytes read.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="size" type="xs:long"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="write">
+		<xs:annotation>
+			<xs:documentation>Size of bytes written.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="size" type="xs:long"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="size" type="xs:long">
+		<xs:annotation>
+			<xs:documentation>Size of file.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="realms">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="realm" type="vzlt:realmType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="id" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>ID of the node agent has been distributed to</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="vocabulary" type="vzlt:vocabularyType"/>
+	<xs:element name="plugin">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="name" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="token" type="vzlt:tokenType"/>
+	<xs:element name="pass" type="vzlt:auth_nameType"/>
+	<xs:element name="eid" type="vzlt:eid_type"/>
+	<xs:element name="get_eidResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="eid"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="loginResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="token"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="generate_passResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="pass"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="subscribeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="unsubscribeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="broadcastResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="cancelResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_stateResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="state" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_configurationResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any namespace="##any" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_versionResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="version"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="register_clientResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="count_registeredResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="registered"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="distributeResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="id"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_pluginsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="plugin" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_vocabularyResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="vocabulary" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pingResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="connectResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="closeResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="read_blockResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="read"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="write_blockResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="write"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_realmResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="realms"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_sizeResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="size"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="system_configurationType">
+		<xs:complexContent>
+			<xs:extension base="vzlp:configurationType">
+				<xs:sequence>
+					<xs:element name="distribution">
+						<xs:annotation>
+							<xs:documentation>Remote agent distribution.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="architecture" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Distribution architecture.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Additional items to distribute. </xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="path" type="xs:base64Binary">
+												<xs:annotation>
+													<xs:documentation>Path to item.</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="type">
+												<xs:annotation>
+													<xs:documentation>Item type.</xs:documentation>
+												</xs:annotation>
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:enumeration value="dir"/>
+														<xs:enumeration value="arch_sh"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="dst_path" type="xs:base64Binary" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Destination path. If not specified then destination path is equal to 'path'.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="id" type="vzlt:eid_type">
+						<xs:annotation>
+							<xs:documentation>Parallels Agent environment ID.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="timeouts" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="distribute" type="xs:int"/>
+								<xs:element name="connectivity_check" type="xs:int"/>
+								<xs:element name="login_timeout" type="xs:int"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="map" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Map of ID to Host address</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="node" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="id" type="vzlt:eid_type">
+												<xs:annotation>
+													<xs:documentation>Parallels Agent environment ID.</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="host" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>Real hostname or IP-address, something to connect with.</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="log" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Enables logging of all communications with Agent.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="text"/>
+								<xs:enumeration value="binary"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="log_level" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Log level. 0 - minimal log level, 1 - errors only, 2 - warnings... 6 - maximal log level - log packets. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

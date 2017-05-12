@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+
+use Video::Capture::V4l;
+use Time::HiRes 'time';
+
+$grab = new Video::Capture::V4l;
+
+my $channel = $grab->channel (0);
+my $tuner = $grab->tuner (0);
+$tuner->mode(MODE_PAL); $tuner->set;
+$channel->norm(MODE_PAL); $channel->set;
+
+$grab->picture->brightness(32768);
+$grab->picture->contrast(40000);
+$grab->picture->hue(32768);
+$grab->picture->colour(32768);
+$grab->picture->set;
+
+#$RTL2 = 855250;
+$RTL2 = 154250;
+print $grab->freq ($RTL2),"\n";
+
+$|=1;
+
+open DB,"<sailormoon.db" or die;
+read(DB,$w,8) == 8 or die "no header(?)";
+($w,$h)=unpack("N*",$w);
+print "$w $h\n";
+my $db = do { local $/; <DB> };
+
+my $frame=0;
+my $fr=$grab->capture ($frame,$w<<4,$h<<4);
+
+my $fps = 25; # glorious PAL
+my @reg;
+my ($expect_frame,$expect_count);
+
+my $start = time;
+my $next_frame = 0;
+my $this_frame;
+my $locked;
+my $minb1 = 10;
+
+for(;;) {
+   my $nfr = $grab->capture (1-$frame,$w<<4,$h<<4);
+   $this_frame = $next_frame; $next_frame = int((time-$start)*$fps);
+   $grab->sync($frame) or die "unable to sync";
+
+   Video::Capture::V4l::reduce2($fr,$w<<4);
+   Video::Capture::V4l::reduce2($fr,$w<<3);
+   Video::Capture::V4l::reduce2($fr,$w<<2);
+   Video::Capture::V4l::reduce2($fr,$w<<1);
+   Video::Capture::V4l::normalize($fr);
+   ($fr,$diff) = Video::Capture::V4l::findmin ($db, $fr, $expect_frame, $expect_count);
+
+   if ($diff < 400*400) {
+     push(@reg,$this_frame,$fr);
+     if (@reg > $fps*2) {
+        shift @reg; shift @reg;
+        my ($a,$b,$r2) = Video::Capture::V4l::linreg(\@reg);
+        if ($frame_zero) {
+           $expect_frame = $this_frame + $frame_zero + 1;
+           $expect_count = 25;
+        } else {
+           $expect_frame = $expect_count = 0;
+        }
+        printf "%9.2f + %7.2f * %6d =~ %4d (@%9.2f) EXPECT %6d - %4d ($minb1)",$a,$b,$this_frame,$fr,$r2,$frame_zero,$expect_frame;
+        my $b1 = abs($b-1);
+        if ($r2<100 && $b1<0.01) {
+           $found++;
+           print " LOCKED LOCKED LOCKED ($locked, $frame_zero)";
+        }
+        if ($b1<$minb1) {
+           $frame_zero=-$a;
+           $minb1 = $b1;
+        }
+        print "\n";
+     }
+     $jitter=0;
+   } else {
+     $jitter++;
+     if ($jitter > 5) {
+        $expect_frame=$expect_count=$frame_zero=0;
+     }
+   }
+   if ($found && $this_frame>$frame_zero+2000) {
+      print "KICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFFKICKOFF\n";
+      die;
+   }
+
+   $count++;
+
+   $frame = 1-$frame;
+   $fr = $nfr;
+}
+

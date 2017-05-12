@@ -1,0 +1,349 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Lucid qw(:all);
+use VJF::Emphase qw(:all); 
+use VJF::MITDT qw(:all);
+
+$| = 1;
+
+sub SNP_list
+{
+  my $H0 = shift();
+  my $H1 = shift();
+  my @H0 = split /\s+/, $H0;
+  my @H1 = split /\s+/, $H1;
+  if(scalar(@H0) != scalar(@H1))
+  {
+    die "Haplotypes of incompatible lengths\n[$H0]\n[$H1]\n";
+  }
+  my $res = '';
+  for(my $i = 0; $i<scalar(@H0); $i++)
+  {
+    $res .= "$H0[$i] $H1[$i] ";
+  }
+  return $res;
+}
+
+#######################################################################
+#                                                                     #
+# Début des hostilites                                                #
+#                                                                     #
+#######################################################################
+my $usage = <<EOF
+$0 [options] trios.ped
+
+Option for both algorithms:
+-H <n>           <n> is 0 or 1, for reconstruction under H0 or H1.
+                 Default: 0.
+
+Options for EM algorithm:
+--step    <n>    number of SNPs added at each step. Default : 2.
+                 If the program is too slow, you may try --step 1
+--th      <t>    threshold under which familial configurations
+                 are pruned. Default : 1e-2.
+--maxconf <n>    maximum number of familial configuration.
+                 Default : 1000.
+--EMth    <t>    threshold under which an haplotype frequency is
+                 set to 0 during the EM run. Default : 1e-10.
+--EMcv    <t>    Convergence criterion for the EM. Default : 1e-3.
+
+Options for IP algorithm:
+--nfile   <n>    Number of imputed files. Default: 10.
+--niter   <n>    Number of IP iterations before each imputed file.
+                 Default: 200.
+--alpha   <x>    The initial value of the data augmentation parameter.
+                 Default: 0.2*(number of families in the input file)
+--base    <name> Basename for imputed files (name.1, name.2, etc)
+                 Default: the name of the input file.
+EOF
+;
+
+my @specs = (   Param('--step')->default(2),
+		Param('--th')->default(1e-2),
+		Param('--maxconf')->default(1000),
+		Param('--EMth')->default(1e-10),
+                Param('--EMcv')->default(1e-3),
+		Param('--nfile')->default(10),
+		Param('--niter')->default(200),
+		Param('--alpha')->default(0),
+		Param('--base')->default(''),
+		Param('-H')->default('0')
+		);
+
+
+my $opt = Getopt::Lucid->getopt(\@specs);
+
+$STEPS            = $opt->get_step;
+$HAP_TRIM_FREQ    = $opt->get_th;
+$EM_CUT_THRESHOLD = $opt->get_EMth;
+$MAX_CONF         = $opt->get_maxconf;
+$EM_stop          = $opt->get_EMcv;
+
+# my $haplist = $opt->get_haplist;
+# my $hapfreq = $opt->get_hapfreq;
+# my $configs = $opt->get_configs;
+
+# open HAPLIST, ">$haplist" or die "$haplist: $!";
+# open HAPFREQ, ">$hapfreq" or die "$hapfreq: $!";
+# open CONFIGS, ">$configs" or die "$configs: $!";
+
+my $file   = pop @ARGV;
+die $usage unless defined($file);
+
+my $n_file = $opt->get_nfile;
+my $n_iter = $opt->get_niter;
+my $basename = $opt->get_base;
+my $init_alpha = $opt->get_alpha;
+my $Hyp0 = $opt->get_H;
+
+# ??
+$Hyp0 =~ s/^-//;
+
+if($basename eq '')
+{
+  $basename = "$file.";
+}
+$basename .= "%0".(1+int(log($n_file)/log(10)))."d";
+
+##############################################################
+#                                                            #
+#                    EM données trio                         #
+#                                                            #
+##############################################################
+
+my %link; #Le hash qui va tout contenir ou presque...
+
+my $titre = read_link($file, %link);
+print "Read $NB_FAM families, $NB_SNP snps\n";
+
+if($Hyp0 eq '0' or $Hyp0 eq '01')
+{
+  print "EM under H0\n";
+  run_EM_trios(%link);
+}
+else
+{
+  print "EM under H1\n";
+  run_EM_trios_hd(%link);
+}
+
+my ($tt, $pere, $mere, $fils);
+my $fam;
+
+
+#####################################################
+#                                                   #
+#               c'est parti pour l'IP               #
+#                                                   #
+#####################################################
+
+my %skipfam; # les familles virées.
+my $new_nbfam = $NB_FAM; # On va compter les familles
+                         # qui n'ont pas été virées
+
+for $fam (sort {compare($a,$b)} (keys %FAM))
+{
+  ($tt, $pere, $mere, $fils) = is_trio($fam);
+  if(scalar(@{$link{$fam}{'probas'}}) == 0)
+  {
+    $new_nbfam--;
+    $skipfam{$fam}++;
+  }
+}
+
+print "On $NB_FAM families, $new_nbfam are kept\n";
+
+#####################
+# Création du cfile #
+#####################
+
+my $nconf;
+my $cfile ;
+
+unless($Hyp0)
+{
+  print "IP under H0\n";
+  $cfile = cree_data1_H0($NB_HAP, $new_nbfam);  # On n'alloue pas l'espace memoire de la table des genotypes !
+}
+else
+{
+  print "IP under H1\n";
+  $cfile = cree_data1($NB_HAP, $new_nbfam);
+}
+
+
+
+my $k = 0;  # compteur des familles
+for $fam (sort {compare($a,$b)} (keys %FAM))
+{
+  next if $skipfam{$fam};
+  ($tt, $pere, $mere, $fils) = is_trio($fam);
+
+  my $j = 0;  # compteur des configurations
+  my @confs;
+  for(my $i=0; $i<scalar(@{$link{$fam}{'probas'}}); $i++)
+  {
+    my $p = $link{$fam}{'probas'}[$i];
+    # ON FAIT - 1 SUR LES NUMÉROS D'HAPLOTYPES
+    # PARCE QUE L'EM LES SORT NUMÉROTÉS À PARTIR DE 1 !!!
+
+    my $fi1 = $link{$fam,$fils}{'conf'}[2*$i]   - 1;
+    my $fi2 = $link{$fam,$fils}{'conf'}[2*$i+1] - 1;
+    my $ci1 = $CI{$fam}[2*$i] - 1;
+    my $ci2 = $CI{$fam}[2*$i+1] - 1;
+
+    push @confs, $ci1, $ci2, $fi1, $fi2, $p; 
+    $j++;
+  }
+  set_trio($cfile, $k, $j, @confs);
+  $k++;
+}
+
+
+# création du ifile
+my $ifile = cree_data1($NB_HAP, $new_nbfam);
+for($k=0; $k<$new_nbfam; $k++)
+{
+  set_trio($ifile, $k, 1, 0,0,0,0,1);
+}
+
+##########################################################
+#
+#                      algo IP
+#
+##########################################################
+
+$init_alpha = 0.2*$new_nbfam unless $init_alpha > 0;
+my ($g0, $h0, $g1, $h1, $p);
+my ($G0, $H0, $G1, $H1);
+my $format = ("%s "x8)."\n";
+my $OUT;
+for(my $i = 1; $i<=$n_file; $i++)
+{
+  ##################################################################
+  print "Creating imputed file #$i...";
+  my $alpha = $init_alpha;
+  unless($Hyp0)
+  {
+    for(my $j = 0; $j<$n_iter; $j++)
+    {
+      init_tab_H0($cfile); 
+      make_freq_cum($cfile); 
+      make_imput($cfile,$ifile); 
+      compt_hap_H0($cfile,$ifile); 
+      new_param_H0($cfile,$ifile, $alpha); 
+      new_posterior_H0($cfile,$ifile); 
+      $alpha -= $init_alpha/$n_iter;
+    }
+  }
+  else
+  {
+    for(my $j = 0; $j<$n_iter; $j++)
+    {
+      init_tab($cfile); 
+      make_freq_cum($cfile); 
+      make_imput($cfile,$ifile);
+      compt_geno($cfile,$ifile); 
+      compt_untrans($cfile,$ifile); 
+      new_param($cfile,$ifile, $alpha); 
+      new_posterior($cfile,$ifile); 
+      $alpha -= $init_alpha/$n_iter;
+    }  
+  }
+  ##################################################################
+
+  # sortie du fichier imputé
+  open $OUT, sprintf(">$basename",$i) or die $!;
+  $k = 0;  # bon vieux compteur des familles
+  for $fam (sort {compare($a,$b)} (keys %FAM))
+  {
+    next if $skipfam{$fam};
+    ($tt, $pere, $mere, $fils) = is_trio($fam);
+    ($h0, $h1, $g0, $g1, $p) = get_trio($ifile,$k,0);
+    # On refait + 1 sur les numéros d'haplotypes pour retrouver
+    # les numéros d'origine.
+    $G0 = $HAPLOTYPES[$g0 + 1];
+    $G1 = $HAPLOTYPES[$g1 + 1];
+    $H0 = $HAPLOTYPES[$h0 + 1];
+    $H1 = $HAPLOTYPES[$h1 + 1];
+    printf $OUT $format,$fam,$pere,$link{$fam,$pere}{'pere'},$link{$fam,$pere}{'mere'},$link{$fam,$pere}{'sexe'},$link{$fam,$pere}{'phen'},SNP_list($G0,$H0);
+    printf $OUT $format,$fam,$mere,$link{$fam,$mere}{'pere'},$link{$fam,$mere}{'mere'},$link{$fam,$mere}{'sexe'},$link{$fam,$mere}{'phen'},SNP_list($G1,$H1);
+    printf $OUT $format,$fam,$fils,$link{$fam,$fils}{'pere'},$link{$fam,$fils}{'mere'},$link{$fam,$fils}{'sexe'},$link{$fam,$fils}{'phen'},SNP_list($G0,$G1);
+    $k++;
+  }
+  close $OUT;
+  print "OK\n";
+}
+
+
+=head1 NAME
+  
+MI-TDT - Multiple Imputation for Transmission Disequilibrium Test.
+
+=head1 SYNOPSIS
+
+MI-TDT [options] file.ped
+
+=head1 DESCRIPTION
+
+MI-TDT is an application based on a Multiple Imputation algorithm which allows dealing with missing information in trio data (one affected child and both parents). Missing information could be understood as missing haplotypic phase or missing genotype.
+
+=head1 OPTIONS
+
+Option for both algorithms:
+
+=over 4
+
+=item B<-H> <n>         <n> is 0 or 1, for reconstruction under H0 or H1.
+Default: 0.
+
+=back
+
+Options for EM algorithm:
+
+=over 4
+
+=item B<--step> <n>     number of SNPs added at each step. Default: 2.
+If the program is too slow, you may try --step 1
+
+=item B<--th> <t>       threshold under which familial configurations
+are pruned. Default: 1e-2.
+
+=item B<--maxconf> <n>  maximum number of familial configuration.
+Default: 1000.
+
+=item B<--EMth> <t>     threshold under which an haplotype frequency is
+set to 0 during the EM run. Default: 1e-10.
+
+=item B<--EMcv> <t>     Convergence criterion for the EM. Default: 1e-3.
+
+=back
+
+Options for IP algorithm:
+
+=over 4
+
+=item B<--nfile> <n>    Number of imputed files. Default: 10.
+
+=item B<--niter> <n>    Number of IP iterations before each imputed file.
+Default: 200.
+
+=item B<--alpha> <x>    The initial value of the data augmentation parameter.
+Default: 0.2*(number of families in the input file)
+
+=item B<--base> <name>  Basename for imputed files (name.1, name.2, etc)
+Default: the name of the input file.
+
+=back
+
+=head1 VERSION 
+
+This manual was written for MI-TDT version 0.1.
+
+=head1 SEE ALSO
+
+L<VJF::MITDT>
+
+=cut
+
+

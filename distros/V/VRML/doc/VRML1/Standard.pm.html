@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>VRML::VRML1::Standard.pm - implements the VRML 1.x standard nodes</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#group_nodes">Group Nodes</a></li>
+		<li><a href="#geometry_nodes">Geometry Nodes</a></li>
+		<li><a href="#property_nodes">Property Nodes</a></li>
+		<li><a href="#appearance_nodes">Appearance Nodes</a></li>
+		<li><a href="#transform_nodes">Transform Nodes</a></li>
+		<li><a href="#common_nodes">Common Nodes</a></li>
+		<li><a href="#other">other</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>VRML::VRML1::Standard.pm - implements the VRML 1.x standard nodes</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use VRML::VRML1::Standard;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Following nodes are currently implemented.</p>
+<p>[<code>Group Nodes</code>]
+[<code>Geometry Nodes</code>]
+[<code>Property Nodes</code>]</p>
+<p>[<code>Appearance Nodes</code>]
+[<code>Transform Nodes</code>]
+[<code>Common Nodes</code>]</p>
+<p>
+</p>
+<h2><a name="group_nodes">Group Nodes</a></h2>
+<p><em>These nodes NEED</em> <code>End</code> !</p>
+<dl>
+<dt><strong><a name="item_group">Group</a></strong><br />
+</dt>
+<dd>
+<a href="#item_group"><code>Group()</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_separator">Separator</a></strong><br />
+</dt>
+<dd>
+<a href="#item_separator"><code>Separator()</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_switch">Switch</a></strong><br />
+</dt>
+<dd>
+<a href="#item_switch"><code>Switch($whichChild)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_wwwanchor">WWWAnchor</a></strong><br />
+</dt>
+<dd>
+<a href="#item_wwwanchor"><code>WWWAnchor($url, $description, $target)</code></a>
+</dd>
+<dd>
+<p>$target works only with <em>some</em> browsers</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_lod">LOD</a></strong><br />
+</dt>
+<dd>
+<a href="#item_lod"><code>LOD($range, $center)</code></a>
+</dd>
+<dd>
+<p>$range  = MFFloat</p>
+</dd>
+<dd>
+<p>$center = SFVec3f</p>
+</dd>
+<dd>
+<p>example: <a href="#item_lod"><code>LOD([1, 2, 5], '0 0 0')</code></a></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_spingroup">SpinGroup</a></strong><br />
+</dt>
+<dd>
+<a href="#item_spingroup"><code>SpinGroup($rotation, $local)</code></a> is supported only by <em>some</em> browsers
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="geometry_nodes">Geometry Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_asciitext">AsciiText</a></strong><br />
+</dt>
+<dd>
+<a href="#item_asciitext"><code>AsciiText($string, $width, $justification, $spacing)</code></a>
+</dd>
+<dd>
+<p>$justification is a string ('LEFT','CENTER','RIGHT')</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_cone">Cone</a></strong><br />
+</dt>
+<dd>
+<a href="#item_cone"><code>Cone($radius, $height, @parts)</code></a>
+</dd>
+<dd>
+<p>@parts is an array of strings ('SIDES', 'BOTTOM', 'ALL')</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_cube">Cube</a></strong><br />
+</dt>
+<dd>
+<a href="#item_cube"><code>Cube($width, $height, $depth)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_cylinder">Cylinder</a></strong><br />
+</dt>
+<dd>
+<a href="#item_cylinder"><code>Cylinder($radius, $height, @parts)</code></a>
+</dd>
+<dd>
+<p>@parts is a list of strings ('SIDES', 'TOP', 'BOTTOM', 'ALL')</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_indexedfaceset">IndexedFaceSet</a></strong><br />
+</dt>
+<dd>
+<a href="#item_indexedfaceset"><code>IndexedFaceSet($coordIndex_ref, $materialIndex_ref, $normalIndex_ref, $textureCoordIndex_ref)</code></a>
+</dd>
+<dd>
+<p>$coordIndex_ref is a reference of a list of point index strings
+like <code>['0 1 3 2', '2 3 5 4', ...]</code></p>
+</dd>
+<dd>
+<p>$materialIndex_ref is a reference of a list of materials</p>
+</dd>
+<dd>
+<p>$normalIndex_ref is a reference of a list of normals</p>
+</dd>
+<dd>
+<p>$textureCoordIndex_ref is a reference of a list of textures</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_indexedlineset">IndexedLineSet</a></strong><br />
+</dt>
+<dd>
+<a href="#item_indexedlineset"><code>IndexedLineSet($coordIndex_ref, $materialIndex_ref, $normalIndex_ref, $textureCoordIndex_ref)</code></a>
+</dd>
+<dd>
+<p>$coordIndex_ref is a reference of a list of point index strings
+like <code>['0 1 3 2', '2 3 5 4', ...]</code></p>
+</dd>
+<dd>
+<p>$materialIndex_ref is a reference of a list of materials</p>
+</dd>
+<dd>
+<p>$normalIndex_ref is a reference of a list of normals</p>
+</dd>
+<dd>
+<p>$textureCoordIndex_ref is a reference of a list of textures</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_pointset">PointSet</a></strong><br />
+</dt>
+<dd>
+<a href="#item_pointset"><code>PointSet($numPoints, $startIndex)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_sphere">Sphere</a></strong><br />
+</dt>
+<dd>
+<a href="#item_sphere"><code>Sphere($radius)</code></a>
+</dd>
+<dd>
+<p>$radius must be &gt; 0</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="property_nodes">Property Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_coordinate3">Coordinate3</a></strong><br />
+</dt>
+<dd>
+<a href="#item_coordinate3"><code>Coordinate3(@points)</code></a>
+</dd>
+<dd>
+<p>@points is a list of points with strings like <code>'1.0 0.0 0.0', '-1 2 0'</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_fontstyle">Fontstyle</a></strong><br />
+</dt>
+<dd>
+<code>FontStyle($size, $family, $style)</code>
+defines the current font style for all subsequent <a href="#item_asciitext"><code>AsciiText</code></a> Nodes
+</dd>
+<dd>
+<p>$familiy can be 'SERIF','SANS','TYPEWRITER'</p>
+</dd>
+<dd>
+<p>$style can be 'NONE','BOLD','ITALIC'</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="appearance_nodes">Appearance Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_material">Material</a></strong><br />
+</dt>
+<dd>
+<a href="#item_material"><code>Material(%materials)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_materialbinding">MaterialBinding</a></strong><br />
+</dt>
+<dd>
+<a href="#item_materialbinding"><code>MaterialBinding($value)</code></a>
+</dd>
+<dd>
+<p>$value can be</p>
+</dd>
+<dd>
+<pre>
+    DEFAULT     Use default bindng
+    OVERALL     Whole object has same material
+    PER_PART    One material for each part of object
+    PER_PART_INDEXED    One material for each part, indexed
+    PER_FACE    One material for each face of object
+    PER_FACE_INDEXED    One material for each face, indexed
+    PER_VERTEX  One material for each vertex of object
+    PER_VERTEX_INDEXED  One material for each vertex, indexed</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_normal">Normal</a></strong><br />
+</dt>
+<dd>
+<a href="#item_normal"><code>Normal(@vector)</code></a>
+</dd>
+<dd>
+<p>@vector is a list of vectors with strings like <code>'1.0 0.0 0.0', '.5 .2 0'</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_normalbinding">NormalBinding</a></strong><br />
+</dt>
+<dd>
+<a href="#item_normalbinding"><code>NormalBinding($value)</code></a>
+</dd>
+<dd>
+<p>$value is the same as <a href="#item_materialbinding"><code>MaterialBinding</code></a></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_texture2">Texture2</a></strong><br />
+</dt>
+<dd>
+<a href="#item_texture2"><code>Texture2($value)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="transform_nodes">Transform Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_transform">Transform</a></strong><br />
+</dt>
+<dd>
+<a href="#item_transform"><code>Transform($translation, $rotation, $scaleFactor, $scaleOrientation, $center)</code></a>
+</dd>
+<dd>
+<p>$translation is a string like ``0 1 -2''</p>
+</dd>
+<dd>
+<p>$rotation is a string like ``0 0 1 1.57''</p>
+</dd>
+<dd>
+<p>$scaleFactor is a string like ``1 1 1''</p>
+</dd>
+<dd>
+<p>$scaleOrientation is a string like ``0 0 1 0''</p>
+</dd>
+<dd>
+<p>$center is a string like ``0 0 0''</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_rotation">Rotation</a></strong><br />
+</dt>
+<dd>
+<a href="#item_rotation"><code>Rotation($rotation)</code></a>
+</dd>
+<dd>
+<p>$rotation is a string like ``0 0 1 1.57''</p>
+</dd>
+<dd>
+<p><code>This node is not supported under VRML 2.0. Use Transform</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_scale">Scale</a></strong><br />
+</dt>
+<dd>
+<a href="#item_scale"><code>Scale($scaleFactor)</code></a>
+</dd>
+<dd>
+<p>$scaleFactor is a string like ``1 1 1''</p>
+</dd>
+<dd>
+<p><code>This node is not supported under VRML 2.0. Use Transform</code></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_translation">Translation</a></strong><br />
+</dt>
+<dd>
+<a href="#item_translation"><code>Translation($translation)</code></a>
+</dd>
+<dd>
+<p>$translation is a string like ``0 1 -2''</p>
+</dd>
+<dd>
+<p><code>This node is not supported under VRML 2.0. Use Transform</code></p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="common_nodes">Common Nodes</a></h2>
+<dl>
+<dt><strong><a name="item_perspectivecamera">PerspectiveCamera</a></strong><br />
+</dt>
+<dd>
+<a href="#item_perspectivecamera"><code>PerspectiveCamera($position, $orientation, $heightAngle, $focalDistance, $nearDistance, $farDistance)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_orthographiccamera">OrthographicCamera</a></strong><br />
+</dt>
+<dd>
+<a href="#item_orthographiccamera"><code>OrthographicCamera($position, $orientation, $height, $focalDistance, $nearDistance, $farDistance)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_directionallight">DirectionalLight</a></strong><br />
+</dt>
+<dd>
+<a href="#item_directionallight"><code>DirectionalLight($direction, $intensity, $color, $on)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_pointlight">PointLight</a></strong><br />
+</dt>
+<dd>
+<a href="#item_pointlight"><code>PointLight($location, $intensity, $color, $on)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_spotlight">SpotLight</a></strong><br />
+</dt>
+<dd>
+<a href="#item_spotlight"><code>SpotLight($location, $direction, $intensity, $color, $on)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_directedsound">DirectedSound</a></strong><br />
+</dt>
+<dd>
+<a href="#item_directedsound"><code>DirectedSound($name, $description, $location, $direction, $intensity, $maxFrontRange, $maxBackRange, $minFrontRange, $minBackRange, $loop, $pause)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="other">other</a></h2>
+<dl>
+<dt><strong><a name="item_wwwinline">WWWInline</a></strong><br />
+</dt>
+<dd>
+<a href="#item_wwwinline"><code>WWWInline($name, $bboxSize, $bboxCenter)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_info">Info</a></strong><br />
+</dt>
+<dd>
+<a href="#item_info"><code>Info($string)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_navigationinfo">NavigationInfo</a></strong><br />
+</dt>
+<dd>
+<a href="#item_navigationinfo"><code>NavigationInfo($type, $speed, $headlight)</code></a>
+</dd>
+<dd>
+<p>Works only with Live3D and WebFX</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_use">USE</a></strong><br />
+</dt>
+<dd>
+<a href="#item_use"><code>USE($name)</code></a>
+</dd>
+<p></p>
+<dt><strong><a name="item_def">DEF</a></strong><br />
+</dt>
+<dd>
+<a href="#item_def"><code>DEF($name)</code></a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>VRML::VRML1::Standard</p>
+<p>VRML::Base</p>
+<p><a href="http://www.gfz-potsdam.de/~palm/vrmlperl/">http://www.gfz-potsdam.de/~palm/vrmlperl/</a> for a description of <em>VRML-modules</em> and how to obtain it.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p><a href="#item_indexedfaceset"><code>IndexedFaceSet</code></a> and <a href="#item_indexedlineset"><code>IndexedLineSet</code></a> work currently only with references</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Hartmut Palm <em>&lt;<a href="mailto:palm@gfz-potsdam.de">palm@gfz-potsdam.de</a>&gt;</em></p>
+<p>Homepage <a href="http://www.gfz-potsdam.de/~palm/">http://www.gfz-potsdam.de/~palm/</a></p>
+
+</body>
+
+</html>

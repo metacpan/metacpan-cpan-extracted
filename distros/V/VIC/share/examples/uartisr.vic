@@ -1,0 +1,18 @@
+PIC P16F690;
+
+Main {
+    setup UART, 9600; # set up USART for transmit
+    $myvar2 = "";
+    read UART, ISR {
+        $myvar2 .= shift;
+    };
+    write UART, "Hello World!";
+}
+
+Simulator {
+    attach UART, 9600, 'loopback';
+    stop_after 1s;
+    log UART;
+    scope UART;
+    autorun;
+}

@@ -1,0 +1,8 @@
+COPYING
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/VUser/SquirrelMail/Prefs.pm
+lib/VUser/SquirrelMail/Prefs/SQL.pm
+META.yml

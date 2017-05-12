@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+
+# dumpepg dumps the epg database given as first argument run "getepg" to
+# create it.
+
+use Storable;
+use POSIX 'strftime';
+
+my $db_name = $ARGV[0];
+$db_name .= ".epg" unless -e $db_name;
+
+print "Electronic Program Guide <$db_name>\n\n";
+
+*db = Storable::retrieve($db_name);
+
+sub dump_ai {
+   my $ai = shift;
+   printf "EPG STREAM 1 <%d>", $ai->{epg_version};
+   printf " #ni %d, #oi %d, #mi %d\n", $ai->{no_navigation}, $ai->{no_osd}, $ai->{no_message};
+   printf "EPG STREAM 2 <%d>", $ai->{epg_version_swo};
+   printf " #ni %d, #oi %d, #mi %d\n", $ai->{no_navigation_swo}, $ai->{no_osd_swo}, $ai->{no_message_swo};
+   
+   printf "this network #%d (%s) # updates %d\n", $ai->{this_network_op}, $ai->{service_name}, $ai->{no_updates};
+   for (@{$ai->{networks}}) {
+      printf "   network #%04x (%s), LTO %d, %d days, range<%d-%d/%d>, @%d, +%03x\n",
+      @$_{qw/cni netwop_name LTO nodays prog_start_no prog_stop_no prog_stop_swo default_alphabet network_add_info/};
+   }
+   print "\n";
+}
+
+sub string2text {
+   local $_ = shift;
+   y/~{|}[]/ßaöäüÄÜ/;
+   s/(.{40})/$1\n/g;
+   s/([\x00-\x07])/sprintf " [%dm", ord($1)+30/ge;
+   s/([\x00-\x09\x0b-\x1a\x1c-\x1f])/sprintf "·[%02x]",ord $1/ge;
+   s/^ //g;
+   $_."[37m";
+}
+
+sub date2unix {
+   my($date,$time,$lto)=@_;
+   381283200
+   + ($date-45000) * 86400
+   + ($time >> 12     ) * 10 * 60 * 60
+   + ($time >>  8 & 15) * 60 * 60
+   + ($time >>  4 & 15) * 10 * 60
+   + ($time       & 15) * 60
+   + $lto * 15;
+}
+
+sub date2text {
+   sprintf "{%04x}", $_[0];
+}
+
+sub time2text {
+   sprintf "%02x:%02x", $_[0] >> 8, $_[0] & 0xff;
+}
+
+dump_ai($db{ai});
+
+my @pi = map values %$_, values %{$db{pi}};
+
+printf "Dump of %d program information structures\n\n", 1*@pi;
+
+for (sort { $a->{start_date} <=> $b->{start_date} ||
+            $a->{start_time} <=> $b->{start_time} ||
+            $a->{netwop_no}  <=> $b->{netwop_no} } @pi) {
+   my $ti = string2text($_->{title});
+
+   my $start = date2unix($_->{start_date}, $_->{start_time}, $db{ai}{networks}[$_->{netwop_no}]{LTO});
+   my $stop  = date2unix($_->{start_date}, $_->{stop_time }, $db{ai}{networks}[$_->{netwop_no}]{LTO});
+   $stop += 86400 if $stop < $start;
+
+   printf "PI #%d (%s) %s - %s \"%s\"\n", $_->{block_no}, $db{ai}{networks}[$_->{netwop_no}]{netwop_name},
+          strftime("%A %Y-%m-%d %H:%M", localtime $start), strftime("%H:%M", localtime $stop),
+          $ti;
+   my $si = string2text($_->{shortinfo}); $si =~ s/^/   /gm; print $si,"\n";
+   my $si = string2text($_->{longinfo}); $si =~ s/^/   /gm; print "   =>",$si,"\n";
+   print "   FLAGS <";
+   printf " editorial rating %d", $_->{editoral_rating} if $_->{editoral_rating}>0;
+   printf " parental rating %d", $_->{parental_rating} if $_->{parental_rating}>0;
+   print " Mono" if $_->{audio_flags}==0;
+   print " 2 Channel" if $_->{audio_flags}==1;
+   print " Stereo" if $_->{audio_flags}==2;
+   print " Surround" if $_->{audio_flags}==3;
+   print " Widescreen" if $_->{feature_flags}&4;
+   print " PAL+" if $_->{feature_flags}&8;
+   print " Digital" if $_->{feature_flags}&16;
+   print " Encrypted" if $_->{feature_flags}&32;
+   print " Live" if $_->{feature_flags}&64;
+   print " Repeated" if $_->{feature_flags}&128;
+   print " Subtitled" if $_->{feature_flags}&256;
+   print " >\n";
+   print "\n";
+}

@@ -1,0 +1,27 @@
+Welcome to Dreamer!
+
+NOTE: THIS IS A PRE-RELEASE VERSION. ANYTHING IS SUBJECT
+TO CHANGE BETWEEN NOW AND THE 1.0 RELEASE.
+
+Dreamer is a framework to emulate arbitrary one-operand
+computers. This means that Dreamer lets you define simple
+computers and then execute machine code for them.
+
+To understand how to use Dreamer, download the tarball
+and look in the 'examples' folder. There's a pre-defined
+machine called grasshopper and some pre-written programs
+for it.
+
+Assuming you've installed Dreamer, you can execute them
+via:
+
+    $ cd examples/grasshopper
+    $ perl grasshopper.pl sample_code/io
+
+Also, Dreamer is extensively documented. If anything
+isn't clear or you find something missing (or if you
+have any feedback in general), please email me.
+
+Thanks,
+
+william@coders.coop

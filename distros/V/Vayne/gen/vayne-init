@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+use Path::Tiny;
+use YAML;
+
+=head1 SYNOPSIS
+
+   $0 --dst vayne_home
+
+=cut
+
+my $conf = join '', <DATA>; $conf = Load $conf;
+
+my $vayne_home; GetOptions( 'dst=s' => \$vayne_home ) or pod2usage(2);
+$vayne_home ||='~/vayne';
+
+pod2usage(2) unless $vayne_home;
+
+die "$vayne_home exists" if -e $vayne_home;
+
+printf "\nGenerate Vayne Home!!\n\n";
+
+printf "+ dir \t%s\n", path($vayne_home)->mkpath;
+
+for my $file(sort keys %$conf)
+{
+    my $dst = path($vayne_home, $file);
+    $dst->parent->mkpath;
+    $dst->spew( $conf->{$file} );
+    $dst->chmod("a+x") if $dst =~ /\/worker\//;
+    printf "+ file\t%s\n", $dst;
+}
+
+printf "+ file\t%s\n", my $source = path($vayne_home, 'source');
+$source->spew("export VAYNE_HOME=$vayne_home");
+
+print "\nadd \"source $vayne_home/source\" to your ~/.bashrc \n";
+
+__DATA__

@@ -1,0 +1,49 @@
+use 5.010;
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    NAME                => 'VSGDR::TestScriptGen',
+    AUTHOR              => q{Ded MedVed <dedmedved@cpan>},
+    VERSION_FROM        => 'lib/VSGDR/TestScriptGen.pm',
+    ABSTRACT_FROM       => 'lib/VSGDR/TestScriptGen.pm',
+    MIN_PERL_VERSION    => 5.10.0,
+    ($ExtUtils::MakeMaker::VERSION >= 6.48
+      ? ('LICENSE'=> 'perl')
+      : ()),
+    PL_FILES            => {},
+    EXE_FILES => [ "genTests.pl", 
+                 ],
+    PREREQ_PM => {
+        'Test::More'                                            => 0,
+        'Carp'                                                  => 0,
+        'DBD::ODBC'                                             => 0,
+        'DBI'                                                   => 0,
+        'Data::Dumper'                                          => 0,
+        'English'                                               => 0,
+        'File::Basename'                                        => 0,
+        'Getopt::Euclid'                                        => 0,
+        'IO::Dir'                                               => 0,
+        'IO::File'                                              => 0,
+        'List::Util'                                            => 1.00,
+        'List::MoreUtils'                                       => 0,
+        'POSIX'                                                 => 0,
+        'Try::Tiny'                                             => 0,
+        'VSGDR::UnitTest::TestSet::Test'                        => 0,
+        'VSGDR::UnitTest::TestSet::Test::TestCondition'         => 0,
+        'VSGDR::UnitTest::TestSet::Representation'              => 0,
+        'VSGDR::UnitTest::TestSet::Resx'                        => 0,
+        'Win32'                 => 0,
+        'autodie'               => 0,
+        'indirect'              => 0,
+        'version'               => 0,
+        
+
+    },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean               => { FILES => 'TestScriptGen-*' },
+);
+
+
+

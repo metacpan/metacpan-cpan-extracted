@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Video-Filename
+version:             0.35
+abstract:            Parse filenames for information about the video
+license:             ~
+author:              
+    - Behan Webster <behanw@websterwood.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Debug::Simple:                 0
+    Test::More:                    0
+    Text::Roman:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

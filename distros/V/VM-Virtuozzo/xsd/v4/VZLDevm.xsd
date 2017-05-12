@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vzl/4.0.0/devm" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.swsoft.com/webservices/vzl/4.0.0/devm" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="VZLProtocol.xsd"/>
+	<xs:element name="devm" type="devmType" substitutionGroup="vzlp:operator">
+		<xs:annotation>
+			<xs:documentation>Device Management.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<running/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="devmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="vzlp:operator_functionalType">
+				<xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="get_mounts" minOccurs="0"/>
+						<xs:element ref="new_mount" minOccurs="0"/>
+						<xs:element ref="umount" minOccurs="0"/>
+						<xs:element ref="get_info" minOccurs="0"/>
+						<xs:element ref="create_drive" minOccurs="0"/>
+						<xs:element ref="delete_drive" minOccurs="0"/>
+						<xs:element ref="resize_drive" minOccurs="0"/>
+						<xs:element ref="format_drive" minOccurs="0"/>
+						<xs:element ref="list_device" minOccurs="0"/>
+						<xs:element ref="forward_device" minOccurs="0"/>
+						<xs:element ref="remove_forward" minOccurs="0"/>
+						<xs:element ref="list_forward" minOccurs="0"/>
+					</xs:choice>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="mount" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="device_info" minOccurs="0"/>
+						<xs:element ref="device" minOccurs="0"/>
+						<xs:element ref="forward" minOccurs="0"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="mount_deviceType">
+		<xs:annotation>
+			<xs:documentation>Device mount information structure.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="permanent" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>True means that device should be mounted permanent.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="device" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Device name.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="point" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Mount point.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="filesystem" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type of filesystem.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="active" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>True means to make the mount active immediately.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="size" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>WINDOWS ONLY
+Device size</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="interface" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Interface type. For SCSI loopbacks:SCSI. If not specified - common loopback.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="get_mounts">
+		<xs:annotation>
+			<xs:documentation>Gets mounted devices for the specifed Container. Returns "mount"s or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="new_mount">
+		<xs:annotation>
+			<xs:documentation>Mount the specifed device. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="mount_deviceType">
+					<xs:sequence minOccurs="0">
+						<xs:element name="eid" type="vzlt:eid_type"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="umount">
+		<xs:annotation>
+			<xs:documentation>Unmounts the specified device. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="false">
+			<xs:complexContent mixed="false">
+				<xs:extension base="mount_deviceType">
+					<xs:sequence minOccurs="0">
+						<xs:element name="eid" type="vzlt:eid_type"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_info">
+		<xs:annotation>
+			<xs:documentation>Gets information about all available filesystems, partitions and devices. Returns  "device_info" or Error.</xs:documentation>
+			<xs:appinfo>
+				<states>
+					<nonexistent/>
+					<down/>
+					<mounted/>
+					<running/>
+					<repairing/>
+				</states>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="mount" type="mount_deviceType">
+		<xs:annotation>
+			<xs:documentation>Device mount information.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="device_info">
+		<xs:annotation>
+			<xs:documentation>Devices/ filesystems / partitions information.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="filesystem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="device" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="partition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="create_drive">
+		<xs:annotation>
+			<xs:documentation>Creates drive's file image 
+WINDOWS: mounts a new drive into Container. Returns device path (i.e. drive's file image path) in "device_info/device" or Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="mount_deviceType">
+					<xs:sequence>
+						<xs:element name="eid" type="vzlt:eid_type"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="delete_drive">
+		<xs:annotation>
+			<xs:documentation>Deletes existing (WINDOWS: mounted) drive and removes it's file image. Returns OK/Error</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+				<xs:choice>
+					<xs:element name="point" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>WINDOWS: Mount point.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="device" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Linux: drive to remove (full path to loopback image)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resize_drive">
+		<xs:annotation>
+			<xs:documentation>Resizes existing (WINDOWS: mounted) drive of file image. Returns OK/Error
+Linux: tries to resize fs</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="size" type="xs:long">
+					<xs:annotation>
+						<xs:documentation>new drive size in bytes</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+				<xs:choice>
+					<xs:element name="point" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>WINDOWS: Mount point.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="device" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Linux: drive to resize (full path to loopback image)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="format_drive">
+		<xs:annotation>
+			<xs:documentation>Format drive (create filesystem)</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="device" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>path to device to format</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="type" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>filesystem type to create</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="label" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>volume label</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="block_size" type="xs:long" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>filesystem block size (in bytes)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_mountsResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="mount" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="new_mountResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="umountResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_infoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="device_info"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="create_driveResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="device_info"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="delete_driveResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resize_driveResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="common_deviceType" mixed="false">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Device name. On Windows:  ATAPI-CD ROM-DRIVE-52MAX SCSI CdRom Device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>On Windows: CD-ROM Drive</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="windows_deviceType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="common_deviceType">
+				<xs:sequence>
+					<xs:element name="physical_name" type="xs:base64Binary" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>On Windows: </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="scsi_deviceType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="windows_deviceType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="device" type="common_deviceType"/>
+	<xs:element name="forward">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="source">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+							<xs:element ref="device"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="destination">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+							<xs:element ref="device"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list_device">
+		<xs:annotation>
+			<xs:documentation>Gets list of HN devices. If no device is specified - gets full list of HN devices.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="device" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list_deviceResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="device" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="forward_device">
+		<xs:annotation>
+			<xs:documentation>Forward device to Container. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="forward"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="forward_deviceResponse"/>
+	<xs:element name="remove_forward">
+		<xs:annotation>
+			<xs:documentation>Remove forward from Container. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="forward"/>
+				<xs:element name="force" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Force removing in case of forward is in use</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="remove_forwardResponse"/>
+	<xs:element name="list_forward">
+		<xs:annotation>
+			<xs:documentation>Gets list of forwards. If eid is  not specified - get list of forwards for all Container's.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eid" type="vzlt:eid_type" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list_forwardResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="forward" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

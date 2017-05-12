@@ -1,0 +1,44 @@
+Changes
+lib/VSGDR/SQLServer/DataType.pm
+lib/VSGDR/SQLServer/DataType/Bit.pm
+lib/VSGDR/SQLServer/DataType/Generic.pm
+lib/VSGDR/UnitTest/TestSet.pm
+lib/VSGDR/UnitTest/TestSet/Representation.pm
+lib/VSGDR/UnitTest/TestSet/Representation/NET.pm
+lib/VSGDR/UnitTest/TestSet/Representation/NET/CS.pm
+lib/VSGDR/UnitTest/TestSet/Representation/NET/VB.pm
+lib/VSGDR/UnitTest/TestSet/Representation/NET2.pm
+lib/VSGDR/UnitTest/TestSet/Representation/NET2/CS.pm
+lib/VSGDR/UnitTest/TestSet/Representation/NET2/VB.pm
+lib/VSGDR/UnitTest/TestSet/Representation/XLS.pm
+lib/VSGDR/UnitTest/TestSet/Representation/XML.pm
+lib/VSGDR/UnitTest/TestSet/Resx.pm
+lib/VSGDR/UnitTest/TestSet/Test.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/Checksum.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/EmptyResultSet.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/ExecutionTime.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/ExpectedSchema.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/Inconclusive.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/NotEmptyResultSet.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/RowCount.pm
+lib/VSGDR/UnitTest/TestSet/Test/TestCondition/ScalarValue.pm
+delGDRTest.pl
+disableGDRTestCondition.pl
+dumpGDRSql.pl
+genGDRTests.pl
+mergeGDRTests.pl
+replaceGDRSql.pl
+reportGDRTests.pl
+runGDRTests.pl
+splitGDRTests.pl
+trGDRTests.pl
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

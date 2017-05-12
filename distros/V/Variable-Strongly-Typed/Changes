@@ -1,0 +1,9 @@
+Revision history for Variable-Strongly-Typed
+
+1.1.0   9/2/05
+        Added subroutine checking & changable failed function
+        Fixed POD
+
+1.0.0  Wed Aug 31 10:32:23 2005
+       Initial release.
+

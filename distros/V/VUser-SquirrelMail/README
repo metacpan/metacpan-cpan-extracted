@@ -1,0 +1,13 @@
+$Id: README,v 1.1 2005/12/01 18:54:48 perlstalker Exp $
+
+VUser-SquirrelMail is an extension to vuser to manage SquirrelMail settings.
+
+SquirrelMail Modules:
+
+- Prefs
+
+Currently Prefs only supports preferences stored in a SQL database.
+
+AUTHOR
+
+Randy Smith <perlstalker@vuser.org>

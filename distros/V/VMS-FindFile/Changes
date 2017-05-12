@@ -1,0 +1,18 @@
+Revision history for Perl extension VMS::FindFile.
+
+0.1 21-SEP-2000
+     First working version
+
+0.9 04-DEC-2000
+     Corrected error handling.
+
+
+0.91  Fri Oct 25 08:33:33 2002
+	- First CPAN version; created by h2xs 1.22 on Linux with options
+		-A -f -n VMS::FindFile -v 0.91 -O -b 5.4.0 --skip-exporter --skip-autoloader
+
+        Uses ppport.h; includes actual working tests.
+
+0.92  Thu Apr 16 2009
+	- Allow longer filenames and filenames with internal spaces.
+	- Test improvements from Carl Friedberg.

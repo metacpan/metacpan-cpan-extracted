@@ -1,0 +1,50 @@
+---
+abstract: 'Extended tools to assist working with perl in vim.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Fennec: 1.012
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Vim-Helper
+provides:
+  Vim::Helper:
+    file: lib/Vim/Helper.pm
+    version: 0.001
+  Vim::Helper::Fennec:
+    file: lib/Vim/Helper/Fennec.pm
+    version: 0
+  Vim::Helper::Help:
+    file: lib/Vim/Helper/Help.pm
+    version: 0
+  Vim::Helper::LoadMod:
+    file: lib/Vim/Helper/LoadMod.pm
+    version: 0
+  Vim::Helper::Plugin:
+    file: lib/Vim/Helper/Plugin.pm
+    version: 0
+  Vim::Helper::Test:
+    file: lib/Vim/Helper/Test.pm
+    version: 0
+  Vim::Helper::TidyFilter:
+    file: lib/Vim/Helper/TidyFilter.pm
+    version: 0
+  Vim::Helper::VimRC:
+    file: lib/Vim/Helper/VimRC.pm
+    version: 0
+requires:
+  Carp: 0
+  Declare::CLI: 0.007
+  Exporter::Declare: 0.105
+  File::Temp: 0
+resources:
+  bugtracker: http://github.com/exodist/Vim-Helper
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Vim-Helper
+version: 0.001

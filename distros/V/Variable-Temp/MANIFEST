@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Variable/Temp.pm
+samples/gen_lvalue_test
+t/00-load.t
+t/01-import.t
+t/10-base.t
+t/12-destroy.t
+t/13-magic.t
+t/20-lvalue.t
+t/21-lvalue-sub.t
+t/lib/VPIT/TestHelpers.pm

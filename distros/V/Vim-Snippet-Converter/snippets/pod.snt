@@ -1,0 +1,62 @@
+;pod
+=pod <<POD>>
+<<>>
+=cut
+<<>>
+;end
+
+;h1
+=head1 <<Header>>
+<<>>
+=cut
+<<>>
+;end
+
+;h2
+=head2 <<Header>>
+<<>>
+=cut
+<<>>
+;end
+
+;h3
+=head3 <<Header>>
+<<>>
+=cut
+<<>>
+;end
+
+;h4
+=head4 <<Header>>
+<<>>
+=cut
+<<>>
+;end
+
+;over
+=over <<INDENTLEVEL>>
+<<ITEM>>
+=back
+<<>>
+;end
+
+;item
+=item <<ITEM>>
+<<>>
+;end
+
+;b
+B<<<TEXT>>><<>>
+;end
+
+;l
+L<<<LINK>>><<>>
+;end
+
+;i
+I<<<ITALIC>>><<>>
+;end
+
+;c
+I<<<CODE>>><<>>
+;end

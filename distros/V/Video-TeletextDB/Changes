@@ -1,0 +1,23 @@
+Revision history for Perl extension Video::TeletextDB.
+
+- Todo:
+    - Much more tests are needed
+    - Higher teletext levels
+    - Maybe add documentation and tests for want (maybe needs to be renamed?)
+
+0.02  2004-11-27
+	- Small doc updates
+	- Put the DB_RO and DB_RW classes under Video::TeletextDB
+	- Fix author email address
+	- Use the V4L2 interfaces to get the frequency in TeleCollect
+	- Run the tests in a temp dir
+	- Let TeleCollect also report channel changes on the first frequency 
+	  measurement in the loop.
+	- Add $VERSION in TeleCollect
+	- Solaris unlink dir gives EPERM, not EISDIR (and actually succeeds
+          for root (which is not fixed yet))
+
+0.01  2004-07-02
+	- original version; created by h2xs 1.23 with options
+		-X -n Video::TeletextDB
+

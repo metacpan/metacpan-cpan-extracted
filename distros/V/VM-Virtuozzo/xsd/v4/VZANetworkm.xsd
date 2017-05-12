@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.swsoft.com/webservices/vza/4.0.0/vzanetworkm" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:vzlp="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" xmlns:vzlt="http://www.swsoft.com/webservices/vzl/4.0.0/types" xmlns="http://www.swsoft.com/webservices/vza/4.0.0/vzanetworkm" xmlns:networkm="http://www.swsoft.com/webservices/vzl/4.0.0/networkm" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/types" schemaLocation="../../vzl/4.0.0/VZLCommonTypes.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/networkm" schemaLocation="../../vzl/4.0.0/VZLNetworkm.xsd"/>
+	<xs:import namespace="http://www.swsoft.com/webservices/vzl/4.0.0/protocol" schemaLocation="../../vzl/4.0.0/VZLProtocol.xsd"/>
+	<xs:element name="vzanetworkm" type="vzanetworkmType">
+		<xs:annotation>
+			<xs:documentation>Network Management</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="vzanetworkmType" mixed="false">
+		<xs:complexContent mixed="false">
+			<xs:extension base="networkm:networkmType">
+				<xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Input</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="set_config"/>
+						<xs:element ref="get_config"/>
+					</xs:choice>
+					<xs:choice minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Output</xs:documentation>
+						</xs:annotation>
+						<xs:element ref="net_config" minOccurs="0"/>
+					</xs:choice>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="set_config">
+		<xs:annotation>
+			<xs:documentation>Sets hardware node network adapters configuration. Returns OK/Error.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_config">
+		<xs:annotation>
+			<xs:documentation>Gets hardware node network configuration. Returns Error/Configuration.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="net_configType">
+		<xs:sequence>
+			<xs:element name="shaping" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Traffic shaping is on.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="range" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List of network classes for traffic shaping.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="class_id" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Traffic shaping class ID.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ip_address" type="vzlt:ip_addressType">
+							<xs:annotation>
+								<xs:documentation>IP address and mask for shaping.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="comment" type="xs:base64Binary" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Comment for class.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="class" type="class_rateType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Per-class network ranges</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="interface" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Bandwidth for network interfaces.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="net_device_id" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Network device ID.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="bandwidth" type="xs:long">
+							<xs:annotation>
+								<xs:documentation>Bandwidth in kbps. For Linux only.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="class_rateType">
+		<xs:sequence>
+			<xs:element name="id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Traffic shaping class ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="rate" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Traffic rate value in kbps. For Linux only.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="totalrate" type="xs:long" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total traffic rate value in kbps.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="net_config" type="net_configType"/>
+	<xs:element name="set_configResponse">
+		<xs:complexType>
+			<xs:sequence/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="get_configResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="net_config"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

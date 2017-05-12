@@ -1,0 +1,25 @@
+[% USE Mail %]
+
+[% vote = c.model('Vote') %]
+
+[% FOREACH id = vote.vote_voting(voteid) %]
+[% voting = vote.voting_info(id) %]
+[% IF loop.first %]
+<div id="voting_list" class="box">
+<p>Liste des votants:</p>
+<table border="1">
+<tr><th>Numéro</th><th>Electeur</th><th>Emargement</th></tr>
+[% END %]
+<tr>
+<td>[% loop.count %]</td>
+<td>
+    [% voting.label | html %]
+    [% "&lt;" IF voting.label %][% voting.mail | mail | html %][% "&gt;" IF voting.label %]
+</td>
+<td>[% "A voté" IF voting.date %]</td>
+</tr>
+[% IF loop.last %]
+</table>
+</div>
+[% END %]
+[% END %]

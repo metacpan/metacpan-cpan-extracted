@@ -1,0 +1,38 @@
+Revision history for Perl module VK::App
+
+0.12 Mon Jun 22 17:02:48 NOVT 2015
+  - fix authorization
+
+0.11 Thu Jun 26 17:50:03 NOVT 2014
+   - fixes bugs with long requests
+   - fixes urls in documentation
+
+0.10 Wed Oct 3 13:17:09 NOVT 2012
+   - fix authorization
+
+0.08  Sun Jul 3 00:01:23 2012
+    - response encoding to utf8 is disabled 
+
+0.07  Sun Jul 2 10:44:30 2012
+    - Error in Makefile.PL fixed
+
+0.06  Sun Jul 1 09:41:50 2012
+    - Very important update!
+      Changes in authorization by login and password depending on changes in vk.com.
+      Old versions of the module does't working now.
+    - Update Makefile.PL
+
+0.05  Sat Jun 30 09:50:48 2012
+    - POD fixed
+
+0.04  Wed Jun 27 09:20:37 2012
+    - fixes in documentation, dependencies and in vmd.pl script
+
+0.03  Tue Jun 26 23:59:59 2012
+    - META.yml and META.json added
+
+0.02  Tue Jun 26 23:11:47 2012
+    - update POD and Makefile.PL
+
+0.01 Sun Jun 24 15:34:14 2012
+    - original version; created by ExtUtils::ModuleMaker 0.51

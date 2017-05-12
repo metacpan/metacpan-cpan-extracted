@@ -1,0 +1,16 @@
+K 10
+svn:author
+V 5
+evank
+K 8
+svn:date
+V 27
+2007-08-13T04:54:44.951142Z
+K 7
+svn:log
+V 422
+* Cleaned up some documentation
+* Cache directory will now default to system temp directory in PHP >= 5.2.1
+* Added a protected 'debug' method to base class (as well as many calls to it), for cleaner handling of diagnostic messages
+* As an effort to minimize source file size, converted space-indending to tab-indenting.  This will likely make for some horrendous diffs, but it trimmed down filesizes rather significantly.
+END

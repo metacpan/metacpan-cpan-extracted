@@ -1,0 +1,104 @@
+Revision history for Validate-Tiny
+
+1.6     2016-11-08
+	[Changes]
+	POD fixes (DJERIUS)
+
+1.551   2015-05-08
+
+        [Bug fixes]
+        Fix is_a constraint stringification issue
+
+        [New features]
+        Add is_existing constraint
+
+        [Other]
+        Return success with bare return instead of return undef
+
+1.501   2015-04-18 !!! Not backwards compatible. Read notes !!!
+        
+        [Bug fixes]
+        - filters checked for undefined values
+
+        [New features]
+        - A new %FILTER hash allows a user to add custom filters
+        - Object interface changed - new is now just a constructor and
+          check is used to do actual validation. To adapt your code,
+          it should be enough to just replace all Validate::Tiny->new with
+          Validate::Tiny->check.
+        - Removed error_string function
+
+1.015   2015-02-21
+        Code refactoring
+
+0.105   2014-04-04
+        Out of beta. Stable release.
+        No code changes.
+
+0.982   2012-07-09
+        Replaced "defined" with "exists" to allow filtering of keys
+        with undef value.
+        Added a third param to check subs $key, which contains the
+        name of the fields being checked.
+
+0.982   2012-05-08
+        Fix a bug with $vt->data croaking if no input fields are
+        specified.
+
+0.981   2012-04-26
+        Empty fields array will now process all input fields
+
+0.98    2012-02-01
+        Fix whitespace glitch in filter 'strip'.
+        Move tests to different files.
+        Write more tests.
+
+0.38    2012-01-25
+        Added dependancy info in META
+
+0.37    2012-01-20
+        Add is_required_if closure
+
+0.35    2012-01-16
+        Fix stock closure logic when handling not-required fields.
+        Test not only if the value is defined, but also if it is
+        an empty value.
+
+0.32    2012-01-12
+        Ge back to using List::MoreUtils and Exporter
+        (under pressure from reddit users)
+
+0.31    2012-01-11
+        Add credits in POD
+
+0.30    2011-01-10
+        Lower minimum required Perl version to 5.8
+        add is_a, is_like, is_in constraint closures
+
+0.21    2011-12-09
+        Add "single" parameter to method "error_string".
+        Fix typos and enhance POD.
+
+0.20    2011-12-08
+        Add method error_string
+
+0.10    2011-12-08
+        Typos in POD fixed.
+
+0.09    2011-10-07
+        Update Test::More dependency to 0.94 (needed for subtest)
+        Remove dependency from List::MoreUtils
+
+0.08    2011-09-17
+        Fixed croak issue with missing fields
+        Add undef checks
+
+0.06    2011-07-25
+        Add object interface
+
+0.05    2011-07-22
+        Edit meta files
+
+0.01    2011-07-01
+        First version, released.
+

@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+
+# Created on: 2009-05-16 17:53:41
+# Create by:  ivan
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use VCS::Which;
+
+our $VERSION = version->new('0.6.4');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    my $dir;
+    ARG:
+    for my $arg (@ARGV[ 1 .. @ARGV -1 ]) {
+        if ( -e $arg ) {
+            $dir = $arg;
+            if ( -f $dir ) {
+                $dir = path($dir)->parent;
+            }
+            last ARG;
+        }
+    }
+
+    $dir ||= '.';
+
+    my $vcsw = VCS::Which->new( dir => $dir );
+
+    if ($ARGV[0] eq 'cat') {
+        shift @ARGV;
+        my ($file, $revision);
+        for my $arg (@ARGV) {
+            if ( -f $arg ) {
+                $file = $arg;
+            }
+            elsif ($arg =~ /^-r/ || $revision eq '-r') {
+                ($revision) = $arg =~ /(\d+)/xms;
+                $revision ||= '-r';
+            }
+        }
+        print $vcsw->cat($file, $revision);
+        exit;
+    }
+
+    $vcsw->exec(@ARGV);
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+vcsw - One command to rule version control systems
+
+=head1 VERSION
+
+This documentation refers to vcsw version 0.6.4.
+
+=head1 SYNOPSIS
+
+   vcsw status
+
+   vcsw commit
+
+=head1 DESCRIPTION
+
+This is a command line tool to give basic access to L<VCS::Which>. It allows
+using the one command (C<vcsw>) to interface with the underling version
+control system with out having to remember which one you are using. This
+will mostly work fine but occasional differences may cause problems.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW, Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

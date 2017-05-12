@@ -1,0 +1,15 @@
+<html>
+  <body>
+    Remote test
+
+    <script>
+      var ipc = require('electron').ipcRenderer;
+
+      ipc.on('ping', function(event, message) {
+        ipc.send('pong', message + message);
+      });
+
+      ipc.send('ready');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+Revision history for Perl extension VMS::Persona.
+
+0.01  Tue Dec 30 09:05:46 1997
+	- original version; created by h2xs 1.18
+    - Created, with all the trimmings
+
+1.00  Tue Dec 30 14:55:12 1997
+    - Tested it pretty extensively, and it works nicely.
+
+1.01  Mon Jan 12 11:10:03 1998
+    - Changed the test some, to be a touch more robust.
+    - Fixed up the docs a bit to document the croak()ing errors.

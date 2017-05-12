@@ -1,0 +1,304 @@
+INTRODUCTION
+============
+
+`VIM::Pacakger` is an util for vim script pacakge. features are:
+
+    - dependency solving
+    - easy to install, uninstall, upgrade vim scripts
+    - vim script testing
+    - simple meta file
+    - vim script developing helpers
+
+INSTALLATION
+============
+
+there are 3 ways for you to install VIM::Packager
+
+### via Makefile.PL:
+
+        $ git clone git://github.com/c9s/vim-packager.git
+        $ cd vim-packager
+        $ perl Makefile.PL
+        $ sudo make             # you might need sudo if you have to install the dependencies.
+        $ sudo make install
+
+### via CPAN:
+
+        $ sudo cpan VIM::Packager
+
+### Shipwright package, just a simple step:
+
+        $ curl http://www.oulixe.us/vim-packager-2009-11-25.bin | perl
+        $ export PATH=~/vim-packager/bin/:$PATH
+        # then you got vim-packager here
+
+VIM::Packager ABSTRACT
+=======================
+
+    $ vim-packager build 
+    $ make install
+    $ make uninstall
+    $ make reinstall
+    $ make clean
+    $ make link
+    $ make link-force
+
+    $ make release
+    $ make bump
+    $ make dist
+    $ make upload
+
+TODO:
+
+generate vimball script:
+
+    $ make vimball
+
+to scan installed vimballs:
+
+    $ make vimball-scan
+
+USAGE
+=======================
+### To install a vim package
+
+first thing, we need to translate meta file (VIMMETA) into Makefile. just type:
+
+    $ vim-packager build
+
+this will detect dependencies of the vim package and generate Makefile for you.
+
+to install dependencies:
+
+    $ make 
+
+to install this package:
+
+    $ make install
+
+to clean up files 
+
+    $ make clean
+
+### To uninstall a vim package 
+
+    $ make uninstall
+
+### To link scripts in vimlib to your vim runtime path (~/.vim/)
+
+for some reason , you want the scripts be linked to your vim runtime path.
+    ( useful when you are developing vim scripts , you dont need to install them everytime after you modified them )
+
+    $ make link
+
+### To distribute your vim package
+
+    $ make dist
+
+### To upload to vim.org
+
+you need to specify script\_id in your meta file ( VIMMETA or META ).
+
+then run vim-packager build to get your Makefile. then type command below to
+upload your distribution:
+
+    $ make upload
+
+### To create a vim package from existed scripts
+
+    $ cd your_plugin/
+
+    $ vim-packager init
+
+    # this should create vimlib/ directory and generate a basic VIMMETA file
+    # for you.
+
+mv your script (\*.vim) into vimlib/plugin ( if it's plugin )
+
+    $ mv *.vim vimlib/plugin/ 
+
+update your VIMMETA file. ( see 'To create a vim package' section below )
+
+then transalte our meta file into Makefile:
+
+    $ vim-packager build 
+
+update manifest:
+
+    $ make manifest
+
+    # for those files you dont want to include in your distribution,
+    # just create MANIFEST.SKIP
+
+to create package tarball file:
+
+    $ make dist
+
+### To create a vim package 
+
+    # XXX:  not implmenet yet
+    $ vim-packager create --name=new_plugin --type plugin --author=Cornelius --email=cornelius.howl@DELETE-ME.gmail.com
+
+    new_plugin/
+    new_plugin/vimlib/plugin/
+    new_plugin/vimlib/doc/
+    new_plugin/vimlib/VIMMETA
+
+fill your 'VIMMETA' file
+
+    =name       new_plugin
+
+    =author     Cornelius (cornelius.howl@gmail.com)
+
+    =version    plugin/new_plugin.vim   # extract version infomation from this file
+
+    =type       syntax
+
+    =vim_version >= 7.0
+
+    =dependency
+
+        autocomplpop.vim > 0.3
+        rainbow.vim      >= 1.2
+
+        # install package from git repository
+        cpan.vim > 0
+            git://github.com/c9s/cpan.vim.git  
+
+        # for depended scripts which is not on archive network (not existed yet)
+        # we can specify an url to retrieve.
+        # for something like below, check if file exists , if not then download it from [url]
+        # this will be detected when you run 'vim-packager build'
+        # and depdencies will be installed when you type 'make'
+
+        somewhat.vim
+            | autoload/acp.vim | [url]
+            | plugin/acp.vim   | [url2]
+
+    =script
+
+        # scripts to install , those files will be installed to ~/.vim/bin/
+        # this could be specified in future.
+
+        bin/parser
+        bin/template_generator
+
+    =repository git://....../
+
+        # your repository url 
+
+
+then we can translate meta file (VIMMETA) into Makefile. just type:
+
+    $ vim-packager build
+
+to install dependencies:
+
+    $ make 
+
+to install this package:
+
+    $ make install
+
+then update your 'MANIFEST' file
+
+    $ make manifest
+
+to create your distribution
+
+    $ make dist
+
+    new_plugin-0.1.tar.gz  # is out
+
+    $ make upload
+
+    Uploading...Done
+
+you can also define your 'MANIFEST.SKIP' file
+
+        .git\*
+        test-
+
+### To create a pure Makefile that doesn't depend on VIM::Packager module
+
+    $ vim-packager build --pure
+
+
+
+FOR AN EXISTED VIM DISTRIBUTION
+===============================
+
+    $ cat > ~/.vim-author
+    author: Your Name 
+    email:  zzz@gmail.com
+
+    $ cd my_plugin
+
+    $ vim-packager init --type=plugin --dirs=basic
+
+    Creating directories.
+    mkdir vimlib/autoload
+    mkdir vimlib/syntax
+    mkdir vimlib/plugin
+    mkdir vimlib/ftplugin
+    mkdir vimlib/ftdetect
+    mkdir vimlib/doc
+    Creating doc skeleton.
+    Writing META.
+    Creating README
+
+        # --type and --dirs is optional
+
+this will mv your vim directories into vimlib/ , if you dont want this then
+specify `--no-migration`
+
+your should update your package information in VIMMETA file
+
+    $ vim-packager build 
+
+    $ make install
+
+
+INSTALLATION
+=========================
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc VIM::Packager
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=vim-packager
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/vim-packager
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/vim-packager
+
+    Search CPAN
+        http://search.cpan.org/dist/vim-packager/
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2009 Cornelius
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

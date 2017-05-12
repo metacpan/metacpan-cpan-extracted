@@ -1,0 +1,7 @@
+CHANGES
+Makefile.PL
+MANIFEST
+README
+persona.pm
+persona.xs
+t/basic.t

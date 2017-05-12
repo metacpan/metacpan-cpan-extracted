@@ -1,0 +1,58 @@
+<definitions>
+<command>
+  <key>.</key>
+  <name>tag</name>
+  <type>system</type>
+</command>
+<command>
+    <key>,</key>
+    <name>tagedit</name>
+    <type>system</type>
+</command>
+<command>
+  <key>q</key>
+  <name>quit</name>
+  <type>system</type>
+</command>
+<command>
+  <key>u</key>
+  <name>undo</name>
+  <type>system</type>
+</command>
+<command>
+  <key>v</key>
+  <name>undoendpt</name>
+  <type>system</type>
+</command>
+<command>
+  <key>d</key>
+  <name>delete</name>
+  <type>system</type>
+</command>
+<command>
+  <key>a</key>
+  <name>funny</name>
+  <type>long</type>
+  <envl>
+      <pt0>1</pt0>
+      <pt0.5>.9</pt0.5>  
+      <pt-0.5>.9</pt-0.5>  
+      <pt1>.5</pt1>  
+      <pt-1>.5</pt-1>  
+      <pt2>.2</pt2>  
+      <pt-2>.2</pt-2>  
+  </envl>
+</command>
+<command>
+  <key>b</key>
+  <name>shortb</name>
+  <type>short</type>
+  <envl>
+    <pt0>1</pt0>
+    <pt1>.5</pt1>
+    <pt2>0</pt2>
+    <pt-1>.5</pt-1>
+    <pt-2>0</pt-2>
+  </envl>
+</command>
+</definitions>

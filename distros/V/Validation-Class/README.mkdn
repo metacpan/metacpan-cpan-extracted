@@ -1,0 +1,1210 @@
+# NAME
+
+Validation::Class - Powerful Data Validation Framework
+
+# VERSION
+
+version 7.900057
+
+# SYNOPSIS
+
+    use Validation::Class::Simple::Streamer;
+
+    my  $params = {username => 'admin', password => 's3cret'};
+    my  $input  = Validation::Class::Simple::Streamer->new(params => $params);
+
+    # check username parameter
+    $input->check('username')->required->between('5-255');
+    $input->filters([qw/trim strip/]);
+
+    # check password parameter
+    $input->check('password')->required->between('5-255')->min_symbols(1);
+    $input->filters([qw/trim strip/]);
+
+    # run validate
+    $input->validate or die $input->errors_to_string;
+
+# DESCRIPTION
+
+Validation::Class is a scalable data validation library with interfaces for
+applications of all sizes. The most common usage of Validation::Class is to
+transform class namespaces into data validation domains where consistency and
+reuse are primary concerns. Validation::Class provides an extensible framework
+for defining reusable data validation rules. It ships with a complete set of
+pre-defined validations and filters referred to as
+["directives"](https://metacpan.org/pod/Validation::Class::Directives#DIRECTIVES).
+
+The core feature-set consist of self-validating methods, validation profiles,
+reusable validation rules and templates, pre and post input filtering, class
+inheritance, automatic array handling, and extensibility (e.g. overriding
+default error messages, creating custom validators, creating custom input
+filters and much more). Validation::Class promotes DRY (don't repeat yourself)
+code. The main benefit in using Validation::Class is that the architecture is
+designed to increase the consistency of data input handling. The following is
+a more traditional usage of Validation::Class, using the DSL to construct a
+validator class:
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    # data validation template
+    mixin basic     => {
+        required    => 1,
+        max_length  => 255,
+        filters     => [qw/trim strip/]
+    };
+
+    # data validation rules for the username parameter
+    field username  => {
+        mixin       => 'basic',
+        min_length  => 5
+    };
+
+    # data validation rules for the password parameter
+    field password  => {
+        mixin       => 'basic',
+        min_length  => 5,
+        min_symbols => 1
+    };
+
+    package main;
+
+    my $person = MyApp::Person->new(username => 'admin', password => 'secr3t');
+
+    # validate rules on the person object
+    unless ($person->validates) {
+        # handle the failures
+        warn $person->errors_to_string;
+    }
+
+    1;
+
+# QUICKSTART
+
+If you are looking for a simple in-line data validation module built
+using the same tenets and principles as Validation::Class, please review
+[Validation::Class::Simple](https://metacpan.org/pod/Validation::Class::Simple) or [Validation::Class::Simple::Streamer](https://metacpan.org/pod/Validation::Class::Simple::Streamer). If you
+are new to Validation::Class, or would like more information on the
+underpinnings of this library and how it views and approaches data validation,
+please review [Validation::Class::Whitepaper](https://metacpan.org/pod/Validation::Class::Whitepaper). Please review the
+["GUIDED-TOUR" in Validation::Class::Cookbook](https://metacpan.org/pod/Validation::Class::Cookbook#GUIDED-TOUR) for a detailed step-by-step look into
+how Validation::Class works.
+
+# KEYWORDS
+
+## adopt
+
+The adopt keyword (or adt) copies configuration and functionality from
+other Validation::Class classes. The adopt keyword takes three arguments, the
+name of the class to be introspected, and the configuration type and name to be
+recreated. Basically, anything you can configure using a Validation::Class
+keyword can be adopted into other classes using this keyword with the exception
+of coderefs registered using the build keyword. Please note! If you are adopting
+a field declaration which has an associated mixin directive defined on the
+target class, you must adopt the mixin explicitly if you wish it's values to be
+interpolated.
+
+    package MyApp::Exployee;
+
+    use Validate::Class;
+    use MyApp::Person;
+
+    adopt MyApp::Person, mixin   => 'basic';
+    adopt MyApp::Person, field   => 'first_name';
+    adopt MyApp::Person, field   => 'last_name';
+    adopt MyApp::Person, profile => 'has_fullname';
+
+    1;
+
+## attribute
+
+The attribute keyword (or has) registers a class attribute, i.e. it creates an
+accessor (getter and setter) on the class. Attribute declaration is flexible and
+only requires an attribute name to be configured. Additionally, the attribute
+keyword can takes two arguments, the attribute's name and a scalar or coderef to
+be used as it's default value.
+
+    package MyApp::Person;
+
+    use Validate::Class;
+
+    attribute 'first_name' => 'Peter';
+    attribute 'last_name'  => 'Venkman';
+    attribute 'full_name'  => sub {
+        join ', ', $_[0]->last_name, $_[0]->first_name
+    };
+
+    attribute 'email_address';
+
+    1;
+
+## build
+
+The build keyword (or bld) registers a coderef to be run at instantiation much
+in the same way the common BUILD routine is used in modern OO frameworks.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    build sub {
+
+        my ($self, $args) = @_;
+
+        # run after instantiation in the order defined
+
+    };
+
+    1;
+
+The build keyword takes one argument, a coderef which is passed the instantiated
+class object.
+
+## directive
+
+The directive keyword (or dir) registers custom validator directives to be used
+in your field definitions. Please note that custom directives can only be used
+with field definitions. This is a means of extending the list of directives per
+instance. See the list of core directives, [Validation::Class::Directives](https://metacpan.org/pod/Validation::Class::Directives),
+or review [Validation::Class::Directive](https://metacpan.org/pod/Validation::Class::Directive) for insight into creating your own
+CPAN installable directives.
+
+    package MyApp::Person;
+
+    use Validate::Class;
+
+    # define a custom class-level directive
+    directive 'blacklisted' => sub {
+
+        my ($self, $field, $param) = @_;
+
+        if (defined $field->{blacklisted} && defined $param) {
+            if ($field->{required} || $param) {
+                if (exists_in_blacklist($field->{blacklisted}, $param)) {
+                    my $handle = $field->label || $field->name;
+                    $field->errors->add("$handle has been blacklisted");
+                    return 0;
+                }
+            }
+        }
+
+        return 1;
+
+    };
+
+    field 'email_address' => {
+        blacklisted => '/path/to/blacklist'
+        email => 1,
+    };
+
+    1;
+
+The directive keyword takes two arguments, the name of the directive and a
+coderef which will be used to validate the associated field. The coderef is
+passed four ordered parameters; a directive object, the class prototype object,
+the current field object, and the matching parameter's value. The validator
+(coderef) is evaluated by its return value as well as whether it altered any
+error containers.
+
+## document
+
+The document keyword (or doc) registers a data matching profile which can be
+used to validate heiarchal data. It will store a hashref with pre-define path
+matching rules for the data structures you wish to validate. The "path matching
+rules", which use a specialized object notation, referred to as the document
+notation, can be thought of as a kind-of simplified regular expression which is
+executed against the flattened data structure. The following are a few general
+use-cases:
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field  'string' => {
+        mixin => [':str']
+    };
+
+    # given this JSON data structure
+    {
+        "id": "1234-A",
+        "name": {
+            "first_name" : "Bob",
+            "last_name"  : "Smith",
+         },
+        "title": "CIO",
+        "friends" : [],
+    }
+
+    # select id to validate against the string rule
+    document 'foobar'  =>
+        { 'id' => 'string' };
+
+    # select name -> first_name/last_name to validate against the string rule
+    document 'foobar'  =>
+        {'name.first_name' => 'string', 'name.last_name' => 'string'};
+
+    # or
+    document 'foobar'  =>
+        {'name.*_name' => 'string'};
+
+    # select each element in friends to validate against the string rule
+    document 'foobar'  =>
+        { 'friends.@'  => 'string' };
+
+    # or select an element of a hashref in each element in friends to validate
+    # against the string rule
+    document 'foobar'  =>
+        { 'friends.@.name' => 'string' };
+
+The document declaration's keys should follow the aforementioned document
+notation schema and it's values should be strings which correspond to the names
+of fields (or other document declarations) that will be used to preform the
+data validation. It is possible to combine document declarations to validate
+hierarchical data that contains data structures matching one or more document
+patterns. The following is an example of what that might look like.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    # data validation rule
+    field  'name' => {
+        mixin      => [':str'],
+        pattern    => qr/^[A-Za-z ]+$/,
+        max_length => 20,
+    };
+
+    # data validation map / document notation schema
+    document 'friend' => {
+        'name' => 'name'
+    };
+
+    # data validation map / document notation schema
+    document 'person' => {
+        'name' => 'name',
+        'friends.@' => 'friend'
+    };
+
+    package main;
+
+    my $data = {
+        "name"   => "Anita Campbell-Green",
+        "friends" => [
+            { "name" => "Horace" },
+            { "name" => "Skinner" },
+            { "name" => "Alonzo" },
+            { "name" => "Frederick" },
+        ],
+    };
+
+    my $person = MyApp::Person->new;
+
+    unless ($person->validate_document(person => $data)) {
+        warn $person->errors_to_string if $person->error_count;
+    }
+
+    1;
+
+Alternatively, the following is a more verbose data validation class using
+traditional styling and configuration.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field  'id' => {
+        mixin      => [':str'],
+        filters    => ['numeric'],
+        max_length => 2,
+    };
+
+    field  'name' => {
+        mixin      => [':str'],
+        pattern    => qr/^[A-Za-z ]+$/,
+        max_length => 20,
+    };
+
+    field  'rating' => {
+        mixin      => [':str'],
+        pattern    => qr/^\-?\d+$/,
+    };
+
+    field  'tag' => {
+        mixin      => [':str'],
+        pattern    => qr/^(?!evil)\w+/,
+        max_length => 20,
+    };
+
+    document 'person' => {
+        'id'                             => 'id',
+        'name'                           => 'name',
+        'company.name'                   => 'name',
+        'company.supervisor.name'        => 'name',
+        'company.supervisor.rating.@.*'  => 'rating',
+        'company.tags.@'                 => 'name'
+    };
+
+    package main;
+
+    my $data = {
+        "id"      => "1234-ABC",
+        "name"    => "Anita Campbell-Green",
+        "title"   => "Designer",
+        "company" => {
+            "name"       => "House of de Vil",
+            "supervisor" => {
+                "name"   => "Cruella de Vil",
+                "rating" => [
+                    {   "support"  => -9,
+                        "guidance" => -9
+                    }
+                ]
+            },
+            "tags" => [
+                "evil",
+                "cruelty",
+                "dogs"
+            ]
+        },
+    };
+
+    my $person = MyApp::Person->new;
+
+    unless ($person->validate_document(person => $data)) {
+        warn $person->errors_to_string if $person->error_count;
+    }
+
+    1;
+
+Additionally, the following is yet another way to validate a document by
+passing the document specification directly instead of by name.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    package main;
+
+    my $data = {
+        "id"      => "1234-ABC",
+        "name"    => "Anita Campbell-Green",
+        "title"   => "Designer",
+        "company" => {
+            "name"       => "House of de Vil",
+            "supervisor" => {
+                "name"   => "Cruella de Vil",
+                "rating" => [
+                    {   "support"  => -9,
+                        "guidance" => -9
+                    }
+                ]
+            },
+            "tags" => [
+                "evil",
+                "cruelty",
+                "dogs"
+            ]
+        },
+    };
+
+    my $spec = {
+        'id'                            => { max_length => 2 },
+        'name'                          => { mixin      => ':str' },
+        'company.name'                  => { mixin      => ':str' },
+        'company.supervisor.name'       => { mixin      => ':str' },
+        'company.supervisor.rating.@.*' => { pattern    => qr/^(?!evil)\w+/ },
+        'company.tags.@'                => { max_length => 20 },
+    };
+
+    my $person = MyApp::Person->new;
+
+    unless ($person->validate_document($spec => $data)) {
+        warn $person->errors_to_string if $person->error_count;
+    }
+
+    1;
+
+## ensure
+
+The ensure keyword (or ens) is used to convert a pre-existing method
+into an auto-validating method. The auto-validating method will be
+registered and function as if it was created using the method keyword.
+The original pre-existing method will be overridden with a modifed version
+which performs the pre and/or post validation routines.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    sub register {
+        ...
+    }
+
+    ensure register => {
+        input  => ['name', '+email', 'username', '+password', '+password2'],
+        output => ['+id'], # optional output validation, dies on failure
+    };
+
+    package main;
+
+    my $person = MyApp::Person->new(params => $params);
+
+    if ($person->register) {
+        # handle the successful registration
+    }
+
+    1;
+
+The ensure keyword takes two arguments, the name of the method to be
+overridden and a hashref of required key/value pairs. The hashref may
+have an input key (e.g. input, input\_document, input\_profile, or input\_method).
+The \`input\` key (specifically) must have a value which must be either an
+arrayref of fields to be validated, or a scalar value which matches (a
+validation profile or auto-validating method name). The hashref may also have
+an output key (e.g. output, output\_document, output\_profile, or output\_method).
+The \`output\` key (specifically) must have a value which must be either an
+arrayref of fields to be validated, or a scalar value which matches (a
+validation profile or auto-validating method name). Whether and what the
+method returns is yours to decide. The method will return undefined if
+validation fails. The ensure keyword wraps and functions much in the same way
+as the method keyword.
+
+## field
+
+The field keyword (or fld) registers a data validation rule for reuse and
+validation in code. The field name should correspond with the parameter name
+expected to be passed to your validation class or validated against.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field 'username' => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255
+    };
+
+The field keyword takes two arguments, the field name and a hashref of key/values
+pairs known as directives. For more information on pre-defined directives, please
+review the ["list of core directives"](https://metacpan.org/pod/Validation::Class::Directives#DIRECTIVES).
+
+The field keyword also creates accessors which provide easy access to the
+field's corresponding parameter value(s). Accessors will be created using the
+field's name as a label having any special characters replaced with an
+underscore.
+
+    # accessor will be created as send_reminders
+    field 'send-reminders' => {
+        length => 1
+    };
+
+Please note that prefixing field names with a double plus-symbol instructs the
+register to merge your declaration with any pre-existing declarations within the
+same scope (e.g. fields imported via loading roles), whereas prefixing field
+names with a single plus-symbol instructs the register to overwrite any
+pre-existing declarations.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    set role => 'MyApp::User';
+
+    # append existing field and overwrite directives
+    field '++email_address' => {
+        required => 1
+    };
+
+    # redefine existing field
+    field '+login' => {
+        required => 1
+    };
+
+    1;
+
+## filter
+
+The filter keyword (or flt) registers custom filters to be used in your field
+definitions. It is a means of extending the pre-existing filters declared by
+the ["filters directive"](https://metacpan.org/pod/Validation::Class::Directive::Filters) before
+instantiation.
+
+    package MyApp::Person;
+
+    use Validate::Class;
+
+    filter 'flatten' => sub {
+        $_[0] =~ s/[\t\r\n]+/ /g;
+        return $_[0];
+    };
+
+    field 'biography' => {
+        filters => ['trim', 'strip', 'flatten']
+    };
+
+    1;
+
+The filter keyword takes two arguments, the name of the filter and a
+coderef which will be used to filter the value the associated field. The coderef
+is passed the value of the field and that value MUST be operated on directly.
+The coderef should also return the transformed value.
+
+## load
+
+The load keyword (or set), which can also be used as a class method, provides
+options for extending the current class by declaring roles, requirements, etc.
+
+The process of applying roles, requirement, and other settings to the current
+class mainly involves introspecting the namespace's methods and merging relevant
+parts of the prototype configuration.
+
+## load-classes
+
+The \`classes\` (or class) option uses [Module::Find](https://metacpan.org/pod/Module::Find) to load all child classes
+(in-all-subdirectories) for convenient access through the
+["class" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#class) method, and when introspecting a larger
+application. This option accepts an arrayref or single argument.
+
+    package MyApp;
+
+    use Validation::Class;
+
+    load classes => ['MyApp::Domain1', 'MyApp::Domain2'];
+
+    package main;
+
+    my $app = MyApp->new;
+
+    my $person = $app->class('person'); # return a new MyApp::Person object
+
+    1;
+
+## load-requirements
+
+    package MyApp::User;
+
+    use Validate::Class;
+
+    load requirements => 'activate';
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    load role => 'MyApp::User';
+
+    sub activate {}
+
+    1;
+
+The \`requirements\` (or required) option is used to ensure that if/when the class
+is used as a role the calling class has specific pre-existing methods. This
+option accepts an arrayref or single argument.
+
+    package MyApp::User;
+
+    use Validate::Class;
+
+    load requirements => ['activate', 'deactivate'];
+
+    1;
+
+## load-roles
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    load role => 'MyApp::User';
+
+    1;
+
+The \`roles\` (or role) option is used to load and inherit functionality from
+other validation classes. These classes should be used and thought-of as roles
+although they can also be fully-functioning validation classes. This option
+accepts an arrayref or single argument.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    load roles => ['MyApp::User', 'MyApp::Visitor'];
+
+    1;
+
+## message
+
+The message keyword (or msg) registers a class-level error message template that
+will be used in place of the error message defined in the corresponding directive
+class if defined. Error messages can also be overridden at the individual
+field-level as well. See the [Validation::Class::Directive::Messages](https://metacpan.org/pod/Validation::Class::Directive::Messages) for
+instructions on how to override error messages at the field-level.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    field email_address => {
+        required   => 1,
+        min_length => 3,
+        messages   => {
+            # field-level error message override
+            min_length => '%s is not even close to being a valid email address'
+        }
+    };
+
+    # class-level error message overrides
+    message required   => '%s is needed to proceed';
+    message min_length => '%s needs more characters';
+
+    1;
+
+The message keyword takes two arguments, the name of the directive whose error
+message you wish to override and a string which will be used to as a template
+which is feed to sprintf to format the message.
+
+## method
+
+The method keyword (or mth) is used to register an auto-validating method.
+Similar to method signatures, an auto-validating method can leverage
+pre-existing validation rules and profiles to ensure a method has the
+required pre/post-conditions and data necessary for execution.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    method 'register' => {
+
+        input  => ['name', '+email', 'username', '+password', '+password2'],
+        output => ['+id'], # optional output validation, dies on failure
+        using  => sub {
+
+            my ($self, @args) = @_;
+
+            # do something registrationy
+            $self->id(...); # set the ID field for output validation
+
+            return $self;
+
+        }
+
+    };
+
+    package main;
+
+    my $person = MyApp::Person->new(params => $params);
+
+    if ($person->register) {
+
+        # handle the successful registration
+
+    }
+
+    1;
+
+The method keyword takes two arguments, the name of the method to be created
+and a hashref of required key/value pairs. The hashref may have a \`using\` key
+whose value is the coderef to be executed upon successful validation. The
+\`using\` key is only optional when a pre-existing subroutine has the same name
+or the method being declared prefixed with a dash or dash-process-dash. The
+following are valid subroutine names to be called by the method declaration in
+absence of a \`using\` key. Please note, unlike the ensure keyword, any
+pre-existing subroutines will not be wrapped-and-replaced and can be executed
+without validation if called directly.
+
+    sub _name {
+        ...
+    }
+
+    sub _process_name {
+        ...
+    }
+
+The hashref may have an input key
+(e.g. input, input\_document, input\_profile, or input\_method). The \`input\` key
+(specifically) must have a value which must be either an arrayref of fields to
+be validated, or a scalar value which matches (a validation profile or
+auto-validating method name), which will be used to perform data validation
+**before** the aforementioned coderef has been executed. Whether and what the
+method returns is yours to decide. The method will return undefined if
+validation fails.
+
+    # alternate usage
+
+    method 'registration' => {
+        input  => ['name', '+email', 'username', '+password', '+password2'],
+        output => ['+id'], # optional output validation, dies on failure
+    };
+
+    sub _process_registration {
+        my ($self, @args) = @_;
+            $self->id(...); # set the ID field for output validation
+        return $self;
+    }
+
+Optionally the hashref may also have an output key (e.g. output,
+output\_document, output\_profile, or output\_method). The \`output\` key
+(specifically) must have a value which must be either an arrayref of
+fields to be validated, or a scalar value which matches (a validation profile
+or auto-validating method name), which will be used to perform data validation
+**after** the aforementioned coderef has been executed.
+
+Please note that output validation failure will cause the program to die,
+the premise behind this decision is based on the assumption that given
+successfully validated input a routine's output should be predictable and
+if an error occurs it is most-likely a program error as opposed to a user error.
+
+See the ignore\_failure and report\_failure attributes on the prototype to
+control how method validation failures are handled.
+
+## mixin
+
+The mixin keyword (or mxn) registers a validation rule template that can be
+applied (or "mixed-in") to any field by specifying the mixin directive. Mixin
+directives are processed first so existing field directives will override any
+directives created by the mixin directive.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    mixin 'boilerplate' => {
+        required   => 1,
+        min_length => 1,
+        max_length => 255
+    };
+
+    field 'username' => {
+        # min_length, max_length, .. required will be overridden
+        mixin    => 'boilerplate',
+        required => 0
+    };
+
+Since version 7.900015, all classes are automatically configured with the
+following default mixins for the sake of convenience:
+
+    mixin ':flg' => {
+        required   => 1,
+        min_length => 1,
+        filters    => [qw/trim strip numeric/],
+        between    => [0, 1]
+    };
+
+    mixin ':num' => {
+        required   => 1,
+        min_length => 1,
+        filters    => [qw/trim strip numeric/]
+    };
+
+    mixin ':str' => {
+        required   => 1,
+        min_length => 1,
+        filters    => [qw/trim strip/]
+    };
+
+Please note that the aforementioned mixin names are prefixed with a semi-colon but
+are treated as an exception to the rule. Prefixing mixin names with a double
+plus-symbol instructs the register to merge your declaration with any pre-existing
+declarations within the same scope (e.g. mixins imported via loading roles),
+whereas prefixing mixin names with a single plus-symbol instructs the register
+to overwrite any pre-existing declarations.
+
+    package MyApp::Moderator;
+
+    use Validation::Class;
+
+    set role => 'MyApp::Person';
+
+    # overwrite and append existing mixin
+    mixin '++boilerplate' => {
+        min_symbols => 1
+    };
+
+    # redefine existing mixin
+    mixin '+username' => {
+        required => 1
+    };
+
+    1;
+
+The mixin keyword takes two arguments, the mixin name and a hashref of key/values
+pairs known as directives.
+
+## profile
+
+The profile keyword (or pro) registers a validation profile (coderef) which as
+in the traditional use of the term is a sequence of validation routines that
+validates data relevant to a specific action.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    profile 'check_email' => sub {
+
+        my ($self, @args) = @_;
+
+        if ($self->email_exists) {
+            my $email = $self->fields->get('email');
+            $email->errors->add('Email already exists');
+            return 0;
+        }
+
+        return 1;
+
+    };
+
+    package main;
+
+    my $user = MyApp::Person->new(params => $params);
+
+    unless ($user->validate_profile('check_email')) {
+        # handle failures
+    }
+
+    1;
+
+The profile keyword takes two arguments, a profile name and coderef which will
+be used to execute a sequence of actions for validation purposes.
+
+# METHODS
+
+## new
+
+The new method instantiates a new class object, it performs a series of actions
+(magic) required for the class to function properly, and for that reason, this
+method should never be overridden. Use the build keyword for hooking into the
+instantiation process.
+
+In the event a foreign (pre-existing) \`new\` method is detected, an
+\`initialize\_validator\` method will be injected into the class containing the
+code (magic) necessary to normalize your environment.
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    # hook
+    build sub {
+
+        my ($self, @args) = @_; # on instantiation
+
+    };
+
+    sub new {
+
+        # rolled my own
+        my $self = bless {}, shift;
+
+        # execute magic
+        $self->initialize_validator;
+
+    }
+
+    1;
+
+## prototype
+
+The prototype method (or proto) returns an instance of the associated class
+prototype. The class prototype is responsible for manipulating and validating
+the data model (the class). It is not likely that you'll need to access
+this method directly, see [Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype).
+
+    package MyApp::Person;
+
+    use Validation::Class;
+
+    package main;
+
+    my $person = MyApp::Person->new;
+
+    my $prototype = $person->prototype;
+
+    1;
+
+# PROXY METHODS
+
+Validation::Class mostly provides sugar functions for modeling your data
+validation requirements. Each class you create is associated with a prototype
+class which provides the data validation engine and keeps your class namespace
+free from pollution, please see [Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype) for more
+information on specific methods and attributes. Validation::Class injects a few
+proxy methods into your class which are basically aliases to the corresponding
+prototype class methods, however it is possible to access the prototype directly
+using the proto/prototype methods.
+
+## class
+
+    $self->class;
+
+See ["class" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#class) for full documentation.
+
+## clear\_queue
+
+    $self->clear_queue;
+
+See ["clear\_queue" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#clear_queue) for full documentation.
+
+## error\_count
+
+    $self->error_count;
+
+See ["error\_count" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#error_count) for full documentation.
+
+## error\_fields
+
+    $self->error_fields;
+
+See ["error\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#error_fields) for full documentation.
+
+## errors
+
+    $self->errors;
+
+See ["errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#errors) for full documentation.
+
+## errors\_to\_string
+
+    $self->errors_to_string;
+
+See ["errors\_to\_string" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#errors_to_string) for full documentation.
+
+## get\_errors
+
+    $self->get_errors;
+
+See ["get\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_errors) for full documentation.
+
+## get\_fields
+
+    $self->get_fields;
+
+See ["get\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_fields) for full documentation.
+
+## get\_hash
+
+    $self->get_hash;
+
+See ["get\_hash" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_hash) for full documentation.
+
+## get\_params
+
+    $self->get_params;
+
+See ["get\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_params) for full documentation.
+
+## get\_values
+
+    $self->get_values;
+
+See ["get\_values" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_values) for full documentation.
+
+## fields
+
+    $self->fields;
+
+See ["fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#fields) for full documentation.
+
+## filtering
+
+    $self->filtering;
+
+See ["filtering" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#filtering) for full documentation.
+
+## ignore\_failure
+
+    $self->ignore_failure;
+
+See ["ignore\_failure" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#ignore_failure) for full documentation.
+
+## ignore\_intervention
+
+    $self->ignore_intervention;
+
+See ["ignore\_intervention" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#ignore_intervention) for full documentation.
+
+## ignore\_unknown
+
+    $self->ignore_unknown;
+
+See ["ignore\_unknown" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#ignore_unknown) for full documentation.
+
+## is\_valid
+
+    $self->is_valid;
+
+See ["is\_valid" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#is_valid) for full documentation.
+
+## param
+
+    $self->param;
+
+See ["param" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#param) for full documentation.
+
+## params
+
+    $self->params;
+
+See ["params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#params) for full documentation.
+
+## plugin
+
+    $self->plugin;
+
+See ["plugin" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#plugin) for full documentation.
+
+## queue
+
+    $self->queue;
+
+See ["queue" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#queue) for full documentation.
+
+## report\_failure
+
+    $self->report_failure;
+
+See ["report\_failure" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#report_failure) for full
+documentation.
+
+## report\_unknown
+
+    $self->report_unknown;
+
+See ["report\_unknown" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#report_unknown) for full documentation.
+
+## reset\_errors
+
+    $self->reset_errors;
+
+See ["reset\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#reset_errors) for full documentation.
+
+## reset\_fields
+
+    $self->reset_fields;
+
+See ["reset\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#reset_fields) for full documentation.
+
+## reset\_params
+
+    $self->reset_params;
+
+See ["reset\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#reset_params) for full documentation.
+
+## set\_errors
+
+    $self->set_errors;
+
+See ["set\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_errors) for full documentation.
+
+## set\_fields
+
+    $self->set_fields;
+
+See ["set\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_fields) for full documentation.
+
+## set\_params
+
+    $self->set_params;
+
+See ["set\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_params) for full documentation.
+
+## set\_method
+
+    $self->set_method;
+
+See ["set\_method" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_method) for full documentation.
+
+## stash
+
+    $self->stash;
+
+See ["stash" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#stash) for full documentation.
+
+## validate
+
+    $self->validate;
+
+See ["validate" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate) for full documentation.
+
+## validate\_document
+
+    $self->validate_document;
+
+See ["validate\_document" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate_document) for full documentation.
+
+## validate\_method
+
+    $self->validate_method;
+
+See ["validate\_method" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate_method) for full documentation.
+
+## validate\_profile
+
+    $self->validate_profile;
+
+See ["validate\_profile" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate_profile) for full documentation.
+
+# UPGRADE
+
+Validation::Class is stable, its feature-set is complete, and is currently in
+maintenance-only mode, i.e. Validation::Class will only be updated with minor
+enhancements and bug fixes. However, the lessons learned will be incorporated
+into a compelete rewrite uploaded under the namespace [Validation::Interface](https://metacpan.org/pod/Validation::Interface).
+The Validation::Interface fork is designed to have a much simpler API with less
+options and better execution, focused on validating hierarchical data as its
+primarily objective.
+
+# EXTENSIBILITY
+
+Validation::Class does NOT provide method modifiers but can be easily extended
+with [Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers).
+
+## before
+
+    before foo => sub { ... };
+
+See ["before method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers#before-method-s-sub) for full
+documentation.
+
+## around
+
+    around foo => sub { ... };
+
+See ["around method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers#around-method-s-sub) for full
+documentation.
+
+## after
+
+    after foo => sub { ... };
+
+See ["after method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers#after-method-s-sub) for full
+documentation.
+
+# SEE ALSO
+
+Validation::Class does not validate blessed objects. If you need a means for
+validating object types you should use a modern object system like [Moo](https://metacpan.org/pod/Moo),
+[Mouse](https://metacpan.org/pod/Mouse), or [Moose](https://metacpan.org/pod/Moose). Alternatively, you could use decoupled object
+validators like [Type::Tiny](https://metacpan.org/pod/Type::Tiny), [Params::Validate](https://metacpan.org/pod/Params::Validate) or [Specio](https://metacpan.org/pod/Specio).
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 1195:
+
+    &#x3d;back without =over

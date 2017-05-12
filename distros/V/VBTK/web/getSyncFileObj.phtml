@@ -1,0 +1,6 @@
+<!--#perl 
+  my $fileName = $_parms->{fileName};
+  my $fileObj = &VBTK::Server::getSyncFileObj($fileName) || return undef;
+  my $serialized = &Storable::freeze($fileObj);
+  return $serialized;
+-->

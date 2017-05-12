@@ -1,0 +1,114 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2007.09.03.00.37.37;	author mkanat;	state dead;
+branches;
+next	1.1;
+
+1.1
+date	2007.04.30.20.49.32;	author arturkeska;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@Remove a bunch of files so that I don't have to deal with them in EXPECTED_CONTENTS.
+@
+text
+@<?PHP
+
+/*! \brief Class represents a object dimenstion. */
+class HTOM_Size implements HTOM_Attribute
+{
+  //! Initialize size object and set it's initial arguments.
+  /*! The constructor may be called in two ways. User can pass the dimenstion values (or NULL).
+   * or pass an HTOM_Size object in the first parameter. If one set the HTOM_Size in the first parameter
+   * the dimenstions will be copied from passed object.
+   * The NULL value in the size propery means that the dimenstion will be cleared, and the
+   * document object will use the default value.
+   * \param width either the HTOM_Size, width size (HTML size style) or NULL.
+   * \param height either height size (HTML size style) or NULL.
+   */
+  public function __construct( $width=NULL, $height=NULL)
+  {
+    if ($width instanceof HTOM_Size) {
+      $this->w=$width->w;
+      $this->h=$width->h;
+    } else {
+      $this->w=$width;
+      $this->h=$height;
+    }
+  }
+
+  //! Set width property
+  /*! \param width the object width. Either the HTML size property. If parameter set to NULL the with will be cleared.
+   */
+  public function SetWidth( $width )
+  {
+    $this->w = $width;
+  }
+
+  //! Set height property
+  /*! \param height the object heigt. Either the HTML size property or NULL.
+   * If parameter set to NULL the height will be cleared.
+   */
+  public function SetHeight( $height )
+  {
+    $this->h = $height;
+  }
+
+  //! Get the width.
+  /*! \return width propery or NULL if property is not being set */
+  public function GetWidth()
+  {
+    return $this->w;
+  }
+
+  //! Get the height.
+  /*! \return height propery or NULL if property is not being set */
+  public function GetHeight()
+  {
+    return $this->h;
+  }
+
+
+  //! Get the name of class.
+  /*! \return "HTOM_Size" string. */
+  public function Name()
+  {
+    return "HTOM_Size";
+  }
+  //! Evaluate to the width/height HTML attributes.
+  public function Evaluate()
+  {
+    $rc="";
+    if ($this->w) {
+      $rc.=" width='".$this->w."'";
+    }
+    if ($this->h) {
+      $rc.=" height='".$this->h."'";
+    }
+    return $rc;
+  }
+}
+
+?>@
+
+
+1.1
+log
+@*** empty log message ***
+@
+text
+@@
+

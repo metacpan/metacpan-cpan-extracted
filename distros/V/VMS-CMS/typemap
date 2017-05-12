@@ -1,0 +1,15 @@
+TYPEMAP
+ldb_cntrlblk *	T_PTR_CMSLIB
+###########################################################
+INPUT
+T_PTR_CMSLIB
+	if (sv_isa($arg, \"VMS::CMS\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp;
+	}
+	else
+	    croak(\"$var is not of type VMS::CMS\")
+###########################################################
+OUTPUT
+T_PTR_CMSLIB
+	sv_setref_pv($arg, \"VMS::CMS\", (void*)$var);

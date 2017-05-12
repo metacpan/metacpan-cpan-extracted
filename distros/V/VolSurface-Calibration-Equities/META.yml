@@ -1,0 +1,33 @@
+---
+abstract: 'now based on centroid calculations A function that optimizes a set of parameters against a function. This optimization method is based on Amoeba optimization. We use a form of the Downhill Simplex Method or Nelder-Mead (available as the R function optim). This can also be coded in other languages.'
+author:
+  - 'binary.com <BINARY@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: VolSurface-Calibration-Equities
+requires:
+  Date::Utility: '0'
+  Format::Util::Numbers: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Math::Trig: '0'
+  Try::Tiny: '0'
+  perl: '5.014000'
+resources:
+  repository: git://github.com//VolSurface-Calibration-Equities.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.66'

@@ -1,0 +1,211 @@
+0.7.1 Oct 31, 2010
+    New Features:
+      - Commits have a "uuid" accessor, that allows you to uniquely identify
+        a particular Commit universally across all repositories.
+      - To help implement the "uuid" accessor, VCI objects themselves now
+        have two new boolean methods: revisions_are_universal, and
+        revisions_are_global (documented in the POD for VCI.pm).
+
+0.6.3 Oct 15, 2010
+    - Make the CVS driver compatible with the date output format of CVS 1.12.
+
+0.6.2 Aug 28, 2010
+    - Fix the META.yml in the VCI package to have the correct version
+      numbers.
+
+0.6.1 Aug 24, 2010
+   - VCI now explicitly requires Perl 5.8. (We probably always did actually
+     require 5.8, because some of our dependencies did.)
+   - The POD has all been reviewed and improved, for every module.
+   - VCI is no longer alpha-quality software, and so all such statements
+     to that effect have been removed from the POD.
+   - The VCI package now uses Module::Install instead of Module::Build
+   
+   New Features:
+      - There is a new "revno" accessor for Commit objects. "revision"
+        now always represents the global revision id, if the VCS has one.
+      - Commit objects have an "author" accessor in addition to the
+        "committer" accessor, for VCSes that understand those things
+        as separate concepts.
+      - Added a new method to VCI.pm, "missing_requirements", to assist
+        downstream consumers in figuring out what needs to be installed
+        in order for certain VCI::VCS modules to work.
+      - Svn: More debug output available.
+
+   API Changes:
+      - A Commit's "moved" accessor now has Committable objects (File or
+        Directory objects) for its values instead of strings.
+      - Bzr: A Commit's "revision" accessor now returns a revid instead of
+        a revision number. This also means that every method that takes
+        "revision" as an argument works on revids intead of revision numbers.
+
+   Optimizations:
+      - VCI now does nearly all of its internal class loading on-demand
+        instead of during compile time. This eliminates dependency loops
+        and probably helps some with startup time.
+
+   Bug Fixes:
+      - The Cvs driver was unable to parse certain valid commit histories,
+        meaning that sometimes commits would be missing. The parser has
+        been re-written to be faster and more reliable.
+
+0.5.4 Aug 13, 2010
+   - Most modules that used to be optional are now required, to improve
+     the amount of testing that we get, and to simplify configuration for
+     downstream consumers.
+  - A few minor POD and test improvements.
+
+0.5.3 Feb 14, 2009
+    Bug Fixes:
+        - Cvs and Bzr: Drivers now work when IPC::Cmd > 0.41 is installed.
+        - Bzr: Now works reliably with bzr > 1.15.
+        - Git: $commit->message now once again returns the literal
+          message, exactly as it was typed in, with modern versions of Git.
+        - Hg: History and Commit info was broken with recent versions of
+          hgweb, and now works.
+
+0.5.2 Jan 7, 2009
+    - Fix a test failure that only happens when using the XS in recent
+      Class::MOP releases.
+
+0.5.1 Jan 2, 2008
+    - No API changes, just major performance enhancements.
+
+    Bug Fixes:
+        - Systems with cvsps 2.2 will now work, when using the Cvs driver.
+          (Older versions of cvsps are still fine, also.)
+        - The Svn driver was broken with newer versions of Subversion.
+
+0.4.1 Jan 10, 2008
+    - VCI is now taint-safe in all drivers except for Git.
+    
+    Bug Fixes:
+        - SECURITY: Versions prior to this one fall victim to CPAN RT ID
+          31738, meaning that drivers that interact with the command line
+          were vulnerable to command injection.
+        - VCI no longer throws warnings if you give it "undef" for the
+          "debug" argument to VCI->connect. (This mostly affected the Bzr
+          driver.)
+        - Svn: root_project->root_directory now works.
+        - Svn: Tests should now pass on Svn versions < 1.4.
+    
+    API Changes:
+        - We use Moose's support for "generics" (like ArrayRef[Int]) instead
+          of having our own Array types, now.
+        - We use Moose's lazy_build, meaning that all build functions
+          changed to "_build_blah" instead of "build_blah"
+        - All of our internal subtypes now start with "VCI::Type::", since
+          I found out that Moose's type names are global.
+
+0.3.1 Dec 3, 2007
+    New Features:
+        - Repository has a root_project to represent the idea that in some
+          VCSes, the entire repository can be looked at as one Project.
+        - FileContainer has contents_history_recursive, which gives a History
+          for the contents of that directory and the contents of all its
+          directories, etc.
+
+    Optimizations:
+        - Calling Bzr::Project::history should now be much faster,
+          particularly on large projects.
+        - Calling Svn::Project::get_commit and Svn::Committable::history
+          should be faster, in most situations.
+
+    Bug Fixes:
+        - Make the bzr tests work with modern versions of bzr. (Fix the
+          parsing of the --version output.)
+        - History::union was sorting by revision number instead of by time.
+        - Getting the contents of an Svn directory would sometimes fail.
+          Thanks to Sam Vilain for help with the fix!
+        - Cvs always said the timezone of commits was the local timezone.
+          Now it's always UTC, to be consistent on all machines.
+
+0.2.1 Fri, Sep 17, 2007
+    - We now explicitly require Perl 5.6.0, which is what
+      Perl::MinimumVersion says we require. No promises that all our
+      dependencies work with 5.6.0, though.
+    
+    New Features:
+        - Added File::content, which allows you to get the actual raw content
+          of a file at its particular revision.
+        - Added File::content_size, which allows you to get the size of the
+          file in bytes at its particular revision.
+        - Added Project::head_revision, which returns the revision ID
+          that represents "head" in the Project.
+        - You can now specify "revision" to get_file to get a particular
+          revision of that file.
+    
+    API Changes:
+        - Project::get_commit now takes named parameters instead of a single
+          positional parameter.
+        - Project::get_history_by_time no longer has an "at" argument. (Use
+          get_commit(time => 'blah') instead.)
+        - Svn's FileOrDirectory is now *both* a VCI::Abstract::File and a
+          VCI::Abstract::Directory, instead of being neither.
+    
+    Optimizations:
+        - Hg's File::history should now be much faster, as gets the
+          information directly from Hg instead of building it from the
+          Project's History.
+    
+    Bug Fixes:
+        - Sometimes Cvs's File::content was including extra garbage at the
+          end of the actual file content.
+        - Specifying a value greater than 1 for "debug" in VCI->connect
+          was throwing an error.
+        - Cvs wasn't dying correctly when a command failed.
+        - File::is_executable wasn't correctly specified as being Bool.
+        - Svn should now correctly delete temp files created by
+          Commit::as_diff after build_as_diff returns.
+
+0.1.2 Tue, Sep 11, 2007
+    - Added tests for Committable ::history, ::first_revision,
+      and ::last_revision.
+    - Committable was always returning a Bzr::History instead of the
+      correct History object.
+    
+    Hg:
+        - History was in reverse order.
+        - Commit::contents would fail if there were no changes to any files
+          in the commit.
+        - Files in Commit ::added, ::modified, ::removed, and ::contents
+          didn't have their "revision" and "time" set.
+    
+    Svn:
+        -Commit ::last_revision and ::first_revision were broken.
+
+0.1.1 Mon, Sep 10, 2007
+    New Features:
+        - Commit objects now have an as_diff accessor, which allows you to
+          get that particular commit as a "diff" from the VCS. This adds
+          a requirement of Text::Diff::Parser 0.07.
+    
+    API Changes:
+        - get_path, get_file, and get_directory now take a single named
+          argument, "path", instead of a single un-named argument.
+    
+    Bugs Fixed:
+        - Added tests for all the drivers, which fixed a lot of bugs. In short,
+          don't use any version of VCI before this one.
+    
+    For VCI Developers:
+        - If you set the VCI_TEST_DEBUG environment variable, it will be
+          passed as the "debug" argument to VCI->connect, allowing you to
+          see more information from the driver about what's going on in the
+          test.
+        - You can set VCI_REMOTE_TESTS = 1 in your environment to run
+          tests that involve accessing machines over the Internet.
+
+0.0.3 Fri, Aug 31, 2007
+    - Svn history was broken when the repo history contained copied items.
+
+0.0.2 Fri, Aug 31, 2007
+    - Bzr's history and contents were broken.
+    - Svn's history was broken.
+    - Git driver had some debug code left in that was breaking history.
+
+0.0.1 Tue, Aug 28, 2007
+    - Support for CVS
+    - Test::Warn was missing from build_requires
+    - Cleaned up documentation
+    - Committables now can never be created with just time and no revision.

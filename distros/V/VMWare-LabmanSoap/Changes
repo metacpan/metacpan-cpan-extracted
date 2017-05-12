@@ -1,0 +1,9 @@
+Revision history for VMWare-LabmanSoap
+
+0.99	04/06/10
+		First version, released on an unsuspecting world.
+
+1.0	06/11/10 
+		Added dependency test check for SOAP::Lite.
+		Renamed the package name to match the filename.
+

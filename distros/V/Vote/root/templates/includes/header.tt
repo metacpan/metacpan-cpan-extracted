@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>[% page.title %]</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="[% c.uri_for('/static', 'vote.css') %]" type="text/css">
+<link rel="icon" href="[%- c.uri_for('/static', 'images', 'favicon.ico') -%]" type="image/x-icon">
+
+<script language="JavaScript" src="[% c.uri_for('/static', 'js', 'CalendarPopup.js') %]"></SCRIPT>
+
+</head>
+<body>
+<div id="header">
+    <p id="title"><b>Epoll:</b> système de vote en ligne</p>
+    <p id="now" style="float: right">Page générée le [% c.model('Vote').dbtime | html %]</p>
+    <p id="menu">
+    <a href="[% c.uri_for('/') %]">Liste des votes</a> ::
+    <a href="[% c.uri_for('/newpoll') %]">Créer un nouveau vote</a>
+    [% IF voteid %]
+    :: <a href="[% c.uri_for('/vote', voteid) %]">
+        Votre vote: [% c.model('Vote').vote_info(voteid).label | truncate(40) | html %]
+    </a>
+    [% END %]
+    </p>
+</div>

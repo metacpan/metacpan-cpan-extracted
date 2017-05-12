@@ -1,0 +1,29 @@
+PIC P16F690;
+
+pragma adc right_justify = 0;
+Main {
+    digital_output RC0;
+    analog_input AN0;
+    adc_enable 500kHz, AN0;
+    Loop {
+        adc_read $display;
+        delay_ms $display;
+        write RC0, 1;
+        delay_ms $display;
+        write RC0, 0;
+        delay 100us;
+    }
+}
+
+Simulator {
+    attach_led RC0;
+    stop_after 10s;
+    log RC0;
+    scope RC0;
+    #adc stimulus
+    stimulate AN0, every 3s, wave [
+        500000, 2.85, 1000000, 3.6,
+        1500000, 4.5, 2000000, 3.2,
+        2500000, 1.8
+    ];
+}

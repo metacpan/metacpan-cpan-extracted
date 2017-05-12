@@ -1,0 +1,12 @@
+bin/MI-TDT
+lib/VJF/MITDT.pm
+Makefile.PL
+MANIFEST
+mi-tdt2.h
+MITDT.xs
+toolbox.c
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+MI-TDT-example/p-values.R
+MI-TDT-example/README
+MI-TDT-example/trios.ped

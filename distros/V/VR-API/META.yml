@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         VR-API
+version:      1.06
+version_from: lib/VR/API.pm
+installdirs:  site
+requires:
+    Crypt::SSLeay:                 0.51
+    SOAP::Lite:                    0.6
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

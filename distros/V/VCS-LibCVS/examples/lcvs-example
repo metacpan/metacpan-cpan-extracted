@@ -1,0 +1,77 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2003,2004,2005 Alexander Taler (dissent@0--0.org)
+#
+# All rights reserved. This program is free software; you can redistribute it
+# and/or modify it under the same terms as Perl itself.
+#
+
+# This is a very basic example of how to use LibCVS.
+
+# If you like what it does, take a look at lcvs-st, which is much more complete.
+
+use strict;
+
+use File::Spec;
+
+use VCS::LibCVS;
+
+####################
+### Create a WorkingDirectory object for the current working directory
+# Use eval to catch any exceptions
+my $working_dir;
+eval {
+  $working_dir = VCS::LibCVS::WorkingDirectory->new(File::Spec->curdir());
+};
+
+# Check if there was an exception, which usually means it's not a CVS directory.
+if ($@) {
+  print("********\n",
+        "The current working directory does not seem to by managed by CVS.\n",
+        "********\n",
+        $@);
+  exit 1;
+}
+
+####################
+### Get the version of the repository from which this directory was checked out.
+eval {
+  my $repo = $working_dir->get_repository();
+  my $repo_version = $repo->get_version();
+  print "Repository Version: $repo_version\n\n";
+};
+
+if ($@) {
+  print("********\n",
+        "Couldn't access the repository for some reason.\n",
+        "********\n",
+        $@);
+  exit 1;
+}
+
+####################
+### Get a list of CVS managed files from the directory
+my $files = $working_dir->get_files();
+
+####################
+### Traverse the list of files
+foreach my $file_name ( keys %$files ) {
+  print "$file_name is ";
+
+  ### Get the file from the list
+  my $working_file = $files->{$file_name};
+
+  ### Check the state of each file
+  # the meaning of this is affected by the scheduled action on the file
+  # see the docs for this function and for get_scheduled_action
+  my $state = $working_file->get_state();
+  print "up-to-date" if $state == VCS::LibCVS::WorkingFile::STATE_UPTODATE;
+  print "modified" if $state == VCS::LibCVS::WorkingFile::STATE_MODIFIED;
+  print "conflicted" if $state == VCS::LibCVS::WorkingFile::STATE_HADCONFLICTS;
+  print "missing" if $state == VCS::LibCVS::WorkingFile::STATE_ABSENT;
+
+  ### Print out the revision number of the file
+  print " from revision ";
+  print $working_file->get_revision_number()->as_string();
+  print " \n";
+}

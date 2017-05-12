@@ -1,0 +1,26 @@
+Changes
+inc/COPYING
+inc/xdelta3-blkcache.h
+inc/xdelta3-cfgs.h
+inc/xdelta3-decode.h
+inc/xdelta3-djw.h
+inc/xdelta3-fgk.h
+inc/xdelta3-hash.h
+inc/xdelta3-internal.h
+inc/xdelta3-list.h
+inc/xdelta3-lzma.h
+inc/xdelta3-main.h
+inc/xdelta3-merge.h
+inc/xdelta3-second.h
+inc/xdelta3-test.h
+inc/xdelta3.c
+inc/xdelta3.h
+Interface.xs
+lib/Vcdiff/Xdelta3.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/non_lseekable.t
+t/streaming.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
