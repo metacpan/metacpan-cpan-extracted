@@ -1,0 +1,84 @@
+/* ================================================================ 
+This copyright notice must be untouched at all times.
+
+The original version of this stylesheet and the associated (x)html
+is available at http://www.cssplay.co.uk/menus/flyout2.html
+Copyright (c) 2005-2007 Stu Nicholls. All rights reserved.
+This stylesheet and the assocaited (x)html may be modified in any 
+way to fit your requirements.
+=================================================================== */
+ .menu {
+z-index:1000;
+font-size:90%;
+margin:25px 0 25px 15px; /* this page only */
+}
+
+/* remove all the bullets, borders and padding from the default list styling */
+.menu ul {
+padding:0;
+margin:0;
+list-style-type:none;
+width:250px;
+}
+/* hack for IE5.5 */
+* html .menu ul {margin-left:-16px; ma\rgin-left:0;}
+/* position relative so that you can position the sub levels */
+.menu li {
+position:relative;
+background: #EEE ;
+text-align:left;
+height: auto;
+}
+
+/* get rid of the table */
+.menu table {position:absolute; border-collapse:collapse; top:0; left:0; z-index:100; font-size:1em;}
+
+/* style the links */
+.menu a, .menu a:visited {
+display:block; 
+text-decoration:none;
+height:25px;
+line-height:25px;
+width:249px;
+color:#000;
+text-indent:5px;
+border:1px solid #BBF;
+border-width:0 1px 1px 0;
+}
+/* hack for IE5.5 */
+* html .menu a, * html .menu a:visited {background:#EEF; width:250px; w\idth:249px;}
+/* style the link hover */
+* html .menu a:hover {color:#fff; background:#EEE;}
+
+.menu :hover > a {
+color:#000; 
+border:1px solid #555;
+font-weight: bold;
+background:#EEF;
+}
+
+/* hide the sub levels and give them a positon absolute so that they take up no room */
+.menu ul ul {
+visibility:hidden;
+position:absolute;
+top:0;
+left:251px; 
+}
+/* make the second level visible when hover on first level list OR link */
+.menu ul li:hover ul,
+.menu ul a:hover ul {
+visibility:visible;
+}
+/* keep the third level hidden when you hover on first level list OR link */
+.menu ul :hover ul ul{
+visibility:hidden;
+}
+ 
+/* make the third level visible when you hover over second level list OR link */
+.menu ul :hover ul :hover ul{ 
+visibility:visible;
+}
+<!--[if IE 7]> 
+.menu li {float:left;}
+* {zoom:1;}
+<![endif]-->

@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Hermes;
+use Argos::Path;
+use Argos::Conf;
+use Argos::Ctrl;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::THIS = 'argos';
+
+=head1 SYNOPSIS
+
+Control argos processes.
+
+=head3 pause/resume
+
+$0 name .. --pause [ --time 20min ]
+
+=head3 exclude/unexclude
+
+$0 name .. --exclude [ --time 20min ]
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->get( qw( time=s pause exclude ) )->dump();
+
+my $path = Argos::Path->new( $o{path} );
+die "argos not set up.\n" unless $path->check();
+
+my $ctrl = $path->path( run => '.ctrl' );
+exit 0 unless -f $ctrl || -l $ctrl;
+$ctrl = Argos::Ctrl->new( $ctrl );
+
+my $range = Hermes->new( $option->dump( 'range' ) );
+my $time = Argos::Conf->time( $o{time} );
+my $now = time;
+my @info = ( $time ? $time + $now : 0, operator() );
+
+if ( my $method = $o{pause} ? 'pause' : $o{exclude} ? 'exclude' : undef )
+{
+    map { $ctrl->$method( $_, @info ) } map { $range->load( $_ )->list } @ARGV;
+}
+
+my %stat = ( excluded => $range->dump() )
+    if $range->load( $ctrl->excluded() )->list;
+
+if ( my @stuck = $ctrl->stuck() )
+{
+    @stuck = map { shift @$_; $_->[1] -= $now; join ',', @$_ } @stuck;
+    $stat{paused} = \@stuck;
+}
+
+YAML::XS::DumpFile STDOUT \%stat if %stat;
+exit 0;
+
+sub operator
+{
+    my $name = `logname`; chop $name; return $name;
+}

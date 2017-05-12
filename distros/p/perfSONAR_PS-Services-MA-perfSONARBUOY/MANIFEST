@@ -1,0 +1,19 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/Services/MA/perfSONARBUOY.pm
+lib/perfSONAR_PS/owdb.pm
+lib/perfSONAR_PS/OWP.pm
+lib/perfSONAR_PS/OWP/Navigation.pm
+lib/perfSONAR_PS/OWP/Sum.pm
+lib/perfSONAR_PS/OWP/Syslog.pm
+lib/perfSONAR_PS/OWP/Archive.pm
+lib/perfSONAR_PS/OWP/DB.pm
+lib/perfSONAR_PS/OWP/Conf.pm
+lib/perfSONAR_PS/OWP/RawIO.pm
+lib/perfSONAR_PS/OWP/Utils.pm
+perl-perfSONAR_PS-Services-MA-perfSONARBUOY.spec
+META.yml                                 Module meta-data (added by MakeMaker)

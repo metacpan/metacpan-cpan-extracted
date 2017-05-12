@@ -1,0 +1,17 @@
+### perl: argos/code/b.generic
+use strict;
+
+use Hermes;
+use Vulcan::OptConf;
+
+return sub
+{
+    my %param = @_;
+    my ( $target, $thread ) = @param{ qw( target thread ) };
+    my ( $i, @batch ) = 0;
+
+    map { push @{ $batch[ $i ++ % $thread ] }, $_ }
+        Hermes->new( Vulcan::OptConf->load()->dump( 'range' ) )
+            ->load( $target )->list();
+    return @batch;
+};

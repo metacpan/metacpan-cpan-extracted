@@ -1,0 +1,186 @@
+=head1 NAME
+
+pfacter - Collect and display facts about the system
+
+=head1 SYNOPSIS
+
+C<< pfacter [option]... [fact] [fact]... >>
+
+=head1 DESCRIPTION
+
+Pfacter is a cross-platform distribution for retrieving facts about the
+system it is run on.  It works like a rosetta stone, collecting information
+on things like IP and MAC addresses, DIMMs, processors, and other hardware
+information.  Pfacter supports writing to an LDAP database, making it an
+ideal tool in the creation of a universal infrastructure host list.
+
+Pfacter was inspired by Facter (http://reductivelabs.com/projects/facter/).
+
+=head1 OPTIONS
+
+=over 4
+
+=item --debug
+
+Print debugging information while working.
+
+=item --help
+
+Display a short usage synopsis.
+
+=item --version
+
+Display the current version/release of Pfacter.
+
+=item --moduledir
+
+Specifies the extensible module location; if no specific facts are
+specified, the entire moduledir directory will be read and acted
+upon.
+
+This (at the most basic level) addes a path to perl's @INC array;
+as an example, if moduledir is specified as "/etc/pfacter/modules" (the
+default), a module named Pfacter::thirdparty would be loaded from a
+module located at /etc/pfacter/modules/Pfacter/thirdparty.pm.
+
+=item --multi
+
+Allows for multi-valued facts (ipAddress, macAddress, memory, etc) to
+be displayed as such (both locally and in LDAP).
+
+=item --write
+
+Write any new or changed host facts to LDAP.  Requires that either a
+configuration file be specified, or a username, password, and server
+address be provided on the command line.
+
+The following flags are used in conjunction with the --write option:
+
+=over 4
+
+=item --configfile <configfile>
+
+The file containing configuration information (username, password, LDAP
+server address, etc).  Format is:
+
+    $option: "value"
+
+Anything specified on the command-line (such as moduledir, LDAP connection
+information, etc) can be specified in this configuration file.
+
+For LDAP authentication, the configfile would contain something like:
+
+    $username: "pfacter"
+    $password: "pf4ct3r"
+    $server:   "ldap.company.com"
+
+If you use the configfile option it is also possible to specify multiple
+LDAP servers to attempt binds against.  Simple change the format to:
+
+    @server:   "ldap1.company.com ldap2.company.com ldap3.company.com"
+
+...and Net::LDAP will attempt to bind to each host in order until a
+successful connection is made.  This is not possible if the server is
+specified on the command line.
+
+The configfile flag is the most secure (and preferred) method for storing
+connection and authentication information.  It is however possible to
+pass configuration information via the command line with the following
+three flags:
+
+=item --username <username>
+
+The name of the LDAP user to bind as.
+
+=item --password <password>
+
+Password.
+
+=item --server <server>
+
+The IP address or name of the LDAP server.
+
+Refer to the examples for more information regarding the syntax/use
+of the username, password, and server flags.
+
+=item --base <base DN>
+
+If not specified, the base DN is guessed based on the domain.
+
+=item --ssl
+
+Connect securely (with SSL, obviously) to the LDAP server.
+
+=back
+
+=item --xml
+
+Print all output in XML format.
+
+=item --yaml
+
+Print all output in YAML format.
+
+=back
+
+=head1 EXAMPLES
+
+C<< pfacter kernel kernelrelease kernelversion >>
+
+Print information about the kernel, kernel release, and kernel version.
+
+C<< pfacter --write --configfile /etc/pfacter.conf >>
+
+Print all facts and write any changes to LDAP.  Uses the authentication
+information stored in /etc/pfacter.conf.
+
+C<< pfacter --write --username uid=pfacter,ou=People,dc=company,dc=com
+--password pf4ct3r --server ldap.company.com --ssl ipaddress macaddress >>
+
+Print IP address and MAC address facts.  Write any changes to LDAP using
+the specified connection and authentication information.  Use SSL.
+
+=head1 SAMPLE OUTPUT
+
+What follows is the output of Pfacter on a relatively standard Linux VM.
+
+    architecture => x86_64
+    disk => /dev/sda=10.7g /dev/sdb=8589m
+    domain => company.com
+    filesystems => /dev/sda1=/boot /dev/sda2=/ /dev/sda3=/usr /dev/sda4=/var /dev/sda5=/tmp /dev/sda6=/home
+    fqdn => rabbit.company.com
+    hardwaremodel => x86_64
+    hardwareplatform => x86_64
+    hardwareproduct => VMware Virtual Platform
+    hostname => rabbit
+    ipaddress => eth0=10.125.11.178 lo=127.0.0.1
+    kernel => Linux
+    kernelrelease => 2.6.18-8.el5
+    kernelversion => #1 SMP Fri Jan 26 14:15:14 EST 2007
+    localtime => Thu Feb 21 14:52:01 2008
+    lsbdescription => Red Hat Enterprise Linux Server release 5 (Tikanga)
+    lsbid => RedHatEnterpriseServer
+    lsbrelease => 5
+    macaddress => eth0=00:50:56:A6:55:D2
+    memory => 0=1024m
+    memorytotal => 1027280
+    operatingsystem => RedHat
+    processor => Dual Core AMD Opteron(tm) Processor 280
+    processorcount => 1
+    serialnumber => VMware-50 26 c5 38 09 2f 52 a3-b0 19 5c c9 f6 51 a8 6f
+    swap => 1540920
+    uniqueid => 7d0ab20b
+
+Refer to the formatting options above for alternatives (XML, YAML, etc).
+
+=head1 INSTALLING
+
+Pfacter can be easily installed from CPAN on almost any OS:
+
+C<< perl -MCPAN -e 'install Pfacter' >>
+
+=head1 AUTHOR
+
+Scott Schneider <sschneid@gmail.com>
+
+=cut

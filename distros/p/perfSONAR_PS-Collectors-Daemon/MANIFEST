@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/Collectors/Base.pm
+logger.conf
+perfsonar-collector
+perfsonar-collector.init
+perl-perfSONAR_PS-Collectors-Daemon.spec
+psConfigureCollectors
+META.yml                                 Module meta-data (added by MakeMaker)

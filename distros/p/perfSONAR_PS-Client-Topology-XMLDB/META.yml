@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         perfSONAR_PS-Client-Topology-XMLDB
+version:      0.09
+version_from: lib/perfSONAR_PS/Client/Topology/XMLDB.pm
+installdirs:  site
+requires:
+    Log::Log4perl:                 1
+    perfSONAR_PS::Common:          0.09
+    perfSONAR_PS::DB::XMLDB:       0.09
+    perfSONAR_PS::Topology::Common: 0.09
+    perfSONAR_PS::Topology::ID:    0.09
+    strict:                        0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

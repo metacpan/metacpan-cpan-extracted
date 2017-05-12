@@ -1,0 +1,44 @@
+Pod::LaTeX::Book version 0.0.1
+
+This Module is used to compile a collection of POD pages into a PDF
+book suitable for printing and on-screen viewing. Additional features
+relative to the PoD::LaTeX module include extensive hyperlinking
+within and outside the document, displayed code fragments, and
+improved line-breaking. Specification and fine-grained control over
+the result is provided via a simple and flexible configuration file.
+
+The resulting LaTeX file must be processed with pdflatex. Also, it
+requires the LaTeX packages 'hyperref', 'listings', and 'fancyvrb',
+all of which are on CTAN and in most tex distributions.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the
+following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Pod::LaTeX and a few other common modules.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Peter Paris <lutetius@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

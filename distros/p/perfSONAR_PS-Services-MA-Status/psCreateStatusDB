@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+use Getopt::Long;
+use DBI;
+
+my $sqlite_create_table =<<EOQ
+create table link_status (
+  link_id varchar(255) not null,
+  link_knowledge varchar(32) not null,
+  start_time integer not null,
+  end_time integer not null,
+  oper_status varchar(32) not null,
+  admin_status varchar(32) not null,
+ unique (link_id, start_time, end_time));
+EOQ
+;
+
+my $mysql_create_table =<<EOQ
+create table link_status (
+  link_id varchar(255) not null,
+  link_knowledge varchar(32) not null,
+  start_time bigint not null,
+  end_time bigint not null,
+  oper_status varchar(32) not null,
+  admin_status varchar(32) not null,
+  unique(link_id, start_time, end_time)
+);
+EOQ
+;
+
+my $CONFIG_FILE;
+my $DEBUGFLAG;
+my $HELP;
+my $LOGGER_CONF;
+my $NEW_TOPOLOGY;
+
+my ($status, $res, $res2);
+
+$status = GetOptions (
+        'type=s' => \$DB_TYPE,
+        'table=s' => \$DB_TABLE,
+        'file=s' => \$DB_FILE,
+        'name=s' => \$DB_NAME,
+        'host=s' => \$DB_HOST,
+        'port=s' => \$DB_PORT,
+        'username=s' => \$DB_USERNAME,
+        'password=s' => \$DB_PASSWORD,
+        );
+
+if (not $DB_TYPE) {
+	print "No database type specified\n";
+	usage();
+	exit(-1);
+}
+
+sub usage {
+	print "$0: Initialize a Link Status database\n";
+	print "  --type: The database type: 'sqlite' or 'mysql'\n";
+	print "  --table: The table to write to. defaults to 'link_status'\n";
+	print "  If SQLite is chosen, you can use these arguments\n";
+	print "  --file: The database file to use\n";
+	print "  If MySQL is chosen, you can use these arguments\n";
+	print "  --name: The database to use\n";
+	print "  --host: The database host to use\n";
+	print "  --port: The database port to use\n";
+	print "  --username: The database username to use\n";
+	print "  --password: The database password to use\n";
+}
+
+$DB_TYPE = lc($DB_TYPE);
+
+if ($DB_TYPE ne "sqlite" and $DB_TYPE ne "mysql") {
+	print "Invalid database type specified. Must be either 'mysql' or 'sqlite'\n";
+	usage();
+	exit(-1);
+}
+
+if (not $DB_TABLE) {
+	$DB_TABLE = 'link_status';
+}
+
+if ($DB_TYPE eq "sqlite") {
+	my $dbi_string = "DBI:SQLite:dbname=".$DB_FILE;
+
+	my $dbh = DBI->connect($dbi_string);
+	my $sth = $dbh->prepare($sqlite_create_table);
+	$sth->execute();
+} elsif ($DB_TYPE eq "mysql") {
+        my $dbi_string = "dbi:mysql";
+
+	if (not $DB_NAME) {
+		print "Need to specify a database name\n";
+		usage();
+		exit(-1);
+	}
+
+	$dbi_string .= ":database=".$DB_NAME;
+
+	if (not $DB_HOST) {
+		print "Need to specify the database host\n";
+		usage();
+		exit(-1);
+	}
+
+	$dbi_string .= ":host=".$DB_HOST;
+
+        if ($DB_PORT) {
+            $dbi_string .= ":port=".$DB_PORT;
+        }
+
+	my $dbh = DBI->connect($dbi_string);
+	my $sth = $dbh->prepare($mysql_create_table, $DB_USERNAME, $DB_PASSWORD);
+	$sth->execute();
+}

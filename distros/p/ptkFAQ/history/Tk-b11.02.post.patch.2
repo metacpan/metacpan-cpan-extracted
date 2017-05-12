@@ -1,0 +1,143 @@
+[PREV] [NEXT] [PREV Thread] [NEXT Thread] [Index] 
+==================================================
+
+
+Nick.Ing-Simmons@tiuk.ti.com 
+
+Revised self packing scrollbars patch for Tk-b11.02
+***************************************************
+
+12 Apr 96 08:48:09 GMT ptk@guest.wpi.edu mailing list gateway 
+
+Newsgroups: 
+   comp.lang.perl.tk 
+
+
+
+As Chris discovered there were two bugs in last nights patch.
+Here is a revised version relative to original 11.02.
+
+Changes relative to yesterday's patch are:
+  - uncomment add of Freeze binding.
+  - Only undef -?scrollcommand if axis is disabled.
+
+
+*** Tk-b11.02/Tk/Frame.pm       Sat Apr  6 13:51:04 1996
+--- /home/isp/nick/Tk/Tk/Frame.pm       Fri Apr 12 09:23:57 1996
+***************
+*** 205,211 ****
+    {
+     $w->Tk::bind('Freeze','',['packPropagate' => 0])
+    }
+!  # $w->AddBindTag('Freeze');
+  }
+  
+  sub AddScrollbars
+--- 205,211 ----
+    {
+     $w->Tk::bind('Freeze','',['packPropagate' => 0])
+    }
+!  $w->AddBindTag('Freeze');
+  }
+  
+  sub AddScrollbars
+***************
+*** 272,292 ****
+       my $yside = (($opt =~ /w/) ? 'left' : 'right');  
+       $slice->pack(-side => $yside, -fill => 'y',-before => $slice->{'before'});
+       $havey = 1;
+      }
+     else
+      {
+!      $opt =~ s/[we]//;
+       $slice->packForget;
+      }
+     $cw->{'packysb'} = $havey;
+-    if ($req)
+-     {
+-      $w->configure(-yscrollcommand => ['set', $ysb]);
+-     }
+-    else
+-     {
+-      $w->configure(-yscrollcommand => ['sbset', $cw, $ysb, \$cw->{'packysb'}]);
+-     }
+    }
+   if (defined $xsb)
+    {
+--- 272,292 ----
+       my $yside = (($opt =~ /w/) ? 'left' : 'right');  
+       $slice->pack(-side => $yside, -fill => 'y',-before => $slice->{'before'});
+       $havey = 1;
++      if ($req)
++       {
++        $w->configure(-yscrollcommand => ['set', $ysb]);
++       }
++      else
++       {
++        $w->configure(-yscrollcommand => ['sbset', $cw, $ysb, \$cw->{'packysb'}]);
++       }
+      }
+     else
+      {
+!      $w->configure(-yscrollcommand => undef) unless $opt =~ s/[we]//;
+       $slice->packForget;
+      }
+     $cw->{'packysb'} = $havey;
+    }
+   if (defined $xsb)
+    {
+***************
+*** 294,314 ****
+      {
+       $xsb->pack(-side => $xside, -fill => 'x',-before => $xsb->{'before'});
+       $havex = 1;
+      }
+     else
+      {
+!      $opt =~ s/[ns]//;
+       $xsb->packForget;
+      }
+     $cw->{'packxsb'} = $havex;
+-    if ($req)
+-     {
+-      $w->configure(-xscrollcommand => ['set', $xsb]);
+-     }
+-    else
+-     {
+-      $w->configure(-xscrollcommand => ['sbset', $cw, $xsb, \$cw->{'packxsb'}]);
+-     }
+    }
+   if (defined $corner)
+    {
+--- 294,314 ----
+      {
+       $xsb->pack(-side => $xside, -fill => 'x',-before => $xsb->{'before'});
+       $havex = 1;
++      if ($req)
++       {
++        $w->configure(-xscrollcommand => ['set', $xsb]);
++       }
++      else
++       {
++        $w->configure(-xscrollcommand => ['sbset', $cw, $xsb, \$cw->{'packxsb'}]);
++       }
+      }
+     else
+      {
+!      $w->configure(-xscrollcommand => undef) unless $opt =~ s/[ns]//;
+       $xsb->packForget;
+      }
+     $cw->{'packxsb'} = $havex;
+    }
+   if (defined $corner)
+    {
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+
+
+
+[PREV] [NEXT] [PREV Thread] [NEXT Thread] [Index] 
+==================================================
+

@@ -1,0 +1,51 @@
+<HTML>
+<HEAD><TITLE> 16.2 Is there something equivalent to wish in perl/Tk?</TITLE></HEAD>
+<BODY><a name="A16.2"> 16.2 Is there something equivalent to <CODE>wish</CODE> in perl/Tk?</a>
+
+<hr>
+</p><p>
+The answer is yes.
+<p>
+The idea of <CODE>wish</CODE> is that you read from <KBD>&lt;STDIN&gt;</KBD> 
+and evaluate each statement. The standard way to do this in perl/Tk is to use
+the <KBD>tkpsh</KBD> script that comes in your <KBD>Tk-b&#35;/</KBD>
+distribution. Another elegant way to get <KBD>wish</KBD> like behavior in 
+perl/Tk is to use <b>rmt</b> which you can find in <kbd>perl5/Tk/demos</kbd> 
+in your Tk-b&#35; distribution. 
+When you run <b>rmt</b> you already have Tk.pm set up for you so
+you can start typing things like <KBD>$mmm = new MainWindow;</KBD> <i>etc.</i>
+at the <KBD>rmt:</KBD> prompt.  (This use belies the power of <b>rmt</b> which
+is derived from Ousterhout's Tcl/Tk version of <b>rmt</b> [see section 27.2 of
+his book]. <b>rmt</b> is capable of &quot;inserting Tk code&quot; into
+simultaneously running Tk applications.)
+<p>
+A cruder way to get <CODE>wish</CODE>-like behaviour with perl/Tk is to run a 
+&quot;perl shell&quot; and type in your usual commands, including 
+<KBD>use Tk;</KBD> <i>etc.</i>  There is a script distributed with perl called 
+<CODE>perlsh</CODE> which is written quite simply as:
+<pre>
+    #!/usr/bin/perl
+     $/ = '';        # set paragraph mode
+     $SHlinesep = "\n";
+     while ($SHcmd = &lt;&gt;) {
+         $/ = $SHlinesep;
+         eval $SHcmd; print $@ || "\n";
+         $SHlinesep = $/; $/ = ''; 
+     }
+</pre>
+You can use this during code development to test out little snippets of code.
+It helps to be an accurate typist and the <KBD>use strict;</KBD> is optional
+here :-)
+<p>
+Hiroaki Kobayasi has a more sophisticated <kbd>wish</kbd> like perl/Tk
+&quot;shell&quot; that is called EVA. It is available from:
+<pre>
+    <a href="ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/">ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/eva-*.tar.gz</a>
+</pre>
+
+
+<hr>
+	<p><a href="qna16.1.html">Previous</a> | Return to <a href="ptkTOC.html#TOC16.2">table of contents</a> | <a href="qna16.3.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

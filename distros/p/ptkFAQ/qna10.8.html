@@ -1,0 +1,27 @@
+<HTML>
+<HEAD><TITLE> 10.8. How do I get the size of a Canvas? After a re-size?</TITLE></HEAD>
+<BODY><a name="A10.8"> 10.8. How do I get the size of a <KBD>Canvas</KBD>? After a re-size?</a>
+
+<hr>
+</p><p>
+<pre>
+    $canvas-&gt;cget(-width);
+</pre>
+simply returns the size of the canvas when it was created, whereas 
+<pre>
+    $canvas-&gt;Width;
+</pre>
+will get the answer even after a re-size. Substitute <kbd>[Hh]eight</kbd> for 
+<kbd>[Ww]idth</kbd> in the above if that is what you want.
+<p>
+Nick Ing-Simmons points out that if you want to have your <KBD>Canvas</KBD>
+be able to grow to arbitrarily large sizes be sure to specify the
+<KBD>-expand</KBD> or <KBD>-fill</KBD> options when you <KBD>-&gt;pack</KBD> 
+the <KBD>Canvas</KBD>.
+
+
+<hr>
+	<p><a href="qna10.7.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.8">table of contents</a> | <a href="qna10.9.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

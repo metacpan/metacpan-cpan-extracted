@@ -1,0 +1,259 @@
+From: Nick.Ing-Simmons@tiuk.ti.com 22-DEC-1995 11:37:03.45
+To: ptk@guest.WPI.EDU
+CC: 
+Subj: Little documentation patch for Tk-b9.01
+
+This patch prevents the warnings from Tom's latest pod2man,
+and adds outline docs to Tk::Table.
+
+Apply as follows:
+
+cd .../Tk-b9.01
+patch -p1 < this-file
+
+Seasons Greetings
+
+  Nick 
+
+#---------------8<------------------------------------------------
+diff -rc3P Tk-b9.01/Tk/Callback.pod Tk-b9.02/Tk/Callback.pod
+*** Tk-b9.01/Tk/Callback.pod	Wed Aug 23 08:16:21 1995
+--- Tk-b9.02/Tk/Callback.pod	Fri Dec 22 13:12:38 1995
+***************
+*** 1,6 ****
+  =head1 NAME
+  
+! perl/Tk callbacks 
+  
+  =head1 SYNOPSIS
+  
+--- 1,6 ----
+  =head1 NAME
+  
+! Callback - how perl/Tk callbacks are specified
+  
+  =head1 SYNOPSIS
+  
+diff -rc3P Tk-b9.01/Tk/Composite.pod Tk-b9.02/Tk/Composite.pod
+*** Tk-b9.01/Tk/Composite.pod	Thu Aug 24 14:13:56 1995
+--- Tk-b9.02/Tk/Composite.pod	Fri Dec 22 13:09:54 1995
+***************
+*** 1,11 ****
+  
+  =head1 NAME 
+  
+  
+- Defining a new composite widget class
+- 
+  =head1 SYNOPSIS
+- 
+  
+    package Whatever;
+    @ISA = qw(Tk::Frame);  # or Tk::Toplevel
+--- 1,9 ----
+  
+  =head1 NAME 
+  
++ Defining a new - composite widget class
+  
+  =head1 SYNOPSIS
+  
+    package Whatever;
+    @ISA = qw(Tk::Frame);  # or Tk::Toplevel
+diff -rc3P Tk-b9.01/Tk/ConfigSpec.pod Tk-b9.02/Tk/ConfigSpec.pod
+*** Tk-b9.01/Tk/ConfigSpec.pod	Wed Aug 23 08:16:21 1995
+--- Tk-b9.02/Tk/ConfigSpec.pod	Fri Dec 22 13:08:02 1995
+***************
+*** 1,6 ****
+  =head1 NAME
+  
+! Defining behaviour of 'configure' for composite widgets.
+  
+  =head1 SYNOPSIS
+  
+--- 1,6 ----
+  =head1 NAME
+  
+! ConfigSpecs - Defining behaviour of 'configure' for composite widgets.
+  
+  =head1 SYNOPSIS
+  
+diff -rc3P Tk-b9.01/Tk/Internals.pod Tk-b9.02/Tk/Internals.pod
+*** Tk-b9.01/Tk/Internals.pod	Mon Jun 19 21:32:49 1995
+--- Tk-b9.02/Tk/Internals.pod	Fri Dec 22 13:14:49 1995
+***************
+*** 1,6 ****
+  =head1 NAME
+  
+! CallingTk: what is Perl Tk interface doing when you call Tk functions.
+  
+  This information is worse than useless for C<perlTk> users, but can of
+  some help for people interested in using modified Tk source with
+--- 1,6 ----
+  =head1 NAME
+  
+! CallingTk -  what is Perl Tk interface doing when you call Tk functions.
+  
+  This information is worse than useless for C<perlTk> users, but can of
+  some help for people interested in using modified Tk source with
+***************
+*** 10,16 ****
+  be pertinent to the version of> C<portableTk> I<available when it was
+  created. All the details are subject to change.>
+  
+! =head1 Description
+  
+  =over 5
+  
+--- 10,16 ----
+  be pertinent to the version of> C<portableTk> I<available when it was
+  created. All the details are subject to change.>
+  
+! =head1 DESCRIPTION
+  
+  =over 5
+  
+diff -rc3P Tk-b9.01/Tk/Table.pm Tk-b9.02/Tk/Table.pm
+*** Tk-b9.01/Tk/Table.pm	Tue Dec  5 17:48:57 1995
+--- Tk-b9.02/Tk/Table.pm	Fri Dec 22 14:00:15 1995
+***************
+*** 523,525 ****
+--- 523,605 ----
+   return $see;
+  }
+  
++ =cut
++ 
++ =head1 NAME
++ 
++ Tk::Table - Scrollable 2 dimensional table of Tk widgets
++ 
++ =head1 SYNOPSIS
++ 
++   use Tk::Table;
++ 
++   $table = $parent->Table(-rows => number,
++                           -columns => number,
++                           -scrollbars => anchor,
++                           -fixedrows => number,
++                           -fixedcolumns => number,
++                           -takefocus => boolean);
++ 
++   $widget = $table->Button(...);
++ 
++   $old = $table->put($row,$col,$widget);
++   $old = $table->put($row,$col,"Text");  # simple Label 
++   $widget = $table->get($row,$col);
++ 
++   $cols = $table->totalColumns;
++   $rows = $table->totalRows;
++ 
++   $table->see($widget);
++   $table->see($row,$col);
++ 
++   ($row,$col) = $table->Posn($widget);
++ 
++ =head1 DESCRIPTION 
++ 
++ Tk::Table is an all-perl widget/geometry manager which allows a two dimensional
++ table of arbitary perl/Tk widgets to be displayed.
++ 
++ Entries in the Table are simply ordinary perl/Tk widgets. They should
++ be created with the Table as their parent. Widgets are positioned in the 
++ table using:
++ 
++  $table->put($row,$col,$widget)
++ 
++ All the widgets in each column are set to the same width - the requested
++ width of the widest widget in the column.
++ Likewise, all the widgets in each row are set to the same height - the requested
++ height of the tallest widget in the column.             
++ 
++ A number of rows and/or columns can be marked as 'fixed' - and so can serve
++ as 'headings' for the remainder the rows which are scrollable.
++ 
++ The requested size of the table as a whole is such that the number of rows
++ specified by -rows (default 10), and number of columns specified by -columns
++ (default 10) can be displayed.
++ 
++ If the Table is told it can take the keyboard focus then cursor and scroll
++ keys scroll the displayed widgets.
++ 
++ The Table will create and manage its own scrollbars if requested via 
++ -scrollbars.
++ 
++ The Tk::Table widget is derived from a Tk::Frame, so inherits all its
++ configure options.
++ 
++ =head1 BUGS / Snags / Possible enhancements
++ 
++ =over 3
++ 
++ =item * 
++ 
++ Very large Tables consume a lot of X windows
++ 
++ =item * 
++ 
++ No equivalent of pack's -anchor/-pad etc. options 
++ 
++ =back 
++ 
++ 
++ 
++ 
+diff -rc3P Tk-b9.01/Tk/Tcl-perl.pod Tk-b9.02/Tk/Tcl-perl.pod
+*** Tk-b9.01/Tk/Tcl-perl.pod	Wed Aug 23 08:16:21 1995
+--- Tk-b9.02/Tk/Tcl-perl.pod	Fri Dec 22 13:11:33 1995
+***************
+*** 1,5 ****
+--- 1,9 ----
+  =head1 NAME
+  
++ Tcl vs perl - very old suspect documentation on porting.
++ 
++ =head1 DESCRIPTION
++ 
+  This isn't really a .pod yet, nor is it Tcl vs perl
+  it is a copy of John's comparison of Malcolm's original perl/Tk
+  port with the current one. It is also out-of-date in places.
+diff -rc3P Tk-b9.01/Tk/UserGuide.pod Tk-b9.02/Tk/UserGuide.pod
+*** Tk-b9.01/Tk/UserGuide.pod	Wed Aug 23 08:16:21 1995
+--- Tk-b9.02/Tk/UserGuide.pod	Fri Dec 22 13:14:09 1995
+***************
+*** 1,6 ****
+! =head1 Introduction
+  
+! Writing Tk applications in perl5.
+  
+  This manual page is for beginners.  It assumes you know some perl, 
+  and have got perl+Tk running.
+--- 1,8 ----
+! =head1 NAME
+  
+! perl/Tk - Writing Tk applications in perl5.
+! 
+! =head1 DESCRIPTION
+  
+  This manual page is for beginners.  It assumes you know some perl, 
+  and have got perl+Tk running.
+diff -rc3P Tk-b9.01/Tk/pTk.pod Tk-b9.02/Tk/pTk.pod
+*** Tk-b9.01/Tk/pTk.pod	Wed Aug 23 08:16:50 1995
+--- Tk-b9.02/Tk/pTk.pod	Fri Dec 22 13:15:40 1995
+***************
+*** 9,15 ****
+  this document. Many thanks.
+  
+  
+! =head1 Portable Tk
+  
+  B<PortableTk> is an attempt to make B<Tk> useful from other
+  languages. Currently tk4.0 runs under Perl using this
+--- 9,15 ----
+  this document. Many thanks.
+  
+  
+! =head1 DESCRIPTION
+  
+  B<PortableTk> is an attempt to make B<Tk> useful from other
+  languages. Currently tk4.0 runs under Perl using this

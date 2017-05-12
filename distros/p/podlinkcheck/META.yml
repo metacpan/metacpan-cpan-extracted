@@ -1,0 +1,64 @@
+---
+abstract: 'Check POD L<> link references.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: podlinkcheck
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+optional_features:
+  maximum_interoperation:
+    description: 'Have maximum inter-operation with other modules (optional supported other stuff).'
+    requires:
+      CPAN::SQLite: '0'
+      CPANPLUS::Backend: '0'
+      CPANPLUS::Configure: '0'
+      Sort::Key::Natural: '0'
+provides:
+  App::PodLinkCheck:
+    file: lib/App/PodLinkCheck.pm
+    version: '15'
+  App::PodLinkCheck::ParseLinks:
+    file: lib/App/PodLinkCheck/ParseLinks.pm
+    version: '15'
+  App::PodLinkCheck::ParseSections:
+    file: lib/App/PodLinkCheck/ParseSections.pm
+    version: '15'
+  podlinkcheck:
+    file: META.yml
+    version: '15'
+recommends:
+  Pod::Simple: '3.24'
+  Sort::Key::Natural: '0'
+requires:
+  File::Find::Iterator: '0'
+  File::HomeDir: '0'
+  File::Spec: '0.8'
+  File::Temp: '0'
+  IPC::Run: '0'
+  List::Util: '0'
+  Locale::TextDomain: '0'
+  Pod::Find: '0'
+  Pod::Simple: '0'
+  Search::Dict: '0'
+  constant::defer: '0'
+  perl: '5.006'
+resources:
+  homepage: http://user42.tuxfamily.org/podlinkcheck/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,34 @@
+---
+abstract: 'transparently use packages and inner packages'
+author:
+  - 'Diab Jerius'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::Lib: 0
+  Test::More: 0
+  Test::Trap: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: pkg
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Load: 0
+  Devel::InnerPackage: 0
+  Import::Into: 0
+  perl: 5.10.1
+resources:
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: https://bitbucket.org/djerius/pkg
+version: 0.04

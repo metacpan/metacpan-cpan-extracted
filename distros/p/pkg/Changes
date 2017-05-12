@@ -1,0 +1,24 @@
+Revision history for pkg
+
+0.04 Wed Apr 24 20:57:19 EDT 2013
+
+* bump version number to reflect upload of distribution to CPAN with
+  corrected CPAN metadata
+
+
+0.03 Tue Mar  5 22:07:01 EST 2013
+
+[BUILD FIX]
+
+* add missing test requirement on Test::Exception
+
+0.02 Mon Mar  4 21:58:33 EST 2013
+
+[BUG FIX]
+
+* remove debug print statement
+
+
+0.01
+       Initial release.
+

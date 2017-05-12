@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use Tk;
+
+local(*Tk::m) = *Tk::Tk_module;
+print "$Tk::m\n";
+

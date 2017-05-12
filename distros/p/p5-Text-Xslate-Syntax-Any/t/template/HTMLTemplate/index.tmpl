@@ -1,0 +1,12 @@
+<html>
+<TMPL_INCLUDE NAME="common/header.tx">
+<body>
+<TMPL_INCLUDE NAME="menu.tmpl">
+<ul>
+<TMPL_LOOP NAME=loop>
+<li><TMPL_VAR EXPR="html_escape(name)"></li>
+</TMPL_LOOP>
+</ul>
+<TMPL_INCLUDE NAME="common/footer.tx">
+</body>
+</html>

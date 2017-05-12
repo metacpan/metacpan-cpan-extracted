@@ -1,0 +1,1631 @@
+From:	IN%"tchrist@mox.perl.com"  "Tom Christiansen" 15-FEB-1996 10:23:05.78
+To:	IN%"wjm@best.com"
+CC:	IN%"tchrist@mox.perl.com"  "Tom Christiansen", IN%"kjahds@kjahds.com"  "Kenneth Albanowski", IN%"perl5-porters@africa.nicoh.com"
+Subj:	RE: Improved pod2html
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I18LYYAS748WYZC0@LNS62.LNS.CORNELL.EDU>; Thu,
+ 15 Feb 1996 10:22:42 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA091947649; Thu, 15 Feb 1996 10:20:49 -0500
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA091287601; Thu,
+ 15 Feb 1996 10:20:01 -0500
+Received: from mox.perl.com (perl.com) by africa.nicoh.com with ESMTP
+ (1.37.109.15/16.2) id AA090717544; Thu, 15 Feb 1996 08:19:04 -0700
+Received: from localhost.perl.com (localhost.perl.com [127.0.0.1])
+ by mox.perl.com (8.6.12/8.6.12) with SMTP id IAA22858; Thu,
+ 15 Feb 1996 08:15:14 -0700
+Date: Thu, 15 Feb 1996 08:15:10 -0700
+From: Tom Christiansen <tchrist@mox.perl.com>
+Subject: Re: Improved pod2html
+In-reply-to: William J. Middleton's missive
+ <Pine.SGI.3.91.960215040508.8395A-100000@shellx.best.com> of Thu,
+ 15 Feb 1996 04:28:29 PST.
+Sender: owner-perl5-porters@nicoh.com
+To: wjm@best.com (William J. Middleton)
+Cc: Tom Christiansen <tchrist@mox.perl.com>,
+ Kenneth Albanowski <kjahds@kjahds.com>, perl5-porters@africa.nicoh.com
+Message-id: <22855.824397310@mox>
+Content-type: text/plain; charset=ISO-8859-1
+Content-transfer-encoding: 8bit
+List-Name: perl5-porters
+Precedence: bulk
+References: <Pine.SGI.3.91.960215040508.8395A-100000@shellx.best.com>
+
+Here's a snapshot of the current pod2html work in Boulder:
+
+#!/bin/sh
+# This is a shell archive (produced by GNU sharutils 4.1).
+# To extract the files from this archive, save it to some FILE, remove
+# everything before the `!/bin/sh' line above, then type `sh FILE'.
+#
+# Made on 1996-02-13 13:57 MST by <tchrist@toy>.
+# Source directory was `/tmp'.
+#
+# Existing files will *not* be overwritten unless `-c' is specified.
+#
+# This shar contains:
+# length mode       name
+# ------ ---------- ------------------------------------------
+#  29943 -rw-r--r-- Html.pm
+#  13338 -rw-r--r-- installhtml
+#
+touch -am 1231235999 $$.touch >/dev/null 2>&1
+if test ! -f 1231235999 && test -f $$.touch; then
+  shar_touch=touch
+else
+  shar_touch=:
+  echo
+  echo 'WARNING: not restoring timestamps.  Consider getting and'
+  echo "installing GNU \`touch', distributed in GNU File Utilities..."
+  echo
+fi
+rm -f 1231235999 $$.touch
+#
+# ============= Html.pm ==============
+if test -f 'Html.pm' && test X"$1" != X"-c"; then
+  echo 'x - skipping Html.pm (file already exists)'
+else
+  echo 'x - extracting Html.pm (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'Html.pm' &&
+package Pod::Html;
+X
+use Getopt::Long;	# package for handling command-line parameters
+# require Exporter;
+# @ISA = Exporter;
+@EXPORT = qw(pod2html);
+use Cwd;
+X
+X
+sub pod2html {
+X    local(@ARGV) = @_;
+X    local($ARGC) = @ARGV;
+X
+X    # cache of %pages and %items from last time we ran pod2html
+X    $dircache = "/tmp/.pod2html-dircache";
+X    $itemcache = "/tmp/.pod2html-itemcache";
+X
+X
+X    $usage =<<END_OF_USAGE;
+X    Usage:  $0 --help --htmlroot=<name> --infile=<name> --outfile=<name>
+X              --podpath=<name>:...:<name> --podroot=<name>
+X              --libpods=<name>:...:<name> --recurse --verbose --index
+X	      --netscape --norecurse --noindex
+X
+X        --flush     - flushes the item and directory caches.
+X        --help       - prints this message.
+X        --htmlroot   - http-server base directory from which all relative paths
+X                       in podpath stem (default is /).
+X        --index      - generate an index at the top of the resulting html
+X                       (default).
+X        --infile     - filename for the pod to convert (input taken from stdin
+X                       by default).
+X        --libpods    - colon-separated list of pages to search for =item pod
+X                       directives in as targets of C<> and implicit links (empty
+X                       by default).  note, these are not filenames, but rather
+X                       page names like those that appear in L<> links.
+X	--netscape   - will use netscape html directives when applicable.
+X	--nonetscape - will not use netscape directives (default).
+X        --outfile    - filename for the resulting html file (output sent to
+X                       stdout by default).
+X        --podpath    - colon-separated list of directories containing library
+X                       pods.  empty by default.
+X        --podroot    - filesystem base directory from which all relative paths
+X                       in podpath stem (default is .).
+X        --noindex    - don't generate an index at the top of the resulting html.
+X        --norecurse  - don't recurse on those subdirectories listed in podpath.
+X        --recurse    - recurse on those subdirectories listed in podpath
+X                       (default behavior).
+X        --title      - title that will appear in resulting html file.
+X        --verbose    - self-explanatory
+X
+END_OF_USAGE
+X
+X    @libpods = ();	    	# files to search for links from C<> directives
+X    $htmlroot = "/";	    	# http-server base directory from which all
+X				#   relative paths in $podpath stem.
+X    $htmlfile = "";		# write to stdout by default
+X    $podfile = "";		# read from stdin by default
+X    @podpath = ();		# list of directories containing library pods.
+X    $podroot = ".";		# filesystem base directory from which all
+X				#   relative paths in $podpath stem.
+X    $recurse = 1;		# recurse on subdirectories in $podpath.
+X    $verbose = 0;		# not verbose by default
+X    $doindex = 1;   	    	# non-zero if we should generate an index
+X    $listlevel = 0;		# current list depth
+X    @listitem = ();		# stack of HTML commands to use when a =item is
+X				#   encountered.  the top of the stack is the
+X				#   current list.
+X    @listdata = ();		# similar to @listitem, but for the text after
+X				#   an =item
+X    @listend = ();		# similar to @listitem, but the text to use to
+X				#   end the list.
+X    $ignore = 1;		# whether or not to format text.  we don't
+X				#   format text until we hit our first pod
+X				#   directive.
+X    $netscape = 0;		# whether or not to use netscape directives.
+X    $top = 1;			# true if we are at the top of the doc.  used
+X				#   to prevent the first <HR> directive.
+X
+X    undef $opt_help if defined $opt_help;
+X
+X    # parse the command-line parameters
+X    $result = GetOptions( qw(
+X	    flush
+X	    help
+X	    htmlroot=s
+X	    index!
+X	    infile=s
+X	    libpods=s
+X	    netscape!
+X	    outfile=s
+X	    podpath=s
+X	    podroot=s
+X	    norecurse
+X	    recurse!
+X	    title=s
+X	    verbose
+X    ));
+X    usage("invalid parameters") if not $result;
+X    parse_command_line();
+X
+X
+X    # set some variables to their default values if necessary
+X    $podfile  = "-" unless $podfile;	# stdin
+X    $htmlfile = "-" unless $htmlfile;	# stdout
+X    $htmlroot = "" if $htmlroot eq "/";	# so we don't get a //
+X
+X
+X    %pages = ();		# associative array used to find the location
+X				#   of pages referenced by L<> links.
+X    %sections = ();		# sections within this page
+X    %items = ();		# associative array used to find the location
+X				#   of =item directives referenced by C<> links
+X
+X
+X    # read the pod a paragraph at a time
+X    warn "Scanning for sections in input file(s)\n" if $verbose;
+X    $/ = "";
+X    open(POD, "<$podfile")
+X	    || die "$0: cannot open $podfile file for input: $!\n";
+X    @poddata  = <POD>;
+X    close(POD);
+X
+X
+X    # scan the pod for =head[1-6] directives and build an index
+X    $index = scan_headings(\%sections, @poddata);
+X
+X
+X    # open the output file
+X    open(HTML, ">$htmlfile")
+X	    || die "$0: cannot open $htmlfile file for output: $!\n";
+X
+X    # put a title in the HTML file
+X    $podfile =~ /^(.*)\.pod$/;
+X    $title = ($podfile eq "-" ? 'No Title' : $1) unless defined $title;
+X    print HTML <<END_OF_HEAD;
+X    <HTML>
+X
+X    <HEAD>
+X    <TITLE>$title</TITLE>
+X    </HEAD>
+X
+X    <BODY>
+X
+END_OF_HEAD
+X
+X    # load a cache of %pages and %items if possible.  $tests will be
+X    #  non-zero if successful.
+X    $tests = 0;
+X    if (-f $dircache && -f $itemcache) {
+X	warn "scanning for item cache\n" if $verbose;
+X	$tests = find_cache($dircache, $itemcache, $podpath, $podroot,
+X		    \%pages, \%items);
+X    }
+X
+X
+X    # if we didn't succeed in loading the cache then we must (re)build
+X    #  %pages and %items.
+X    if (!$tests) {
+X	warn "scanning directories in pod-path\n" if $verbose;
+X	scan_podpath($podroot, $recurse, \%pages, \%items);
+X    }
+X
+X
+X    # scan the pod for =item directives
+X    scan_items("", \%items, @poddata);
+X
+X
+X    # put an index at the top of the file.  note, if $doindex is 0 we
+X    # still generate an index, but surround it with an html comment.
+X    # that way some other program can extract it if desired.
+X    $index =~ s/--+/-/g;
+X    print HTML "<!-- INDEX BEGIN -->\n";
+X    print HTML "<!--\n" unless $doindex;
+X    print HTML "$index";
+X    print HTML "-->\n" unless $doindex;
+X    print HTML "<!-- INDEX END -->\n\n";
+X    print HTML "<HR>\n" if $doindex;
+X
+X
+X    # now convert this file
+X    warn "Converting input file\n" if $verbose;
+X    foreach $i (0..$#poddata) {
+X	$_ = $poddata[$i];
+X	$paragraph = $i+1;
+X	if (/^\s*(=.*)/s) {	# is it a pod directive?
+X	    $ignore = 0;
+X	    $_ = $1;
+X	    if (/^=(head[1-6])\s+(.*)/) {	# =head[1-6] heading
+X		process_head($1, $2);
+X	    } elsif (/^=item\s*(.*)/sm) {	# =item text
+X		process_item($1);
+X	    } elsif (/^=over\s*(.*)/) {		# =over N
+X		process_over();
+X	    } elsif (/^=back/) {		# =back
+X		process_back();
+X	    } elsif (/^=cut/) {			# =cut
+X		process_cut();
+X	    } elsif (/^=pod/) {			# =pod
+X		process_pod();
+X	    } else {
+X		/^=(\S*)\s*/;
+X		warn "$0: $podfile: unknown pod directive '$1' in "
+X		   . "paragraph $paragraph.  ignoring.\n";
+X	    }
+X	    $top = 0;
+X	}
+X	else {
+X	    $text = $_;
+X	    process_text(\$text, 1);
+X	    print HTML "$text\n<P>\n\n" unless $ignore;
+X	}
+X    }
+X
+X
+X    # finish off any pending directives
+X    finish_list();
+X    print HTML <<END_OF_TAIL;
+X    </BODY>
+X
+X    </HTML>
+END_OF_TAIL
+X
+X
+X    # close the html file
+X    close(HTML);
+X
+X
+X    warn "Finished\n" if $verbose;
+}
+X
+##############################################################################
+X
+sub usage {
+X    warn "$0: $podfile: @_\n" if @_;
+X    die $usage;
+}
+X
+X
+sub parse_command_line {
+X    usage() if defined $opt_help;	# see if the user asked for help
+X    $opt_help = "";			# just to make -w shut-up.
+X
+X    $podfile  = $opt_infile if defined $opt_infile;
+X    $htmlfile = $opt_outfile if defined $opt_outfile;
+X
+X    @podpath  = split(":", $opt_podpath) if defined $opt_podpath;
+X    @libpods  = split(":", $opt_libpods) if defined $opt_libpods;
+X
+X    warn "Flushing item and directory caches\n"
+X	if $opt_verbose && defined $opt_flush;
+X    unlink($dircache, $itemcache) if defined $opt_flush;
+X
+X    $htmlroot = $opt_htmlroot if defined $opt_htmlroot;
+X    $podroot  = $opt_podroot if defined $opt_podroot;
+X
+X    $doindex  = $opt_index if defined $opt_index;
+X    $recurse  = $opt_recurse if defined $opt_recurse;
+X    $title    = $opt_title if defined $opt_title;
+X    $verbose  = defined $opt_verbose ? 1 : 0;
+X    $netscape = $opt_netscape if defined $opt_netscape;
+}
+X
+X
+#
+# find_cache - tries to find if the caches stored in $dircache and $itemcache
+#  are valid caches of %pages and %items.  if they are valid then it loads
+#  them and returns a non-zero value.
+#
+sub find_cache {
+X    my($dircache, $itemcache, $podpath, $podroot, $pages, $items) = @_;
+X    my($tests);
+X
+X    $tests = 0;
+X
+X    open(CACHE, "<$itemcache") ||
+X	die "$0: error opening $itemcache for reading: $!\n";
+X    $/ = "\n";
+X
+X    # is it the same podpath?
+X    $_ = <CACHE>;
+X    chomp($_);
+X    $tests++ if (join(":", @podpath) eq $_);
+X
+X    # is it the same podroot?
+X    $_ = <CACHE>;
+X    chomp($_);
+X    $tests++ if ($podroot eq $_);
+X
+X    # load the cache if its good
+X    if ($tests != 2) {
+X	close(CACHE);
+X
+X	%$items = ();
+X	return 0;
+X    }
+X
+X    warn "loading item cache\n" if $verbose;
+X    while ($_ = <CACHE>) {
+X	/(.*?) (.*)$/;
+X	$$items{$1} = $2;
+X    }
+X    close(CACHE);
+X
+X    warn "scanning for directory cache\n" if $verbose;
+X    open(CACHE, "<$dircache") ||
+X	die "$0: error opening $dircache for reading: $!\n";
+X    $/ = "\n";
+X    $tests = 0;
+X
+X    # is it the same podpath?
+X    $_ = <CACHE>;
+X    chomp($_);
+X    $tests++ if (join(":", @podpath) eq $_);
+X
+X    # is it the same podroot?
+X    $_ = <CACHE>;
+X    chomp($_);
+X    $tests++ if ($podroot eq $_);
+X
+X    # load the cache if its good
+X    if ($tests != 2) {
+X	close(CACHE);
+X
+X	%$pages = ();
+X	%$items = ();
+X	return 0;
+X    }
+X
+X    warn "loading directory cache\n" if $verbose;
+X    while ($_ = <CACHE>) {
+X	/(.*?) (.*)$/;
+X	$pages{$1} = $2;
+X    }
+X
+X    close(CACHE);
+X
+X    return 1;
+}
+X
+#
+# scan_podpath - scans the directories specified in @podpath for directories,
+#  .pod files, and .pm files.  it also scans the pod files specified in
+#  @libpods for =item directives.
+#
+sub scan_podpath {
+X    my($podroot, $recurse, $pages, $items) = @_;
+X    my($pwd, $dir);
+X    my($libpod, $dirname, $pod, @files, @poddata);
+X
+X    # scan each directory listed in @podpath
+X    $pwd = getcwd();
+X    chdir($podroot)
+X	|| die "$0: error changing to directory $podroot: $!\n";
+X    foreach $dir (@podpath) {
+X	scan_dir($dir, $recurse, $pages, $items);
+X    }
+X
+X    # scan the pods listed in @libpods for =item directives
+X    foreach $libpod (@libpods) {
+X	# if the page isn't defined then we won't know where to find it
+X	# on the system.
+X	next unless defined $pages{$libpod} && $pages{$libpod};
+X
+X	# if there is a directory then use the .pod and .pm files within it.
+X	if ($pages{$libpod} =~ /([^:]*[^(\.pod|\.pm)]):/) {
+X	    #  find all the .pod and .pm files within the directory
+X	    $dirname = $1;
+X	    opendir(DIR, $dirname) ||
+X		die "$0: error opening directory $dirname: $!\n";
+X	    @files = grep(/(\.pod|\.pm)$/ && ! -d $_, readdir(DIR));
+X	    closedir(DIR);
+X
+X	    # scan each .pod and .pm file for =item directives
+X	    foreach $pod (@files) {
+X		open(POD, "<$dirname/$pod") ||
+X		    die "$0: error opening $dirname/$pod for input: $!\n";
+X		@poddata = <POD>;
+X		close(POD);
+X
+X		scan_items("$dirname/$pod", $items, @poddata);
+X	    }
+X	} elsif ($pages{$libpod} =~ /([^:]*\.pod):/ ||
+X		 $pages{$libpod} =~ /([^:]*\.pm):/) {
+X	    # scan the .pod or .pm file for =item directives
+X	    $pod = $1;
+X	    open(POD, "<$pod") ||
+X		die "$0: error opening $pod for input: $!\n";
+X	    @poddata = <POD>;
+X	    close(POD);
+X
+X	    scan_items("$pod", $items, @poddata);
+X	} else {
+X	    warn "$0: shouldn't be here (line ".__LINE__."\n";
+X	}
+X    }
+X    @poddata = ();	# clean-up a bit
+X
+X    chdir($pwd)
+X	|| die "$0: error changing to directory $pwd: $!\n";
+X
+X    # cache the item list for later use
+X    warn "caching items for later use\n" if $verbose;
+X    open(CACHE, ">$itemcache") ||
+X	die "$0: error open $itemcache for writing: $!\n";
+X
+X    print CACHE join(":", @podpath) . "\n$podroot\n";
+X    foreach $key (keys %$items) {
+X	print CACHE "$key $$items{$key}\n";
+X    }
+X
+X    close(CACHE);
+X
+X    # cache the directory list for later use
+X    warn "caching directories for later use\n" if $verbose;
+X    open(CACHE, ">$dircache") ||
+X	die "$0: error open $dircache for writing: $!\n";
+X
+X    print CACHE join(":", @podpath) . "\n$podroot\n";
+X    foreach $key (keys %$pages) {
+X	print CACHE "$key $$pages{$key}\n";
+X    }
+X
+X    close(CACHE);
+}
+X
+X
+#
+# scan_dir - scans the directory specified in $dir for subdirectories, .pod
+#  files, and .pm files.  notes those that it finds.  this information will
+#  be used later in order to figure out where the pages specified in L<>
+#  links are on the filesystem.
+#
+sub scan_dir {
+X    my($dir, $recurse, $pages, $items) = @_;
+X    my($t, @subdirs, @pods, $pod, $dirname, @dirs);
+X
+X    @subdirs = ();
+X    @pods = ();
+X
+X    opendir(DIR, $dir) ||
+X	die "$0: error opening directory $dir: $!\n";
+X    while ($_ = readdir(DIR)) {
+X	if (-d "$dir/$_" && $_ ne "." && $_ ne "..") {	    # directory
+X	    $$pages{$_}  = "" unless defined $$pages{$_};
+X	    $$pages{$_} .= "$dir/$_:";
+X	    push(@subdirs, $_);
+X	} elsif (/\.pod$/) {	    	    	    	    # .pod
+X	    s/\.pod$//;
+X	    $$pages{$_}  = "" unless defined $$pages{$_};
+X	    $$pages{$_} .= "$dir/$_.pod:";
+X	    push(@pods, "$dir/$_.pod");
+X	} elsif (/\.pm$/) { 	    	    	    	    # .pm
+X	    s/\.pm$//;
+X	    $$pages{$_}  = "" unless defined $$pages{$_};
+X	    $$pages{$_} .= "$dir/$_.pm:";
+X	    push(@pods, "$dir/$_.pm");
+X	}
+X    }
+X    closedir(DIR);
+X
+X    # recurse on the subdirectories if necessary
+X    if ($recurse) {
+X	foreach $subdir (@subdirs) {
+X	    scan_dir("$dir/$subdir", $recurse, $pages, $items);
+X	}
+X    }
+}
+X
+X
+#
+# scan_headings - scan a pod file for head[1-6] tags, note the tags, and
+#  build an index.
+#
+sub scan_headings {
+X    my($sections, @data) = @_;
+X    my($tag, $title, $listdepth, $index);
+X
+X    $listdepth = 0;
+X    $index = "";
+X
+X    # scan for =head directives, note their name, and build an index
+X    #  pointing to each of them.
+X    foreach $line (@data) {
+X	if ($line =~ /^\s*=(head)([1-6])\s+(.*)/) {
+X	    ($tag,$which_head, $title) = ($1,$2,$3);
+X	    chomp($title);
+X	    $$sections{htmlize($title)} = 1;
+X
+X	    if ($which_head > $listdepth) {
+X		$index .= ("\t" x $listdepth) . "<UL>\n";
+X	    } elsif ($which_head < $listdepth) {
+X		$listdepth--;
+X		$index .= ("\t" x $listdepth) . "</UL>\n";
+X	    }
+X	    $listdepth = $which_head;
+X
+X	    $index .= ("\t" x $listdepth) . "<LI>" .
+X	              "<A HREF=\"#" . htmlize($title) . "\">$title</A>\n";
+X	}
+X    }
+X
+X    # finish off the lists
+X    while ($listdepth--) {
+X	$index .= ("\t" x $listdepth) . "</UL>\n";
+X    }
+X
+X    # get rid of bogus lists
+X    $index =~ s,\t*<UL>\s*</UL>\n,,g;
+X
+X    return $index;
+}
+X
+X
+#
+# scan_items - scans the pod specified by $pod for =item directives.  we
+#  will use this information later on in resolving C<> links.
+#
+sub scan_items {
+X    my($pod, $items, @poddata) = @_;
+X    my($i, $item);
+X
+X    $pod =~ s/\.pod$//;
+X    $pod .= ".html" if $pod;
+X
+X    foreach $i (0..$#poddata) {
+X	$_ = $poddata[$i];
+X
+X	# remove any formatting instructions
+X	s,[A-Z]<([^<>]*)>,$1,g;
+X
+X	# figure out what kind of item it is and get the first word of
+X	#  it's name.
+X	if (/^=item\s+(\w*)\s*.*$/s) {
+X	    if ($1 eq "*") {		# bullet list
+X		/^=item\s+\*\s+(\w*)\s*.*$/s;
+X		$item = $1;
+X	    } elsif ($1 =~ /^[0-9]+/) {	# numbered list
+X		/^=item\s+[0-9]+\.?\s+(\w*)\s*.*$/s;
+X		$item = $1;
+X	    } else {
+X		$item = $1;
+X	    }
+X
+X	    $$items{$item} = "$pod" if $item;
+X	}
+X    }
+}
+X
+X
+#
+# process_head - convert a pod head[1-6] tag and convert it to HTML format.
+#
+sub process_head {
+X    my($tag, $heading) = @_;
+X
+X    # figure out the level of the =head
+X    $tag =~ /head([1-6])/;
+X
+X    print HTML "<P>\n" unless $listlevel;
+X    print HTML "<HR>\n" unless $listlevel || $top;
+X    print HTML "<H$1>" unless $listlevel;
+X    print HTML '<A NAME="' . htmlize($heading) . "\">$heading</A>";
+X    print HTML "</H$1>" unless $listlevel;
+X    print HTML "\n";
+}
+X
+X
+#
+# process_item - convert a pod item tag and convert it to HTML format.
+#
+sub process_item {
+X    my($text) = @_;
+X    my($i, $quote);
+X
+X    # lots of documents start a list with doing an =over.  this is
+X    # bad!  but, the proper thing to do seems to be to just assume
+X    # they did do an =over.  so warn them once and then continue.
+X    warn "$0: $podfile: unexpected =item directive in paragraph $paragraph.  ignorning.\n"
+X	unless $listlevel;
+X    process_over() unless $listlevel;
+X
+X    return unless $listlevel;
+X
+X    # remove formatting instructions from the text
+X    $text =~ s/[A-Z]<([^<>]*)>/$1/g;
+X    pre_escape(\$text);
+X
+X    # check if this is the first =item after an =over
+X    $i = $listlevel - 1;
+X    if ($listlevel > $#listitem+1) {
+X	# make perl code that will be used later on whenever we
+X	# convert an =item directive (@listitem), the paragraph(s)
+X	# following an =item directive (@listdata), and an =over
+X	# directive (@listend).
+X	if ($text =~ /\A\*/) {		# bullet
+X	    push(@listitem,  'print HTML "<LI><STRONG>";'
+X			   . '$text =~ /\A\*\s*(.*)\Z/s;'
+X			   . 'print HTML "<A NAME=\"item_" . htmlize($1) . "\">" if $1;' 
+X			   . '$quote = 1;'
+X			   . 'print HTML process_puretext($1, \$quote);'
+X			   . 'print HTML "</A>" if $1;' 
+X			   . 'print HTML "</STRONG>";'
+X			   );
+X	    push(@listdata, '""');
+X	    push(@listend,  '"</UL>"');
+X	    print HTML "<UL>\n";
+X	} elsif ($text =~ /\A[0-9]+/) {	# numbered list
+X	    push(@listitem,  'print HTML "<LI><STRONG>";'
+X			   . '$text =~ /\A[0-9]+\.?(.*)\Z/s;'
+X			   . 'print HTML "<A NAME=\"item_" . htmlize($1) . "\">" if $1;' 
+X			   . '$quote = 1;'
+X			   . 'print HTML process_puretext($1, \$quote);'
+X			   . 'print HTML "</A>" if $1;' 
+X			   . 'print HTML "</STRONG>";'
+X			   );
+X	    push(@listdata, '""');
+X	    push(@listend,  '"</OL>"');
+X	    print HTML "<OL>\n";
+X	} else {			# all others
+X	    push(@listitem,  'print HTML "<DT><STRONG>";'
+X			   . 'print HTML "<A NAME=\"item_" . htmlize($text) . "\">" if $text;' 
+X			   . '$quote = 1;'
+X			   . 'print HTML process_puretext($text, \$quote);'
+X			   . 'print HTML "</A>" if $text;' 
+X			   . 'print HTML "</STRONG>";'
+X			   );
+X	    push(@listdata, '"<DD>"');
+X	    push(@listend,  '"</DL>"');
+X	    print HTML "<DL>\n";
+X	}
+X    }
+X
+X    # the trick is to use the last item in @listitem as perl code.  each
+X    # list has a different way of being formatted and converted to html.
+X    eval $listitem[$i];
+X    die $@ if $@;
+X    print HTML eval $listdata[$i];
+X    die $@ if $@;
+X    print HTML "\n";
+}
+X
+X
+#
+# process_over - process a pod over tag and start a corresponding HTML
+# list.
+#
+sub process_over {
+X    # start a new list
+X    $listlevel++;
+}
+X
+X
+#
+# process_back - process a pod back tag and convert it to HTML format.
+#
+sub process_back {
+X    warn "$0: $podfile: unexpected =back directive in paragraph $paragraph.  ignorning.\n"
+X	unless $listlevel;
+X    return unless $listlevel;
+X
+X    # close off the list.  note, I check to see if $listend[$listlevel] is
+X    # defined because an =item directive may have never appeared and thus
+X    # $listend[$listlevel] may have never been initialized.
+X    $listlevel--;
+X    print HTML eval $listend[$listlevel] if defined $listend[$listlevel];
+X    print HTML "\n";
+X
+X    # don't need the corresponding perl code anymore
+X    pop(@listitem);
+X    pop(@listdata);
+X    pop(@listend);
+}
+X
+X
+#
+# process_cut - process a pod cut tag, thus stop ignoring pod directives.
+#
+sub process_cut {
+X    $ignore = 1;
+}
+X
+X
+#
+# process_pod - process a pod pod tag, thus ignore pod directives until we see a
+# corresponding cut.
+#
+sub process_pod {
+}
+X
+X
+#
+# process_text - handles plaintext that appears in the input pod file.
+# there may be pod commands embedded within the text so those must be
+# converted to html commands.
+#
+sub process_text {
+X    my($text, $escapeQuotes) = @_;
+X    my($result, $rest, $s1, $s2, $s3, $s4, $match, $bf);
+X    my($podcommand, $params, $tag, $quote);
+X
+X    return if $ignore;
+X
+X    $quote  = 0;    	    	# status of double-quote conversion
+X    $result = "";
+X    $rest = $$text;
+X    if ($rest =~ /^\s+/) {	# preformatted text, no pod directives
+X	$rest   =~ s/\n+\Z//;
+X
+X	$rest   =~ s/&/&amp;/g;
+X	$rest   =~ s/</&lt;/g;
+X	$rest   =~ s/>/&gt;/g;
+X	$rest   =~ s/"/&quot;/g;
+X
+X	$result =   "<PRE>\n"	# text should be as it is (verbatim)
+X		  . "$rest\n"
+X		  . "</PRE>\n";
+X    } else {			# formatted text
+X	# parse through the string, stopping each time we find a
+X	# pod-escape.  once the string has been throughly processed
+X	# we can output it.
+X	while ($rest) {
+X	    # check to see if there are any possible pod directives in
+X	    # the remaining part of the text.
+X	    if ($rest =~ m/[BCEIFLSZ]</) {
+X		warn "\$rest\t= $rest\n" unless
+X		    $rest =~ /\A
+X			   ([^<]*?)
+X			   ([BCEIFLSZ]?)
+X			   <
+X			   (.*)\Z/xs;
+X
+X		$s1 = $1;	# pure text
+X		$s2 = $2;	# the type of pod-escape that follows
+X		$s3 = '<';	# '<'
+X		$s4 = $3;	# the rest of the string
+X	    } else {
+X		$s1 = $rest;
+X		$s2 = "";
+X		$s3 = "";
+X		$s4 = "";
+X	    }
+X
+X	    if ($s3 eq '<' && $s2) {	# a pod-escape
+X		$result    .= ($escapeQuotes ? process_puretext($s1, \$quote) : $s1);
+X		$podcommand = "$s2<";
+X		$rest       = $s4;
+X
+X		# find the matching '>'
+X		$match = 1;
+X		$bf = 0;
+X		while ($match && !$bf) {
+X		    $bf = 1;
+X		    if ($rest =~ /\A([^<>]*<)(.*)\Z/s) {
+X			$bf = 0;
+X			$match++;
+X			$podcommand .= $1;
+X			$rest        = $2;
+X		    }
+X		    if ($rest =~ /\A([^<>]*>)(.*)\Z/s) {
+X			$bf = 0;
+X			$match--;
+X			$podcommand .= $1;
+X			$rest        = $2;
+X		    }
+X		}
+X
+X		warn "$0: $podfile: cannot find matching > for $s2 in paragraph $paragraph.\n"
+X		    if $match;
+X
+X		# pull out the parameters to the pod-escape
+X		$podcommand =~ /^([BCFEILSZ]?)<(.*)>$/s;
+X		$tag    = $1;
+X		$params = $2;
+X
+X		# process the text within the pod-escape so that any escapes
+X		# which must occur do.
+X		process_text(\$params, 0);
+X
+X		$s1 = $params;
+X		if (!$tag || $tag eq " ") {	#  <> : no tag
+X		    $s1 = "&lt;$params&gt;";
+X		} elsif ($tag eq "L") {		# L<> : link 
+X		    $s1 = process_L($params);
+X		} elsif ($tag eq "I" ||		# I<> : italicize text
+X			 $tag eq "B" ||		# B<> : bold text
+X			 $tag eq "F") {		# F<> : file specification
+X		    $s1 = process_BFI($tag, $params);
+X		} elsif ($tag eq "C") {		# C<> : literal code
+X		    $s1 = process_C($params);
+X		} elsif ($tag eq "E") {		# E<> : escape
+X		    $s1 = process_E($params);
+X		} elsif ($tag eq "Z") {		# Z<> : zero-width character
+X		    $s1 = process_Z($params);
+X		} elsif ($tag eq "S") {		# S<> : non-breaking space
+X		    $s1 = process_S($params);
+X		} else {
+X		    warn "$0: $podfile: unhandled tag '$tag' in paragraph $paragraph\n";
+X		}
+X
+X		$result .= "$s1";
+X	    } else {
+X		# for pure text we must deal with implicit links and
+X		# double-quotes among other things.
+X		$result .= ($escapeQuotes ? process_puretext("$s1$s2", \$quote) : "$s1$s2");
+X		$rest    = $s4;
+X	    }
+X	}
+X    }
+X    $$text = $result;
+}
+X
+X
+#
+# process_puretext - process pure text (without pod-escapes) converting
+#  double-quotes and handling implicit C<> links.
+#
+sub process_puretext {
+X    my($text, $quote) = @_;
+X    my(@words, $result, $rest, $space);
+X
+X    # convert double-quotes to single-quotes
+X    $text =~ s/\A([^"]*)"/$1''/s if $$quote;
+X    while ($text =~ s/\A([^"]*)["]([^"]*)["]/$1``$2''/sg) {}
+X
+X    $$quote = ($text =~ m/"/ ? 1 : 0);
+X    $text =~ s/\A([^"]*)"/$1``/s if $$quote;
+X
+X    # keep track of trailing white-space
+X    $space = ($text =~ /(\s*)\Z/s ? $1 : "");
+X
+X    # collapse all white space into a single space
+X    $text =~ s/\s+/ /g;
+X    @words = split(" ", $text);
+X
+X    # process each word individually
+X    foreach $word (@words) {
+X	# see if we can infer a link
+X	if ($word =~ /^\w+\(/) {
+X	    # has parenthesis so should have been a C<> ref
+X	    $word = process_C($word);
+#	    $word =~ /^[^()]*]\(/;
+#	    if (defined $items{$1} && $items{$1}) {
+#		$word =   "\n<CODE><A HREF=\"$htmlroot/$items{$1}#item_"
+#			. htmlize($word)
+#			. "\">$word</A></CODE>\n";
+#	    } elsif (defined $items{$word} && $items{$word}) {
+#		$word =   "\n<CODE><A HREF=\"$htmlroot/$items{$word}#item_"
+#			. htmlize($word)
+#			. "\">$word</A></CODE>\n";
+#	    } else {
+#		$word =   "\n<CODE><A HREF=\"#item_"
+#			. htmlize($word)
+#			. "\">$word</A></CODE>\n";
+#	    }
+X	} elsif ($word =~ /^[\$\@%&*]+\w+$/) {
+X	    # perl variables, should be a C<> ref
+X	    $word = process_C($word);
+X	} elsif ($word =~ m,^\w+://\w,) {
+X	    # looks like a URL
+X	    $word = qq(<A HREF="$word">$word</A>);
+X	} elsif ($word =~ /[\w.-]+\@\w+\.\w/) {
+X	    # looks like an e-mail address
+X	    $word = qq(<A HREF="MAILTO:$word">$word</A>);
+X	} elsif ($word !~ /[a-z]/ && $word =~ /[A-Z]/) {  # all uppercase?
+X	    $word = "\n<FONT SIZE=-1>$word</FONT>\n" if $netscape;
+X	}
+X    }
+X
+X    # build a new string based upon our conversion
+X    $result = "";
+X    $rest   = join(" ", @words);
+X    while (length($rest) > 75) {
+X	if ( $rest =~ m/^(.{0,75})\s(.*?)$/o ||
+X	     $rest =~ m/^(\S*)\s(.*?)$/o) {
+X
+X	    $result .= "$1\n";
+X	    $rest    = $2;
+X	} else {
+X	    $result .= "$rest\n";
+X	    $rest    = "";
+X	}
+X    }
+X    $result .= $rest if $rest;
+X
+X    # restore the trailing white-space
+X    $result .= $space;
+X
+X    return $result;
+}
+X
+X
+#
+# pre_escape - convert & in text to $amp;
+#
+sub pre_escape {
+X    my($str) = @_;
+X
+X    $$str =~ s,&,&amp;,g;
+}
+X
+X
+#
+# process_L - convert a pod L<> directive to a corresponding HTML link.
+#  most of the links made are inferred rather than known about directly
+#  (i.e it's not know if the =head section exists in the target file,
+#   or if a .pod file exists in the case of split files).  however, the
+#  guessing usually works.
+#
+sub process_L {
+X    my($str) = @_;
+X    my($s1, $s2, $linktext, $page, $section, $link);	# work strings
+X
+X    $s1 = $str;
+X    for ($s1) {
+X	# a :: acts like a /
+X	s,::,/,;
+X
+X	# make sure sections start with a /
+X	s,^",/",g;
+X	s,^,/,g if (!m,/, && / /);
+X
+X	# check if there's a section specified
+X	if (m,^(.*?)/"?(.*?)"?$,) {	# yes
+X	    ($page, $section) = ($1, $2);
+X	} else {			# no
+X	    ($page, $section) = ($str, "");
+X	}
+X
+X	# check if we know that this is a section in this page
+X	if (!defined $pages{$page} && defined $sections{$page}) {
+X	    $section = $page;
+X	    $page = "";
+X	}
+X    }
+X
+X    if ($page eq "") {
+X	$link = "#" . htmlize($section);
+X	$linktext = $section;
+X    } elsif (!defined $pages{$page}) {
+X	warn "$0: $podfile: cannot resolve L<$str> in paragraph $paragraph: no such page\n";
+X	$link = "";
+X	$linktext = $page;
+X    } else {
+X	$linktext  = ($section ? "$section" : "the $page manpage");
+X	$section = htmlize($section) if $section ne "";
+X
+X	# if there is a directory by the name of the page, then assume that an
+X	# appropriate section will exist in the subdirectory
+X	if ($section ne "" && $pages{$page} =~ /([^:]*[^(\.pod|\.pm)]):/) {
+X	    $link = "$htmlroot/$1/$section.html";
+X
+X	# since there is no directory by the name of the page, the section will
+X	# have to exist within a .html of the same name.  thus, make sure there
+X	# is a .pod or .pm that might become that .html
+X	} else {
+X	    $section = "#$section";
+X	    # check if there is a .pod with the page name
+X	    if ($pages{$page} =~ /([^:]*)\.pod:/) {
+X		$link = "$htmlroot/$1.html$section";
+X	    } elsif ($pages{$page} =~ /([^:]*)\.pm:/) {
+X		$link = "$htmlroot/$1.html$section";
+X	    } else {
+X		warn "$0: $podfile: cannot resolve L$str in paragraph $paragraph: ".
+X			     "no .pod or .pm found\n";
+X		$link = "";
+X		$linktext = $section;
+X	    }
+X	}
+X    }
+X
+X    if ($link) {
+X	$s1 = "<A HREF=\"$link\">$linktext</A>\n";
+X    } else {
+X	$s1 = "<EM>$linktext</EM>\n";
+X    }
+X    return $s1;
+}
+X
+X
+#
+# process_BFI - process any of the B<>, F<>, or I<> pod-escapes and
+# convert them to corresponding HTML directives.
+#
+sub process_BFI {
+X    my($tag, $str) = @_;
+X    my($s1);			# work string
+X    my(%repltext) = (	'B' => 'STRONG',
+X			'F' => 'EM',
+X			'I' => 'EM');
+X
+X    # extract the modified text and convert to HTML
+X    $s1 = "<$repltext{$tag}>$str</$repltext{$tag}>\n";
+X    return $s1;
+}
+X
+X
+#
+# process_C - process the C<> pod-escape.
+#
+sub process_C {
+X    my($str) = @_;
+X    my($s1);
+X
+X    $s1 = $str;
+X    $s1 =~ s/\([^()]*\)//g;	# delete parenthesis
+X    $s1 =~ s/\W//g;		# delete bogus characters
+X
+X    # if there was a pod file that we found earlier with an appropriate
+X    # =item directive, then create a link to that page.
+X    if (defined $items{$s1}) {
+X	$s1 = ($items{$str} ?
+X	       "<A HREF=\"$htmlroot/$items{$s1}#item_" . htmlize($s1) .  "\">$s1</A>" :
+X	       "<A HREF=\"#item_" . htmlize($s1) .  "\">$s1</A>");
+X    } else {
+X	$s1 = "<CODE>$str</CODE>";
+X	# warn "$0: $podfile: cannot resolve C<$str> in paragraph $paragraph\n" if $verbose
+X    }
+X
+X    return $s1;
+}
+X
+X
+#
+# process_E - process the E<> pod directive which seems to escape a character.
+#
+sub process_E {
+X    my($str) = @_;
+X
+X    for ($str) {
+X	s,([^/].*),\&$1\;,g;
+X    }
+X
+X    return $str;
+}
+X
+X
+#
+# process_Z - process the Z<> pod directive which really just amounts to
+# ignoring it.  this allows someone to start a paragraph with an =
+#
+sub process_Z {
+X    my($str) = @_;
+X
+X    # there is no equivalent in HTML for this so just ignore it.
+X    $str = "";
+X    return $str;
+}
+X
+X
+#
+# process_S - process the S<> pod directive which means to convert all
+# spaces in the string to non-breaking spaces (in HTML-eze).
+#
+sub process_S {
+X    my($str) = @_;
+X
+X    # convert all spaces in the text to non-breaking spaces in HTML.
+X    $str =~ s/ /&nbsp;/g;
+X    return $str;
+}
+X
+X
+#
+# finish_list - finish off any pending HTML lists.  this should be called
+# after the entire pod file has been read and converted.
+#
+sub finish_list {
+X    while ($listlevel--) {
+X	print HTML "</DL>\n";
+X    }
+}
+X
+X
+#
+# htmlize - converts a pod section specification to a suitable section
+# specification for HTML.
+#
+sub htmlize {
+X    my($heading) = @_;
+X
+X    $heading = lc($heading);
+X    $heading =~ s/[^\w\s]//g;
+X    $heading =~ s/(\s+)/ /g;
+X    $heading =~ s/^\s*(.*?)\s*$/$1/s;
+X    $heading =~ s/ /_/g;
+X    $heading =~ s/\A(.{32}).*\Z/$1/s;
+X
+X    return $heading;
+}
+X
+BEGIN {
+}
+X
+1;
+X
+SHAR_EOF
+  $shar_touch -am 0213135796 'Html.pm' &&
+  chmod 0644 'Html.pm' ||
+  echo 'restore of Html.pm failed'
+  shar_count="`wc -c < 'Html.pm'`"
+  test 29943 -eq "$shar_count" ||
+    echo "Html.pm: original size 29943, current size $shar_count"
+fi
+# ============= installhtml ==============
+if test -f 'installhtml' && test X"$1" != X"-c"; then
+  echo 'x - skipping installhtml (file already exists)'
+else
+  echo 'x - extracting installhtml (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'installhtml' &&
+#!/usr/bin/perl -w
+X
+use Config;		# for config options in the makefile
+use Getopt::Long;	# for command-line parsing
+use Cwd;
+use Pod::Html;
+X
+umask 022;
+X
+$usage =<<END_OF_USAGE;
+Usage: $0 --help --podpath=<name>:...:<name> --podroot=<name>
+X         --htmldir=<name> --htmlroot=<name> --norecurse --recurse
+X         --splithead=<name>,...,<name> --splititem=<name>,...,<name>
+X	 --libpods=<name>,...,<name>
+X
+X    --help      - this message
+X    --podpath   - colon-separated list of directories containing .pod and
+X                  .pm files to be converted (. by default).
+X    --podroot   - filesystem base directory from which all relative paths in
+X                  podpath stem (default is .).
+X    --htmldir   - directory to store resulting html files in relative
+X                  to the filesystem (\$podroot/html by default). 
+X    --htmlroot  - http-server base directory from which all relative paths
+X                  in podpath stem (default is /).
+X    --libpods   - comma-separated list of files to search for =item pod
+X                  directives in as targets of C<> and implicit links (empty
+X                  by default).
+X    --norecurse - don't recurse on those subdirectories listed in podpath.
+X                  (default behavior).
+X    --recurse   - recurse on those subdirectories listed in podpath
+X    --splithead - comma-separated list of .pod or .pm files to split.  will
+X                  split each file into several smaller files at every occurance
+X                  of a pod =head[1-6] directive.
+X    --splititem - comma-separated list of .pod or .pm files to split using
+X                  splitpod.
+X    --splitpod  - where the program splitpod can be found (\$podroot/pod by
+X                  default).
+X
+END_OF_USAGE
+X
+@libpods = ();
+@podpath = ( "." );	# colon-separated list of directories containing .pod
+X			# and .pm files to be converted.
+$podroot = ".";		# assume the pods we want are here
+$htmldir = "";		# nothing for now...
+$htmlroot = "/";	# default value
+$recurse = 0;		# default behavior
+@splithead = ();	# don't split any files by default
+@splititem = ();	# don't split any files by default
+$splitpod = "";		# nothing for now.
+X
+$debug = 0; 	    	# whether or not to print debugging info
+X
+X
+# parse the command-line
+$result = GetOptions( qw(
+X	debug
+X	help
+X	podpath=s
+X	podroot=s
+X	htmldir=s
+X	htmlroot=s
+X	libpods=s
+X	recurse!
+X	splithead=s
+X	splititem=s
+X	splitpod=s
+));
+usage("invalid parameters") unless $result;
+parse_command_line();
+X
+X
+# set these variables to appropriate values if the user didn't specify
+#  values for them.
+$htmldir = "$htmlroot/html" unless $htmldir;
+$splitpod = "$htmlroot/pod" unless $splitpod;
+X
+X
+# sanity checks (code from installman)
+-x  "./perl"	|| warn "./perl not found!  Have you run make?\n";
+-d  $Config{'installprivlib'}
+X	|| warn "Perl library directory $Config{'installprivlib'} not found.
+X		Have you run make install?.  (Installing anyway.)\n";
+-x 't/TEST'		|| warn "WARNING: You've never run 'make test'!!!",
+X	"  (Installing anyway.)\n";
+X
+X
+# make sure that the destination directory exists
+(mkdir($htmldir, 0755) ||
+X	die "$0: cannot make directory $htmldir: $!\n") if ! -d $htmldir;
+X
+X
+# the following array will eventually contain files that are to be
+# ignored in the conversion process.  these are files that have been
+# process by splititem or splithead and should not be converted as a
+# result.
+@ignore = ();
+X
+X
+# split pods.  its important to do this before convert ANY pods because
+#  it may effect some of the links
+@splitdirs = ();    # files in these directories won't get an index
+split_on_head($podroot, $htmldir, \@splitdirs, \@ignore, @splithead);
+split_on_item($podroot, \@splitdirs, \@ignore, @splititem);
+X
+X
+# convert the pod pages found in @poddirs
+warn "converting files\n" if $debug;
+warn "\@ignore\t= @ignore\n" if $debug;
+foreach $dir (@podpath) {
+#    installdir($dir, $recurse, $podroot, \@splitdirs, \@ignore);
+}
+X
+X
+# now go through and create master indices for each pod we split
+foreach $dir ((@splithead,@splititem)) {
+X    $dir =~ /^(.*)(\.pod|\.pm)$/sm;
+warn "creating index $htmldir/$1.html\n";
+X    create_index("$htmldir/$1.html", "$htmldir/$1");
+}
+X
+##############################################################################
+X
+X
+sub usage {
+X    warn "$0: @_\n" if @_;
+X    die $usage;
+}
+X
+X
+sub parse_command_line {
+X    usage() if defined $opt_help;
+X    $opt_help = ""; 	    	    # make -w shut up
+X
+X    # list of directories
+X    @podpath   = split(":", $opt_podpath) if defined $opt_podpath;
+X
+X    # lists of files
+X    @splithead = split(",", $opt_splithead) if defined $opt_splithead;
+X    @splititem = split(",", $opt_splititem) if defined $opt_splititem;
+X    @libpods   = split(",", $opt_libpods) if defined $opt_libpods;
+X
+X    $htmldir  = $opt_htmldir if defined $opt_htmldir;
+X    $htmlroot = $opt_htmlroot if defined $opt_htmlroot;
+X    $podroot  = $opt_podroot if defined $opt_podroot;
+X    $splitpod = $opt_splitpod if defined $opt_splitpod;
+X
+X    $recurse = $opt_recurse if defined $opt_recurse;
+X    $debug = $opt_debug if defined $opt_debug;
+}
+X
+X
+sub create_index {
+X    my($html, $dir) = @_;
+X    my(@files, @filedata, @index, $file);
+X
+X    # get the list of .html files in this directory
+X    opendir(DIR, $dir) ||
+X	die "$0: error opening directory $dir for reading: $!\n";
+X    @files = grep(/\.html$/, readdir(DIR));
+X    closedir(DIR);
+X
+X    open(HTML, ">$html") ||
+X	die "$0: error opening $html for output: $!\n";
+X
+X    # for each .html file in the directory, extract the index
+X    #	embedded in the file and throw it into the big index.
+X    foreach $file (@files) {
+X	$/ = "";
+X
+X	open(IN, "<$dir/$file") ||
+X	    die "$0: error opening $dir/$file for input: $!\n";
+X	@filedata = <IN>;
+X	close(IN);
+X
+X	@index = grep(/<!-- INDEX BEGIN -->.*<!-- INDEX END -->/s,
+X		    @filedata);
+X	for (@index) {
+X	    s/<!-- INDEX BEGIN -->(\s*<!--)(.*)(-->\s*)<!-- INDEX END -->/$2/s;
+X	    s,#,$dir/$file#,g;
+X	    print HTML "$_\n";
+X	    #print HTML "$_\n<P><HR><P>\n";
+X	}
+X    }
+X
+X    close(HTML);
+}
+X
+X
+sub split_on_head {
+X    my($podroot, $htmldir, $splitdirs, $ignore, @splithead) = @_;
+X    my($pod, $dirname, $filename);
+X
+X    # split the files specified in @splithead on =head[1-6] pod directives
+X    warn "splitting files by head.\n" if $debug && $#splithead >= 0;
+X    foreach $pod (@splithead) {
+X	# figure out the directory name and filename
+X	$pod      =~ s,^([^/]*)$,/$1,;
+X	$pod      =~ m,(.*?)/(.*?)(\.pod)?$,;
+X	$dirname  = $1;
+X	$filename = "$2.pod";
+X
+X	# since we are splitting this file it shouldn't be converted.
+X	push(@$ignore, "$podroot/$dirname/$filename");
+X
+X	# split the pod
+X	splitpod("$podroot/$dirname/$filename", "$podroot/$dirname", $htmldir,
+X	    $splitdirs);
+X    }
+}
+X
+X
+sub split_on_item {
+X    my($podroot, $splitdirs, $ignore, @splititem) = @_;
+X    my($pwd, $dirname, $filename);
+X
+X    warn "splitting files by item.\n" if $debug && $#splititem >= 0;
+X    $pwd = getcwd();
+X    foreach $pod (@splititem) {
+X	# figure out the directory to split into
+X	$pod      =~ s,^([^/]*)$,/$1,;
+X	$pod      =~ m,(.*?)/(.*?)(\.pod)?$,;
+X	$dirname  = "$1/$2";
+X	$filename = "$2.pod";
+X
+X	# since we are splitting this file it shouldn't be converted.
+X	push(@$ignore, "$podroot/$dirname.pod");
+X
+X	# split the pod
+X	push(@$splitdirs, "$podroot/$dirname");
+X	if (! -d "$podroot/$dirname") {
+X	    mkdir("$podroot/$dirname", 0755) ||
+X		    die "$0: error creating directory $podroot/$dirname: $!\n";
+X	}
+X	chdir("$podroot/$dirname") ||
+X	    die "$0: error changing to directory $podroot/$dirname: $!\n";
+X	system("splitpod", "../$filename");
+X    }
+X    chdir($pwd);
+}
+X
+X
+#
+# splitpod - splits a .pod file into several smaller .pod files
+#  where a new file is started each time a =head[1-6] pod directive
+#  is encountered in the input file.
+#
+sub splitpod {
+X    my($pod, $poddir, $htmldir, $splitdirs) = @_;
+X    my(@poddata, @filedata, @heads);
+X    my($file, $i, $j, $prevsec, $section, $nextsec);
+X
+X    warn "splitting $pod\n" if $debug;
+X
+X    # read the file in paragraphs
+X    $/ = "";
+X    open(SPLITIN, "<$pod") ||
+X	die "$0: error opening $pod for input: $!\n";
+X    @filedata = <SPLITIN>;
+X    close(SPLITIN) ||
+X	die "$0: error closing $pod: $!\n";
+X
+X    # restore the file internally by =head[1-6] sections
+X    @poddata = ();
+X    for ($i = 0, $j = -1; $i <= $#filedata; $i++) {
+X	$j++ if ($filedata[$i] =~ /^\s*=head[1-6]/);
+X	$poddata[$j]  = "" unless defined $poddata[$j];
+X	$poddata[$j] .= "\n$filedata[$i]" if $j >= 0;
+X    }
+X
+X    # create list of =head[1-6] sections so that we can rewrite
+X    #  L<> links as necessary.
+X    %heads = ();
+X    foreach $i (0..$#poddata) {
+X	$heads{htmlize($1)} = 1 if $poddata[$i] =~ /=head[1-6]\s+(.*)/;
+X    }
+X
+X    # create a directory of a similar name and store all the
+X    #  files in there
+X    $pod =~ s,.*/(.*),$1,;	# get the last part of the name
+X    $dir = $pod;
+X    $dir =~ s/\.pod//g;
+X    push(@$splitdirs, "$poddir/$dir");
+X    mkdir("$poddir/$dir", 0755) ||
+X	die "$0: could not create directory $poddir/$dir: $!\n"
+X	unless -d "$poddir/$dir";
+X
+X    $poddata[0] =~ /^\s*=head[1-6]\s+(.*)/;
+X    $section    = "";
+X    $nextsec    = $1;
+X
+X    # for each section of the file create a separate pod file
+X    for ($i = 0; $i <= $#poddata; $i++) {
+X	# determine the "prev" and "next" links
+X	$prevsec = $section;
+X	$section = $nextsec;
+X	if ($i < $#poddata) {
+X	    $poddata[$i+1] =~ /^\s*=head[1-6]\s+(.*)/;
+X	    $nextsec       = $1;
+X	} else {
+X	    $nextsec = "";
+X	}
+X
+X	# determine an appropriate filename (this must correspond with
+X	#  what pod2html will try and guess)
+X	# $poddata[$i] =~ /^\s*=head[1-6]\s+(.*)/;
+X	$file = "$dir/" . htmlize($section) . ".pod";
+X
+X	# create the new .pod file
+X	warn "\tcreating $poddir/$file\n" if $debug;
+X	open(SPLITOUT, ">$poddir/$file") ||
+X	    die "$0: error opening $poddir/$file for output: $!\n";
+X	$poddata[$i] =~ s,L<([^<>]*)>,
+X			    defined $heads{htmlize($1)} ? "L<$dir/$1>" : "L<$1>"
+X			 ,ge;
+X	print SPLITOUT $poddata[$i]."\n\n";
+X	print SPLITOUT "Previous Page: L<$dir/\"$prevsec\">\n\n" if $prevsec;
+X	print SPLITOUT "Next Page: L<$dir/\"$nextsec\">\n\n" if $nextsec;
+X	close(SPLITOUT) ||
+X	    die "$0: error closing $poddir/$file: $!\n";
+X    }
+}
+X
+X
+#
+# installdir - takes care of converting the .pod and .pm files in the
+#  current directory to .html files and then installing those.
+#
+sub installdir {
+X    my($dir, $recurse, $podroot, $splitdirs, $ignore) = @_;
+X    my(@dirlist, @podlist, @pmlist, $doindex);
+X
+X    @dirlist = ();	# directories to recurse on
+X    @podlist = ();	# .pod files to install
+X    @pmlist  = ();	# .pm files to install
+X
+X    # should files in this directory get an index?
+X    $doindex = (grep($_ eq "$podroot/$dir", @$splitdirs) ? 0 : 1);
+X
+X    opendir(DIR, "$podroot/$dir")
+X	|| die "$0: error opening directory $podroot/$dir: $!\n";
+X
+X    # find the directories to recurse on
+X    @dirlist = map { "$dir/$_" }
+X	grep(-d "$podroot/$dir/$_" && !/^\.{1,2}/, readdir(DIR)) if $recurse;
+X    rewinddir(DIR);
+X
+X    # find all the .pod files within the directory
+X    @podlist = map { /^(.*)\.pod$/; "$dir/$1" }
+X	grep(! -d "$podroot/$dir/$_" && /\.pod$/, readdir(DIR));
+X    rewinddir(DIR);
+X
+X    # find all the .pm files within the directory
+X    @pmlist = map { /^(.*)\.pm$/; "$dir/$1" }
+X	grep(! -d "$podroot/$dir/$_" && /\.pm$/, readdir(DIR));
+X
+X    closedir(DIR);
+X
+X    # recurse on all subdirectories we kept track of
+X    foreach $dir (@dirlist) {
+X	installdir($dir, $recurse, $podroot, $splitdirs, $ignore);
+X    }
+X
+X    # install all the pods we found
+X    foreach $pod (@podlist) {
+X	# check if we should ignore it.
+X	next if grep($_ eq "$podroot/$pod.pod", @$ignore);
+X
+X	# check if a .pm files exists too
+X	if (grep($_ eq "$pod.pm", @pmlist)) {
+X	    warn  "$0: Warning both `$podroot/$pod.pod' and "
+X		. "`$podroot/$pod.pm' exist, using pod\n";
+X	    push(@ignore, "$pod.pm");
+X	}
+X	runpod2html("$pod.pod", $doindex);
+X    }
+X
+X    # install all the .pm files we found
+X    foreach $pm (@pmlist) {
+X	# check if we should ignore it.
+X	next if grep($_ eq "$pm.pm", @ignore);
+X
+X	runpod2html("$pm.pm", $doindex);
+X    }
+}
+X
+X
+#
+# runpod2html - invokes pod2html to convert a .pod or .pm file to a .html
+#  file.
+#
+sub runpod2html {
+X    my($pod, $doindex) = @_;
+X    my($html, $i, $dir, @dirs);
+X
+X    $html = $pod;
+X    $html =~ s/\.(pod|pm)$/.html/g;
+X
+X    # make sure the destination directories exist
+X    @dirs = split("/", $html);
+X    $dir  = "$htmldir/";
+X    for ($i = 0; $i < $#dirs; $i++) {
+X	if (! -d "$dir$dirs[$i]") {
+X	    mkdir("$dir$dirs[$i]", 0755) ||
+X		die "$0: error creating directory $dir$dirs[$i]: $!\n";
+X	}
+X	$dir .= "$dirs[$i]/";
+X    }
+X
+X    # invoke pod2html
+X    warn "converting $podroot/$pod to $htmldir/$html\n" if $debug;
+#    system("./pod2html",
+X    Pod::Html'pod2html("pod2html",
+X	"--htmlroot=$htmlroot",
+X	"--podpath=".join(":", @podpath),
+X	"--podroot=$podroot",
+X	($doindex ? "--index" : "--noindex"),
+X	"--" . ($recurse ? "" : "no") . "recurse",
+X	($#libpods >= 0) ? "--libpods=" . join(":", @libpods) : "",
+X	"--infile=$podroot/$pod", "--outfile=$htmldir/$html");
+X    die "$0: error running ./pod2html: $!\n" if $?;
+}
+X
+X
+#
+# htmlize - converts a pod section specification to a suitable section
+#  specification for HTML.  this should be kept in sync with pod2html.
+#
+sub htmlize {
+X    my($heading) = @_;
+X
+X    $heading = lc($heading);
+X    $heading =~ s/[^\w\s]//g;
+X    $heading =~ s/(\s+)/ /g;
+X    $heading =~ s/^\s*(.*?)\s*$/$1/s;
+X    $heading =~ s/ /_/g;
+X    $heading =~ s/\A(.{32}).*\Z/$1/s;
+X
+X    return $heading;
+}
+X
+SHAR_EOF
+  $shar_touch -am 0213135696 'installhtml' &&
+  chmod 0644 'installhtml' ||
+  echo 'restore of installhtml failed'
+  shar_count="`wc -c < 'installhtml'`"
+  test 13338 -eq "$shar_count" ||
+    echo "installhtml: original size 13338, current size $shar_count"
+fi
+exit 0

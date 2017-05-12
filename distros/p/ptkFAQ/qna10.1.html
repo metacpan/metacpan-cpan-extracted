@@ -1,0 +1,27 @@
+<HTML>
+<HEAD><TITLE> 10.1. Display a bitmap?</TITLE></HEAD>
+<BODY><a name="A10.1"> 10.1. Display a bitmap?</a>
+
+<hr>
+</p><p>
+Unlike other widgets the <KBD>Canvas</KBD> does not take the <KBD>-bitmap</KBD>
+configuration option. One of the ways to place things - including bitmaps -
+onto a <KBD>Canvas</KBD> is to call <KBD>create</KBD> on it. To emphasize how a
+<KBD>Canvas</KBD> handles bitmaps differently from the configurable widgets let
+me assume that you wanted to specify the 'hourglass' built in bitmap in the
+following. (For more on xbm file specification see a 
+<a href="qna9.8.html">previous question [9.8] within this FAQ</a>.)  
+Here is a way to combine the <KBD>Canvas;</KBD> and 
+<KBD>create;</KBD> calls:
+<PRE>
+    my($canvar) = $main-&gt;Canvas();
+    my($bittag) = $canvar-&gt;create('bitmap',10,10, -bitmap=&gt;'hourglass');
+    $canvar-&gt;pack;
+</PRE>
+
+
+<hr>
+	<p><a href="qna10.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.1">table of contents</a> | <a href="qna10.2.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

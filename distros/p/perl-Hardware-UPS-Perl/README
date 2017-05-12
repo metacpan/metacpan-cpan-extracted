@@ -1,0 +1,43 @@
+$Id: README,v 1.4 2007/04/18 15:22:06 creile Exp $
+
+Hardware-UPS-Perl provides Perl modules and scripts to deal with an UPS using
+an arbitrary Hardware::UPS::Perl driver. So far, the package only supplies a
+driver for the Megatec protocol. The package provides two modes of operation:
+
+1) local operation:
+   The UPS resides on a local serial port. The UPS can be monitored by the
+   script upswatch.pl directly.
+
+2) remote operation:
+   The UPS resides on a serial port at a remote host. The UPS can be monitored
+   via TCP using the script upsagent.pl running at that particular remote host
+   and upswatch.pl running at the local host by specifying that host on the
+   command line with option "-r, --remote <Host>". 
+
+Hardware-UPS-Perl has been developed and tested using a TRUST PW-4120M UPS.
+
+
+INSTALLATION
+
+To install this package, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+In case of SuSE 10.1 and above (and propably below) you can also build
+an RPM by running
+
+   rpmbuild -ta perl-Hardware-UPS-Perl-${VERSION}.tar.gz
+
+and install the resulting RPM afterwards directly using rpm.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 Christian Reile <Christian.Reile@t-online.de>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. For details see file COPYING.
+

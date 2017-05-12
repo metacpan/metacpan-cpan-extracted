@@ -1,0 +1,33 @@
+package-compute
+===============
+
+Created:      2012-10-26
+Home page:    <https://metacpan.org/release/package-compute>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=package-compute>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2012-12-12
+
+ [ Documentation ]
+ - Document test suite.
+ - Fix spelling errors.
+   Fixes RT#81514.
+   SPROUT++
+   <https://rt.cpan.org/Ticket/Display.html?id=81514>
+
+0.003	2012-11-27
+
+ [ Packaging ]
+ - Make sure t/02usage.t does not depend on Perl 5.10.
+
+0.002	2012-11-27
+
+ - Added: Provide 'use package::compute -anon' to compute an anonymous
+   package name.
+
+0.001	2012-10-26	Initial release

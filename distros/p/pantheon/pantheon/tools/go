@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use File::Spec;
+
+use Vulcan::ExpSSH;
+use Vulcan::OptConf;
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = -1;
+
+=head1 SYNOPSIS
+
+ $0 host [user]
+
+=cut
+my %o = Vulcan::OptConf->load()->get()->dump();
+my $user = `logname`; chomp $user;
+my $pass = File::Spec->join( ( getpwnam $user )[7], '.go' );
+my $zone = eval { YAML::XS::LoadFile $o{conf} } || [];
+
+unless ( $pass = eval { YAML::XS::LoadFile $pass } ) { $pass = $ENV{PASSWD} }
+elsif ( defined $pass->{$user} ) { $pass = $pass->{$user} }
+else { ( $user, $pass ) = each %$pass }
+
+die "cannot resolve host\n" unless Vulcan::ExpSSH->new( @$zone )
+    ->conn( pass => $pass, user => $user, host => shift, sudo => shift );

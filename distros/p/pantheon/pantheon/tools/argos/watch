@@ -1,0 +1,116 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use File::Basename;
+
+use Hermes;
+use Argos::Path;
+use Argos::Conf;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::THIS = 'argos';
+
+=head1 SYNOPSIS
+
+watch argos map output.
+
+$0 [--interval I<num>] [--count]
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->set( interval => 2 )->get( qw( interval=i count ) )->dump();
+
+my $path = Argos::Path->new( $o{path} );
+my $conf = Argos::Conf->new( $o{map} );
+
+my $range = Hermes->new( $option->dump( 'range' ) );
+my $db = $range->db();
+my %want = map { $_ => 1 } @ARGV;
+
+do
+{
+    my ( %file, %data, %cluster, %sum ) = map { $_ => 1 }
+        map { glob $path->path( run => "$_.*" ) } $conf->names();
+
+    for my $file ( keys %file )
+    {
+        next unless my $data = eval { YAML::XS::LoadFile( $file ) };
+        my ( @name, %dup ) = split '\.', File::Basename::basename( $file );
+        my $stat = pop @name; 
+        my $name = join '.', @name;
+
+        next if %want && ! $want{$stat};
+
+        while ( my ( $mesg, $node ) = each %$data ) 
+        {
+            my %sort;
+
+            for my $node ( @$node )
+            {
+                if ( ref $node )
+                {
+                    push @{ $sort{ $node->[1] } }, $node->[0]
+                        unless $dup{$mesg}{ $node->[0] } ++;
+                }
+                else
+                {
+                    $node =~ s/:\d+$//g;
+
+                    my %name = map { $_ => 1 } map { @$_ }
+                        $db->select( 'name', node => [ 1, $node ] ),
+                        $db->select( 'name', info => [ 1, $node ] );
+
+                    $cluster{$node} ||= %name
+                        ? [ keys %name ] : [ 'unknown cluster' ];
+
+                    map { push @{ $sort{$_} }, $node } @{ $cluster{$node} };
+                }
+            }
+
+            $mesg = YAML::XS::Load( $mesg ) if $mesg =~ /^---/;
+
+            for my $cluster ( keys %sort )
+            {
+                $range->load( delete $sort{$cluster} );
+                if ( $o{count} )
+                {
+                    $sum{$stat}{$name} += my $count = $range->list();
+                    $cluster .= sprintf " [%s]", $count;
+                }
+                $sort{$cluster} = $range->dump();
+            }
+
+            push @{ $data{$stat}{$name} }, { node => \%sort, mesg => $mesg };
+        }
+    }
+
+    if ( $o{count} )
+    {
+        for my $stat ( keys %data )
+        {
+            my $data = delete $data{$stat};
+            my $sum = 0;
+
+            for my $name ( keys %$data )
+            {
+                $sum += my $count = $sum{$stat}{$name};
+                $data->{ "$name ($count)" } = delete $data->{$name};
+            }
+            $data{ "$stat ($sum)" } = $data;
+        }
+    }
+
+    system( 'clear' );
+    YAML::XS::DumpFile( \*STDOUT, \%data ) if %data;
+}
+while sleep $o{interval};
+
+exit 0;

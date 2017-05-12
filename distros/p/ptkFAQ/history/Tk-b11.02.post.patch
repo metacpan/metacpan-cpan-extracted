@@ -1,0 +1,124 @@
+Self packing scrollbars bug in Tk-b11.02
+****************************************
+
+Nick.Ing-Simmons@tiuk.ti.com
+Thu, 11 Apr 96 18:21:51 BST 
+
+ o Messages sorted by: [ date ][ thread ][ subject ][ author ] 
+ o Next message: Chris Holt: "Possible self packing scrollbars bugs in
+   Tk-b11.02+patch" 
+ o Previous message: Ilya Zakharevich: "Re: pTk problem or
+   perl5.00201 problem?" 
+
+If a widget (e.g. a Listbox) is created without scrollbars in 
+for an 'axis' (e.g. -scrollbars => 'w' in ScrlListbox) and data 
+entered in widget means only part of data is visible on that axis
+(e.g. wide lines in the ScrlListbox) then auto-scrollbar code
+gets very busy trying to add scrollbars which are not allowed.
+
+This patch fixes it.
+
+*** Tk-b11.02/Tk/Frame.pm Sat Apr 6 13:51:04 1996
+--- /home/isp/nick/Tk/Tk/Frame.pm Thu Apr 11 17:36:54 1996
+***************
+*** 272,292 ****
+my $yside = (($opt =~ /w/) ? 'left' : 'right'); 
+$slice->pack(-side => $yside, -fill => 'y',-before => $slice->{'before'});
+$havey = 1;
+}
+else
+{
+$opt =~ s/[we]//;
+$slice->packForget;
+}
+$cw->{'packysb'} = $havey;
+- if ($req)
+- {
+- $w->configure(-yscrollcommand => ['set', $ysb]);
+- }
+- else
+- {
+- $w->configure(-yscrollcommand => ['sbset', $cw, $ysb,
+\$cw->{'packysb'}]);
+- }
+}
+if (defined $xsb)
+{
+--- 272,293 ----
+my $yside = (($opt =~ /w/) ? 'left' : 'right'); 
+$slice->pack(-side => $yside, -fill => 'y',-before => $slice->{'before'});
+$havey = 1;
++ if ($req)
++ {
++ $w->configure(-yscrollcommand => ['set', $ysb]);
++ }
++ else
++ {
++ $w->configure(-yscrollcommand => ['sbset', $cw, $ysb,
+\$cw->{'packysb'}]);
++ }
+}
+else
+{
+$opt =~ s/[we]//;
+$slice->packForget;
++ $w->configure(-yscrollcommand => undef);
+}
+$cw->{'packysb'} = $havey;
+}
+if (defined $xsb)
+{
+***************
+*** 294,314 ****
+{
+$xsb->pack(-side => $xside, -fill => 'x',-before => $xsb->{'before'});
+$havex = 1;
+}
+else
+{
+$opt =~ s/[ns]//;
+$xsb->packForget;
+}
+$cw->{'packxsb'} = $havex;
+- if ($req)
+- {
+- $w->configure(-xscrollcommand => ['set', $xsb]);
+- }
+- else
+- {
+- $w->configure(-xscrollcommand => ['sbset', $cw, $xsb,
+\$cw->{'packxsb'}]);
+- }
+}
+if (defined $corner)
+{
+--- 295,316 ----
+{
+$xsb->pack(-side => $xside, -fill => 'x',-before => $xsb->{'before'});
+$havex = 1;
++ if ($req)
++ {
++ $w->configure(-xscrollcommand => ['set', $xsb]);
++ }
++ else
++ {
++ $w->configure(-xscrollcommand => ['sbset', $cw, $xsb,
+\$cw->{'packxsb'}]);
++ }
+}
+else
+{
+$opt =~ s/[ns]//;
+$xsb->packForget;
++ $w->configure(-xscrollcommand => undef);
+}
+$cw->{'packxsb'} = $havex;
+}
+if (defined $corner)
+{
+
+ o Next message: Chris Holt: "Possible self packing scrollbars bugs in
+   Tk-b11.02+patch" 
+ o Previous message: Ilya Zakharevich: "Re: pTk problem or
+   perl5.00201 problem?" 
+

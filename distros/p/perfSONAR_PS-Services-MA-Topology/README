@@ -1,0 +1,29 @@
+perfSONAR_PS::Services::MA::Topology README File
+================================================
+
+Description
+-----------
+
+The perfSONAR_PS::Services::MA::Topology module allows one to make topological
+information data available using the OGF topology schema.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Services::MA::Topology'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

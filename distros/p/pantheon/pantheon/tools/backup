@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw( $RealBin );
+
+use Vulcan::OptConf;
+use Vulcan::Manifest;
+
+our $PACK = 'pantheon';
+
+=head1 SYNOPSIS
+
+ $0 package [--conf manifest] 
+
+=cut
+my %o = Vulcan::OptConf->load()->get( 'conf=s' )->dump();
+my @path = split /\/$PACK\b/, $RealBin;
+
+$path[-1] = @path > 1 ? '' : die "not $PACK\n";
+my $root = join "/$PACK", @path;
+
+chdir $root;
+my $list = Vulcan::Manifest->new( $o{conf} )->dump();
+my %file = map { $_ => $list->file( $_ ) } qw( in ex );
+my ( $pack, $tar ) = ( shift || $PACK, 'vcf' );
+
+if ( $pack =~ /\.t(?:ar\.)?gz$/ ) { $tar = 'z' . $tar }
+elsif ( $pack !~ /\.tar$/ ) { $pack .= '.tar' }
+
+system "cd $root && tar -T $file{in} -X $file{ex} -$tar $pack";

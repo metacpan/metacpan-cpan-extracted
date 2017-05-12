@@ -1,0 +1,456 @@
+Archive-name: perl-faq/ptk-faq/part0
+Posting-Frequency: monthly
+Last-modified: Wed May 15 22:26:55 EDT 1996
+URL: http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+Version: 0.03
+
+URL (Hypertext-split): http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+URL (Plaintext): http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+Image-supplement: http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ftp-Archive: ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt
+ftp-Archive: ftp://ftp.wpi.edu/perl5/pTk-FAQ
+ftp-Archive: ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+e-mail-Archive: ptkfaq@pubweb.bnl.gov
+gopher-Archive: 128.84.219.153
+
+Perl/Tk FAQ part 0 of 5 - Introduction     
+************************************** 
+
+
+ 
+ 
+ The Perl/Tk extension to the Perl programming language is copywritten by its author
+ Nick Ing-Simmons <nik@tiuk.ti.com> whose Tk-b11.02/COPYING file reads as
+ follows: 
+ 
+ Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+ This package is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself, with the exception
+ of the files in the pTk sub-directory which have separate terms
+ derived from those of the orignal Tk4.0 sources and/or Tix. 
+ 
+ See pTk/license.terms for details of this Tk license, 
+ and pTk/Tix.license for the Tix license.
+ 
+ 
+ 
+ This compilation of Frequently Asked Questions & answers (FAQ) is intended to
+ answer several of the first (and mostly more basic) questions posted to the 
+ comp.lang.perl.tk newsgroup. 
+ 
+ This document concerns itself with the Perl/Tk programming language (or, if you
+ prefer, the Tk extension to Perl). Please beware that this is not the Perl FAQ, this is
+ not the Tcl FAQ, nor is this the Tcl/Tk FAQ. Each of those other documents are
+ useful sources of information for Perl/Tk programmers but are completely different
+ from this one. 
+ 
+ This is a dynamic document and contributions, clarifications, and corrections are 
+ most welcome! Please send e-mail to <pvhp@lns62.lns.cornell.edu>. With your help
+ this document will get better (-:
+ 
+ perl/Tk FAQ
+ 
+  1. What is perl/Tk? 
+  2. What is the difference between perl/Tk and Tkperl? 
+  3. Where is it? 
+  4. What/Where is CPAN? 
+  5. How do I build it? 
+  6. Where is the Documentation? 
+  7. How do I write scripts in perl/Tk? 
+  8. What widget types are available under perl/Tk? 
+  9. How do I get widget X to do Y ? 
+     1. How do I get a Button to call a Perl subroutine? 
+     2. How do I arrange the layout of my widgets? 
+     3. How do I get a Popup to popup? 
+     4. How do I bind keyboard keys? 
+     5. How do I add bindings? 
+     6. How do I bind the action of a slider (sic) to ... ? 
+     7. How do I configure a Scrollbar to scroll multiple widgets? 
+     8. How do I display a bitmap? 
+     9. How do I display an image? 
+     10. What Image types are available? 
+     11. Is there any way to have more than one Listbox contain a selection? 
+     12. How do I select a range of tags in a Text widget? 
+     13. How do I group Radiobuttons together? 
+     14. How do I specify fonts? 
+     15. How do I get the entry in an Entry? 
+     16. How do I hide a password Entry? 
+     17. How do I obtain Menus that do not tear off? 
+  10. How do I get a Canvas to ... ? 
+     1. Display a bitmap? 
+     2. Erase a display? 
+     3. Display an Image? 
+     4. What things can be created on a Canvas? 
+     5. How do I use the Canvas as a geometry manager? 
+     6. How do I get a Canvas to output PostScript(c)? 
+     7. How do I get a PostScript(c) output of a Canvas w/ widgets? 
+     8. How do I get the size of a Canvas? After a re-size? 
+     9. How do I bind different actions to different areas of the same 
+       Canvas? 
+  11. Common Problems. 
+     1. What do the ->, => and :: symbols mean? 
+     2. What happened to the ampersands &? 
+     3. What happened to the quotation marks? 
+     4. Must I use "my" on all my variables? 
+     5. Is there a way to find out what is in my perl/Tk "PATH"? 
+     6. What is the difference between use and require? 
+     7. How do I change the cursor/color? 
+     8. How do I ring the bell? 
+     9. How do I determine the version of perl/Tk that I am running? 
+     10. How do I call perl from C? 
+     11. How do I call Tcl code from perl/Tk? 
+  12. What are some of the primary differences between Tcl/Tk and Perl/Tk? 
+  13. How do I install new scripts | modules | extensions? 
+  14. How do I write new modules? 
+  15. Composite Widgets. 
+     1. How do I get a Dialog box? 
+     2. Is there a file selector? 
+     3. Is there a color editor? 
+     4. Is there a round Scale? 
+     5. Is there something equivalent to tkerror? 
+     6. Are there Tables? 
+  16. Programming/development tools. 
+     1. Is there a Tcl/Tk to perl/Tk translator? 
+     2. Is there something equivalent to wish in perl/Tk? 
+     3. Is there a debugger specifically for perl/Tk? 
+     4. Is there a GUI builder in perl/Tk? 
+  17. Processes & Inter-Process Communication under Perl/Tk. 
+     1. How does one get Perl/Tk to act on events that are not coming from X?
+     2. Is there a send and do I need xauth? 
+     3. How can I do animations using after? 
+     4. How do I update widgets while waiting for other processes to
+       complete? 
+     5. How do you fork on System V (HP)? 
+  18. How do I "clear the screen"? 
+  19. Are there any international font packages for perl/Tk? 
+  20. Are there any other ways to create X interfaces from perl? 
+  21. Where can I get more information on graphics modules? 
+  22. Are there any major applications written in perl/Tk? 
+  23. What is the history of pTk and perl/Tk? 
+  24. What can we expect the future to hold? 
+  25. How do I obtain the latest version of this FAQ? 
+  26. Acknowledgements & maintainer. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 1. What is perl/Tk? 
+ 
+ Perl/Tk (also known as pTk or ptk) is a collection of modules and code that attempts
+ to wed the easily configured Tk 4 widget toolkit to the powerful lexigraphic, dynamic
+ memory, I/O, and object-oriented capabilities of Perl 5. In other words, it is an
+ interpreted scripting language for making widgets and programs with Graphical User
+ Interfaces (GUI). (Examples of widget programs [not necessarily written in perl/Tk]
+ include xterm, xclock, most web-browsers, etc.. They are programs with "GUI"
+ interfaces of one sort or another and are subject to the effects of your window
+ manager.) 
+ 
+ Perl/Tk is based on "Tk 4.0p3" the widget Toolkit originally associated with the Tcl (
+ ======================================================================================
+ Tool command language) scripting language. However, Perl/Tk does not require any
+ of the lexical features/idiosynchrocies of Tcl. Perl/Tk uses perl 5 syntax, grammar,
+ and data structures. 
+ 
+ Like perl, wish, and even tclsh; perl/Tk is most easily used on a Unix computer
+ platform running X. Having said that, it is worth noting that things like Linux and
+ FreeBSD mean that the micro-computer hardware crowd too can have access to the
+ wonders of perl/Tk. Perl and Tcl/Tk have also been ported to non Unix operating
+ systems, there is no reason to suppose it cannot be done with the perl/Tk code
+ eventually as well. 
+ 
+ The perl/Tk package is still in beta phase and is being written primarily by Nick
+ Ing-Simmons <Nick.Ing-Simmons@tiuk.ti.com> at Texas Instruments in
+ Northampton, England. 
+ 
+ The pTk code proper is an externally callable Tk toolkit (i.e. a re-write of the Tk 4.0
+ code that allows easier external linking & calling, especially by perl). Ptk can then be
+ called from Perl 5 via the Tk.pm et al perl glue modules. Hence "ptk" does not
+ necessarily refer to Perl Tk but could be taken to mean portable Tk - given a glue
+ package to another language. The stated goal of the pTk code is to have its library
+ usable from perl, Tcl, LISP, C++, python, etc.. It just so happens that present work is
+ concentrating on perl. 
+ 
+ Historical note: "ptk" was known as "ntk" before about 11:30 EST 4 May 1995. 
+ 
+ The perl/Tk language is itself further extensible via the perl 5 module mechanism. A
+ number of composite widget extensions to the language have been written using perl
+ modules. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 2. What is the difference between perl/Tk and Tkperl? 
+ 
+ TkPerl was originally the name of a (now unsupported) perl 4 package that Malcolm
+ Beattie <mbeattie@sable.ox.ac.uk> at Oxford University called his code to wed the
+ Tk X toolkit with Perl. (He has referred to this code as a different "kettle of fish" from
+ perl/Tk.) 
+ 
+ Since that beginning Malcolm has also come up with a Tcl module for perl 5 that has
+ a Tcl::Tk module extension. That module allows the use of Tcl within a Perl script (
+ i.e. you must know both languages to get your widgets to work.) If you are interested in
+ that package instead, see the necessary kits for Malcolm Beattie's Tcl/Tk extensions
+ to Perl, which have been distrubuted as Tcl-b#.tar.gz and 
+ TclTk-b#.tar.gz files in the authors/id/MICB/ directory at CPAN sites
+ (locations given in a separate question in this FAQ). 
+ 
+ The name "tkperl" is sometimes applied to the "perl/Tk" or "ptk" package that is the
+ subject of this FAQ. Nick Ing-Simmons prefers "perl/Tk" as the name of the
+ package, with "pTk" or "ptk" as contractions of that name as well as referring to
+ something technically distinct: given the extensibility of the pTk code the "p" could
+ also be taken to mean 'portable' or 'pure' (not to be confused with either the Helsinki
+ University of Technology portTk, nor with Brian Warkentine's Rivet). In this
+ document the code of interest is either referred to as "perl/Tk", "pTk", or "ptk"
+ though the primary focus is on perl/Tk. 
+ 
+ Warning: do not attempt to install both perl/Tk and Tcl/Tkperl in the same perl
+ installation. The names in the respective modules overlap. In particular the Tcl::Tk
+ module is declared in a Tk.pm file - so a statement like: 
+ 
+     use Tk;
+ 
+ will probably confuse your perl. If you cannot live without either module then install
+ make & maintain separate perls for each and arrange your script writing accordingly
+ (this will not be easy). 
+ 
+ A more extensive comparison of the differences between the Tkperl and the perl/Tk
+ code is given in the Tcl-perl.pod file that is distributed with perl/Tk (see below
+ for locations). 
+ 
+ Lastly, it should be mentioned that if you build your Tk-b# statically rather than
+ dynamically it will make a new perl interpreter called tkperl (confusing isn't it?
+ :-). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 3. Where is it? 
+ 
+ Source code
+ -----------
+ 
+ Tk-b11.02 (the latest): you will need Perl 5.002, a recent MakeMaker and the 
+ =============================================================================
+ Tk-b11.02 kit. To obtain all of these (as well as several other modules that
+ sophisticated Tk programs now rely on) visit a CPAN ftp site. CPAN (the
+ Comprehensive Perl Archive Network) and what you need to get from it, is discussed
+ in fuller detail in the next question. 
+ 
+ (This question remains for historical reasons as well as to discuss things that have not
+ quite made it to CPAN.) 
+ 
+ The Tk-b# kits used to be available from 
+ 
+     ftp://ftp.wpi.edu/perl5/          130.215.24.209
+ 
+ [ However, visiting the CPAN sites (discussed in the next question) should provide
+ you with all that you need (including other perl modules).] 
+ 
+ Please note that if you will be attempting to build with the old Tk-b9.01 then you will
+ probably also want Nick's document patch to go with that older kit, it is available
+ from: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/ptkpod-b9.01.patch
+ 
+ To construct Perl 5.002 go to a CPAN site and pick up the full kit (it will have some
+ mysterious name like perl5.002.tar.gz or something). 
+ 
+ As of November 1995 Tk-b# (various versions) are being distributed at CPAN ftp
+ sites (see later question in this FAQ) in the authors/id/NI-S/ directory. 
+ 
+ Tk-b8: For this older version you must have Perl (5.001m) (not n) and the ptk kit.
+ The Tk-b8 kit is at CPAN sites, as well as from: 
+ 
+ USA 
+     ftp://ftp.wpi.edu/perl5/Tk-b8.tar.gz              130.215.24.209
+     ftp://ftp.perl.com/pub/perl/ext/tk/               199.45.129.30
+     http://www.freebsd.org/ports/programming.html (pick up "pTk-b8")
+     http://www.metronet.com/perlinfo/perl5/extensions/Tk-b8.tar.gz 
+ UK
+     ftp://ftp.ox.ac.uk/pub/perl/Tk-b8.tar.gz          163.1.2.4
+ Germany
+     ftp://franz.ww.tu-berlin.de/pub/authors/NI-S/Tk-b8.tar.gz 130.149.200.51
+ Australia (please be patient and only try during off hours)
+     ftp://ftp.syd.dit.csiro.au/pub/perl5/ftp.wpi.edu  130.155.20.5
+ 
+ Perl 5.001m is available from one of the CPAN ftp sites in the src/5.0/ directory
+ as file perl5.001m.tar.gz. 
+ 
+ Binaries
+ --------
+ 
+ A pre-compiled binary distribution of Perl5.001m with Tk-b8 for Linux is available
+ from: 
+ 
+ Australia (please be patient and only try during off hours)
+     ftp://syd.dit.csiro.au/pub/perl5/local/perl5.001m+Tk-b8-Linux-ELF.tar.gz
+ 
+ It unpacks into /usr/local. You need to have ELF running and to have the ELF
+ X11 libraries (please be patient and only try during off hours). 
+ 
+ Binaries for the Perl 5 & Tk-b6 are available for a number of UNIX platforms
+ courtesy of Thomas Schlagel and Alan Stange of Brookhaven Lab at: 
+ 
+ USA
+     http://pubweb.bnl.gov/~ptk/
+ 
+ Thomas and Alan have recently (winter 1995-1996) announced that they will update
+ the Tk module version number of the many binaries they distribute. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 4. What/Where is CPAN? 
+ 
+ "CPAN" = Comprehensive Perl Archive Network a worldwide collection of
+ anonymous ftp sites for Perl et al (not to be confused with CTAN which is for TeX).
+ The files of particular interest to a perl/Tk programmer include: 
+ 
+  o The latest Tk-b# release should be in the authors/id/NI-S/ directory at
+    any CPAN ftp site (listed below). 
+  o The latest official Perl release should be in the src/ directory in a file called 
+    latest.tar.gz at any CPAN ftp site (listed below). 
+  o If you need something older or newer than the latest supported release try the 
+    src/5.0/ directory (for perl5.002_*.tar.gz e.g.) at any CPAN ftp
+    site (listed below).
+    (Also, if you need something really new try the incoming/ directory at any
+    site listed below.) 
+  o Alan Scheinine's SelFile.pm is in the authors/id/ALSCH/ directory at
+    any CPAN ftp site (listed below). 
+  o Guy Decoux's BLT_Table geometry manager is in the 
+    authors/id/GUYDX/ directory at any CPAN ftp site (listed below). 
+  o Ilya Zakharevich's eText plug in replacement for the Text widget is in the 
+    authors/id/ILYAZ/etext/ directory at any CPAN ftp site (listed
+    below). 
+  o The latest version of MakeMaker (the perl equivalent to imake/xmkmf) is
+    available from the authors/id/ANDK/ directory at any CPAN ftp site
+    (listed below). 
+  o To run the ptknews script you will need Mail/RFC822.pm from the 
+    Mailtools module kit, available from the authors/id/GBARR/
+    directory at any CPAN ftp site (listed below). 
+  o The build of Tk-b10(++) requires URI::URL and HTML::Parse these are
+    part of the libwww-perl-*.tar.gz kit, available from the 
+    authors/id/GAAS/ directory at any site listed below. 
+    libwww-perl-*.tar.gz in turn requires NET-FTP-*.tar.gz,
+    available from the authors/id/GBARR/ directory at any CPAN ftp site
+    (listed below). 
+  o Assorted documentation is in the doc/ directory at any CPAN ftp site (listed
+    below). 
+  o Fairly up-to-date versions of all sorts of documentation (including this FAQ
+    in various formats) is in the doc/, directory tree (you may have to go down
+    one or more directories) at any CPAN ftp site (listed below). 
+  o Most things perl/Tk (exclusive of external documentation such as this FAQ)
+    are also linked to a modules/by-module/Tk/ directory at any CPAN ftp
+    site (listed below). 
+ 
+ Here are the 40 CPAN sites/directories (with dotted quads [IP numbers] given on the
+ right for those without name-servers): 
+ 
+ Updated: Thu May 16 01:13:37 EDT 1996 
+ 
+ Africa
+   South Africa     
+     ftp://ftp.is.co.za/programming/perl/CPAN/           196.4.160.8
+ Asia
+   Hong Kong        
+     ftp://ftp.hkstar.com/pub/CPAN/                      202.82.0.80
+   Japan            
+     ftp://ftp.lab.kdd.co.jp/lang/perl/CPAN/             192.26.91.3
+   Taiwan           
+     ftp://dongpo.math.ncu.edu.tw/perl/CPAN/             140.115.25.3
+ Australasia
+   Australia        
+     ftp://coombs.anu.edu.au/pub/perl/CPAN/              150.203.76.2
+     ftp://ftp.mame.mu.oz.au/pub/perl/CPAN/              128.250.209.2
+   New Zealand      
+     ftp://ftp.tekotago.ac.nz/pub/perl/CPAN/             202.49.6.24
+ Europe
+   Austria          
+     ftp://ftp.tuwien.ac.at/pub/languages/perl/CPAN/     128.130.66.11
+   Czech Republic   
+     ftp://sunsite.mff.cuni.cz/MIRRORS/ftp.funet.fi/pub/languages/perl/CPAN/  194.50.16.66
+   Denmark          
+     ftp://sunsite.auc.dk/pub/languages/perl/CPAN/       130.225.51.30
+   Finland          
+     ftp://ftp.funet.fi/pub/languages/perl/CPAN/         128.214.248.6
+   France           
+     ftp://ftp.ibp.fr/pub/perl/CPAN/                     132.227.77.2
+     ftp://ftp.pasteur.fr/pub/computing/unix/perl/CPAN/  157.99.64.12
+   Germany          
+     ftp://ftp.leo.org/pub/comp/programming/languages/perl/CPAN/  131.159.0.252
+     ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN/           134.147.32.42
+   Greece           
+     ftp://ftp.ntua.gr/pub/lang/perl/                    147.102.222.210
+   Hungary          
+     ftp://ftp.kfki.hu/pub/packages/perl/CPAN/           148.6.0.5
+   the Netherlands  
+     ftp://ftp.cs.ruu.nl/pub/PERL/CPAN/                  131.211.80.17
+   Poland           
+     ftp://ftp.pk.edu.pl/pub/lang/perl/CPAN/             149.156.132.152
+     ftp://sunsite.icm.edu.pl/pub/CPAN/                  148.81.209.2
+   Portugal         
+     ftp://ftp.ci.uminho.pt/pub/lang/perl/               193.136.16.247
+   Slovenia         
+     ftp://ftp.arnes.si/software/perl/CPAN/              193.2.1.72
+   Spain            
+     ftp://ftp.rediris.es/mirror/CPAN/                   130.206.1.2
+   Sweden           
+     ftp://ftp.sunet.se/pub/lang/perl/CPAN/              130.238.127.3
+   Switzerland      
+     ftp://ftp.switch.ch/mirror/CPAN/                    130.59.1.40
+   UK               
+     ftp://ftp.demon.co.uk/pub/mirrors/perl/CPAN/        158.152.1.44
+     ftp://sunsite.doc.ic.ac.uk/packages/CPAN/           146.169.17.5
+     ftp://unix.hensa.ac.uk/mirrors/perl-CPAN/           129.12.200.129
+ North America
+   British Columbia 
+     ftp://mango.pinc.com/pub/mirrors/CPAN/              204.174.113.53
+   California       
+     ftp://ftp.digital.com/pub/plan/perl/CPAN/           204.123.2.4
+     ftp://ftp.cdrom.com/pub/perl/CPAN/                  165.113.58.253
+   Colorado         
+     ftp://ftp.cs.colorado.edu/pub/perl/CPAN/            128.138.243.20
+   Florida          
+     ftp://ftp.cis.ufl.edu/pub/perl/CPAN/                128.227.162.34
+   Illinois         
+     ftp://uiarchive.cso.uiuc.edu/pub/lang/perl/CPAN/    128.174.5.14
+   Massachusetts    
+     ftp://ftp.iguide.com/pub/mirrors/packages/perl/CPAN/  206.15.105.99
+   Oklahoma         
+     ftp://ftp.uoknor.edu/mirrors/CPAN/                  129.15.2.40
+   Texas            
+     ftp://ftp.sedl.org/pub/mirrors/CPAN/                198.213.9.194
+     ftp://ftp.metronet.com/pub/perl/                    192.245.137.6
+     ftp://ftp.sterling.com/CPAN/                        198.4.58.3
+ South America
+   Chile            
+     ftp://sunsite.dcc.uchile.cl/pub/Lang/perl/CPAN/     146.83.4.11
+ 
+ For those equipped with multi-protocol browsers you might pay a visit to Tom
+ Christiansen's CPAN multiplexer whose relevant Tk URLs are: 
+ 
+     http://perl.com/cgi-bin/cpan_mod?module=Tk
+     http://perl.com/cgi-bin/cpan_mod?module=Tk&readme=1
+ 
+ According to Stephen P. Potter some of the CPAN sites have decompression on the
+ fly for people who do not have programs like gunzip. For example, at the ufl site
+ (Florida USA) type this into your ftp session to download a gunzipped version of Tk: 
+ 
+     ftp> get Tk-b11.02.tar.gz Tk-b11.02.tar
+ 
+ If you have the appropriate CPAN and FTP modules already installed you can
+ retrieve a module from CPAN and carry out a complete installation with a perl
+ one-liner like this: 
+ 
+     perl -MCPAN -e 'install "Tk"'
+ 
+ For more information on CPAN you can send e-mail to the CPAN administrators, 
+ <cpan-adm@ftp.funet.fi>. If you know of some Perl resources that seem not to be in
+ the CPAN (you did check the contents listings in indices/, didn't you?) please tell
+ the CPAN administrators. If you have some modules/scripts/documentation yourself
+ that you would like to contribute to CPAN, please read the file 
+ authors/00upload.howto and let the CPAN administrators know about it. 
+ 

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         pod2pdf
+version:      0.42
+version_from: lib/App/pod2pdf.pm
+installdirs:  site
+requires:
+    Getopt::ArgvFile:              0
+    PDF::API2:                     0.6
+    Pod::Escapes:                  0
+    Pod::ParseLink:                0
+    Pod::Parser:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

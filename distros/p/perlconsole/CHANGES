@@ -1,0 +1,21 @@
+2007-08-    Alexis Sukrieh <sukria@sukria.net>
+
+    * New release: 0.3
+    * use Module::Refresh before evaluating a line
+    * support for complex perl code (while, if, for, ...)
+    * History saved in ~/.perlconsole_history
+    * Support for a ~/.perlconsolerc (every line in that file 
+      will be evaluated at launch time)
+    * Added a real namespace to the console, each variable declared
+      with "my" are persistent in the session.
+    * The console runs in strict mode.
+
+2007-08-13  Alexis Sukrieh <sukria@sukria.net>
+
+    * New release: 0.2
+    * Support for output modes "yaml" and "Data::Dumper"
+    * Complete rewrite in Object Oriented way, more scalable.
+
+2007-08-10  Alexis Sukrieh <sukria@sukria.net>
+
+    * Initial release

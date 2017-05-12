@@ -1,0 +1,10 @@
+---
+test:
+  stat: [ '*.test' ]
+  tier: 
+    - [ 'nobody' ]
+    - [ 'nobody' ]
+  code: r.generic
+  freq: 15min
+  rate: 5min
+  esc: 2

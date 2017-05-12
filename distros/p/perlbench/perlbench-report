@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+
+BEGIN {
+    unshift(@INC, "lib") if -f "lib/PerlBench.pm";
+}
+
+use PerlBench qw(sec_f);
+use PerlBench::Results;
+use Getopt::Long qw(GetOptions);
+
+my $res = PerlBench::Results->new;
+
+if (0) {
+    for my $h ($res->hosts) {
+	print "$h\n";
+    }
+}
+
+if (1) {
+    for my $p ($res->perls) {
+	print "$p->{name}\n";
+	print "    \@$p->{host}\n";
+	for my $t (sort {$b->{med} <=> $a->{med}} @{$p->{t}}) {
+	    my($name) = split(' ', $t->{test});
+	    $name =~ s,^benchmarks/,,;
+	    $name =~ s,\.b$,,;
+	    printf "    %-35s %s\n", $name, sec_f($t->{med}, $t->{min} - $t->{med});
+	}
+    }
+}

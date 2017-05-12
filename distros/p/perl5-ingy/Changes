@@ -1,0 +1,41 @@
+0.13 Sat Aug 16 14:44:42 PDT 2014
+ - Change Meta email
+
+0.12 Sat Aug 16 11:58:07 PDT 2014
+ - Meta 0.0.2
+
+0.11 Fri Aug 15 20:30:35 PDT 2014
+ - Add t/000-require-modules.t
+
+0.10 Tue Aug  5 10:12:52 PDT 2014
+ - Add badges to doc
+
+0.09 Wed Jul 30 16:00:51 PDT 2014
+ - Fix Meta and add Contributing
+ - Switch IRC to
+
+0.08 Fri Jun 27 19:11:55 PDT 2014
+ - Switch to Zilla::Dist
+
+0.07 Wed Jul 27 11:12:32 CDT 2011
+ - Make module declare its dependencies
+
+0.06 Sun Jul 17 22:56:47 PDT 2011
+ - Use new perl5 API
+
+0.05 Mon Jun 13 12:16:03 EST 2011
+ - Make sure XXX shows up as dependency
+
+0.04 Sun Jun 12 13:45:31 EST 2011
+ - Switch to new perl5 API
+ - Remove Cwd File::Spec
+
+0.03 Sat Jun 11 16:35:24 EST 2011
+ - Added YAML::XS Cwd File::Spec Capture::Tiny XXX
+
+0.02 Tue Jun  7 17:21:37 EST 2011
+ - Rerelease now that perl5 is indexed.
+
+0.01 Sun Jun  5 23:33:31 EST 2011
+ - First Release
+

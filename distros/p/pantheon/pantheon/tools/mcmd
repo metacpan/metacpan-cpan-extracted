@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Hermes;
+use MIO::CMD;
+use Vulcan::OptConf;
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = -1;
+@Vulcan::OptConf::CONF = qw( pass_through );
+
+=head1 SYNOPSIS
+
+ $0 -r range [--timeout seconds] [--max number] [--noop] cmd ..
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->get( qw( range=s timeout=i max=i noop ) )->dump();
+
+$option->assert( 'range' );
+
+my $range = Hermes->new( $option->dump( 'range' ) );
+my %cmd = map { $_ => \@ARGV } $range->load( delete $o{range} )->list();
+
+my %result = MIO::CMD->new( %cmd )->run( %o );
+my %mesg;
+
+while ( my ( $io, $mesg ) = each %result )
+{
+    while ( my ( $mesg, $node ) = each %$mesg )
+    {
+        push @{ $mesg{$io} }, join ': ', $range->load( $node )->dump, $mesg;
+    }
+}
+
+for my $io ( sort keys %mesg )
+{
+    print "---\n$io:\n";
+    map { print "  $_" } @{ $mesg{$io} };
+}
+
+exit 0;

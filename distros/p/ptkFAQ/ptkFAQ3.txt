@@ -1,0 +1,1014 @@
+Archive-name: perl-faq/ptk-faq/part3
+Posting-Frequency: monthly
+Last-modified: Wed May 15 22:26:55 EDT 1996
+URL: http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+Version: 0.03
+
+URL (Hypertext-split): http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+URL (Plaintext): http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+Image-supplement: http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ftp-Archive: ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt
+ftp-Archive: ftp://ftp.wpi.edu/perl5/pTk-FAQ
+ftp-Archive: ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+e-mail-Archive: ptkfaq@pubweb.bnl.gov
+gopher-Archive: 128.84.219.153
+
+Perl/Tk FAQ part 3 of 5 - More Programming 
+****************************************** 
+
+
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10. How do I get a Canvas to ... ? 
+ 
+ The Canvas widget is the most configurable and versatile. With versatility comes
+ complication however, and it is certainly deserving of its own special section within
+ this FAQ... 
+ 
+ You might also see the examples in the widget demo especially the "canvas item
+ types" selection (which runs the items.pl demo script). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.1. Display a bitmap? 
+ 
+ Unlike other widgets the Canvas does not take the -bitmap configuration option.
+ One of the ways to place things - including bitmaps - onto a Canvas is to call 
+ create on it. To emphasize how a Canvas handles bitmaps differently from the
+ configurable widgets let me assume that you wanted to specify the 'hourglass' built in
+ bitmap in the following. (For more on xbm file specification see a previous question
+ [9.8] within this FAQ.) Here is a way to combine the Canvas; and create; calls: 
+ 
+     my($canvar) = $main->Canvas();
+     my($bittag) = $canvar->create('bitmap',10,10, -bitmap=>'hourglass');
+     $canvar->pack;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.2. Erase a display? 
+ 
+ To erase something like a bitmap call delete on the item. Assuming your Canvas
+ tag is $canvar and your item tag it $bittag (as in the previous [10.1] question)
+ then the call proceeds like: 
+ 
+     $canvar -> delete($bittag);
+ 
+ This is of course useful in a callback. For example to configure a Button to do your
+ deletion for you you could say something like: 
+ 
+     $main->Button(-text   => 'clear', 
+                   -command=>sub{$canvar -> delete($bittag)}
+                  )->pack;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.3. Display an Image? 
+ 
+ Just as for the other widget types there is a two step process of first getting a "Photo"
+ handle on the file of interest. For the Canvas (unlike the other widgets) one then
+ makes a call to create an image as in the following example where 'imggif' is
+ the Photo handle for a gif file that is distributed with Tk-b#: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+     my $canvar = $main ->Canvas;
+ 
+     $main->Photo('imggif', 
+                   -file => "$Tk::tk_library/demos/images/earth.gif");
+     $canvar->create(qw(image 5c 5c), '-image' => 'imggif');
+ 
+     $canvar->pack;
+     MainLoop;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.4. What things can be created on a Canvas? 
+ 
+ The following types can be used in $canvar->create calls: 
+ 
+     arc        sections of circle
+     bitmap     for X11 bitmap files/builtins
+     image      for Photo image types (gif, xpm...) 
+     line
+     oval       includes circles
+     polygon    may be -filled
+     text       similar to Text widget primitive
+     window     allows embeddding of other widgets
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.5. How do I use the Canvas as a geometry manager? 
+ 
+ In a call to create a window (or anything) on your Canvas you need to specify its
+ position - this is in part how a Canvas can be used as a geometry manager. e.g.: 
+ 
+     my($bittag) = $canvar->create('bitmap',10,10, -bitmap=>'hourglass');
+ 
+ Specifies the x=10, y=10 screen pixel location (from the upper left). Other possible
+ units are: 
+ 
+ 
+     tag  unit             example
+          pixels           25,50   # i.e. no unit tag at all
+     m    milliimeters     10c,20c
+     c    centimeters      1c,2c
+     p    points (1/72")   35p,70p
+ 
+ There can be a great deal more to it than just units, however. Note the following
+ question posed and answered by Eric J. Bohm. 
+ 
+     Eric J. Bohm <bohm@cs.buffalo.edu> wrote:
+     !I've got a row of entries packed side by side in a frame.  
+     !These frames are packed on top of each other.  
+     !So, when someone deletes a row, the lower ones bubble 
+     !up automatically.  This works just fine and dandy, and let me
+     !extend my thanks to our brave and energetic pTk team.
+     !
+     !The trick here is what widget do I put this in so that 
+     !it will be scrollable when I have too many rows to 
+     !fit on the screen?
+       [details and complaints]
+ 
+  Following up to my own message here. 
+ 
+  All right, after several false leads, I spent 3 hours fighting a canvas widget and
+  pounding my head against the canvas.html doc, until I finally understood how to
+  include my entries in a frame in a window in the canvas and get things to scroll
+  nicely. 
+ 
+  Turns out that the whole thing isn't all that hard to do once I understood how
+  canvas widgets work. 
+ 
+  Not sure if its of general interest, but here's the snippet, which was stolen from
+  the items demo inside the widget_lib and then brutally hacked. 
+ 
+  Perhaps a simpler demo would have been easier to use as a guide, but I got there
+  eventually, so my thanks for the widget demo.
+ 
+     #----------------------------------------
+     my $c = $w_frame->Canvas();
+     $c->configure(
+          -height       => '300',
+          -width        => '600',
+          -relief       => 'sunken',
+          -bd => 2,
+      );
+      my $w_frame_vscroll = $w_frame->Scrollbar(
+                                          -command => ['yview', $c]
+                                               );
+      my $w_frame_hscroll = $w_frame->Scrollbar(
+                                          -orient => 'horiz', 
+                                          -command => ['xview', $c]
+                                                );
+      $c->configure(-xscrollcommand => ['set', $w_frame_hscroll]);
+      $c->configure(-yscrollcommand => ['set', $w_frame_vscroll]);
+      $w_frame_hscroll->pack(-side => 'bottom', -fill => 'x');
+      $w_frame_vscroll->pack(-side => 'right', -fill => 'y');
+      $c->pack(-expand => 'yes', -fill => 'both',-side=>'top');
+      my $entryframe=$c->Frame;
+      my $c_win= create $c 'window','0','0',
+                           -window=>$entryframe,
+                           -anchor=>'nw';
+      #----------------------------------------
+ 
+  Where $c -> configure( -scrollregion => [$top, $left,
+  $right, $bottom]) can be used to size things nicely once you find out how
+  big it'll be. 
+ 
+  And the widgets you want scrolled should be slaves of $entryframe. 
+ 
+  Vastly more robust than anything I had running in the BLT Table. 
+ 
+  EJB 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.6. How do I get a Canvas to output PostScript(c)? 
+ 
+ Many thanks to Tom Oelke <tpo9617@rit.edu> for providing this question, answer
+ & snippet of code: 
+ 
+  The following section of code gets the postscript code for the section of canvas
+  that's top-left corner is at $min_x, $min_y, and has a width and height
+  equivalent to the displayed region. This ps code is then piped out to lpr to be
+  printed. 
+ 
+     my $ps = $canvas->postscript( '-x' => $min_x,
+                                   '-y' => $min_y,
+                                   -width => $canv->Width,
+                                  -height => $canv->Height);
+     open (PS, "| lpr"); # customize with -Pname e.g. 
+     print PS $ps;
+     close (PS);
+ 
+ Whereas you would use something like: 
+ 
+     open (PS, ">file.ps"); # to output to a file
+     print PS $ps;
+     close (PS);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.7. How do I get a PostScript(c) output of a Canvas w/ widgets? 
+ 
+ In general you don't. You can't do it in Tcl/Tk either (if that is any consolation). Nick
+ Ing-Simmons posted an explicit discussion of what is involved: 
+ 
+ 
+ Subj: RE: Canvases and postscript output
+ 
+ On Tue, 28 Nov 95 14:37:09 PST
+ Davis <morry@dsg.tandem.com> writes:
+ ! I have a canvas with text and some entry widgets that I want to create
+ !postscript from. I used the 
+ !widget->postscript( -file => 'ld.ps', -colormode  => 'gray');
+ !the file gets created but its empty. Is there some other options I need?
+ 
+  Core Tk cannot write postscript for embedded windows, the best it could do
+  would be to grab a Pixmap of the window as displayed. This is fine if the window
+  is visible, but if it is scrolled off screen or under another application there is no
+  pixmap. 
+ 
+  Only complete fix is to have a ->postscript method for every possible
+  widget which can render un-mapped widgets. This is non-trivial task. 
+ 
+ 
+ !Also I have a scrollbar for this canvas and when I scroll  the entry widget
+ !actually scroll part way out of the frame the canvas is in. Why does this
+ !happen and can I fix it? 
+ 
+  The Entry widgets need to be descendants of the canvas or they just get
+  clipped to their parent. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.8. How do I get the size of a Canvas? After a re-size? 
+ 
+     $canvas->cget(-width);
+ 
+ simply returns the size of the canvas when it was created, whereas 
+ 
+     $canvas->Width;
+ 
+ will get the answer even after a re-size. Substitute [Hh]eight for [Ww]idth in
+ the above if that is what you want. 
+ 
+ Nick Ing-Simmons points out that if you want to have your Canvas be able to grow
+ to arbitrarily large sizes be sure to specify the -expand or -fill options when you 
+ ->pack the Canvas. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.9. How do I bind different actions to different areas of the same Canvas? 
+ 
+ Kobayasi Hiroaki <kobayasi@sowa.is.uec.ac.jp> recently posted an extraordinary
+ little script that addresses this question quite succinctly: 
+ 
+  How about this?
+  ## I don't know whether this is a good solution or not.
+  ## but it works under Tk-b9 + perl5.002b1f.
+ 
+     
+     #!/usr/local/bin/perl -w
+     use Tk;
+     
+     ($c = MainWindow->new->Canvas)->
+        pack(-fill => 'both', -expand => 1);
+     # to survive under Tk-b8. 
+     # You don't need paren before pack in b9.
+     
+     ($pop1 = $c->Menu)->command(-label => "FOO");
+     ($pop2 = $c->Menu)->command(-label => "BAR");
+     
+     $c->create(oval => 0, 0, 100, 100, 
+                -fill => 'black', 
+                -tags => ['popup']);
+     
+     $c->Tk::bind($c, '<3>', [\&PopupOnlyThis, $pop1]);
+     $c->bind('popup', '<3>', [\&PopupOnlyThis, $pop2]);
+     
+     sub PopupOnlyThis {
+         print "@_\n";
+         my($c, $pop) = @_;
+     
+         # to prevent multiple popup.
+         Tk->break if defined $Tk::popup;
+     
+         my $e = $c->XEvent;
+         $pop->Popup($e->X, $e->Y);
+         # Tk::Menu::Popup sets $Tk::popup.
+     
+     }
+     MainLoop;
+     
+     $Tk::popup = undef; # to kill warning.
+     
+     __END__
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11. Common Problems. 
+ 
+ Everything in Tk-land is a reference. When defining callbacks take care to pass
+ variables by reference. Callbacks are closures and to ensure a variable gets its current
+ value, as opposed to its value when the callback is defined, pass by reference, e.g.: 
+ 
+     $frog = 123;
+     $b = $mw->Button(
+         -text    => 'Push Me',
+         -command => [
+             sub {
+                my($widget, $frog) = @ARG;
+                print STDERR "widget=$widget!\n";
+                print STDERR "frog=$$frog!\n";
+             }, $mw, \$frog,
+          ],
+     ); # end Button definition
+ 
+ If $frog is not passed by reference the print statement will always output "123"
+ (actually, the print as it exists will print nothing since it's trying to dereference 
+ $frog, which presumably is now not a reference). Note that by definition all perl/Tk
+ widgets are already references, since they're simply Perl objects, and that's why you
+ do not have to print $$widget! 
+ 
+ A good "reference" for handling references and dereferencing are the perlref(1)
+ and perlobj(1) man pages. A good "reference" for the various data types you will
+ encounter in this kind of perl programming is Tom Christiansen's Perl Data
+ Structures Cookbook which is now available as the perldsc(1) man page. 
+ 
+ Also beware the traps that befall perl4 programmers in making the move to perl 5.
+ References for this include the new perltrap(1) man page as well as William
+ Middleton's perl425 trap document at: 
+ 
+     http://www.perl.com/perl/all_about/perl425.html
+ or
+     http://w4.lns.cornell.edu/~pvhp/ptk/misc/perl425.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.1. What do the ->, => and :: symbols mean? 
+ 
+ The -> is the "infix dereference operator". In other words it is the means by which
+ one calls a sub with a pass by reference (among other things you can do with ->). As
+ stated above most things in calls to perl/Tk routines are passed by reference. The ->
+ is used in perl just as in C or C++. (Most of the widget primitives are elements of the 
+ Tk:: "perl class".) A simple example of dereferencing would be: 
+ 
+     $x = { def => bar };  # $x is a reference to an anon. hash
+     print $x->{def},"\n"; # prints ``bar''
+ 
+ Note that in the case of calling perl/Tk subs there may be more than one way to call
+ by reference. Compare 
+ 
+     my($top) = MainWindow->new;
+ 
+ with 
+ 
+     my($top) = new MainWindow;
+ 
+ But in general you will be making extensive use of calls like: 
+ 
+     $top -> Widge-type;
+ 
+ There is a clear and succint discussion of references, dereferences, and even closures
+ in man perlref(1) or see the perl 5 info page at: 
+ 
+     http://www.metronet.com/perlinfo/perl5.html
+ 
+ The use of the => operator is quite common in perl/Tk scripts. Quoting from man
+ perlop(1): 
+ 
+  The => digraph is simply a synonym for the comma operator. It's useful for
+  documenting arguments that come in pairs. 
+ 
+ You could say that => is used for aesthetic or organizational reasons. Note in the
+ following how hard it is to keep track of whether or not every -option has an 
+ argument: 
+ 
+     $query -> Button(-in,\$reply,-side,'left',-padx,2m,-pady,
+      2m,-ipadx,2m,-ipady,1m)->pack(-side,'bottom');
+ 
+ As opposed to: 
+ 
+     $query ->Button( -in => \$reply,
+                      -side => 'left',
+                      -padx => 2m,
+                      -pady => 2m,
+                      -ipadx => 2m,
+                      -ipady => 1m
+                     )->pack(-side => 'bottom');
+ 
+ By the way if you wanted the numeric "greater than or equal" you would use >= not =>.
+ 
+ While the :: symbol can be thought of as similar to the period in a C struct, it is
+ much more akin to the :: class scope operator in C++: 
+ 
+     a.b.c;       /* something in C */
+     a::b::c();   // function in C++ 
+     $a::b::c;    # a scalar in Perl 5
+     @a::b::c;    # a list in Perl 5
+     %a::b::c;    # an associative array or "hash" in Perl 5
+     &a::b::c;    # a function in Perl 5
+ 
+ It is also analogous to the single forward quotation mark in perl 4: 
+ 
+     $main'foo;   # a $foo scalar in perl 4
+     $main::foo;  # a $foo scalar in Perl 5
+ 
+ For backward compatibility perl 5 allows you to refer to $main'foo but 
+ $main::foo is recommended. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.2. What happened to the ampersands &? 
+ 
+ Perl 4 programmers especially may be surprised to find that as of Perl 5.0 the
+ ampersand & may be omitted in a call to a subroutine if the subroutine has been
+ declared before being used. Actually you can even get around the declare before omit
+ ampersand rule by using the subs.pm pragma, or by pre-declaring (without
+ defining) as in a script like: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+     sub Mysub;  #pre-declare allows calling Mysub()
+ 
+     ...Other main/Tk stuff - 
+             including call to Mysub() sans &...
+ 
+     sub Mysub {
+ 
+         ...Mysub stuff...
+ 
+     }
+ 
+ Note however that one place the \& reference is sometimes used in perl/Tk in the
+ setting up a callback for a widget. Other references are possible: e.g. \$foo is a
+ reference to the scalar variable $foo (this was true even under perl 4). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.3. What happened to the quotation marks? 
+ 
+ Perl 4 programmers especially may be surprised to find a serious dearth of quotation
+ marks around strings in perl 5 scripts such as in perl/Tk. The "rules have been
+ relaxed" somewhat for the use of quotation marks. Basically it is OK to leave them
+ out if the context of the string in question is unambiguous. However, it never hurts to
+ leave them in and may help readability. 
+ 
+ Here is Larry Wall's synopsis of the string situation: 
+ 
+ Newsgroups: 
+    comp.lang.perl.misc 
+ Subject: 
+    Re: To string or not to string... 
+ 
+ In article <4e49fv$j0u@panix3.panix.com>,
+ Andy Finkenstadt <genie@panix.com> wrote:
+ ! Back when I was learning perl (after receiving a review copy of
+ ! learning perl, and buying the real perl book, each from ORA),
+ ! I always got bit by when I needed to use "strings" and when
+ ! I could get away with bare_words within braces for associative
+ ! arrays.  (Yes, this is under 4.036 if it matters.)
+ ! 
+ ! the most typical example would be:
+ ! 
+ ! When must I use $assoc{"trailer"} and when can I get away with
+ ! $assoc{trailer}?   Similarly, $ENV{CONTENT_LENGTH} versus
+ ! $ENV{"CONTENT_LENGTH"}?  Unfortunately sometimes my strings
+ ! end up being numbers in their own right, i.e.:  $message{"0"}
+ ! or $msg=0; $message{$msg}.  Which is more appropriate,
+ ! which are merely stylistic, and which are stricly perl5
+ ! features now that I'm upgrading most of my installations
+ ! of perl.
+ 
+  Perl 4 let you use a "bareword" for a string if it had no other interpretation. It
+  would warn you under -w if you used a word consisting entirely of lower-case
+  characters, since such a word might gain an interpretation someday as a
+  keyword. 
+ 
+  Perl 5 still works the same way, but with several twists. 
+ 
+  1. ) Since you can now call predeclared subroutines as though they were builtins,
+    you have to worry about collisions with subroutine names too. However... 
+  2. ) You can completely disallow the default interpretation of barewords by
+    saying "use strict subs", which requires any such bareword to be a predeclared
+    subroutine. But... 
+  3. ) Overriding all that, Perl 5 (in recent versions) will FORCE string
+    interpretation of any bare identifier used where a single hash subscript is
+    expected, either within curlies or before a =>. (Those are the places you might
+    usually want the old barewords anyway.)
+ 
+  The upshot of these rules is that you can write Perl 5 with much less
+  punctuation than Perl 4, yet also with less ambiguity. If you so choose. 
+ 
+  Larry 
+ 
+ Tcl programmers should note that in Perl the single quotation marks '' act much as
+ the curly brace {} enclosure does in Tcl (no escaping special characters $@\ etc.).
+ Whereas the double quotation marks "" allow for substitution of $variables (the
+ rules are a little different between Tcl and Perl however). 
+ 
+ Note also that a frequently seen short hand in perl5/Tk scripts is the @list returned
+ by qw(): 
+ 
+     @list = qw(zoom schwartz bufigliano);
+ 
+ which is equivalent to: 
+ 
+     @list = split(' ','zoom schwartz bufigliano');
+ 
+ or more simply: 
+ 
+     @list = ('zoom','schwartz','bufigliano');
+ 
+ i.e. the qw/STRING/ @list is not equivalent to the quotation marks provided by 
+ q/STRING/, qq/STRING/, or qq(STRING)... 
+ 
+ There are, ironically enough, situations in perl/Tk where one needs to use quotation
+ marks as in the following by post by <a904209@pluto.tiuk.ti.com>: 
+ 
+ 
+  Paul Wickman wrote in article <4b4o0fINNlu8@CS.UTK.EDU>:
+ !
+ !    Why does the following statement work fine:
+ !
+ !$day->pack(-before => $year, -side => 'left');
+ !
+ !    But the below generates the given error:
+ !
+ !$day->pack(-after => $year, -side => 'left');
+ !
+ !Ambiguous use of after => resolved to "after" => at line 191.
+ !
+ 
+  Because there is a sub after in scope, probably imported from Tk via use
+  Tk;. 
+ 
+  There are two workrounds: 
+ 
+     use Tk qw(MainLoop exit ...); # just ones you use
+ 
+  or 
+ 
+     $day->pack('-after' => $year, -side => 'left');
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.4. Must I use "my" on all my variables? 
+ 
+ If you use strict; (as recommended) the answer is "probably". This confines the
+ variables names to your namespace - so your variable does not conflict with one in
+ the module(s) your are using (you are at the least useing Tk;). my does "lexical
+ scoping" on a variable rather than the "dynamic scoping" done by local (like auto
+ variables in C). The difference between these two is that the scope of my $var is
+ confined to the block (sub, if, foreach, etc.) in which it is declared and used, as
+ opposedto local $iable which can propogate to all blocks called by the block in
+ which it is declared. In general the confined scope of my $var means that its use
+ will proceed quicker and more efficiently than local $iable. 
+ 
+ If you give a fully qualified variable name such as 
+ 
+     $main::var = 1;  # No "my" needed
+ 
+ Then no my $var is needed. However, the lexical scoping of my $var makes it
+ preferable. 
+ 
+ If you choose to use my (as recommended) then beware that you should declare a
+ variable my only at the first use (instantiation) of a variable. Consider yet another
+ way to re-write the "Hello World!" script: 
+ 
+     #!/usr/local/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+     my $label = $main->Label(-text => 'Hello World!');
+     my $button = $main->Button(-text => 'Quit',
+                                -command => sub{exit});
+     $label->pack;  #no "my" necessary here
+     $button->pack; #or here
+     MainLoop;
+ 
+ Considering the finite number of names (in particular the high probability that a
+ variable named $label or $button was used in one or more of the extensions to perl
+ that you may be using) it helps one's programming to use strict; and declare
+ variables yours alone with my. 
+ 
+ James M. Stern points out that redundant my declarations are not simply useless they
+ can be dangerous as in the following script which will not work: 
+ 
+     #!/usr/local/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+     my $label = $main->Label(-text => 'Hello World!');
+     my $main;   #WRONG: this $main overrides previous
+     my $button = $main->Button(-text => 'Quit', #will now fail
+                                -command => sub{exit});
+     $label->pack;  
+     $button->pack; 
+     MainLoop;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.5. Is there a way to find out what is in my perl/Tk "PATH"? 
+ 
+ Presuming this question is asking for a little more than the answer you get when you
+ type: 
+ 
+     ls perl5/Tk/*.pm
+ 
+ there is a way to find out what gets EXPORTED by Tk.pm. Use a script like: 
+ 
+     #!/usr/bin/perl
+     
+     use Tk;
+     require 'dumpvar.pl';
+     
+     dumpvar('Tk');
+ 
+ or more succintly at the shell command prompt: 
+ 
+     perl -e 'use Tk; require "dumpvar.pl"; dumpvar("Tk");'
+ 
+ The advantage of using dumpvar over ls is that it gives you a brief summary of all
+ the arguments your widgets want. Note that the output is many lines and you may
+ wish to pipe through more or less. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.6. What is the difference between use and require? 
+ 
+ The short answer is that something like: 
+ 
+     use Tk;
+ 
+ is equivalent to: 
+ 
+     BEGIN { require "Tk.pm"; import Tk; }
+ 
+ Hence the essential difference is that a mere require Tk; does not achieve the 
+ import of function/method names. The significance of this is that it allows one to
+ call ->Button rather than having to call the fully qualified ->Tk::Button e.g..
+ For further details on this subject see man perlmod(1) or see Tom Christiansen's
+ document at: 
+ 
+     ftp://ftp.perl.com/perl/info/everything_to_know/use_vs_require
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.7. How do I change the cursor/color? 
+ 
+ Nick Ing-Simmons <nik@tiuk.ti.com> and others posted a series of answers to this
+ type of question. In summary what they said was: 
+ 
+  Basically 
+ 
+     $mw->configure(-cursor => ... );
+ 
+  Unless you use one of built-in cursors it gets messy. 
+ 
+  Here copy of what Tk/demos/color_editor does: 
+ 
+     #!/usr/local/bin/perl -w
+     use Tk;
+     my $mw = MainWindow->new;
+     $mw->configure(-cursor => ['@' . Tk->findINC('demos/images/cursor.xbm'), 
+                                     Tk->findINC('demos/images/cursor.mask'),
+                                      'red', 'green']);
+     MainLoop;
+ 
+  That says that argument to -cursor is a list of 4 things: 
+ 
+  1. . Pathname to bitmap with '@' prepended to say it isn't a built in name
+    (Using findINC to locate file relative to Tk install location.) 
+  2. . Pathname to mask bitmap (no @ required) 
+  3. . Foreground colour 
+  4. . Background colour 
+ 
+ 
+ ! I want to remap it for the MainWindow
+ ! and will be using a pixmap.
+ 
+  You won't be using a Pixmap with normal X11. X11 allows *bitmap* with
+  optional mask (another bitmap), and two colours. 
+ 
+  The optional nature of the mask means that a simple call with a list reference
+  like: 
+ 
+     $mw->configure(-cursor => ['watch', 'red', 'blue']);
+ 
+  should work alright. 
+ 
+ You may also obtain the value of the default cursor for a widget using something like 
+ ->optionGet. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.8. How do I ring the bell? 
+ 
+ The short answer is 
+ 
+    $widget -> bell;
+ 
+ A slightly longer answer might include a fully functioning script: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     $main = MainWindow -> new;
+     $butn = $main->Button(-text => 'bell')
+     $butn->configure(-command => sub{ $butn->bell; });
+     $butn->pack();
+     MainLoop;
+ 
+ An even longer answer would be a fully functioning script with a callback: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     $main = MainWindow -> new;
+     $but = $main->Button(-text => 'bell', 
+                          -command => sub{ringit($main)})->pack;
+     MainLoop;
+     
+     sub ringit { 
+         my $m = shift; 
+         $m->bell; 
+     }
+ 
+ Simon Galton <galtons@candu.aecl.ca> reminds us to be careful in that 
+ 
+  some systems remap this [the "console bell"] to anything from a digital sound to
+  a flash on the screen. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.9. How do I determine the version of perl/Tk that I am running? 
+ 
+ Version numbering has changed recently and determining the version of perl/Tk that
+ you are running now depends on what version you are running: 
+ 
+ Tk-b10++:
+ Tk-b10 (and higher) has changed to $Tk::VERSION rather than $Tk:Version
+ to be consistent with other packages. 
+ 
+ Tk-b9.01:
+ The version numbers as of Tk-b9.01 are stored in the following variables: 
+ 
+     Core Tk version : $Tk::version
+     Tk patchLevel :   $Tk::patchLevel
+     library :         $Tk::library
+     perl/Tk Version : $Tk::Version 
+ 
+ At your shell prompt you could say something like the following to determine you
+ perl/Tk Version: 
+ 
+     perl -e 'use Tk; print "$Tk::Version\n";'
+ 
+ The switch to Tk-b9.01 from previous versions included a large number of method
+ name changes. Nick was kind enough to include a b9names script in the distribution
+ that assists with the job of updating your older scripts. See the b9names script for a
+ rather complete discussion of the name changes. Geoffroy Ville also posted a notice
+ of some of the changes. Here is a brief (and very incomplete!) summary: 
+ 
+ 
+ older                         Tk-b9.01++
+ packslaves                    pack('slaves')
+ packpropagate                 pack('propagate')
+ packForget                    pack('forget')
+                               pack('info')
+ 
+ $w->delete if ($w);            $w->destroy if ($w);
+ 
+ Tk-b8(--):
+ A little script (Tk_module) can tell you and return the value: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     local(*Tk_m) = \$Tk::Tk_module;
+     print "$Tk_m\n";
+ 
+ Or more succintly say something like the following (at your shell prompt): 
+ 
+     perl -e 'use Tk; print "$Tk::Tk_module\n";'
+ 
+ You can obtain the version of Tk in use with the following (at your shell prompt): 
+ 
+     perl -e 'use Tk; print "$Tk::tk_version\n";'
+ 
+ where this command returned "4.0" when the previous one (or Tk_module) returned
+ "b8". 
+ 
+ All Tk versions:
+ Don't forget that you can always determine your Perl version/patchlevel/etc. with: 
+ 
+     perl -v
+ 
+ (at the shell prompt - it's actually a little harder to get as much information from
+ within a #!script.) As of perl 5.002 you can use perl -V to determine your perl 
+ Configuration. 
+ 
+ Ozawa Sakuro <ozawa@prince.pe.u-tokyo.ac.jp> points out some ways to do it in a
+ script: 
+ 
+  1. '$]' holds the version number. 
+  2. In Perl5, 'require NUMBER;' will complain if version is younger than
+    NUMBER. (e.g. require 5.001;) 
+  3. Of course, newly imported (and incompatible) features in newer scripts will
+    bailout before execution if parsed by an old interpreter. 
+ 
+ Note that if you use English; then $PERL_VERSION holds the version
+ number. 
+ 
+ To determine your MakeMaker version number try something like this (5.002): 
+ 
+     perl -MExtUtils::MakeMaker -e 'print "$ExtUtils::MakeMaker::VERSION\n";'
+ 
+ or this (5.001m ok): 
+ 
+     perl -e 'use ExtUtils::MakeMaker; print "$ExtUtils::MakeMaker::VERSION\n";'
+ 
+ or even this (older perls and MakeMakers): 
+ 
+     perl -e 'use ExtUtils::MakeMaker; print "$ExtUtils::MakeMaker::Version\n";'
+ 
+ Please note that thoughout this FAQ document there are references to things like 
+ =================================================================================
+ Tk-b10(++) or Tk-b10++ which roughly translated to use English; means
+ something like "I think this will work with this version of Tk and (masybe) higher
+ versions...". You might also see Tk-b8(--) which means something like "it worked
+ with that old version and probably worked with prior versions and if you are stuck
+ with an old Tk version you might have to do it this way...". 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.10. How do I call perl from C? 
+ 
+ You need to see a recent copy of the perlembed(1) pod page. By "recent" it needs
+ to be up to date with at least perl5.002. 
+ 
+ Borrowing from Jon Orwant's preamble to that document: 
+ 
+ Do you want to: 
+ 
+ Use C from Perl?
+    Read (at least) the perlcall(1), the perlapi(1), the perlxs(1), the 
+    perlxstut(1), and the perlguts(1) manpages.
+ Use C++ from Perl?
+    Recent changes to MakeMaker will make this easier. Be sure you are familiar
+    with the perlcall(1), the perlapi(1), the perlxs(1), the 
+    perlxstut(1), and the perlguts(1) manpages.
+ Use an executable program from Perl?
+    Read about backquotes ``, system(), and exec() built in perl functions.
+    Try reading the perlfunc(1) manpage.
+ Use Perl from Perl?
+    Read about do, eval, use and require. The perlfunc(1) manpage
+    discusses these. For complete scripts you may also make use of the backquotes ``,
+    system(), or exec() built in perl functions, but you may take a
+    performance hit in doing so (see perlfunc(1) for information).
+ Use C from C?
+    Rethink your design.
+ Use C++ from C++?
+    See previous.
+ Use Perl from C?
+    Read (at least) the perlembed(1) and the perlguts(1) manpages.
+ Use Perl from C++?
+    Read (at least) the perlembed(1) and the perlguts(1) manpages.
+ 
+ There is also an Doug MacEachern's <dougm@osf.org> embedder's development kit
+ on CPAN and at a URL of the following form: 
+ 
+     http://www.osf.org/~dougm/perl/Devel-embed-*.tar.gz
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.11. How do I call Tcl code from perl/Tk? 
+ 
+ In general you don't! The whole idea of perl/Tk is that you are programming in perl
+ not Tcl. To glean the possible advantages of doing this you might want to read the
+ opinions of Tom Christiansen (a definite perl proponent) at: 
+ 
+     ftp://mox.perl.com/pub/perl/versus/tcl
+ 
+ It is nevertheless worth noting that you might still have access to a complete Tcl
+ script from perl via the perl system, or `` (backtick), or even exec mechanisms.
+ Just be careful with I/O waits and return values if you try one of these approaches.
+ Further suggestions may be found in the various perlipc files at: 
+ 
+     ftp://ftp.perl.com/perl/info/everything_to_know/
+ 
+ A more satisfactory wish-like behavior can be embedded in perl by making
+ appropriate modifications to Dov Grobgeld's perl script that uses sockets for
+ perl<->wish communication: 
+ 
+ #!/usr/local/bin/perl
+ #####################################################################
+ #  An example of calling wish as a subshell under Perl and
+ #  interactively communicating with it through sockets.
+ #
+ #  The script is directly based on Gustaf Neumann's perlwafe script.
+ #
+ #  Dov Grobgeld dov@menora.weizmann.ac.il
+ #  1993-05-17
+ #####################################################################
+ 
+     $wishbin = "/usr/local/bin/wish";
+ 
+     die "socketpair unsuccessful: $!!\n" unless socketpair(W0,WISH,1,1,0);
+     if ($pid=fork) {
+             select(WISH); $| = 1;
+             select(STDOUT);
+ 
+         # Create some TCL procedures
+             print WISH 'proc echo {s} {puts stdout $s; flush stdout}',"\n";
+ 
+         # Create the widgets
+         print WISH <<TCL;
+         # This is a comment "inside" wish
+ 
+         frame .f -relief raised -border 1 -bg green
+         pack append . .f {top fill expand}
+ 
+         button .f.button-pressme -text "Press me" -command {
+             echo "That's nice."
+         }
+         button .f.button-quit -text quit -command {
+             echo "quit"
+         }
+         pack append .f .f.button-pressme {top fill expand} \\
+                        .f.button-quit {top expand}
+ TCL
+         # Here is the main loop which receives and sends commands
+         # to wish.
+         while (<WISH>) {
+             chop;
+             print "Wish sais: <$_>\n";
+             if (/^quit/) { print WISH "destroy .\n"; last; }
+         }
+             wait;
+     } elsif (defined $pid) {
+         open(STDOUT, ">&W0");
+         open(STDIN, ">&W0");
+         close(W0);
+         select(STDOUT); $| = 1;
+         exec "$wishbin --";
+     } else {
+         die "fork error: $!\n";
+     }
+ 
+ Ilya Zakharevich <ilya@math.ohio-state.edu> has a "ptcl.h" header file for the
+ construction of tcl bindings from pTk (there are limitations to this approach). It was
+ posted to the mailing list archive at: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.11/0057.html
+ 
+ If you absolutely must pass large amounts of pre-parsed data between Tcl and perl
+ then perhaps you should look into Malcolm Beattie's Tcl/Tk extensions to Perl
+ instead. Those modules are distrubuted at CPAN sites. As mentioned above running
+ Tcl/Tk/perl is incompatible with running perl/Tk. 
+ 

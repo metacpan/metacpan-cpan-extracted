@@ -1,0 +1,33 @@
+perfSONAR_PS::Services::LS README File
+============================================
+
+DESCRIPTION
+-----------
+
+The perfSONAR_PS::Services::LS module allows one to run a Lookup Service where
+services can register the data they contain.
+
+INSTALLATION
+------------
+
+ Prerequisites
+ -----------------
+    Oracle DB XML (http://www.oracle.com/technology/products/berkeley-db/xml/index.html)
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Services::LS'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2008, Internet2 and the University of Delaware
+
+All rights reserved.

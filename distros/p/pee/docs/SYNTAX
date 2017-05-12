@@ -1,0 +1,98 @@
+There are 4 types of tags:
+
+1. code blocks
+2. expression blocks
+3. pee directives
+4. comment blocks
+
+
+1. code blocks
+
+Code blocks are surrounded by the '<?' and '?>' delimiters.
+Between the delimiters, you may have ANY valid perl code.
+
+Example:
+
+<?
+$a = 1;
+$b = 4;
+$c = $a + $b;
+
+# '$c' can be used elsewhere in the page later
+?>
+
+
+
+2. expression block
+
+Expression blocks are snippets of perl expression that you wish to 
+print in-place.
+They are surrounded by the '<?=' and '?>' delimiters.
+Again, ANY valid perl expression can go into an expression block.
+Expression blocks don't have to end with a semicolon (';').
+
+
+
+Example:
+
+I have <?= $c ?> cats.
+Well, actually I had <?=$a?> at first, then I got another <?=$b?>.
+Altogether I have <?= $a + $b ?>.
+
+
+
+3. pee directives
+
+Pee directives are special purpose functions that are made available
+to the template designers to address certain needs.
+They are surrounded by the '<?!' and '?>' delimiters.
+
+Currently, there are only two directives, 'include' and 'sinclude'.
+This is provided to avoid duplicate code / text.
+You may use the 'include' directive to source in another file to be
+expanded in place.  It can be a normal text or HTML file (but you would
+be better off using the 'sinclude' directive for this), or another PET file.
+The 'include'd file will be interpreted just like a PET file, i.e.
+all PET syntax will be recognized.  You are expected not to create
+infinite loops with cyclical references.
+
+
+The 'sinclude' directive can be used to statically include a 
+text resource, like a static header or date_stamp, etc. into
+a PET file.  The file will not be compiled but simply inserted.
+
+Example:
+
+<html>
+<!-- include the HTML HEAD block -->
+<?!include html_head.pet?>
+<body>
+blah blah
+
+<!-- copyright don't change much, so we use 'sinclude' here -->
+<?!sinclude copyright.html?>
+</body>
+</html>
+
+
+4. comment block
+
+Pee comment blocks will be ignored by the page compiler.
+You may place any comment that you do not want to get generated
+between '<?--' and '?>'.
+
+This is analogous to the HTML comment '<!--' and '-->'.  While
+the HTML comments are not displayed in the browser, PEE comments
+are not even generated in the output from the server.
+
+example:
+
+<?--
+  This button is tied to the process_cc() routine
+?>
+<input type=submit>
+
+
+
+*** And of course, you can have any other text anywhere, inter-mixed
+with any of these directives.

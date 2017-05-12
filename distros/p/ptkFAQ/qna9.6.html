@@ -1,0 +1,69 @@
+<HTML>
+<HEAD><TITLE> 9.6. How do I bind the action of a slider (sic) to ... ?</TITLE></HEAD>
+<BODY><a name="A9.6"> 9.6. How do I bind the action of a slider (<i>sic</i>) to ... ?</a>
+
+<hr>
+</p><p>
+Technically speaking they are called <KBD>Scrollbar</KBD>s (not sliders) and one
+must <KBD>configure</KBD> the action of the desired widget to call the 
+<KBD>Scrollbar</KBD>s (<i>i.e.</i> <CODE>bind</CODE> is not involved here)
+<p>
+A common task using <KBD>Scrollbar</KBD>s is to <KBD>configure</KBD> things 
+like <KBD>Canvas</KBD>, <KBD>Listbox</KBD>, or a <KBD>Text</KBD> widgets to be 
+updated (change appearance) when the slider of the acompanying 
+<KBD>Scrollbar</KBD> is moved by the user.
+<p>
+As an example consider the code that sets up a twelve element <KBD>Listbox</KBD>
+and an accompanying vertical <KBD>Scrollbar</KBD>:
+<PRE>
+    my $main = new MainWindow;
+    my $box = $main-&gt;Listbox(-relief =&gt; 'sunken', 
+                             -width =&gt; -1, # Shrink to fit
+                             -height =&gt; 5,
+                             -setgrid =&gt; 'yes');
+    my @items = qw(One Two Three Four Five Six Seven
+                   Eight Nine Ten Eleven Twelve);
+    foreach (@items) {
+       $box-&gt;insert('end', $_);
+    }
+    my $scroll = $main-&gt;Scrollbar(-command =&gt; ['yview', $box]);
+</PRE>
+So far so good. But merely setting them up does not mean that the
+<KBD>Listbox</KBD> even knows that the <KBD>Scrollbar</KBD> is lying next to 
+it. Note that the scalar variable <CODE>$scroll</CODE> is how we
+refer to the <KBD>Scrollbar</KBD>, thus, hooking the <CODE>$box</CODE> up to 
+handle <CODE>$scroll</CODE> events is a matter of <KBD>configur</KBD>ation:
+<PRE> 
+    $box-&gt;configure(-yscrollcommand =&gt; ['set', $scroll]);
+</PRE> 
+A complete script that makes use of this code (and adds the necessary
+calls to <CODE>pack</CODE> and <CODE>MainLoop;</CODE>) is given as 
+the <a href="pod/ex4.pl">fifth example</a> in 
+<a href="pod/UserGuide.html">UserGuide.pod</a> (and may be 
+found at <a href="pod/">http://w4.lns.cornell.edu/~pvhp/ptk/pod/</a>.)
+<p>
+There was an old Perl/Tk tendency to have a bunch of <KBD>Scrl<i>Foo</i></KBD>
+widgets (such as <KBD>ScrlListbox</KBD>). The use of such widgets is now
+deprecated in favor of a new <KBD>Scrolled</KBD> class, as in:
+<PRE>
+    $w = $patent-&gt;Scrolled('Text',...);
+</PRE>
+The widgets that can be <KBD>-&gt;Scrolled()</KBD> include: 
+<UL>
+<LI><KBD>Canvas</KBD> <KBD>(::Axis)</KBD></LI>
+<LI><KBD>Entry</KBD></LI>
+<LI><KBD>Ghostview</KBD></LI>
+<LI><KBD>HList</KBD></LI>
+<LI><KBD>HTML</KBD> <KBD>(::Web)</KBD></LI>
+<LI><KBD>Listbox</KBD></LI>
+<LI><KBD>Pod</KBD></LI>
+<LI><KBD>Text</KBD> <KBD>(::ROText)</KBD> <KBD>(::TextUndo)</KBD></LI>
+<LI><KBD>Tiler</KBD></LI>
+</UL>
+
+
+<hr>
+	<p><a href="qna9.5.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.6">table of contents</a> | <a href="qna9.7.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

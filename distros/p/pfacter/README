@@ -1,0 +1,4 @@
+pfacter is a collection of perl scripts used to collect and display facts
+about an operating system.  It is freely distributable under the terms of
+the GNU General Public License.
+

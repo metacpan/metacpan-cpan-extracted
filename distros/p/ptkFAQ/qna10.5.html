@@ -1,0 +1,94 @@
+<HTML>
+<HEAD><TITLE> 10.5. How do I use the Canvas as a geometry manager?</TITLE></HEAD>
+<BODY><a name="A10.5"> 10.5. How do I use the <KBD>Canvas</KBD> as a geometry manager?</a>
+
+<hr>
+</p><p>
+In a call to <KBD>create</KBD> a <KBD>window</KBD> (or anything) on your 
+<KBD>Canvas</KBD> you need to specify its position - this is in part how a 
+<KBD>Canvas</KBD> can be used as a geometry manager. <i>e.g.</i>:
+<pre>
+    my($bittag) = $canvar-&gt;create('bitmap',10,10, -bitmap=&gt;'hourglass');
+</pre>
+Specifies the x=10, y=10 screen pixel location (from the upper left). Other
+possible units are:
+<pre>
+<b>
+    tag  unit             example</b>
+         pixels           25,50   # i.e. no unit tag at all
+    m    milliimeters     10c,20c
+    c    centimeters      1c,2c
+    p    points (1/72")   35p,70p
+</pre>
+There can be a great deal more to it than just units, however. Note the
+following question posed and answered by Eric J. Bohm.
+<PRE>
+    Eric J. Bohm &lt;bohm@cs.buffalo.edu&gt; wrote:<i>
+    !I've got a row of entries packed side by side in a frame.  
+    !These frames are packed on top of each other.  
+    !So, when someone deletes a row, the lower ones bubble 
+    !up automatically.  This works just fine and dandy, and let me
+    !extend my thanks to our brave and energetic pTk team.
+    !
+    !The trick here is what widget do I put this in so that 
+    !it will be scrollable when I have too many rows to 
+    !fit on the screen?</i>
+      [details and complaints]
+</PRE><BLOCKQUOTE>
+Following up to my own message here.
+<p>
+All right, after several false leads, I spent 3 hours fighting a canvas
+widget and pounding my head against the canvas.html doc, until I finally
+understood how to include my entries in a frame in a window in the canvas
+and get things to scroll nicely. 
+<p>
+Turns out that the whole thing isn't all that hard to do once I understood
+how canvas widgets work.  
+<p>
+Not sure if its of general interest, but here's the snippet, which was
+stolen from the items demo inside the widget_lib and then brutally hacked.
+<p>
+Perhaps a simpler demo would have been easier to use as a guide, but I got
+there eventually, so my thanks for the widget demo.</BLOCKQUOTE><PRE>
+    #----------------------------------------
+    my $c = $w_frame-&gt;Canvas();
+    $c-&gt;configure(
+         -height       =&gt; '300',
+         -width        =&gt; '600',
+         -relief       =&gt; 'sunken',
+         -bd =&gt; 2,
+     );
+     my $w_frame_vscroll = $w_frame-&gt;Scrollbar(
+                                         -command =&gt; ['yview', $c]
+                                              );
+     my $w_frame_hscroll = $w_frame-&gt;Scrollbar(
+                                         -orient =&gt; 'horiz', 
+                                         -command =&gt; ['xview', $c]
+                                               );
+     $c-&gt;configure(-xscrollcommand =&gt; ['set', $w_frame_hscroll]);
+     $c-&gt;configure(-yscrollcommand =&gt; ['set', $w_frame_vscroll]);
+     $w_frame_hscroll-&gt;pack(-side =&gt; 'bottom', -fill =&gt; 'x');
+     $w_frame_vscroll-&gt;pack(-side =&gt; 'right', -fill =&gt; 'y');
+     $c-&gt;pack(-expand =&gt; 'yes', -fill =&gt; 'both',-side=&gt;'top');
+     my $entryframe=$c-&gt;Frame;
+     my $c_win= create $c 'window','0','0',
+                          -window=&gt;$entryframe,
+                          -anchor=&gt;'nw';
+     #----------------------------------------</PRE><BLOCKQUOTE>
+Where <kbd>$c -&gt; configure( -scrollregion =&gt; [$top, $left, 
+$right, $bottom])</kbd> can be used to size things nicely once 
+you find out how big it'll be.  
+<p>
+And the widgets you want scrolled should be slaves of <kbd>$entryframe</kbd>.
+<p>
+Vastly more robust than anything I had running in the BLT Table.
+<p>
+<I>EJB</I>
+</BLOCKQUOTE>
+
+
+<hr>
+	<p><a href="qna10.4.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.5">table of contents</a> | <a href="qna10.6.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

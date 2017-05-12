@@ -1,0 +1,562 @@
+2.13.2  Mon Jun  6 16:59:45 PDT 2016
+  Bug Fixes
+  * Prevent `perl5i -e` from segfaulting (Michael G Schwern) [github #269]
+  * Fix stat() and lstat() for Perl 5.24 (Slaven Rezic) [github #291]
+
+  Doc Changes
+  * Spelling fixes from Debian (gregor herrmann) [github #294]
+  * "siganture" typo fixes (mohawk2) [github #295]
+
+  Build Changes
+  * extra_compiler_flags are passed through when building the perl5i
+    executable (Michael G Schwern)
+
+  Other
+  * Kwalitee fixups (Nikolay Mishin) [github #289]
+  * Now testing against Perl 5.22 (viviparous) [github #292]
+  * Now using JSON::MaybeXS instead of JSON (Lee Johnson) [github #288]
+
+
+2.13.1  Thu Jan  1 20:14:59 PST 2015
+  Distribution Changes
+  * Upgrade utf8::all requirement to get consistent @ARGV behavior.
+  * The latest autodie is recommended for load time and memory usage
+    improvements. [github #284]
+
+  Bug Fixes
+  * Change how we import utf8::all so @ARGV is translated appropriately.
+    [github #279] (Paul Howarth)
+  * Update autobox to avoid segfaults during global destruction.
+    [github #283] [rt.cpan.org 71777] (Michael Schwern)
+
+
+2.13.0  Wed Jul 23 11:51:53 PDT 2014
+  New Features
+  * $scalar->path will return a Path::Tiny object using the contents
+    of $scalar.  Makes working with files much, much easier.
+    [github #229] [github #247] (Michael G Schwern)
+
+  Distribution Changes
+  * The project has moved to the evalEmpire organization to allow
+    broader project admin options. http://github.com/evalEmpire/perl5i
+    (Michael G Schwern)
+
+  Doc Changes
+  * Added a project rationale. [github #252] [github #226]
+    (Carlos Lima)
+
+  Bug Fixes
+  * Fixed a crash if the perl5i command line is fed a null byte.
+    [github #269] [github #273] (Reini Urban) (Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯)
+  * Stop using deprecated Hash::StoreIterator::eech().
+    [github #270] (Chad Granum)
+  * The methods() meta method now ignores subroutines declared with func().
+    [github #222] [github #253] (Carlos Lima)
+
+
+2.12.0  Mon Jun 10 18:09:31 PDT 2013
+  New Features
+  * Added the ability to skip loading certain features. [github #228]
+    (Michael G Schwern) (Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯)
+
+  Bug Fixes
+  * Quiet "smartmatch is experimental" warnings in 5.18. [github #261]
+    (Chuck Adams)
+
+  Doc Changes
+  * Document ->mo->as_yaml and ->mo->as_json [github #230] (Michael G. Schwern)
+  * Remove references to the defunct mailing list [github #235] (Michael G. Schwern)
+  * Add references to the wiki and Twitter [github #235] (Michael G. Schwern)
+
+  Test Fixes
+  * Test fixes for 5.18. [github #264] [github #262] (Chuck Adams) (Michael G Schwern)
+
+  Distribution Fixes
+  * Require a newer, safer version of Devel::Declare. [github #181] (Michael G Schwern)
+    (Ben Hengst)
+  * Forgot to explicitly depend on Hash::FieldHash. (Michael G Schwern)
+  * Upgrade Hash::StoredIterator to avoid 5.12, 5.14 and 5.18 failures.
+    (Michael G Schwern) (Chad Granum)
+
+
+2.11.2  Mon Mar 18 02:55:20 GMT 2013
+  Distribution Fixes
+  * perl5i::0 and perl5i::1 had internal packages outside the perl5i
+    package which caused CPAN permissions problems.  This has been
+    fixed. (Michael G. Schwern)
+
+
+2.11.1  Mon Mar 18 02:32:07 UTC 2013
+  Distribution Fixes
+  * Creating a new release with correct PAUSE permissions 
+    (Nóirín Plunkett)
+
+
+2.11.0  Mon Mar 18 02:24:20 UTC 2013
+  Bug Fixes
+  * %hash->each({...}) iterator now uses Hash::StoredIterator
+    to ensure that it's safe to nest calls to each(), and to use
+    keys() and values() inside each() (Chad Granum)
+
+  Test Fixes
+  * Added new test template (Michael G. Schwern)
+
+  New Features
+  * ->mo->as_yaml and ->mo->as_json now allow you to dump a
+    meta-object as yaml or json respectively [github #230] (Ben 
+    Hengst)
+
+  Misc
+  * Fixed examples in the documentation (Tom Legrady)
+
+
+2.10.0  Sat Jul  7 11:57:01 PDT 2012
+  Bug Fixes
+  * Upgraded autodie dependency to fix automatic utf8 open.
+    [github #220] [github #218]
+
+  Test Fixes
+  * Removed a use of Test::Exception, which we don't depend on.
+
+  New Features
+  * %hash = @array->as_hash; will turn all the values in @array to
+    keys in %hash. [github 172] (Prashan Dharmasena)
+  * @array->popn($n) and @array->shiftn() pop() and shift() multiple
+    elements off an array. [github 149] (Tanner Hobson)
+  * @array->pick($n) and @array->pick_one will pick random elements
+    out of an @array, like picking cards from a deck.
+    [github 145] (Prashan Dharmasena)
+  * The Carp 1.25 formatting change has been smoothed over using
+    Carp::Fix::1_25.
+
+
+2.9.1  Fri Nov 11 16:13:32 PST 2011
+  Bug Fixes
+  * @empty_array->foreach(\&callback) would do the callback() once
+    despite the array being empty. [github 211] (Andrew Parker)
+
+
+2.9.0  Sun Oct 23 00:47:24 PDT 2011
+  New Features
+  * %hash->each() is guaranteed to iterate through the entire hash.
+    [github 142]
+  * $string->is_module_name() checks if a string is a valid module name.
+
+  Doc Changes
+  * Document the very useful %hash->each( func ($k, $v) { ... } ).
+    [github 142]
+  * Add perl5ifaq entry: "How do I merge two hashes?"
+  * Add perl5ifaq entry: "How can I get the unique keys from multiple hashes?"
+  * Minor POD glitches and spelling fixes from Debian.
+    [rt.cpan.org 71253] [rt.cpan.org 71254]
+
+  Test Fixes
+  * Updated tests for new version of Child. (Chad Granum)
+
+  Bug Fixes
+  * Depend on the newest version of Child. (Chad Granum)
+
+  Security Fixes
+  * require() will now only require modules.  [github #204]
+
+
+2.8.0  Sat Sep 24 21:36:32 PDT 2011
+  Bug Fixes
+  * Depend on a newer, more reliable version of Devel::Declare.  Lets perl5i work
+    with Devel::REPL. [github 153]
+  * Depend on a newer indirect.pm to avoid leaks into eval on 5.10. [rt.cpan.org 64521]
+  * Quiet the overzealous "v-string in use/require non-portable" warning from
+    5.10.0. [github 174]
+
+  New Features
+  * Added a list() keyword to force list context.  Compliments scalar().
+    [github #169] (Mike Doherty)
+  * `strict vars` is now off for perl5i one-liners. [github #63] (Mike Doherty)
+  * alias() will no longer issue "subroutine redefined" warnings.
+    There was no way to make them honor "no warnings 'redefine'". [github #185]
+    (Mike Doherty)
+  * -Mperl5i now means -Mperl5i::latest rather than spitting at you.
+    [github #193] (Mike Doherty)
+  * $string->reverse now always reverses $string regardless of context.
+    [github #182]
+
+  Doc Changes
+  * Removed unnecessarily detailed docs about Child.
+
+  Misc
+  * Delegate Unicode stuff to utf8::all. [github #190]
+  * checksum() now using the core Digest::SHA module instead of
+    Digest::SHA1. [github #196] (Mike Doherty)
+
+
+2.6.1  Thu, 24 Mar 2011 16:33:39 +1100
+  Bug Fixes
+  * methods() can handle modules like Fcntl with weird things in their
+    symbol tables. [github 184]
+
+  Test Fixes
+  * Work around broken Test::Output 0.16_03 alpha that CPAN testers
+    are using.  See https://rt.cpan.org/Ticket/Display.html?id=66172
+
+
+2.6.0  Thu, 24 Feb 2011 11:23:25 +1100 
+  New Features
+  * Added capture(), from Capture::Tiny, to capture output to STDOUT and
+    STDERR [github 178]
+
+  New Docs
+  * Added perl5ifaq entries for capturing output from a command using
+    capture()
+
+  Bug Fixes
+  * perl5i will no longer double encode @ARGV if it's loaded multiple times.
+    [github 176]
+
+  Windows Fixes
+  * Fix t/center.t (Myf White)
+  * Fix t/command_line_wrapper.t (Myf White)
+
+  Misc
+  * The dependency on true.pm will no longer confuse some YAML parsers.
+
+
+2.5.1  Fri, 28 Jan 2011 11:01:33 +1000
+  Misc
+  * Fix the META.yml file so the requirement on "true" is not
+    interpreted as a boolean by YAML::XS. [github 173]
+
+
+2.5.0  Mon, 24 Jan 2011 11:03:38 +1000
+  Doc Fixes
+  * Update the Artistic License link to one that works. (Schwern)
+
+  New Features
+  * Added $class->mc->symbol_table to get a class's symbol table (Schwern)
+  * Added $obj->mo->methods to get the methods available to an object (Schwern)
+    [github 170]
+
+
+2.4.1  Wed Nov 24 16:35:39 EST 2010
+  Bug Fixes
+  * The lexical nature of the improved error message was implemented
+    wrong and caused it to leak out or not work. [github 99] (Schwern)
+
+
+2.4.0  Fri Aug 27 19:18:45 PDT 2010
+  New Features
+  * You no longer have to put a true value at the end of a module.
+    Thanks to chocolateboy's true.pm!
+
+  Bug Fixes
+  * Bumped the dependency on indirect.pm to avoid a seg fault in
+    @{[ $x->$y ]} when $x and $y are undefined. [github 164]
+    Thanks to Tokuhiro Matsuno and Vincent Pit.
+  * The improved error message for failing to load a module is now
+    a lexical feature.  This prevents it messing up things that
+    parse that error message, like base.pm.  This makes perl5i
+    play nice with Class::DBI amongst a lot of other things.
+    [github 165] (Chad)
+
+
+2.3.1  Fri Jul 30 18:14:38 PDT 2010
+  No changes from 2.3.0_03.
+
+
+2.3.0_03  Wed Jul 28 20:32:36 PDT 2010
+  Incompatible Changes (only with this alpha series)
+  * Signature->num_params is now Signature->num_positional_params because
+    we'll add named params eventually and you generally only care about
+    how many positional params a function takes. (Schwern)
+  * Remove ngrep, nmap and nfor.  Replaced by @array->foreach( def($x,$y) ) {}
+    and @array->map( def($x) {} );
+  * def has been removed.  Consensus is emerging for func.
+
+  New Features
+  * Added child() to make forking easier. [github 150] (Chad)
+  * @array->foreach now takes a function with variable arguments and DWIM
+  * $number->is_even and is_odd [github 143] (Eric A. Zarko)
+
+  Bug Fixes
+  * Anonymous functions were getting a new signature each time they're
+    declared even though its the same code reference. (Schwern)
+
+
+2.3.0_02  Thu Jul 15 19:13:22 PDT 2010
+  New Features
+  * Signature introspection, via $code->signature, for subroutines defined
+    with C<def>, C<func> and C<method>.
+
+  Documentation
+  * Anonymous methods and functions (they always worked)
+
+
+2.3.0_01  Mon Jul 12 16:15:05 PDT 2010
+  New Features
+  * ngrep and nmap are like grep and map but you can name the $_ variable.
+    (Chad) [github 36]
+  * nfor is like for but you can specify it to loop over any number of
+    elements at a time. (Chad) [github 40]
+  * "method" declares a method and does the "my $self = shift" for you.
+    (Schwern) [github 19]
+  * "def" and "func" provide basic subroutine signatures. (Schwern)
+    [github 19]
+  * The error message upon not being able to load a module has been
+    improved for human readability. (Chad) [github 99]
+
+  Test Fixes
+  * Clean up dangling temp files. (Avar) [github 139]
+
+
+2.2.2  Mon May 17 16:34:52 PDT 2010
+  Bug Fixes
+  * Let perl5i::1 load without Time::y2038 if Perl is already y2038 safe
+    just like perl5i::2 does.
+
+  Test Fixes
+  * Possible failure of t/command_line_wrapper.t if perl5i isn't
+    already installed.
+
+
+2.2.1  Sun May 16 22:52:01 PDT 2010
+  Bug Fixes
+  * Greatly reduced the amount of clashes when loading perl5i::1 and
+    perl5i::2.
+  * Make meta objects on read only strings and numbers work with
+    non-threaded perls. [github 131]
+  * Bumped to a version of indirect which does not leak out of scope.
+    [rt.cpan.org 50570]
+
+
+2.2.0  Sun May  9 13:22:56 PDT 2010
+  New Features
+  * $thing->mo->is_tainted, along with untaint and taint, are now callable
+    on everything to provide a unified interface. [github 89]
+  * Added $number->commify and $number->group_digits to turn 1000 into 1,000.
+    [github 128]
+  * Added $obj->mo->id, a universal unique object identifier.
+
+  Deprecation Warnings
+  * $thing->is_tainted, untaint and taint will be removed in v3.
+    Please use $thing->mo->is_tainted and friends. [github 89]
+
+  Bug Fixes
+  * $class->can($method) now works as it should (previously autoboxing
+    would interfere). [github 112]
+
+
+2.1.1  Tue Apr 27 21:34:04 PDT 2010
+  Fixes
+  * Upgrade dependency on autovivification so Regexp::Common works
+    with perl5i. [github 32]
+
+
+2.1.0  Fri Apr 16 12:15:10 EEST 2010
+  New Features
+  * trim, ltrim and rtrim now work on arrays.  [github 121] (Nick Patch)
+
+  Fixes
+  * Quiet a warning in DateTime.pm on systems where gmtime() returns
+    undef for out of bound times (mostly Windows).
+  * Fix the perl5i command line tool on stock OS X 5.10.0 [github 116]
+  * Fix perl5i.bat on Windows.
+  * perl5i can load after List::MoreUtils (and thus things like Moose)
+    [github 127]
+  * Fix is_integer() and is_decimal() for things like 1.0 and 1.
+    [github 123]
+  * Fix rounding of negative numbers. [github 118]
+
+  Test Fixes
+  * Quiet the autodie test on Windows [github 126]
+  * Fix the quoting of command_line_wrapper.t for Windows [github 126]
+
+
+2.0.3  Fri Mar 19 13:57:37 PDT 2010
+  Fixes
+  * Forgot to require B before using a B routine in the JSON dump.
+
+  Build Fixes
+  * Forgot to require Digest::SHA1 for checksum()
+
+  Test Fixes
+  * Removed use of Test::Exception which may have been causing the
+    "Bizarre copy of HASH" errors in 5.11.5.
+
+
+2.0.2  Wed Mar 17 12:21:00 PDT 2010
+  Build Fixes
+  * Ensure non META.yml savy CPAN shells see the configure_requires
+    for Module::Build.
+  * Forgot to require indirect.pm, JSON and YAML::Any
+
+  Test Fixes
+  * Don't run the v1 and v0 sanity tests unless Time::y2038 is installed.
+  * autobox 2.60 changed how isa() works and broke 42->isa("UNIVERSAL").
+    Will fix for real later.
+
+
+2.0.1  Wed Mar 17 11:10:54 PDT 2010
+  Fixes
+  * Quick fix to handle not always having Time::y2038.
+
+
+2.0.0  Tue Mar 16 23:34:22 PDT 2010
+  Incompatible Changes
+  * In general, methods which return a list return an array in
+    list context and an array ref in scalar context.  This enables
+    chaining of autoboxed methods.
+  * $module->load() is now $module->require() with simpler semantics.
+    [github 107] [schwern]
+  * Indirect object syntax (ie. $obj = new Class) is now a compile time
+    syntax error.
+  * $thing->mo now always returns a meta instance object.  This allows
+    the meta object to DWIM on plain strings which previously would be
+    treated as classes and return the meta class object.
+  * The guaranteed range of gm/localtime() has been reduced to avoid
+    depending on Time::y2038 if possible.
+  * $thing->perl is now $thing->mo->perl and works on everything.
+
+  New Features
+  * $thing->mo->is_equal($other) universal equality method. [brunov]
+  * $thing->mc has been added to always return a meta class object.
+    This allows disambiguation when $thing could be considered a
+    class name.
+  * new autoboxed methods: %hash->diff() and %hash->intersect() [brunov]
+  * Added $thing->mo->dump to dump objects in multiple formats
+    including YAML and JSON.
+
+  Fixes
+  * Update dep on autovivification to one that works on 5.11 [schwern]
+  * Update autobox::Core dep to clarify scalar vs list context returns.
+  * Fix taint test failing with Test::More 0.95_01. [schwern]
+  * Fix time compat test failing because of unknown time zones. [schwern]
+  * Time::y2038 is only required if the built in time functions
+    are not up to task. [schwern]
+
+  Optimizations
+  * Optimize @array->intersect() and @array->diff() when @array contains no refs.
+    [brunov]
+
+
+1.1.0  Tue Mar  2 19:09:49 PST 2010
+  New Features
+  * print() and say() now work on hashes, time(), localtime() and gmtime().
+  * $obj->mo->checksum will return a checksum for the contents of any object.
+  * Added $path->path2module and $module->module2path
+
+  Bugs
+  * alias() was still being exported.
+  * Work around DateTime::TimeZone not being able to determine the local
+    time zone on FreeBSD and possibly others.
+  * localtime() is less suseptable to the DateTime distant year DOS attack.
+
+  Docs
+  * Document that carp() and croak() are exported.
+
+
+1.0.0  Thu Feb 25 21:56:47 PST 2010
+  New Features
+  * @array->first() now takes a regex like @array->grep() [github 93] (brunov)
+  * All autoboxed objects now respond to is_number() and friends.  They
+    always return false. [github 100] (brunov)
+  * All applicable array and hash methods now return arrays in list context
+    and array refs in scalar context. (brunov)
+  * diff() now works on nested data structures and honors overloaded objects
+    (brunov)
+  * Add a basic $number->round() [github 95]
+  * Added @array->intersect() (brunov)
+
+  Docs
+  * Wrote perl5ifaq for all your frequently asked questions.
+  * Document the perl5i command line utility. [github 31]
+
+  Bug Fixes
+  * Ensure the DateTime objects coming from time(), gmtime() and localtime()
+    compare with eq and ==
+
+
+0.2.2  Fri Feb 19 14:56:36 PST 2010
+  Other
+  * Some modules got the wrong version.
+
+
+0.2.1  Fri Feb 19 04:23:58 PST 2010
+  Bug Fixes
+  * round_up() and round_down() didn't work
+
+
+0.2.0  Fri Feb 19 03:48:36 PST 2010
+  Incompatible Changes
+  * "use perl5i" no longer works.  You must instead "use perl5i::0" to
+    protect against future incompatibilities.  "use perl5i::latest" for
+    the adventurous.
+  * We no longer export rreturn() or lnoreturn() from Want.
+    This can wait if we tackle lvalue subroutines.
+  * load() is now a scalar method, so its $module->load not load($module)
+  * alias() is now an autoboxed method rather than a function.
+
+  New Features
+  * try/catch support via Try::Tiny (brunov)
+  * caller() now returns an object via Perl6::Caller (schwern, Timothy Totten)
+  * Everything has a Meta object (perl5i::Meta) accessable via $thing->mo
+  * Added meta object methods to handle tainting.
+    mo->is_tainted(), mo->taint(), mo->untaint().
+  * Added mo->reftype to get the bare reference type of anything.
+  * Added mo->class to get the class of anything.
+  * Added mo->ISA to return @ISA.
+  * Added mo->super to call a method in a super class.
+  * Added mo->linear_isa to get the object's inheritance path.
+  * Introduced perl5i::latest to use the latest version.
+  * Added %hash->flip() and %hash->merge() (brunov)
+  * @array->grep now takes a regex
+  * Select methods from List::MoreUtils added as ARRAY methods.
+    all, any, none, true, false, uniq, minmax, mesh.
+  * Added @array->diff() (brunov)
+  * "use utf8" is on by default.
+  * STDOUT, STDIN, STDERR and all opened filehandles have utf8 encoding on.
+  * @ARGV is encoded as UTF8
+  * Added methods to determine if a scalar is a number and what kind it
+    is.
+  * Added ceil()/floor() and round_up()/round_down() synonyms.
+
+  Docs
+  * Various POD fixes (chromatic, Richard Soderberg)
+  * Collected together the autoboxed methods
+
+  Other
+  * Look, a changes document!
+  * Added a patching policy.  See the PATCHING file.
+  * We have a mailing list now.  http://groups.google.com/group/perl5i
+
+
+0.1.0  Sat Jan 23 14:55:52 2010 -0800
+  * Return to CPAN after deleting 20090424
+  * New versioning scheme so we can declare incompatibilities, see
+    semver.org for details.  If you have perl5i installed you must
+    force an upgrade.
+  * Thanks to the Open Source Bridge perl5i Hackathon!
+
+  Incompatible Changes
+  * Switched to DateTime from Time::Piece
+
+  New Features
+  * List::Util now autoboxed (Chas)
+  * time() returns a DateTime object (schwern)
+  * Added alias() (schwern)
+  * Now y2038 safe (schwern)
+  * die always returns 255 regardless of $! or $? (Chas)
+  * Added a perl5i command line program (dap)
+  * Add $CWD for localized chdir'ing via File::chdir (schwern)
+  * Add $scalar->center() (chromatic, benh)
+  * Add $scalar->ltrim(), ->rtrim() and trim() (benh)
+  * Add $scalar->wrap() via Text::Wrap (brunov)
+  * Automatic "use English" (schwern)
+  * Automatic "use IO::Handle" so things like autoflush are available (schwern)
+  * Automatic "use Want" (Jeff Lavallee)
+  * Automatic "no autovivification" (schwern)
+
+  Bug Fixes
+  * stat() works in list context (schwern)
+
+
+20090424  Fri Apr 24 11:38:24 2009 -0700
+  * First release

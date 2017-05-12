@@ -1,0 +1,41 @@
+     .smver_1 { font-weight: bolder;   font: 11px Verdana, Geneva, Arial, Helvetica, sans-serif;   }
+     .smver_2 {font-weight: normal; font-family: Verdana, Times, serif; font-size:  12px }
+     .nblue {color: blue; font-style: normal; text-align: center}
+     .nred { color: red; font-weight: bolder; text-align: left; overflow: auto;}  
+     .snbld {font-weight: bold; font-family:   Verdana, serif; font-size: 70%}
+     .arn {font-family: Arial, serif;	font-style:normal}
+     .buttons {  font-family: Verdana, Geneva, Arial, Helvetica; font-size: 11px; font-weight: bolder;
+  		  background-color: #DCE5F2; 
+  		  color: #000000; 
+  		  margin-top: 3px;
+  		  margin-bottom: 3px;
+  		  margin-left: 3px;
+  		  margin-right: 3px;
+		  text-align: left}   
+      table { background-color: #F8F8FF;  color: #000000;   border: 1px solid #D7E5F2; border-collapse: collapse; } 
+      td {  border: 1px solid #D7E5F2; padding-left: 4px; }
+      .orange_tr  {color: orange; font-family: Verdana, Times, serif; font-style: normal; text-align: left ;font-size:  10px}
+      .blue_tr  {color: blue; font-family: Verdana, Times, serif; font-style: normal; text-align:  left;font-size:  10px}
+      .green_tr  {color: green;font-family: Verdana, Times, serif;  font-style: normal; text-align: left;font-size:  10px }
+      .lc_st{  font: 12px Verdana, Geneva, Arial, Helvetica, sans-serif; color: #000000;   } 
+     .fc_st { background-color: #F2F7FB; color: #000000;  text-align: left;  margin-right: 0px; padding-right: 0px; } 
+     .smlc_st {  font: 11px Verdana, Geneva, Arial, Helvetica, sans-serif;   color: #3670A7;  width: 100px; }
+     .smfc_st {  background-color: #F2F7FB;  color: #000000;  text-align: left; }   
+      .lc_st input {  width: 120px; font: 12px Verdana, Geneva, Arial, Helvetica, sans-serif; text-align: left;
+  		     background-color: #D7E5F2; color: #102132;   border: 1px solid #284279;  margin-right: 0px; } 
+      .smver_1 input {   font: 10px Verdana, Geneva, Arial, Helvetica, sans-serif; text-align: left;
+  		     background-color: #D7E5F2; color: #102132;   border: 1px solid #284279;  margin-right: 0px; } 
+      .fc_st  input { width: 150px; font: 10px Verdana, Geneva, Arial, Helvetica, sans-serif; text-align: left;
+  		     background-color: #D7E5F2; color: #102132;   border: 1px solid #284279;  margin-right: 0px; } 
+     .smfc_st input { width: 100px;  font: 10px Verdana, Geneva, Arial, Helvetica, sans-serif;
+  		      background-color: #D7E5F2; color: #102132;  border: 1px solid #284279; }
+     div#domain_table {float:left; width: 500px; margin-left:-100%;background:  #F8F8FF }
+     html,body{margin:0;padding:0}
+     div#domainPage {margin-left: 500px; border: 1px  solid #EEC;font-weight: normal; font-family: Verdana, Times, serif; font-size:  12px}
+     div#LastActionResult {  padding-left: 10px; border:1px solid #000; float: left; width:  490px;  background: #EEE;  color: red; font-weight: bolder; text-align: left; overflow: auto;}
+     div#wrapper {float: left; width: 100% }
+     h2 {height:40px;line-height:40px;margin:0; padding-left: 10px;background: #EEF;   } 
+     div#header h2{height:80px;line-height:80px;margin:0; padding-left: 10px;background: #EEE;}
+    
+     h3 {height:20px;line-height:20px;margin:0; padding-left: 20px;background: #EEF;font-size: 95% }
+     

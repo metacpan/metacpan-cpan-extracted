@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use Sys::Hostname;
+
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+our ( $OPS, @NTP ) = qw( ops ntp1 ntp2 );
+our ( $TRY, $CYCLE ) = ( 3, 3600 );
+
+Vulcan::Sudo->sudo();
+
+my %o = Vulcan::OptConf->load()->get( qw( daemon interval=i ) )->dump();
+
+my $conf = $o{conf};
+my $cycle = $o{interval} || $CYCLE;
+my $zone = Sys::Hostname::hostname; $zone =~ s/^([^\.]+\.){2}/.$OPS./;
+
+do
+{
+    my $conf = $conf ? eval { YAML::XS::LoadFile( $conf ) } || {} : {};
+    my $ntp = $conf->{$zone};
+
+    system '/etc/init.d/ntpd stop > /dev/null 2>&1';
+
+    for my $ntp ( $ntp ? @$ntp : map { $_ . $zone } @NTP )
+    {
+        map { last unless system "/usr/sbin/ntpdate $ntp" } 1 .. $TRY;
+        warn "Failed to sync with $ntp\n";
+    }
+
+} while $o{daemon} && sleep $cycle;
+
+exit 0;

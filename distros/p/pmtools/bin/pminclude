@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+# pminclude -- show the include path for modules (@INC)
+
+use strict;
+use warnings;
+
+our $VERSION = '2.0.0';
+
+BEGIN { $^W = 1 }
+
+for my $inc (@INC) {
+    print "$inc\n";
+} 
+
+__END__
+
+=head1 NAME
+
+pminclude - show the include path for modules (@INC)
+
+=head1 DESCRIPTION
+
+This is mostly here for people too lazy to type:
+
+    $ perl -V | tail
+
+=head1 EXAMPLES
+
+    $ pminclude
+    /etc/perl
+    /usr/local/lib/perl/5.14.2
+    /usr/local/share/perl/5.14.2
+    /usr/lib/perl5
+    /usr/share/perl5
+    /usr/lib/perl/5.14
+    /usr/share/perl/5.14
+    /usr/local/lib/site_perl
+
+
+=head1 SEE ALSO
+
+pmls(1), pmpath(1)
+
+=head1 AUTHORS and COPYRIGHTS
+
+Copyright (C) 2013-2014 Mark Leighton Fisher.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it
+under the terms of either:
+(a) the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+(b) the Perl "Artistic License".
+(This is the Perl 5 licensing scheme.)
+
+Please note this is a change from the
+original pmtools-1.00 (still available on CPAN),
+as pmtools-1.00 were licensed only under the
+Perl "Artistic License".

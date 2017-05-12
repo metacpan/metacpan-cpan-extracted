@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Vulcan::OptConf;
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = -1;
+@Vulcan::OptConf::CONF = qw( pass_through no_ignore_case );
+
+=head1 SYNOPSIS
+
+Execute a command in a loop; sleep between iterations; write command
+output to a file.
+
+$0 [--interval seconds] [--output file] command ..
+
+=cut
+my %o = Vulcan::OptConf
+    ->load()->set( interval => 1 )->get( qw( interval=i output=s ) )->dump();
+
+my $out = delete $o{output};
+my $clr = 'clear';
+
+if ( $out )
+{
+    my $tmp =  "$out.tmp";
+    $clr = "mv $tmp $out";
+    push @ARGV, '>', $tmp;
+}
+
+my $cmd = join ' ', @ARGV;
+
+for ( my $now; $now = time; )
+{
+    system $clr unless $out;
+    last if system $cmd;
+    system $clr if $out;
+
+    my $due = $o{interval} + $now - time;
+    sleep $due if $due > 0;
+}
+
+exit $?;

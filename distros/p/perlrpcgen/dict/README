@@ -1,0 +1,23 @@
+# $Id: README,v 1.1 1997/04/30 21:06:45 jake Exp $
+
+The 'dict' service provides a simple interface for storing and
+retrieving (key, value) pairs in a table. Dict.pl is the server
+implementation, and Dict.pm is a tied interface to the client
+calls. See 'perldoc Dict.pl' and 'perldoc Dict.pm' for details.
+
+Installation
+
+    1. Edit the Makefile and set PERL to the Perl binary you used to
+       build perlrpcgen.
+
+    2. make
+
+    3. make install
+
+    4. Run 'Dict/server/dict_svc Dict.pl' to start the server.
+
+    5. Edit example.pl: set the #! line to the Perl binary you used
+       to build perlrpcgen, and set the server name to the name of
+       your machine.
+
+    6. Run example.pl and see if everything worked.

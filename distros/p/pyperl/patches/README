@@ -1,0 +1,26 @@
+This directory contain various patches that you might want to apply
+before building the perl/python glue:
+
+perl-method-G_EVAL
+    This patch to perl-5.6.0 make sure that we can trap all
+    failures involving method calls.  This patch has been
+    accepted for official inclusion in upcoming perl-5.6.1
+    (change #6127).
+
+perl-vcroak-null
+    This patch to perl-5.6.0 make it possible to throw arbitrary
+    objects from XS code.  We use this in order to throw
+    Python::Err objects when perl call python and python throws
+    an exception.   This patch has been accepted for official
+    inclusion in upcoming perl-5.6.1 (change #6125).
+
+python-20-dynload-global
+    THIS PATCH SHOULD NOT BE NEEDED ANY MORE!!
+
+    This patch to python-2.0 is needed to be able to load
+    XS modules with the perl embedded in python.  It make sure
+    dynamic objects are loaded with the RTLD_GLOBAL flag, so
+    that names can be used to resolve objects loaded later.
+
+python-152-dynload-global
+    Same patch for Python-1.5.2

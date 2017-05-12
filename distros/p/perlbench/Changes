@@ -1,0 +1,79 @@
+2005-12-30   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.93 [235992]
+
+   Added script 'perlbench-runtests' which runs new style *.b
+   tests.
+   
+   Added stub script 'perlbench-report' which will grow into
+   something that nicely formats the 'perlbench-runtests' results.
+
+   The 'perlbench-timeit' script has grown some new options.
+
+
+
+2005-12-19   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.92
+
+   Added new timing framework in the PerlBench module.
+
+   Added script 'perlbench-timeit'.
+
+   Renamed 'bench' as 'perlbench-run'.
+
+   Moved old style benchmarks to the 'benchmarks' directory.
+
+
+
+2005-12-15   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.91
+
+   More text on the HTML index.  Use JavaScript popups.
+
+
+
+2005-12-14   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.90
+
+   Rescaled test that ran too long on my current machine.
+
+   Save result details in a directory with HTML index.
+
+
+
+1999-04-05   Gisle Aas <gisle@aas.no>
+
+   Release 0.07
+
+   OS/2 patches by Ilya Zakharevich <ilya@math.ohio-state.edu>
+
+   t/hash/set will not grow the hash as much.  Got out of memory
+   problems.
+
+
+
+1998-07-15   Gisle Aas <aas@sn.no>
+
+   Release 0.06
+
+   Makefile.PL: Define 'make test' target.
+
+   Make it easier to test uninstalled perls.  Patch by
+   <joshua.pritikin@db.com>.
+
+   Use the Time::HiRes module if available.
+
+
+
+1998-01-05   Gisle Aas <aas@sn.no>
+
+   Release 0.04
+
+
+
+1997-05-13   Gisle Aas <aas@sn.no>
+
+   Release 0.01

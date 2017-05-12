@@ -1,0 +1,29 @@
+Revision history for WebService-ReviewBoard
+
+0.1.2 Thu Oct 28 17:29:53 PDT 2010
+    - fixed $rr->submit_review_request, discard_review_request and publish
+
+0.1.1 Thu Jul 30 12:59:55 PDT 2009
+    - fix bug #41634: SSL reviewboard URLs not supported
+
+0.1.0 Thu Jul 30 09:46:17 PDT 2009
+    - not compatible with older versions.  upgrading will break existing code using this library 
+    - renamed WebService::ReviewBoard::Review to WebService::ReviewBoard::ReviewRequest
+    - ReviewRequest now inherits from WebService::ReviewBoard
+    - added $rr->get_ship_it_count()
+
+0.0.3 Mon Oct 13 11:54:53 PDT 2008
+    - added submit_review_request/discard_review_request
+    - added set_groups/get_groups
+    - modified the tests to discard the review requests that are temporary
+
+0.0.2 Sat Jun 14 11:49:57 PDT 2008
+    - made get_ua(), get_review_board_url() and api_post() public methods so they can be overridden
+    - WebService::ReviewBoard::Review constructors take a WebService::ReviewBoard object to get the UserAgent
+    - added WebService::ReviewBoard::Review->new(...) 
+    - moved WebService::ReviewBoard::create_review() to WebService::ReviewBoard::create( {...} ) (a constructor)
+    - added WebService::ReviewBoard::Review->fetch( { ... } ) (a constructor)
+    - added getters for all the fields in WS::RB::Review
+
+0.0.1  Wed Feb 27 11:02:32 PST 2008
+    - Initial release.

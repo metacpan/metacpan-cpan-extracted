@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+Poros proxy
+
+=cut
+use strict;
+use warnings;
+
+use Poros;
+use Vulcan::OptConf;
+
+$Vulcan::OptConf::THIS = 'poros';
+
+my %o = Vulcan::OptConf->load()->dump();
+Poros->new( $o{path} )->run();
+exit 0;

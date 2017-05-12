@@ -1,0 +1,515 @@
+<HTML>
+<HEAD>
+<BASE HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html">
+<TITLE>IMAGE supplement to comp.lang.perl.tk FAQ</TITLE>
+</HEAD><BODY>
+From: <A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A> (Peter Prymmer)<BR>
+Newsgroups: <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>,<A HREF="news:comp.answers">comp.answers</A>,<A HREF="news:news.answers">news.answers</A><BR>
+Subject: <A HREF="ptkFAQ.html">comp.lang.perl.tk FAQ</A> Image supplement<BR>
+Followup-To: comp.lang.perl.tk<BR>
+Summary: comp.lang.perl.tk Answers to Frequently Asked Questions with pictures.<BR>
+<BR>
+URL: <A HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html">
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html</A><BR>
+Version: DRAFT<BR>
+<BR>
+<BR>
+<H1>Image Supplement to the:<BR>
+    Perl/Tk FAQ</H1>
+<FORM METHOD="POST" ACTION="http://perl.com/cgi-bin/cpan_mod">
+<IMG SRC="img/T_pTk.gif" ALT="ntk-&gt;ptk">
+<INPUT NAME="module" VALUE="Tk" TYPE="HIDDEN">
+<INPUT TYPE="submit" VALUE="Download pTk now!">
+</FORM>
+<FORM METHOD="GET" ACTION="http://perl.com/cgi-bin/cpan_mod">
+<IMG SRC="img/Tk_icon.gif" ALT="Tk icon">
+<INPUT NAME="module" VALUE="Tk" TYPE="HIDDEN">
+<INPUT NAME="readme" VALUE="1" TYPE="HIDDEN">
+<INPUT TYPE="submit" VALUE="examine README file for pTk...">
+</FORM>
+<P>
+The Perl/Tk extension to Perl is the work of Nick Ing-Simmons
+<a href="mailto:nik@tiuk.ti.com">nik@tiuk.ti.com</a> whose copyright notice
+appears in the Tk-b11.01/COPYING file as follows:
+<pre>
+Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, with the exception
+of the files in the pTk sub-directory which have separate terms
+derived from those of the orignal Tk4.0 sources and/or Tix. 
+
+See pTk/<a href="misc/license.terms">license.terms</a> for details of this Tk license, 
+and pTk/<a href="misc/Tix.license">Tix.license</a> for the Tix license.
+
+</pre>
+<hr>
+<pre>
+<a href="#HELLO">Hello World!</a> | <a href="#PRIMITIVE">Widgets</a> | <a href="#COMPOSITES">Composites</a> | <a href="#BITMAPS">Tk Bitmaps</a> | <a href="#PIXMAPS">Pixmaps</a> | <a href="#PHOTOS">Photos</a> | <a href="#JPEG">Tk::JPEG</a>
+</pre>
+<hr>
+<HR>
+<h2><a name="HELLO">Hello World!</a></h2>
+Presented here in this section are XWD-&gt;GIF files (non-transparent GIF87 -
+amenable to all GUI browsers that I know of, and more respectful of my limited
+disk space :P) of the 
+<a href="pod/ex0.pl"><KBD>ex0.pl</KBD></a> script taken from 
+<a href="pod/UserGuide.html"><KBD>UserGuide.pod</KBD></a>:
+<PRE>
+    #!/usr/bin/perl5 -w
+    #
+    # A trivial one-window example is show below:
+    #
+
+    use strict;
+    use Tk; 
+    my $main = new MainWindow;
+    $main-&gt;Label(-text =&gt; 'Hello, world!')-&gt;pack;
+    $main-&gt;Button(-text =&gt; 'Quit',
+                  -command =&gt; sub{exit}
+                  )-&gt;pack;
+    MainLoop;
+</PRE>
+So here it is: <IMG ALIGN="TOP" SRC="img/Hello.gif" ALT="img/Hello.gif"><BR>
+Please note that in that image (as well as most of the rest on this page) I 
+have not included the window manager border because it's appearence depends on 
+your window manager.<BR>
+For example under <code><b>mwm</b></code> with green borders 
+ <KBD>ex0.pl</KBD> might look like this:
+<IMG ALIGN="TOP" SRC="img/Hello_mwm.gif" ALT="img/Hello_mwm.gif"><BR>
+Whereas under <code><b>tvtwm</b></code> with red borders it might look like 
+ this:
+<IMG ALIGN="TOP" SRC="img/Hello_tvtwm.gif" ALT="img/Hello_tvtwm.gif"><BR>
+
+<hr>
+<HR>
+<h2><a name="PRIMITIVE">Widget primitives</a></h2>
+One of the things that makes the Tk toolkit so useful and easy to use is the
+large number of configuration options and the reasonableness of all the 
+default values of those options.  This is especially valuable in an 
+interpreted language as the programmer is accustomed to quick turn around 
+times. The default values allow for a &quot;quick hack&quot; followed by a more 
+professional re-working later by specifying a few <KBD>-configuration =&gt;
+options</KBD> in already working code.
+<p>
+Presented here in this section are XWD-&gt;GIF files 
+to display the output of very basic perl/Tk scripts of
+the following form: 
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; <i>Widget</i>() -&gt; pack;
+    $MainLoop;
+</PRE>
+Since I do not know of anyone who has set their web-browser
+background color to yellow - it was chosen to highlight the widget over the
+<KBD>Toplevel</KBD> that is a part of <KBD>MainWindow</KBD> in a few of the 
+following images. In them I used: 
+<PRE>
+    $top -&gt; <i>Widget</i>(-background =&gt; 'yellow') -&gt; pack;
+</PRE>
+Where <KBD><i>Widget</i></KBD> may be any one of several widget primitives:
+<a href="#Button"><KBD>Button</KBD></a>, 
+<a href="#Radiobutton"><KBD>Radiobutton</KBD></a>, 
+<a href="#Checkbutton"><KBD>Checkbutton</KBD></a>, 
+<a href="#Listbox"><KBD>Listbox</KBD></a>, 
+<a href="#Scrollbar"><KBD>Scrollbar</KBD></a>, 
+<a href="#Entry"><KBD>Entry</KBD></a>, 
+<a href="#Text"><KBD>Text</KBD></a>, 
+<a href="#Canvas"><KBD>Canvas</KBD></a>, 
+<a href="#Frame"><KBD>Frame</KBD></a>, 
+<a href="#Toplevel"><KBD>Toplevel</KBD></a>, 
+<a href="#Scale"><KBD>Scale</KBD></a>, 
+<a href="#Menu"><KBD>Menu</KBD></a>, 
+<a href="#Menubutton"><KBD>Menubutton</KBD></a>
+
+<hr><h3><a name="Button" href="doc/button.htm">Button</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Button(-background =&gt; 'yellow') -&gt; pack;
+    $MainLoop;
+</PRE>
+ <img src="img/Button.gif" alt="img/Button.gif">
+
+<hr><h3><a name="Radiobutton" href="doc/radiobut.htm">Radiobutton</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Radiobutton() -&gt; pack;
+    $MainLoop;
+</PRE>
+Note that the default is selected:
+ <img src="img/Radiobutton.gif" alt="img/Radiobutton.gif">
+
+<hr><h3><a name="Checkbutton" href="doc/checkbut.htm">Checkbutton</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Checkbutton(-background =&gt; 'yellow') -&gt; pack;
+    $MainLoop;
+</PRE>
+Note that the default is unselected:
+ <img src="img/Checkbutton.gif" alt="img/Checkbutton.gif">
+
+<hr><h3><a name="Listbox" href="doc/listbox.htm">Listbox</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Listbox() -&gt; pack;
+    $MainLoop;
+</PRE>
+ <img src="img/Listbox.gif" alt="img/Listbox.gif">
+
+<hr><h3><a name="Scrollbar" href="doc/scrollbar.htm">Scrollbar</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Scrollbar() -&gt; pack;
+    $MainLoop;
+</PRE>
+Note that the default is small with a vertical orientation:
+ <img src="img/Scrollbar.gif" alt="img/Scrollbar.gif">
+
+<hr><h3><a name="Entry" href="doc/entry.htm">Entry</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Entry() -&gt; pack;
+    $MainLoop;
+</PRE>
+ <img src="img/Entry.gif" alt="img/Entry.gif">
+
+<hr><h3><a name="Text" href="doc/text.htm">Text</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Entry() -&gt; pack;
+    $MainLoop;
+</PRE>
+Note that the default size is pretty big:
+ <img src="img/Text.gif" alt="img/Text.gif">
+
+<hr><h3><a name="Canvas" href="doc/canvas.htm">Canvas</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Canvas() -&gt; pack;
+    $MainLoop;
+</PRE>
+ <img src="img/Canvas.gif" alt="img/Canvas.gif">
+
+<hr><h3><a name="Frame" href="doc/frame.htm">Frame</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Frame() -&gt; pack;
+    $MainLoop;
+</PRE>
+Note that the <KBD>Frame</KBD> is a container widget and unless it has
+something to contain or is given non-trivial <KBD>-height</KBD> and
+<KBD>-width</KBD> options it is barely visible at all:
+ <img src="img/Frame.gif" alt="img/Frame.gif">
+
+<hr><h3><a name="Toplevel" href="doc/toplevel.htm">Toplevel</a></h3>
+<KBD>Toplevel</KBD>s cannot be packed from a <KBD>MainWindow</KBD> (since 
+<KBD>MainWindow</KBD> &quot;is&quot; a <KBD>Toplevel</KBD>).
+ <!-- img src="img/Toplevel.gif" alt="img/Toplevel.gif" -->
+
+<hr><h3><a name="Scale" href="doc/scale.htm">Scale</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Scale() -&gt; pack;
+    $MainLoop;
+</PRE>
+Note that the default is that the scale runs from 0 to 100 from top to bottom
+in a vertical orientation:
+ <img ALIGN="TOP" src="img/Scale.gif" alt="img/Scale.gif">
+
+<hr><h3><a name="Menubutton" href="doc/menubutton.htm">Menubutton</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Menubutton() -&gt; pack;
+    $MainLoop;
+</PRE>
+ <img src="img/Menubutton.gif" alt="img/Menubutton.gif">
+
+<hr><h3><a name="Menu" href="doc/menu.htm">Menu</a></h3>
+<KBD>Menu</KBD>s cannot be packed from a <KBD>MainWindow</KBD>.
+ <!-- img src="img/Menu.gif" alt="img/Menu.gif" -->
+<P>
+Nevertheless, here is how the <KBD>menubar</KBD> sample script (in your Tk 
+build directory) might appear under <code><b>twm</b></code>:
+ <img ALIGN="TOP" src="img/menubar.gif" alt="img/menubar.gif">
+
+
+<hr>
+Remember also that a good introduction to these primitives and how they may 
+be used in conjunction
+with each other may be found in your <KBD>widget</KBD> demo script (also
+invoked with <kbd>make test</kbd>).
+<IMG SRC="img/widget.gif" ALT="img/widget.gif" ALIGN="TOP"><BR>
+Note that all the widget demos have a &quot;See Code&quot; button. To help 
+figure out what is happening in the script you may, when the
+window appears, edit the text and instrument the code with 
+<KBD>print</KBD> statements and then simply press the 
+&quot;Rerun Demo&quot; button.
+
+<hr>
+<hr>
+<h2><a name="COMPOSITES">Compounds|Composites</a></h2>
+In days gone by you could have visited the Perl/Tk Compound Widget page where 
+there were many cute screen
+captures (similar to this page only cuter). It <em>was</em> on the web at:
+<pre>
+    <a href="http://fxfx.com/kgr/compound/">http://fxfx.com/kgr/compound/</a>
+</pre>
+(farewell Perl/Tk compound widget page....)
+<p>
+You might also be interested in the Compound widgets in your own
+<kbd>Contrib</kbd> directory. Here are some recent <kbd>Contrib</kbd>
+documents:
+<pre>
+    <a href="Contrib/">http://w4.lns.cornell.edu/~pvhp/ptk/Contrib/</a>
+</pre>
+<hr><h3><a name="FileSelector">FileSelector</a></h3>
+At the Perl/Tk compound widget site there was a wonderful page dedicated to an 
+early version of the FileSelector.  It used to be at:
+<pre>
+    <a href="http://fxfx.com/kgr/compound/FileSelector/">http://fxfx.com/kgr/compound/FileSelector/</a>
+</pre>
+Through the generosity of Kevin Greer who maintained that page I have managed
+to recover the rather nice picture that he made of the early FileSelector:<BR>
+ <img src="img/FileSelector.gif" alt="img/FileSelector.gif">
+
+<hr><h3><a name="Dial" href="Contrib/Dial.html">Dial</a></h3>
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    use Tk::Dial;
+    my $top = MainWindow-&gt;new();
+    $top -&gt; Dial() -&gt; pack;
+    $MainLoop;
+</PRE>
+ <img src="img/Dial.gif" alt="img/Dial.gif">&lt;- up to 100 (default).
+
+<hr><h3><a name="3D.frame">3D effect with</a> <a href="doc/frame.htm">Frame</a>s</h3>
+Strictly speaking this is not really a compound or composite widget - but it
+does combine several widget primitives into a perl/Tk script. A
+question arose recently (December95|January96) about how to get 3D effects 
+with perl/Tk widgets. The
+answer &quot;use the <kbd>-borderwidth =&gt; <i>some number</i></kbd>
+argument&quot; (posted by a couple of folks) when incorporated into the 
+original test script:
+<PRE>
+    #!/usr/bin/perl -w
+
+    use Tk;
+
+    $mw = MainWindow-&gt;new();
+
+    $f = $mw-&gt;Frame( -relief =&gt; 'raised', -borderwidth =&gt; 2);
+    $f-&gt;pack( -side =&gt; 'top', -fill =&gt; 'both',
+           -padx =&gt; "0.4c", -pady =&gt; "0.4c");
+
+    $ff = $f-&gt;Frame( -relief =&gt; 'raised', -borderwidth =&gt; 2);
+    $ff-&gt;pack( -side =&gt; 'top', -fill =&gt; 'both',
+           -padx =&gt; "0.4c", -pady =&gt; "0.4c");
+
+    $fff = $ff-&gt;Frame( -relief =&gt; 'raised', -borderwidth =&gt; 2);
+    $fff-&gt;pack( -side =&gt; 'top', -fill =&gt; 'both',
+            -padx =&gt; "0.4c", -pady =&gt; "0.4c");
+    $fff-&gt;Label( -text =&gt; 'Raised frames')-&gt;pack();
+
+    $g = $mw-&gt;Frame( -relief =&gt; 'sunken', -borderwidth =&gt; 2);
+    $g-&gt;pack( -side =&gt; 'top', -fill =&gt; 'both', -expand =&gt; 1,
+          -padx =&gt; "0.4c", -pady =&gt; "0.4c");
+
+    $gg = $g-&gt;Frame( -relief =&gt; 'sunken', -borderwidth =&gt; 2);
+    $gg-&gt;pack( -side =&gt; 'top', -fill =&gt; 'both', -expand =&gt; 1,
+       -padx =&gt; "0.4c", -pady =&gt; "0.4c");
+
+    $ggg = $gg-&gt;Frame( -relief =&gt; 'sunken', -borderwidth =&gt; 2);
+    $ggg-&gt;pack( -side =&gt; 'top', -fill =&gt; 'both', -expand =&gt; 1,
+        -padx =&gt; "0.4c", -pady =&gt; "0.4c");
+    $ggg-&gt;Label( -text =&gt; 'Sunken frames')-&gt;pack();
+
+    MainLoop();
+</PRE>
+makes for a rather pretty effect:<BR>
+ <img src="img/3d.frame.gif" alt="img/3d.frame.gif">
+
+<hr>
+<hr>
+<h2><a name="BITMAPS">Tk bitmaps (builtin)</a></h2>
+This was taken directly from the bitmap display script
+<KBD>widget_lib/bitmaps.pl</KBD> that is ordinarily run as part
+of the <KBD>widget</KBD> demo:<BR>
+ <img src="img/Tk_bm.gif" alt="img/Tk_bm.gif">
+<hr><h3><a name="Bitmap">Bitmap</a></h3>
+Here is but a small segment of the code in <KBD>icon.pl</KBD> that gives a nice
+Checkbutton selected|de-selected affect through the use of the
+<KBD>Bitmap</KBD> perl/Tk function:
+<PRE>
+    #!/usr/bin/perl -w
+    # from icon.pl
+    sub icon_mini {
+        my $w = new MainWindow;
+
+        $w-&gt;Bitmap('flagup',
+            -file =&gt; "$tk_library/demos/images/flagup",
+            -maskfile =&gt; "$tk_library/demos/images/flagup",
+        );
+        $w-&gt;Bitmap('flagdown',
+            -file =&gt; "$tk_library/demos/images/flagdown",
+            -maskfile =&gt; "$tk_library/demos/images/flagdown",
+        );
+
+        my $w_frame_b1 = $w-&gt;Checkbutton(
+            -image            =&gt; 'flagdown',
+            -selectimage      =&gt; 'flagup',
+            -indicatoron      =&gt; 0,
+        );
+        $w_frame_b1-&gt;pack();
+    } # end icon
+    use Tk;
+    icon_mini();
+    MainLoop;
+</PRE>
+Here it is unselected:
+ <img src="img/mail_demo_flagdown.gif" alt="img/mail_demo_flagdown.gif">
+ and selected:
+ <img src="img/mail_demo_flagup.gif" alt="img/mail_demo_flagup.gif">
+
+<hr>
+<hr>
+<h2><a name="PIXMAPS">Pixmaps</a></h2>
+The perl/Tk <KBD>Pixmap()</KBD> function can be used to achieve an effect 
+similar to the <pre>wm iconbitmap @<i>file</i></pre> 
+in Tcl/Tk. Consider it's use in <KBD>iconwin</KBD>:
+<PRE>
+    #!/usr/bin/perl -w
+    BEGIN { unshift(@INC,'blib') }
+    use Tk;
+    $top = MainWindow-&gt;new();
+    $top-&gt;iconify;
+    $top-&gt;Icon(
+         '-image' =&gt; $top-&gt;Pixmap(
+                          '-file' =&gt; "Tk/demos/images/ned.xpm")
+               );
+    $top-&gt;after(3000, [ 'Icon', $top, '-background' =&gt; 'green' ]);
+    $top-&gt;iconify;
+    MainLoop();
+</pre>
+The <em>icon</em> generated by this script might appear under
+ <code><b>mwm</b></code> as:
+ <img src="img/pixicon_mwm.gif" alt="img/pixicon_mwm.gif" align="TOP"><br>
+under <code><b>twm</b></code> as:
+ <img src="img/pixicon_twm.gif" alt="img/pixicon_twm.gif" align="TOP"><br>
+and under <code><b>tvtwm</b></code> as:
+ <img src="img/pixicon_tvtwm.gif" alt="img/pixicon_tvtwm.gif" align="TOP"><br>
+
+
+<hr>
+<hr>
+<h2><a name="PHOTOS">Photos</a></h2>
+The perl/Tk <KBD>Photo()</KBD> function achieves an effect similar to the
+<KBD>Bitmap()</KBD> function discussed <a href="#BITMAPS">previously</a>.
+Namely, it returns a file descriptor to be used in a later <KBD>-image</KBD>
+configuration option to a widget.
+<p>
+As an example consider the <KBD>Label</KBD> widget that uses the
+<KBD>'imggif'</KBD> descriptor in the following:
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $main = new MainWindow;
+    $main -&gt; Photo('imggif', 
+             -file =&gt; "$Tk::tk_library/demos/images/earthris.gif");
+    my $c = $main-&gt;Label('-image' =&gt; 'imggif')-&gt;pack;
+    $main-&gt;Button(-text =&gt; 'exit',
+                  -command =&gt; sub{destroy $main}
+                  )-&gt;pack(-anchor =&gt; 'e');
+    MainLoop;
+</PRE>
+ <img src="img/photo_earthris.gif" alt="img/photo_earthris.gif">
+
+<hr>
+<hr>
+<h2><a name="JPEG">Tk::JPEG</a></h2>
+The JPEG.pm module for Tk was written by Nick Ing-Simmons to incorporate the
+IJG code. 
+It too returns a file handle to be used in a later <KBD>-image</KBD>
+configuration option to a widget.
+<p>
+Here our <KBD>Label</KBD> widget now uses the
+<KBD>$jpgimg</KBD> descriptor in the following:
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    require Tk::JPEG;
+    my $main = new MainWindow;
+    my $jpgimg = $main -&gt; Photo('-format' =&gt; 'jpeg'.
+                                 -file =&gt; "testimg.jpg");
+    my $c = $main-&gt;Label('-image' =&gt; $jpgimg)-&gt;pack;
+    MainLoop;
+</PRE>
+(This particular image is in GIF format to reach the widest possible graphic
+browser audience):<BR>
+ <img src="img/jpeg_testimg.gif" alt="img/jpeg_testimg.gif">
+
+<hr>
+<pre>
+<a href="#HELLO">Hello World!</a> | <a href="#PRIMITIVE">Widgets</a> | <a href="#COMPOSITES">Composites</a> | <a href="#BITMAPS">Tk Bitmaps</a> | <a href="#PIXMAPS">Pixmaps</a> | <a href="#PHOTOS">Photos</a> | <a href="#JPEG">Tk::JPEG</a>
+</pre>
+<HR>
+<ADDRESS>
+I am:<BR>
+<A HREF="http://w4.lns.cornell.edu/~pvhp/">Peter Prymmer</A><BR>
+<A HREF="http://w4.lns.cornell.edu/">Wilson Synchrotron Laboratory</A><BR>
+<A HREF="http://www.cornell.edu/">Cornell University</A><BR>
+<A HREF="http://www.ithaca.ny.us/">Ithaca</A>, 
+ <A HREF="http://wings.buffalo.edu/world/nywww.html">NY</A> 
+ <A HREF="http://www.mit.edu:8001/geo?Ithaca">14853</A><BR><BR>
+<A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A><BR>
+</ADDRESS>
+<p><A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A> -&gt; 
+ <A HREF="ptkFAQ.html">perl/Tk FAQ</A> -&gt; 
+ <A HREF="ptkTOC.html">Table of Contents</A> -&gt; 
+ <A HREF="ptkPORT.html">perl/Tk porting</A>
+
+</BODY>
+</HTML>
+
+
+
+
+

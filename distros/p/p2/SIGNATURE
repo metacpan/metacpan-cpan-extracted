@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d6a3a2e1e7b4f8947c85b244dfd44f13a280d1c8 Changes
+SHA1 698f31879e5e070e8046e2a4a32920e7683d3646 MANIFEST
+SHA1 ce6fe490d4f220cb398da10560a99f017409f74f META.json
+SHA1 9c79b9f323533a0082d42b5827ae19e40a16b6f0 META.yml
+SHA1 007a27ec1edd26b0096952c0ed54e3407f4007cc Makefile.PL
+SHA1 c35f64624907254a376f1da10eade0a6ce18997f README
+SHA1 592e6d54347c5c29993be87c4e2a39357bfbf4de p2.pm
+SHA1 69efffcf50fc63f3a62b59765dc81015b99907e8 t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (Darwin)
+
+iEYEARECAAYFAlE1f7EACgkQmm2SYo/9yUIbHgCdGYPeTuOvMSAJNtVpQjQC0y/n
+EXcAmgIGAm/uvur/agpMkSJIryWpiKJQ
+=IKCL
+-----END PGP SIGNATURE-----

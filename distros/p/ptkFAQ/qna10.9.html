@@ -1,0 +1,56 @@
+<HTML>
+<HEAD><TITLE> 10.9. How do I bind different actions to different areas of the same Canvas?</TITLE></HEAD>
+<BODY><a name="A10.9"> 10.9. How do I <KBD>bind</KBD> different actions to different areas of the same <KBD>Canvas</KBD>?</a>
+
+<hr>
+</p><p>
+Kobayasi Hiroaki &lt;kobayasi@sowa.is.uec.ac.jp&gt; recently posted an 
+extraordinary little script that addresses this question quite succinctly:
+<BLOCKQUOTE>
+How about this?<BR>
+## I don't know whether this is a good solution or not.<BR>
+## but it works under Tk-b9 + perl5.002b1f.<BR>
+</BLOCKQUOTE><PRE>    
+    #!/usr/local/bin/perl -w
+    use Tk;
+    
+    ($c = MainWindow-&gt;new-&gt;Canvas)-&gt;
+       pack(-fill =&gt; 'both', -expand =&gt; 1);
+    # to survive under Tk-b8. 
+    # You don't need paren before pack in b9.
+    
+    ($pop1 = $c-&gt;Menu)-&gt;command(-label =&gt; "FOO");
+    ($pop2 = $c-&gt;Menu)-&gt;command(-label =&gt; "BAR");
+    
+    $c-&gt;create(oval =&gt; 0, 0, 100, 100, 
+               -fill =&gt; 'black', 
+               -tags =&gt; ['popup']);
+    
+    $c-&gt;Tk::bind($c, '&lt;3&gt;', [\&amp;PopupOnlyThis, $pop1]);
+    $c-&gt;bind('popup', '&lt;3&gt;', [\&amp;PopupOnlyThis, $pop2]);
+    
+    sub PopupOnlyThis {
+        print "@_\n";
+        my($c, $pop) = @_;
+    
+        # to prevent multiple popup.
+        Tk-&gt;break if defined $Tk::popup;
+    
+        my $e = $c-&gt;XEvent;
+        $pop-&gt;Popup($e-&gt;X, $e-&gt;Y);
+        # Tk::Menu::Popup sets $Tk::popup.
+    
+    }
+    MainLoop;
+    
+    $Tk::popup = undef; # to kill warning.
+    
+    __END__
+</PRE>
+
+
+<hr>
+	<p><a href="qna10.8.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.9">table of contents</a> | <a href="qna11.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

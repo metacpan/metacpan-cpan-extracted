@@ -1,0 +1,115 @@
+#!/usr/local/bin/perl
+
+use Tk;                            # don't we all?
+my $pi = atan2(1,1)*4.0;           # an amusing transcendental number
+my $main = MainWindow -> new();    # the primal widget
+my ($width, $height );             # canvas geometry
+$width = $height = 100;            # change me if you don't like me
+
+my $x = int($width/2);
+my $y = int($height/2);
+my $r = int($x*0.8) >= int($y*0.8) ? int($x*0.8) : int($y*0.8);  # $radius
+my $c = $main -> Canvas('-width' => $width, '-height' => $height);
+$c -> create('oval', $x-$r, $y-$r, $x+$r, $y+$r, -width => 2);
+$c -> pack(-expand => 1, -fill => 'both');
+
+ # the following two together _prevent_ resizing:
+$main -> maxsize($width,$height);  # fixes size 
+$main -> minsize($width,$height);  # fixes size 
+my ($outickx, $outicky, $intickx, $inticky, $tickwidth);  
+for (0..11) {                      # the tick initialization loop
+    $outickx = int($x + sin($_*$pi/6.0)*$r*1.00);
+    $outicky = int($y - cos($_*$pi/6.0)*$r*1.00);
+    $intickx = int($x + sin($_*$pi/6.0)*$r*0.85);
+    $inticky = int($y - cos($_*$pi/6.0)*$r*0.85);
+    $tickwidth = $_ % 3 == 0 ? 3 : 1;
+    $c->create('line', ($outickx, $outicky, $intickx, $inticky),
+               -width => $tickwidth,
+              );
+} # end tick loop
+undef $outickx; undef $outicky;    # cleanup
+undef $intickx; undef $inticky;
+undef $tickwidth;
+
+# time and date variables:
+my ($second,$minute,$hour,$date,$month,$year,$weekday,$yday,$dst);
+my ($hourx, $houry, $minutex, $minutey ); # clock hand geometry
+# my ($secondx, $secondy );               # (unused) clock hand geometry
+
+for (;;) {                                # this is the timekeeping loop
+       # feel free to make use of some of these variables:
+    ($second,$minute,$hour,$date,$month,$year,$weekday,$yday,$dst) =
+       localtime();
+    $hour = $hour % 12;
+    ($hourx, $houry, $minutex, $minutey,  # $secondx, $secondy, 
+        ) = ( 
+        int($x + sin((($hour+$minute/60.0)/6.0)*$pi) *$r*0.75 ),
+        int($y - cos((($hour+$minute/60.0)/6.0)*$pi) *$r*0.75 ),
+        int($x + sin( ($minute/30.0)*$pi) *$r*1.00 ), 
+        int($y - cos( ($minute/30.0)*$pi) *$r*1.00 ), 
+        # int($x + sin( ($second/30.0)*$pi) *$r ), 
+        # int($y - cos( ($second/30.0)*$pi) *$r ), 
+            );
+    $c -> delete('hourhand');
+    $c -> create('line', ($hourx, $houry, $x, $y),
+                 '-arrow' => 'first', 
+                 '-tags'  => 'hourhand',
+                 '-width' => 3,
+                 );
+    $c -> delete('minutehand');
+    $c -> create('line', ($minutex, $minutey, $x, $y),
+                 '-arrow' => 'first', 
+                 '-tags'  => 'minutehand',
+                 '-width' => 2,
+                 );
+#     $c -> delete('secondhand');
+#     $c -> create('line', ($secondx, $secondy, $x, $y),
+#                 '-tags'  => 'secondhand',
+#                 );
+
+    # DoOneEvent;                # <- use either this or
+    $main -> update;           # <- this (both not necessary).
+
+    sleep(1);                  # 1 sec compromise min cpu vs. lively-X
+
+} # end timekeeping loop
+
+__END__
+
+=head1 NAME
+
+pclock
+
+=head1 SYNOPSIS
+
+    pclock &
+
+=head1 DESCRIPTION
+
+B<pclock> is a clock implemented in Perl/Tk.
+
+Here is the `date` on which this was written:
+
+    Thu May  9 16:58:31 EDT 1996
+
+It was then modified on:
+
+    Fri May 10 16:31:10 EDT 1996
+
+Thanks to Adrian Phillips and Simon Galton for helpful suggestions.
+
+The choice between DoOneEvent; and $main->update; as well as sleep();
+times may be system|X-server dependent.
+
+As distributed by the author there is a second hand embedded within 
+commented code in this program.
+
+=head1 REQUIREMENTS
+
+Perl with the Tk extension.
+
+=head1 AUTHOR
+
+Peter Prymmer pvhp@lns62.lns.cornell.edu  
+
+=cut

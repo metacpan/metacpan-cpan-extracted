@@ -1,0 +1,39 @@
+To use PEE with mod_perl, an engine is provided: 'examples/modperl-pee.pl'.
+It caches compiled templates, dynamically re-compiling them when changed
+on disk.
+
+To set up the modperl engine:
+
+1. Prepare a directory to place the modperl engine script.
+   Here we use '/www/perl' as an example.
+2. Copy 'examples/modperl-pee.pl' to the directory in step (1).
+3. Copy 'examples/startup.pl' to the directory containing the
+   apache httpd.conf file.  In my case, it is /etc/httpd.conf
+   (apache default src installation would be /usr/local/apache/conf)
+4. Edit 'httpd.conf' telling apache to use 'modperl-pee.pl' to handle
+   PET files.  Below is an example of what goes into it.  You can place
+   these in the main section of the httpd.conf or within any <VirtualHost>.
+
+
+  # this directory should contain the 'modperl-pee.pl' script
+  # found in the 'examples/' directory of the Pee distribution
+  # it will be used everytime a PET file is requested
+
+  Alias /perl /www/perl/
+  <Location /perl>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    PerlSendHeader On
+    Options +ExecCGI
+  </Location>
+  
+  # copy 'examples/startup.pl' to where ever you specify below
+  # This is loaded during Apache/mod_perl startup
+  PerlRequire /etc/httpd/conf/startup.pl
+
+
+  # A new type of Handler, pet-file, is created for ".pet" extensions
+  AddHandler pet-file pet
+  # Call the handler '/perl/modperl-pee.pl' when a PET file is requested
+  Action pet-file /perl/modperl-pee.pl
+

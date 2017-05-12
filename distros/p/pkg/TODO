@@ -1,0 +1,10 @@
+-pkgpfx Foo::Bar  [''], ['A']
+  load Foo::Bar, Foo::Bar::A
+  don't like the empty ['']
+
+-short => sub { which shortens }
+
+recursive inner package finding (see Devel::InnerPackage) and aliasing.
+
+-prefix as in the aliased package (call it something else, perhaps;
+	prefix is too generic)

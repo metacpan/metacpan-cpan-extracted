@@ -1,0 +1,29 @@
+---
+abstract: Compile POD pages into a LaTeX book
+author: 'Peter Paris  C<< <lutetius@cpan.org> >>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: pod2book
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Carp: 0
+  Config::Any: 0
+  Getopt::Long: 0
+  Params::Validate: 0
+  Perl6::Slurp: 0
+  Pod::Find: 1.34
+  Pod::LaTeX: 0.58
+  Pod::ParseUtils: 1.33
+  Pod::Usage: 0
+  perl: 5.8.0
+version: 0.0.1

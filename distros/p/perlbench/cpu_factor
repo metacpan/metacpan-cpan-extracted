@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+if (@ARGV && $ARGV[0] =~ /^-v$/) {
+   shift;
+   $VERBOSE = 1;
+}
+
+# Test how fast this machine is in order to find test scale factor
+my($ub,$sb) = times;
+my $count = 20000;
+my $used_time;
+
+print "Starting up with $count iterations\n" if $VERBOSE;
+
+COUNT:
+{
+    # just perform some random calculations
+    my($i, $x, $y);
+    my(@a);
+    $x = 0;
+    $str = "xyzzy" x 20;
+    for ($i = 0; $i < $count; $i++) {
+	if ($str =~ /\d+/) {
+	}
+	$x = ($x + 123) % 333;
+	@a = ($x) x 10;
+	unshift(@a, $x);
+    }
+
+    my($ua, $sa) = times;
+    $used_time = $ua - $ub;
+    if ($used_time < 16) {
+	# This was to fast, redo with higher $count
+	if ($used_time < 0.1) {
+	    $count *= 60;
+	} elsif ($used_time < 1) {
+	    $count *= 16;
+	} else {
+	    my $adjust = 18 / $used_time;
+	    $adjust = 1.5 if $adjust < 1.5;
+	    $count = int($count * $adjust);
+	}
+	print "Too fast (${used_time}s), " if $VERBOSE;
+	print "increasing loop count to $count\n" if $VERBOSE;
+	($ub, $sb) = times;
+	redo COUNT;
+    }
+    printf "$count iterations consumed %.1f CPU seconds\n", $used_time if $VERBOSE;
+    $factor = int($count / $used_time);
+}
+
+print "CPU SPEED FACTOR = " if $VERBOSE;
+print "$factor\n";
+

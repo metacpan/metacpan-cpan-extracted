@@ -1,0 +1,361 @@
+
+Tom Christiansen 
+
+Re: Protocol not supported?
+***************************
+
+6 Nov 1995 12:58:11 GMT Perl Consulting and Training 
+
+Newsgroups: 
+   comp.lang.perl.tk 
+References: 
+   <47jq0c$21f@news.fmso.navy.mil> 
+
+ [courtesy cc of this posting sent to cited author via email]
+
+In comp.lang.perl.tk, 
+    zm00522@news (David A. Gernert) writes:
+:I compiled Perl 5 under AIX 3.2.5 and SunOS -- no problems.  Under Solaris
+:2.4 and other SVR4 systems Perl compiles OK.  However when I attempt
+:to use socket() it fails.  The message from die is: Protocol not supported.
+:I've compiled with gcc and the Sun Solaris compiler -- same results.  I've
+:used static and dynamic loading for Socket.
+:
+:I didn't see anything regarding this in the Perl/Tk FAQ although I'm
+:sure others have encountered it before.  Suggestions?
+
+Yes, I suggest that you should read the standard comp.lang.perl FAQ, 
+which contains the answer to your problem.  Briefly, you're hardcoding 
+stuff, which is wrong and perhaps even evil.  Please see FAQ 4.21, which
+can be conveniently found at http://perl.com/perl/faq/Q4.21.html and 
+is titled:
+
+    Why doesn't my sockets program work under System V (Solaris)? 
+    What does the error message ``Protocol not supported'' mean? 
+
+Here are proper working examples of networking code, which is posted
+at least daily. :-(
+
+--tom
+
+Tom Christiansen      Perl Consultant, Gamer, Hiker      tchrist@mox.perl.com
+
+I use `batshit' in an idiosyncratic fashion. --Andrew Hume
+
+
+
+----------------------------------8<--------------------------------
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#               "End of shell archive."
+# Contents:  in.client un.client in.server un.server SockFuncs.pm
+# Wrapped by tchrist@mox on Wed Nov  1 10:26:21 1995
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'in.client' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'in.client'\"
+else
+echo shar: Extracting \"'in.client'\" \(691 characters\)
+sed "s/^X//" >'in.client' <<'END_OF_FILE'
+X#!/usr/bin/perl -w
+X
+X###################################
+X# in.server: sample INET domain client by tchrist@perl.com
+X###################################
+X
+Xrequire 5.001;
+X
+X################
+X#### for 5.000, remove the "use strict" and s/\bmy //g;
+X################
+X
+Xuse Socket;
+Xuse SockFuncs;  # not standard
+X
+Xuse strict;
+X
+Xmy $remote  = shift || 'localhost';
+Xmy $port = shift || 7778;
+Xmy $proto = getprotobyname('tcp');
+Xmy $iaddr = gethostbyname($remote)             || die "no host: $remote";
+Xmy $paddr = sockaddr_in($port, $iaddr);
+Xsocket(SOCK, PF_INET, SOCK_STREAM, $proto)     || die "socket: $!";
+Xconnect(SOCK, $paddr)                          || die "connect: $!";
+Xprint while ;
+Xclose (SOCK)                                   || die "close: $!";
+Xexit;
+END_OF_FILE
+if test 691 -ne `wc -c <'in.client'`; then
+    echo shar: \"'in.client'\" unpacked with wrong size!
+fi
+chmod +x 'in.client'
+# end of 'in.client'
+fi
+if test -f 'un.client' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'un.client'\"
+else
+echo shar: Extracting \"'un.client'\" \(396 characters\)
+sed "s/^X//" >'un.client' <<'END_OF_FILE'
+X#!/usr/bin/perl
+X
+X# sample UNIX domain client
+X# tchrist@perl.com
+X
+Xrequire 5.001;
+X################
+X#### for 5.000, remove the "use strict"
+X################
+X
+X
+Xuse Socket;
+Xuse SockFuncs;  # not standard
+X
+Xuse strict;
+X
+Xmy $remote = shift || '/tmp/catsock';
+Xsocket(SOCK, PF_UNIX, SOCK_STREAM, 0)          || die "socket: $!";
+Xconnect(SOCK, sockaddr_un($remote))            || die "connect: $!";
+Xprint while ;
+Xexit;
+END_OF_FILE
+if test 396 -ne `wc -c <'un.client'`; then
+    echo shar: \"'un.client'\" unpacked with wrong size!
+fi
+chmod +x 'un.client'
+# end of 'un.client'
+fi
+if test -f 'in.server' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'in.server'\"
+else
+echo shar: Extracting \"'in.server'\" \(2015 characters\)
+sed "s/^X//" >'in.server' <<'END_OF_FILE'
+X#!/usr/bin/perl -Tw
+X
+X###################################
+X# in.server: sample INET domain server by tchrist@perl.com
+X###################################
+X
+Xrequire 5.001;
+Xuse strict;
+X
+X################
+X#### for 5.000, remove the "use strict" and s/\bmy //g;
+X################
+X
+XBEGIN { $ENV{PATH} = '/usr/ucb:/bin' }
+X
+Xuse Socket;
+Xuse SockFuncs;  # not standard
+Xuse Carp;
+X
+Xsub spawn;
+Xsub logmsg { print "$0 $$: @_ at ", scalar localtime, "\n" } 
+X
+Xmy $port = shift || 7778;
+Xmy $proto = getprotobyname('tcp');
+Xsocket(SERVER, PF_INET, SOCK_STREAM, $proto)   || die "socket: $!";
+Xsetsockopt(SERVER, SOL_SOCKET, SO_REUSEADDR, 1) || die "setsockopt: $!";
+Xbind(SERVER, sockaddr_in($port, "\0" x 4))     || die "bind: $!";
+Xlisten(SERVER,5)                               || die "listen: $!";
+X
+Xlogmsg "server started on port $port";
+X
+Xmy $waitedpid = 0;
+Xmy $paddr;
+X
+Xsub REAPER { 
+X    $SIG{CHLD} = \&REAPER;  # loathe sysV
+X    $waitedpid = wait;
+X    logmsg "reaped $waitedpid" . ($? ? " with exit $?" : '');
+X}
+X
+X$SIG{CHLD} = \&REAPER;
+X
+Xfor ( $waitedpid = 0; 
+X      ($paddr = accept(CLIENT,SERVER)) || $waitedpid; 
+X      $waitedpid = 0, close CLIENT) 
+X{
+X    next if $waitedpid;
+X    my($port,$iaddr) = sockaddr_in($paddr);
+X    my $name = gethostbyaddr($iaddr,AF_INET);
+X
+X    logmsg "connection from $name ", fmtaddr($iaddr), " at port $port";
+X
+X    spawn sub { 
+X       print "Hello there, $name, it's now ", scalar localtime, "\n";
+X       exec '/usr/games/fortune' 
+X           or confess "can't exec fortune: $!";
+X    };
+X
+X} 
+X
+Xsub spawn {
+X    my $coderef = shift;
+X
+X    unless (@_ == 0 && $coderef && ref($coderef) eq 'CODE') { 
+X       confess "usage: spawn CODEREF";
+X    }
+X
+X    my $pid;
+X    if (!defined($pid = fork)) {
+X       logmsg "cannot fork: $!";
+X       next;
+X    } elsif ($pid) {
+X       logmsg "begat $pid";
+X       return; # i'm the parent
+X    }
+X    # else i'm the child -- go spawn
+X
+X    open(STDIN,  "<&CLIENT")   || die "can't dup client to stdin";
+X    open(STDOUT, ">&CLIENT")   || die "can't dup client to stdout";
+X    ## open(STDERR, ">&STDOUT") || die "can't dup stdout to stderr";
+X    exit &$coderef();
+X} 
+END_OF_FILE
+if test 2015 -ne `wc -c <'in.server'`; then
+    echo shar: \"'in.server'\" unpacked with wrong size!
+fi
+chmod +x 'in.server'
+# end of 'in.server'
+fi
+if test -f 'un.server' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'un.server'\"
+else
+echo shar: Extracting \"'un.server'\" \(1756 characters\)
+sed "s/^X//" >'un.server' <<'END_OF_FILE'
+X#!/usr/bin/perl -Tw
+X
+X###################################
+X# in.server: sample UNIX domain server by tchrist@perl.com
+X###################################
+X
+Xrequire 5.001;
+X################
+X#### for 5.000, remove the "use strict" and s/\bmy //g;
+X################
+X
+XBEGIN { $ENV{PATH} = '/usr/ucb:/bin' }
+X
+Xuse Socket;
+Xuse SockFuncs; # not standard
+Xuse Carp;
+X
+Xsub spawn;
+Xsub logmsg { print "$0 $$: @_ at ", scalar localtime, "\n" } 
+X
+Xmy $NAME = '/tmp/catsock';
+X
+Xmy $uaddr = sockaddr_un($NAME);
+Xmy $proto = (getprotobyname('tcp'))[2];
+X
+Xsocket(SERVER,PF_UNIX,SOCK_STREAM,0)   || die "socket: $!";
+Xunlink($NAME);
+Xbind  (SERVER, $uaddr)                         || die "bind: $!";
+Xlisten(SERVER,5)                       || die "listen: $!";
+X
+Xlogmsg "server started on $NAME";
+X
+Xsub REAPER { 
+X    $SIG{CHLD} = \&REAPER;  # loathe sysV
+X    $waitedpid = wait;
+X    logmsg "reaped $waitedpid" . ($? ? " with exit $?" : '');
+X}
+X
+X$SIG{CHLD} = \&REAPER;
+X
+Xfor ( $waitedpid = 0; 
+X      accept(CLIENT,SERVER) || $waitedpid; 
+X      $waitedpid = 0, close CLIENT) 
+X{
+X    next if $waitedpid;
+X    logmsg "connection on $NAME";
+X    spawn sub { 
+X       print "Hello there, it's now ", scalar localtime, "\n";
+X       exec '/usr/games/fortune' or die "can't exec fortune: $!";
+X    };
+X} 
+X
+X
+Xsub spawn {
+X    my $coderef = shift;
+X
+X    unless (@_ == 0 && $coderef && ref($coderef) eq 'CODE') { 
+X       confess "usage: spawn CODEREF";
+X    }
+X
+X    my $pid;
+X    if (!defined($pid = fork)) {
+X       logmsg "cannot fork: $!";
+X       next;
+X    } elsif ($pid) {
+X       logmsg "begat $pid";
+X       return; # i'm the parent
+X    }
+X    # else i'm the child -- go spawn
+X
+X    open(STDIN,  "<&CLIENT") || die "can't dup client to stdin";
+X    open(STDOUT, ">&CLIENT") || die "can't dup client to stdout";
+X    open(STDERR, ">&STDOUT") || die "can't dup stdout to stderr";
+X    exit &$coderef();
+X} 
+END_OF_FILE
+if test 1756 -ne `wc -c <'un.server'`; then
+    echo shar: \"'un.server'\" unpacked with wrong size!
+fi
+chmod +x 'un.server'
+# end of 'un.server'
+fi
+if test -f 'SockFuncs.pm' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'SockFuncs.pm'\"
+else
+echo shar: Extracting \"'SockFuncs.pm'\" \(591 characters\)
+sed "s/^X//" >'SockFuncs.pm' <<'END_OF_FILE'
+Xpackage SockFuncs;
+X
+Xuse Socket;
+Xrequire 5.000;
+Xrequire Exporter;
+X
+X@ISA = qw(Exporter);
+X@EXPORT = qw(sockaddr_un sockaddr_in inetaddr fmtaddr);
+X
+X$sockaddr_un_t = 'S a*';
+X$sockaddr_in_t = 'S n a4 x8';
+X$inetaddr_t    = 'C4';
+X
+Xsub sockaddr_un {
+X    wantarray
+X       ? unpack($sockaddr_un_t, $_[0])
+X       : pack($sockaddr_un_t, AF_UNIX, @_)
+X}
+X
+Xsub sockaddr_in {
+X    wantarray 
+X       ? (unpack($sockaddr_in_t, $_[0]))[1,2]
+X       : pack($sockaddr_in_t, AF_INET, @_)
+X}
+X
+Xsub inetaddr {
+X    wantarray
+X       ? unpack($inetaddr_t, $_[0])
+X       : pack($inetaddr_t, @_)
+X} 
+X
+Xsub fmtaddr {
+X    sprintf("[%d.%d.%d.%d]", &inetaddr);
+X} 
+X
+X1;
+END_OF_FILE
+if test 591 -ne `wc -c <'SockFuncs.pm'`; then
+    echo shar: \"'SockFuncs.pm'\" unpacked with wrong size!
+fi
+# end of 'SockFuncs.pm'
+fi
+echo shar: End of shell archive.
+
+exit 0
+-- 

@@ -1,0 +1,22 @@
+README for persona
+
+The persona module was born out of the need to be able to easily specify which
+subroutines of a module should be available (as in "compiled") in different
+sets of mod_perl environments (e.g. the visitors front end web servers, or
+the personnel's back-office web servers).  This both from a memory, database
+and CPU usage point of view, as well as from the viewpoint of security.
+
+Copyright (c) 2009 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Version:
+ 0.12
+
+Required Modules:
+ (none)
+
+perl Makefile.PL
+make
+make test
+make install

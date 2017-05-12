@@ -1,0 +1,40 @@
+### perl: poros/code/sysinfo
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Vulcan::SysInfo;
+use constant INTERVAL => 6;
+
+return sub
+{
+    my %param = @_;
+    my @argv = @{ $param{argv} };
+    my $interval = @argv > 1 ? shift @argv : INTERVAL;
+
+    if ( my $test = shift @argv )
+    {
+        my $sar = Vulcan::SysInfo->new( interval => $interval );
+        my $eval = sub
+        {
+            my $test = shift;
+            my @test = grep { $sar->eval( $_ ) } ref $test ? @$test : $test;
+            return @test ? \@test : undef;
+        };
+
+        if ( ref $test eq 'HASH' )
+        {
+            map { delete $test->{$_}
+                unless $test->{$_} = &$eval( $test->{$_} ) } keys %$test;
+
+            $test = undef unless %$test;
+        }
+        else
+        {
+            $test = &$eval( $test );
+        }
+        YAML::XS::DumpFile \*STDOUT, $test if $test;
+    }
+    return 0;
+};

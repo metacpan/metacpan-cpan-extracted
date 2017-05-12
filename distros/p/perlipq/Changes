@@ -1,0 +1,24 @@
+#
+# $Id: Changes,v 1.5 2001/11/24 09:29:58 jmorris Exp $
+#
+Revision history for Perl extension IPTables::IPv4::IPQueue.
+
+* Sun 03 Dec 2000 James Morris <jmorris@intercode.com.au>
+  Version 0.900 alpha release.
+
+* Mon 08 Jan 2001 James Morris <jmorris@intercode.com.au>
+  Version 1.20 initial release against iptables 1.2.0.
+
+* Fri Sep 21 2001 James Morris <jmorris@intercode.com.au>
+  Updated code, documentation, test script and examples to support
+  ipq_read() timeout.  Libipq implementation courtesy of 
+  Joost Remijn <remijnj@eidetica.com>.  Thanks Joost!
+
+* Mon 23 Oct 2001 James Morris <jmorris@intercode.com.au>
+  Version 1.24 released against iptables 1.2.4 to bring package into
+  line with the new ipq_read() timeout feature.
+
+* Sat 24 Nov 2001 James Morris <jmorris@intercode.com.au>
+  Added support for IPv6, which was implemented in libipq by
+  Fernando Anton.
+  

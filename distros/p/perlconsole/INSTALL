@@ -1,0 +1,19 @@
+Install instructions
+====================
+
+Basically:
+
+$ perl Makefile.PL
+$ make
+$ make install
+
+If you want to install perlconsole system-wide, at least the last command must
+be run as root (e.g. with sudo).
+
+Dependencies
+============
+
+Perl Console depends on the Term::Readline module.
+
+The first step of the installation procedure will warn you in case any of the
+dependencies are not installed.

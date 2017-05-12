@@ -1,0 +1,68 @@
+{
+   "abstract" : "Perl secret operators and constants",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "perlsecret",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "integer" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-perlsecret@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=perlsecret"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/perlsecret.git",
+         "web" : "http://github.com/book/perlsecret"
+      }
+   },
+   "version" : "1.013",
+   "x_contributors" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>",
+      "Rafael Garcia-Suarez <rgs@consttype.org>",
+      "Toby Inkster <tobyink@cpan.org>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Keith C. Ivey <keith@iveys.org>",
+      "Pau Amma <pauamma@gundo.com>",
+      "Ivan Bessarabov <ivan@bessarabov.ru>",
+      "Andy Armstrong <andy@hexten.net>",
+      "Ævar Arnfjörð Bjarmason <avarab@gmail.com>",
+      "Abigail <abigail@abigail.be>"
+   ]
+}
+

@@ -1,0 +1,79 @@
+Revision history for Perl extension pip
+
+1.19 Mon 10 May 2010 - Adam Kennedy
+	- Adding abstracts to ::API and ::FAQ
+	- Update Module::Install to 1.00
+
+1.18 Mon 10 May 2010 - Adam Kennedy
+	- POD typo fix to keep the Debian nazis happy :)
+
+1.17 Mon 10 May 2010
+	- Updating to Module::Install 0.95
+	- Bundling newer author tests
+	- Removing a three-argument open that some overzealous external
+	  contributor added.
+	- Added support for the .tgz extension, behaving the same as .tar.gz
+	- Added support for github tarball URLs in the format
+	  http://github.com/gitpan/Config-Tiny/tarball/2.12
+
+1.16 Mon 23 Nov 2009
+	- Adding support for zip files
+
+1.15 Thu 27 Aug 2009
+	- Upgrading Module::Install to 0.91
+	- Updating to a production version
+
+0.14 Fri  5 Oct 2007
+	- Dropping the File::Temp dependency on non-Windows to 0.14
+	  (allows easier installation on RedHat Enterprise Linux 4, and other perl 5.8.5 platforms)
+	- Adding initial PAR support
+
+0.13 Thu  6 Dec 2007
+	- No functional changes, no need to upgrade
+	- Upgrading to Module::Install 0.68
+	- Updating bundled author tests
+
+0.12 Fri 17 Aug 2007
+	- Fixing support for pip http://server/path/distribution.tar.gz
+	- Added an @INC hack to allow the use with CPAN.pm older than 1.88
+	- Upgrade File::Spec dependency on Win32 to ensure we some rel2abs fixes
+
+0.11 Mon 16 Jul 2007
+	- Apply rel2abs more often to hopefully allow installation of
+	  tarballs in parent directories
+
+0.10 Sun  8 Jul 2007
+	- Minor pod fixes
+	- Adding undocumented experimental support for p5z files
+	- Increasing CPAN::Inject dependency to decrease CPAN.pm dependency :)
+	- Moving bin/pip to more correct script/pip
+	- Fixing the test URI to point to the new repository location
+
+0.08 Tue 16 Jan 2007
+	- Minor testing fixes
+
+0.07 Wed  3 Jan 2007
+	- Essential CPAN::Inject version bump
+	- Fixed local file handling on MSWin32
+
+0.06 Wed  3 Jan 2007
+	- Fixed a minor bug in the --install handling
+
+0.05 Wed  3 Jan 2007
+	- Added basic URI support
+
+0.04 Wed 26 Oct 2006
+	- Added the -i option to install a particular tarball
+
+0.03 Mon 16 Oct 2006
+	- It turns out .pip is taken by Microsoft, thwarting the potential
+	  ability to associate plan files with pip and make then actually clickable.
+	- Converted everything to .p5i
+
+0.02 Sun 15 Oct 2006
+	- Added pip.pm
+	- Added real dists to t/data
+	- Basic .pip plans work
+
+0.01 Sun 15 Oct 2006
+	- original version

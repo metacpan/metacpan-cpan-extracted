@@ -1,0 +1,39 @@
+{
+   "abstract" : "Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! ",
+   "author" : [
+      "Marc Chantreux <khatar@phear.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "perlude",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/eiro/p5-perlude",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eiro/p5-perlude.git",
+         "web" : "https://github.com/eiro/p5-perlude"
+      }
+   },
+   "version" : "0.61"
+}
+

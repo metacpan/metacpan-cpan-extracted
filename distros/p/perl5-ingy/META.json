@@ -1,0 +1,60 @@
+{
+   "abstract" : "Ingy's Favorite Perl 5 Feature Set",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "perl5-ingy",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.11",
+            "IO::All" : "0.43",
+            "XXX" : "0.17",
+            "YAML::XS" : "0.35",
+            "perl" : "v5.8.1",
+            "perl5" : "0.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/perl5-ingy-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/perl5-ingy-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/perl5-ingy-pm.git",
+         "web" : "https://github.com/ingydotnet/perl5-ingy-pm"
+      }
+   },
+   "version" : "0.13"
+}
+

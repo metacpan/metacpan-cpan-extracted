@@ -1,0 +1,106 @@
+Installation instructions for Pee.
+
+
+INSTALLATION
+
+
+If you've unpacked the distribution, skip to step 4.
+
+1. Download the tarball pee-x.xx.tar.gz
+2. unpack using
+   gunzip pee-x.xx.tar.gz - | tar -xvf -
+3. change directory to pee-x.xx/
+4. perl Makefile.PL
+5. make
+7. make install (you need root permissions)
+8. read the following section "POST-INSTALLATION"
+
+
+
+POST-INSTALLATION
+
+
+Pee can be used in 2 different ways: 
+1. Offline generation
+2. Apache Action directive
+
+
+
+1. Offline generation
+
+Compile the templates into perl code, which is legitimate perl scripts.
+It can be run just like any other CGI scripts.
+Adv:    fast (no page-compilation at runtime)
+Disadv: manual compilation
+
+
+# Go to the 'examples' directory
+> cd examples
+
+# compile the 'cgitest.pet', output will be called 'cgitest.pl'.
+> ./compile.pl cgitest.pet
+
+# copy the resulting script (along with the required cgiutils.pl) 
+# to your cgi-bin directory
+> cp cgitest.pl cgiutils.pl <your_cgi-bin_dir>
+
+# Make the script executable
+> chmod 755 <your_cgi-bin_dir>/cgitest.pl
+
+# view it in your browser
+
+
+
+2. Apache Action directive
+
+Using the Apache "Action" directive, you can configure apache to call
+the pee engine whenever it encounters a file that ends with ".pet".
+
+Adv:    No need to manually re-compile when template is changed.
+Disadv: Slightly slower than offline generation.
+
+
+a. Make sure that you have the following lines in your httpd.conf
+   Depending on your installation / platform, the path name may differ
+
+LoadModule action_module     modules/mod_actions.so
+AddModule mod_actions.c
+
+
+b. Edit the httpd.conf
+
+
+Add the following line to your config file (You can put it in the
+global section, or simply append it at the end of the file).
+Assuming that you wish to use the standard cgi-bin/ directory:
+
+
+AddHandler pet-file pet
+Action pet-file /cgi-bin/engine.pl
+
+What this essentially does is whenever someone accesses a ".pet" file,
+the script "/cgi-bin/engine.pl" is called instead.
+
+But the user never sees this, because it is an apache internal request.
+
+
+c. Copy "examples/engine.pl" and "examples/cgiutils.pl" to your cgi-bin 
+   directory, and make sure that it's executable.
+   Assuming that the filesystem equivalent of
+   the url "/cgi-bin/" is "/usr/local/apache/cgi-bin/":
+
+cp examples/engine.pl /usr/local/apache/cgi-bin
+cp examples/cgiutils.pl /usr/local/apache/cgi-bin
+chmod 755 /usr/local/apache/cgi-bin/engine.pl
+
+
+d. copy "examples/cgitest.pet" to a directory that you wish serve the PET 
+   templates.  Assuming that you are using "/www/abc":
+
+cp examples/cgitest.pet /www/abc
+
+
+e. restart apache
+
+f. point your browser to the URL of "cgitest.pet"
+

@@ -1,0 +1,20 @@
+Changes				Changelog for the package
+Base.pm
+Garmin.pm			Library for handling Garmin protocol GPS receivers
+NMEA.pm				Library for handling NMEA protocol GPSreceivers
+Serial.pm			Library for handling IO from the device
+Garmin/Constant.pm  		Garmin Constants	
+Garmin/Handler.pm  		Garmin data handler
+NMEA/Handler.pm  		NMEA data handler
+MANIFEST			This file
+Makefile.PL			Perl MakeMaker Makefile
+COPYING				GPL License
+README
+TODO
+t/base.t
+t/connect.t
+t/nmea.t
+examples/Borders.log
+examples/check-port.pl
+examples/upload-test.pl
+examples/upload-wpt-test.pl

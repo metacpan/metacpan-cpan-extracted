@@ -1,0 +1,9 @@
+<html>
+<?
+$blah = "blah";
+
+?>
+<body>
+<?=$blah?>
+</body>
+</html>

@@ -1,0 +1,54 @@
+perl-Apache2-LogUtil - Prefix log messages with run-time context
+version 00.01001
+================================================================================
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+------------
+
+This module requires these other modules and libraries:
+
+    Apache2::Const
+    Apache2::Log
+    Apache2::ServerUtil
+    APR::Const
+    Apache2::MPM
+    APR::OS
+
+AUTHORS
+-------
+
+Ryan Gies <ryangies@cpan.org>
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2006-2010 by Livesite Networks, LLC. All rights reserved.
+
+Copyright (C) 2000-2005 by Ryan Gies. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, 
+this list of conditions and the following disclaimer.
+
+* The origin of this software must not be misrepresented; you must not 
+claim that you wrote the original software. If you use this software in a 
+product, an acknowledgment in the product documentation would be 
+appreciated but is not required.
+
+* Altered source versions must be plainly marked as such, and must not be 
+misrepresented as being the original software.
+
+* The name of the author may not be used to endorse or promote products 
+derived from this software without specific prior written permission.

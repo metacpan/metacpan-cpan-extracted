@@ -1,0 +1,123 @@
+0.236 20161009
+    . Disable benchmark test rt62341.t as it runs out of memory on
+      many smoker systems; closes RT #118310
+    . No code changes, no need to upgrade
+
+0.235 20161009
+    . Add Travis test configuration (contributed by James McCoy)
+    . Make test for PMC availability more reliable (contibuted by E. Choroba)
+    . No code changes, no need to upgrade
+
+0.234 20150527
+    . Fix the test for PMC loading to work on versions on Perl that don't
+      have Config::non_bincompat_options (HAARG). Fixes RT#102626 .
+
+0.233 20150525
+    ! The diagnostic about inheriting from ourselves was removed.
+      It served no own purpose as Perl already warns if we try to
+      inherit in a circular way.
+      Contributed by Aristoteles Pagaltzis
+
+0.232  20150319
+    . Change line-endings in parent-pmc.t to unix EOLs so that bleadperl
+      is happy
+    . No code changes, no need to upgrade
+
+0.231  20150309
+    . Really restore test compatibility where Perl does not provide
+      &Config::non_bincompat_options. This affected Perl
+      versions < 5.14 (RT #102626, patch by Matthew Horsfall)
+    . No code changes, no need to upgrade
+
+0.230  20150309
+    . Restore test compatibility where Perl does not provide
+      &Config::non_bincompat_options. This affected Perl
+      versions < 5.14 (RT #102626)
+    . No code changes, no need to upgrade
+
+0.229  20150307
+    . Add link to (Github) repository
+      Thanks to Neil Bowers for the idea
+    . Guard tests against PERL_DISABLE_PMC
+      Contributed by Bulk88
+    . No code changes, no need to upgrade
+
+0.228  20130917
+    . Fix RT #88450, install into site/ for 5.12+
+      Thanks to haarg for the report
+
+0.227  20130901
+    . Fix RT #88320, restore tests passing for 5.17.5+
+      Thanks to Zefram for the report and contributing the fix
+
+0.226  20130729
+    . Fix RT #86890, restore tests passing for 5.18+
+      Thanks to Petr Pisar for the report
+
+0.225  20110308
+    . Applied a docpatch by Robin Barker to fix the documentation
+      about the warning of inheriting from yourself.
+      Fixes RT #66459
+
+0.224  20101031
+    . Change assignment @ISA = (@ISA, 'new::class')
+      to use push @ISA, 'new::class'
+      This should make class creation faster from 5.10 onwards
+      and reverts a change made in 2.14. If this is critically slow for you
+      and you can't upgrade your version of Perl, use the old way.
+
+0.223  20090901
+    . No functional changes, no need to upgrade
+    + Fix Makefile.PL so that (re)installing parent under 5.10.1+
+      installs into perl/ instead of site/, patched by J.D.Hedden
+      fixes RT #49328
+
+0.222  20090828
+    . No functional changes, no need to upgrade
+    + Documentation fix suggested by Clinton Gormley
+    + Test fix for Perl compiled without PMC support,
+      spotted and fixed by Nicholas Clark
+    + Distribution changes to placate Module::Release
+
+0.221  20080306
+    . No functional changes, no need to upgrade
+    + Tests, INSTALLDIRS changed for bleadperl integration
+
+0.220  20080304
+    . No functional changes, no need to upgrade
+    + Removed beta status
+
+0.219  20071020
+    . No functional changes, no need to upgrade
+    + Added LICENSE section to clarify the license of this code
+
+0.218  20070819
+    . No functional changes
+    + Code cleanup as suggested by A. Pagaltzis
+
+0.217  20070815
+    + Fixed test failure reported by David Cantrell
+    + Ripped out most of the logic. All you can do
+      is now specify that the base classes should not
+      be loaded from a file via C<-norequire>.
+    + 5.004 compatibility restored by Sébastien Aperghis-Tramoni
+      (mostly it's the test suite that breaks ...)
+
+0.216 20070805
+    Add a test for (transparently) loading a .pmc
+    Loading from an arbitrary file is now possible
+    Class names may not contain a forward slash anymore
+
+0.215 20070802
+    Changed version to a 0.x version to indicate beta status
+    5.004 compatibility patch by Sébastien Aperghis-Tramoni
+    Added a test for a module that returns a false value on load
+    5.9.x performance improvement change - modify @ISA by assignment
+
+2.14 20070802
+    Commented out "use strict" and "use vars qw()" and "no strict()"
+    Changed @ISA modification to better suit the MRO
+
+2.13 20070801
+    Forked from base.pm
+

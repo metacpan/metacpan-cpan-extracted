@@ -1,0 +1,37 @@
+### perl: poros/code/pantheon
+
+use strict;
+use warnings;
+use File::Basename;
+
+use pantheon;
+
+return sub
+{
+    my %param = @_;
+    my ( $path, @env ) = @{ $param{argv} };
+
+    unless ( $path ) { print "$pantheon::VERSION\n"; return 0 }
+
+    die "no such path $path\n" unless -e $path;
+    die "no pantheon\n" unless my ( $pantheon ) = split 'pantheon', $0, 2;
+
+    $ENV{PANTHEON} = $pantheon unless grep { $_ =~ /^PANTHEON=/ } @env;
+    $ENV{MUNGE_PERL} = 1;
+    map { $ENV{$1} = $2 if $_ =~ /^([^=]+)=([^=]+)$/ } @env;
+
+    my ( $pkg, $dir, $ext ) = File::Basename::fileparse( $path, '.tar.gz' );
+    my $output = '1>make.out 2>make.err';
+
+    die "invalid package $pkg\n" if $pkg !~ /^pantheon-\d+\.\d+$/;
+    die "failed to chdir $dir\n" unless chdir $dir;
+
+    exit 1 if $ext && system "rm -rf $pkg && tar xzf $pkg$ext";
+    die "failed to chdir $pkg\n" unless -d $pkg && chdir $pkg;
+
+    exit 1 if system "$^X Makefile.PL $output";
+    die "failed to make install\n" if system "make install $output";
+
+    print "ok\n";
+    return 0;
+};

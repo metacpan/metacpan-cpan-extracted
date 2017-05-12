@@ -1,0 +1,20 @@
+---
+abstract: 'Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! '
+author:
+  - 'Marc Chantreux <khatar@phear.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: perlude
+requires:
+  Carp: '0'
+resources:
+  homepage: https://github.com/eiro/p5-perlude
+  repository: https://github.com/eiro/p5-perlude.git
+version: '0.61'

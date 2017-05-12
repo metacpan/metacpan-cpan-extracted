@@ -1,0 +1,44 @@
+<HTML>
+<HEAD><TITLE> 9.5. How do I add bindings?</TITLE></HEAD>
+<BODY><a name="A9.5"> 9.5. How do I add <KBD>bind</KBD>ings?</a>
+
+<hr>
+</p><p>
+
+On Fri, 15 Sep 95 10:30:56 BST 
+Nick Ing-Simmons &lt;Nick.Ing-Simmons@tiuk.ti.com&gt; writes:
+<PRE><I>
+Re: Multiple binds to a single widget?
+**************************************
+
+On Thu, 14 Sep 1995 14:57:54 -0400
+Alain St &lt;astdenis@cmc.doe.CA&gt; writes:
+!In the tcl/tk doc I have, they say that prepending the script 
+!with '+' appends the new binding to the current one.
+!
+!How do I do that in perlTk? 
+!
+</I></PRE><BLOCKQUOTE>
+You cannot do that that way (yet?) - one issue is what it would mean 
+to prepend '+' to a perl/Tk callback :
+</BLOCKQUOTE><PRE>
+    $widget-&gt;bind('&lt;A&gt;','+',[\&amp;subname,$arg]); 
+    # did not look right to me
+</PRE><BLOCKQUOTE>
+Other issue is that I would need to manage a list-of-callbacks in glue code.
+<p>
+Bind your new command to a new tag:
+</BLOCKQUOTE><PRE>
+    $widget-&gt;bind('Extra',....);
+</PRE><BLOCKQUOTE>
+And add <KBD>Extra</KBD> to the widgets bindtags:
+</BLOCKQUOTE><PRE>
+    $widget-&gt;bindtags([ref($widget),$widget,'Extra',$widget-&gt;toplevel,'all']);
+</PRE>
+
+
+<hr>
+	<p><a href="qna9.4.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.5">table of contents</a> | <a href="qna9.6.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

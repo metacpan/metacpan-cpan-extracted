@@ -1,0 +1,270 @@
+NAME
+    provide - easily switch between different implementations depending on
+    which version of Perl is detected
+
+SYNOPSIS
+        package My::Module;
+
+        use provide (
+            if => ge => '5.013000' => 'My::Module::v5_013000',
+            else                   => 'My::Module::v5_080000',
+        );
+
+DESCRIPTION
+    Good code is free of side effects, avoids tight coupling, and solves a
+    useful problem in an understandable way. This module, on the other hand,
+    is ball of frightened octopuses clinging together.
+
+    The simple act of adding
+
+        use provide (...)
+
+    to an otherwise well-behaved class performs the following changes to it:
+
+    * The calling module automatically inherits from Exporter.
+    * provide.pm finds suitable modules to load and loads them.
+    * Any functions exported by the loaded modules get re-exported by the
+    calling module.
+
+    This module is marginally useful if you are implementing your own module
+    and you end up stumbling over some bug in your code caused by a change
+    to the Perl core. Here's a worked example of when you might use this
+    module:
+
+  hash_pop v1.0 - pass by value
+    Let's pretend you want to implement your own version of pop, but for
+    hashes: it'll return the last key+value pair of the hash (whatever
+    "last" means in the context of an inherently unordered list!). You might
+    start out like this:
+
+        use strict;
+        use warnings;
+        package My::Module;
+        use base qw(Exporter);
+
+        our @EXPORT = qw(hash_pop);
+
+        sub hash_pop {
+            my (%hash) = @_;
+            my ($last_key) = reverse keys %hash;
+            return ($last_key, delete $hash{$last_key});
+        }
+
+        1;
+
+        __END__
+
+    Well, this is about as good an implementation as you can expect. It is
+    easy enough to call:
+
+        my %hash = (1..10); # Belden's default "just give me some kind of hash" hash
+
+        my ($last_key, $last_value) = hash_pop(%hash);
+
+    But unlike the `pop' that we're mimicking, our `hash_pop' doesn't mutate
+    the %hash that we pass in, so it's not very `pop'-like yet.
+
+  hash_pop v1.1 - explicit pass by reference
+    To mutate our subject %hash, we'll need pass by reference:
+
+        sub hash_pop {
+            my $hash = shift;
+            my ($last_key) = reverse keys %$hash;
+            return ($last_key, delete $hash->{$last_key});
+        }
+
+    And since we're passing by reference, we'd darn well better change our
+    call pattern:
+
+        my %hash = (1..10);
+
+        my ($last_key, $last_value) = hash_pop(\%hash);
+
+  hash_pop v1.2 - implicit pass by reference
+    If only there were a way to implicitly pass %hash by reference to
+    `hash_pop' - then we'd have the best of both worlds, wouldn't we? (Would
+    we? I really don't know.)
+
+    Ruby and Python aren't the only languages that have built-in
+    documentation; look at this marvelous interaction with the Perl
+    debugger:
+
+        $ perl -de 1
+          DB<1> p prototype 'CORE::keys'
+        \%
+
+    That's pretty good stuff! Take that, highly self-documenting languages!
+    Now we know how to change `hash_pop':
+
+        sub hash_pop (\%) {
+            my $hash = shift;
+            my ($last_key) = reverse keys %$hash;
+            return ($last_key, delete $hash->{$last_key});
+        }
+
+    And now here's someone using this ridiculous function:
+
+        my %hash = (1..10);
+
+        my ($last_key, $last_value) = hash_pop(%hash);
+
+    Sweet! All done, let's stick it on CPAN!
+
+  Uh-oh, implementing CORE::-like functions means we have to respect the CORE
+    Except: you're not done until you run it against every version of Perl
+    you can shake a perlbrew at. And when you go through and do that, you'll
+    discover a break between Perl v5.12 and v5.13:
+
+        $ perlbrew list | \
+          cut -b 3- | (while read ver; do \
+              perlbrew use $ver; \
+              perl -le 'print $] . "\t" . prototype q,CORE::keys,'; \
+          done)
+
+        __END__
+        5.006002    \%
+        5.008009    \%
+        5.010001    \%
+        5.012005    \[@%]
+        5.014003    +
+        5.016002    +
+        5.017008    +
+
+    Aww, nerds! there's two difference prototypes in play here: \% and +.
+    One valid option is to just give up on supporting older versions of
+    Perl. Another is to implement your own version-specific loading code.
+    And yet another option is to use this module to gloss away implementing
+    your own version-specific code:
+
+  hash_pop v1.3 - version-specific prototypes for implicit reference passing
+        use strict;
+        use warnings;
+        package My::Module;
+
+        use provide (
+            if => ge => '5.013000' => 'My::Module::hash_pop::v5_013000',
+            else                   => 'My::Module::hash_pop::v5_006000',
+        );
+
+        sub _hash_pop {
+            my $hash = shift;
+            my ($last_key) = reverse keys %$hash;
+            return ($last_key, delete $hash->{$last_key});
+        }
+
+        1;
+
+    We're collecting common behavior between the two version-specific
+    modules in My::Module::_hash_pop.
+
+    Now all that's left is to write your version-specific modules. Here's
+    the one for v5.013000 and above:
+
+        use strict;
+        use warnings;
+        package My::Module::hash_pop::v5_013000;
+
+        our @EXPORT = qw(hash_pop);
+
+        require My::Module;
+
+        sub hash_pop (+) { goto &My::Module::_hash_pop }
+
+        1;
+
+    The module for v5.006000 would be nearly identical:
+
+        use strict;
+        use warnings;
+        package My::Module::hash_pop::v5_006000;
+
+        our @EXPORT = qw(hash_pop);
+
+        require My::Module;
+
+        sub hash_pop (\%) { goto &My::Module::_hash_pop }
+
+        1;
+
+    And now someone can go and use our module:
+
+        #!/usr/bin/env perl
+
+        use strict;
+        use warnings;
+
+        use My::Module qw(hash_pop);
+
+        my %hash = (1..10);
+        my ($nine, $ten) = hash_pop %hash;
+
+SYNTAX
+    Currently two statements are supported: `if' and `else'.
+
+  if => TEST => VALUE => RESULT
+    TEST
+    TEST may be any of:
+
+        gt   "greater than"
+        ge   "greater or equal to"
+        eq   "equal to"
+        ne   "not equal to"
+        le   "less than or equal to"
+        lt   "less than"
+
+    VALUE
+    VALUE should be a string which describes something you might get back in
+    $]. See also: perldoc.
+
+    RESULT
+    RESULT is the resulting module that will be loaded if this condition is
+    true.
+
+  else                => RESULT
+    In the event that the preceding `if' condition is false, the `else'
+    RESULT will be loaded.
+
+BUGS
+    This doesn't handle elsif conditions. It probably won't handle if+if+if
+    conditions. Please report bugs on this project's Github issues page.
+
+APOLOGY
+    Too often the explanation for crufty code is, "It seemed like a good
+    idea at the time." To the contrary, this seems like a bad idea. It was a
+    bit of fun to write, but I probably missed a great learning opportunity
+    with my poor implementation.
+
+    I really don't know if this will be useful to anyone at all. One of the
+    challenges to us portraying the Perl community as actively growing is
+    that there are so many well-tested implementations on CPAN to the
+    various Big Problems we all face: processing a CGI form, connecting to a
+    DB_File, writing EBCDIC things (whatever those are!); and more
+    modernishly, Dancing with Mooses and Catalytic Test frameworks.
+
+ACKNOWLEDGEMENTS
+    Sam Merrit coined the phrase "a ball of frightened octopuses clinging
+    together".
+
+    Logan Bell practically dared me to release this. Well, maybe he would if
+    I were to ask him.
+
+    John Napiorkowski originally put in my head the notion that, "A CPAN
+    module is a unit of conversation between developers. It says, 'Here is a
+    problem, and here is my take on how to solve it.'"
+
+    My employer, Shutterstock, Inc., is a staunch supporter of open-source
+    software. It's a shame I've worked so hard to link them to this amusing
+    but disingenuous implementation.
+
+CONTRIBUTING
+    Feel free to use and improve this software in whatever way you see fit.
+    This code is hosted on Github.com at
+    http://github.com/belden/perl-provide.
+
+COPYRIGHT AND LICENSE
+        (c) 2013 by Belden Lyman
+
+    This library is free software: you may redistribute it and/or modify it
+    under the same terms as Perl itself; either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,27 @@
+PCSC-Perl is wrapper built around the PCSC/lite library
+[http://www.linuxnet.com] from David CORCORAN. The PCSC/lite
+library is an abstraction layer that allows standardized
+communications with a wide range of smart card readers. The
+native API for PCSC/lite is C. 
+
+The Perl wrapper lets you access the PCSC/lite API with Perl
+instead of the native C language. This will hopefully help
+you to quickly develop an application prototype or a
+personalisation script. 
+
+PCSC-Perl is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version
+2 of the License, or (at your option) any later version. 
+
+ This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the GNU General Public License for more details. 
+
+If you whish to report a bug concerning the wrapper or the
+associated tools, please feel free to contact the author by
+mail: Lionel VICTOR <lionel.victor@unforgettable.com>. 
+
+If you have any questions about this wrapper, please visit
+http://www.pcsc-perl.org/

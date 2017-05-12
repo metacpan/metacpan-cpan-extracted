@@ -1,0 +1,432 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010000;
+use Pithub;
+use LWP::UserAgent;
+use HTTP::Request;
+use JSON;
+use Data::Dumper; sub p { warn Dumper(@_); }
+use autodie ':system';
+use File::Basename ();
+use Cwd ();
+use Getopt::Long;
+use Term::ReadKey;
+use Sys::Hostname;
+use Pod::Usage;
+use Term::ANSIColor;
+use Encode ();
+use Encode::Locale;
+
+our $VERSION = '0.09';
+
+if (-t) {
+    binmode STDOUT, ":encoding(console_out)";
+    binmode STDERR, ":encoding(console_out)";
+}
+
+sub prompt {
+    my ($prompt, @args) = @_;
+    push @args, 1 if @args % 2;
+    my %args = @args;
+    local $| = 1;
+    my $phrase = '';
+    print $prompt;
+    ReadMode 'cbreak';
+    while (1) {
+        my $c = ReadKey ~0/2-1;
+        if ($c =~ /[\r\n]/) {
+            print "\n";
+            last;
+        }
+        elsif ($c eq "\b" || ord $c == 127) {
+            next unless length $phrase;
+            chop $phrase;
+            next if defined $args{-echo} && length $args{-echo} eq 0;
+            print "\b \b";
+        }
+        elsif (ord $c) {
+            $phrase .= $c;
+            print defined $args{-echo} ?  $args{-echo} : $c;
+        }
+    }
+    ReadMode 'restore';
+    $args{-yes} ? ($phrase =~ /^y/i) : $phrase;
+}
+
+my $agent = LWP::UserAgent->new(timeout => 10);
+$agent->env_proxy(); # for mattn
+my $token = `git config --get ph.token`;
+my $me = `git config --get ph.user`;
+chomp $me;
+unless ($token && $me) {
+    setup();
+}
+my $pithub = Pithub->new(
+    token => $token,
+    ua    => $agent,
+);
+main();
+exit;
+
+# ------------------------------------------------------------------------- 
+sub main {
+    my $cmd = shift @ARGV || 'help';
+    my $cmd_code = __PACKAGE__->can("CMD_$cmd")
+        or die "Unknown command $cmd\n";
+    $cmd_code->();
+}
+
+# ------------------------------------------------------------------------- 
+
+sub CMD_help {
+    pod2usage(-verbose => 2);
+}
+
+sub CMD_version {
+    print "$VERSION\n";
+    exit 0;
+}
+
+sub CMD_issues {
+    my ($user, $repo) = _get_user_repo_with_current_repo('issues');
+    my $res = $pithub->issues->list(user => $user, repo => $repo);
+    while ( my $row = $res->next ) {
+        printf("#%s %s - %s\n", colored(['green'], $row->{number}), $row->{title}, colored(['Cyan'], $row->{user}->{login}));
+        printf("%s\n\n", colored(['white'], $row->{html_url}));
+    }
+}
+
+sub CMD_info {
+    my ($user, $repo) = _get_user_repo('info');
+    my $res = $pithub->repos->get(user => $user, repo => $repo);
+    $res->success or die dump_content($res->content);
+    dump_content($res->content);
+}
+
+sub CMD_clone {
+    my $fork;
+    if ($ARGV[0] eq '--fork') {
+        $fork = 1;
+        shift @ARGV;
+    }
+    my ($user, $repo) = _get_user_repo('clone');
+    if ($fork) {
+        my $res = $pithub->repos->forks->create(user => $user, repo => $repo);
+        $res->success or die dump_content($res->content);
+        $user = $me;
+    }
+    my $res = $pithub->repos->get(user => $user, repo => $repo);
+    $res->success or die dump_content($res->content);
+    my $url = $res->content->{ssh_url} or die "Cannot get ssh_url";
+    system("git", "clone", $url);
+}
+
+sub CMD_fork {
+    my ($user, $repo) = _get_user_repo_with_current_repo('fork');
+    print("Forking $user/$repo\n");
+    my $res = $pithub->repos->forks->create(user => $user, repo => $repo);
+    $res->success or die dump_content($res->content);
+    my $ssh_url = $res->content->{ssh_url} // die dump_content($res->content);
+    system("git", "remote", "add", $me, $ssh_url);
+    system("git remote -v"); # show current settings.
+}
+
+sub CMD_pull {
+    my ($num) = pop @ARGV;
+    my $remote;
+    if (@ARGV) {
+        $remote = shift @ARGV;
+    }
+    else {
+        my $branch = `git symbolic-ref -q HEAD`;
+        chomp $branch;
+        $branch ||= 'master';
+        $branch =~ s{refs/heads/}{};
+        warn $branch;
+        $remote = `git config branch.$branch.remote`;
+        chomp $remote;
+    }
+    warn join(" ", "git", "fetch", $remote, "refs/pull/$num/head:pull-$num");
+    system("git", "fetch", $remote, "refs/pull/$num/head:pull-$num");
+}
+
+sub CMD_pullreq {
+    my ($title, $branch, $desc) = splice(@ARGV, 2);
+    $title or die "Usage: $0 pullreq tokuhirom ph 'pull req title'\n";
+    $branch ||= `git symbolic-ref -q HEAD` || 'master';
+    $desc   ||= '';
+
+    my ($user, $repo) = _get_user_repo('clone');
+    my $res = $pithub->pull_requests->create(
+        user => $user,
+        repo => $repo,
+        data => {
+            title => $title,
+            body  => $desc,
+            head  => "$me:$branch",
+            base  => 'master',
+        },
+    );
+    $res->success or die dump_content($res->content);
+}
+
+sub CMD_add {
+    my ($user, $repo) = _get_user_repo('clone');
+    my $res = $pithub->repos->get(user => $user, repo => $repo);
+    $res->success or die dump_content($res->content);
+    my $url = $res->content->{ssh_url} or die "Cannot get ssh_url";
+    system("git remote add $user $url");
+    system("git fetch $user");
+}
+
+sub CMD_all {
+    my ($user) = shift @ARGV;
+    $user or die "Usage: $0 all tokuhirom\n";
+    my $res = $pithub->repos->list(user => $user);
+    $res->success or die dump_content($res->content);
+    $res->auto_pagination(1);
+    while (my $row = $res->next) {
+        say("-------- $row->{name} --------");
+        next if $row->{fork}; # skip forked repos
+        next if -e $row->{name};
+        system("git", "clone", $row->{ssh_url});
+    }
+}
+
+sub CMD_import {
+    my $remote = 'origin';
+    my $homepage = '';
+    my $description = '';
+    my $private = 0;
+    GetOptions(
+        'remote=s'      => \$remote,
+        'homepage=s'    => \$homepage,
+        'description=s' => \$description,
+        'private'       => \$private,
+    );
+    if (`git config --local --get remote.$remote.fetch`) {
+        Carp::croak "Remote [$remote] already exists. Try specifying another one using --remote.";
+    }
+
+    my $pwd = Cwd::getcwd();
+    my $name = File::Basename::basename($pwd);
+    exit unless prompt("Can I import $pwd to $name in github? [y/N] ", -yes);
+    my $res = $pithub->repos->create(
+        data => {
+            name        => $name,
+            homepage    => $homepage,
+            description => $description,
+            public      => $private ? 0 : 1,
+        }
+    );
+    $res->success or die dump_content($res->content);
+    dump_content($res->content);
+    my $ssh_url = $res->content->{ssh_url} // die "Missing ssh_url";
+
+    print "Adding GitHub repo $name as remote [$remote].\n";
+    system(qw(git remote add), $remote, $ssh_url);
+
+    if (!`git config --get branch.master.remote`) {
+        print "Setting up remote [$remote] for master branch.\n";
+        system(qw(git config branch.master.remote), $remote);
+        system(qw(git config branch.master.merge refs/heads/master));
+        my $rebase = `git config --get branch.autosetuprebase`;
+        chomp $rebase;
+        if ($rebase && ($rebase eq 'remote' || $rebase eq 'always')) {
+            system(qw(git config branch.master.rebase true));
+        }
+    }
+
+    print "Pushing to remote [$remote]\n";
+    system(qw(git push), $remote, qw(master));
+    print "Done.\n";
+}
+
+# ------------------------------------------------------------------------- 
+
+sub _get_user_repo_simple() {
+    my ($repo, $user);
+    if (@ARGV==2) {
+        ($user, $repo) = @ARGV;
+    } elsif (@ARGV==1) {
+        if ($ARGV[0] =~ m{/}) {
+            ($user, $repo) = split m{/}, $ARGV[0];
+        }
+        else {
+            ($user, $repo) = ($me, $ARGV[0]);
+        }
+    }
+    return ($user, $repo);
+}
+
+sub _get_user_repo {
+    my ($cmd) = @_;
+    my ($user, $repo) = _get_user_repo_simple();
+    $user // die "Usage: $0 $cmd miyagawa/Plack\n";
+    return ($user, $repo);
+}
+
+sub _get_user_repo_with_current_repo {
+    my ($cmd) = @_;
+    my ($user, $repo) = _get_user_repo_simple();
+    unless ($user && $repo) {
+        my $remote = `git remote -v`;
+        if ($remote =~ m{git://github\.com\/([^/ ]+)\/([^/ ]+)\.git}) {
+            ($user, $repo) = ($1, $2);
+        } elsif ($remote =~ m{git\@github\.com:([^/]+)/([^/]+)\.git}) {
+            ($user, $repo) = ($1, $2);
+        } else {
+            die "Usage: $0 $cmd plack/Plack\n";
+        }
+    }
+    return ($user, $repo);
+}
+
+our $DUMP_DEPTH = 0;
+sub dump_content {
+    local $DUMP_DEPTH = 0;
+    my $c = shift;
+    _dump_content($c);
+}
+sub _dump_content {
+    my $c = shift;
+    if (ref $c eq 'HASH') {
+        for my $key (sort keys %$c) {
+            print(' ' x ($DUMP_DEPTH*2));
+            print($key . ': ');
+            if (ref $c->{$key} eq 'HASH') {
+                print("\n");
+                local $DUMP_DEPTH = $DUMP_DEPTH + 1;
+                _dump_content($c->{$key});
+            } else {
+                print("$c->{$key}");
+                print("\n");
+            }
+        }
+    }
+}
+
+# ------------------------------------------------------------------------- 
+
+sub save_auth_result {
+    my $res = shift;
+
+    $res->is_success or die $res->as_string;
+    my $dat = decode_json($res->content);
+    $token = $dat->{token} || die "Cannot get token from API:\n\n" . $res->as_string;
+    $token =~ /^[A-Za-z0-9_-]+$/ or die "API token contains bad char: $token";
+    {
+        no autodie;
+        system("git config --global --unset-all ph.user");
+        system("git config --global --unset-all ph.token");
+    }
+    system("git config --global --add ph.user $me") == 0 or die;
+    system("git config --global --add ph.token $token") == 0 or die;
+}
+
+sub request_basic {
+    my ($user, $password, $otp) = @_;
+    my $res = $agent->request(
+        do {
+            my $req = HTTP::Request->new(
+                POST => 'https://api.github.com/authorizations'
+                # GET => 'https://github.com/login/oauth/authorize?client_id=45ee252fecc56cd85629&scopes=delete_repo,public_repo,repo,gist,user'
+            );
+            if (defined $otp) {
+                $req->header('X-GitHub-OTP' => $otp);
+            }
+            $req->content(
+                encode_json({
+                    note   => 'App::ph on ' . Sys::Hostname::hostname,
+                    scopes => [qw(delete_repo public_repo repo gist user)],
+                })
+            );
+            $req->authorization_basic($me, $password);
+            $req;
+        }
+    );
+    return $res;
+}
+
+sub setup {
+    say("setup ph. please input your id/pw to this prompt. password will not save to any location.");
+    $me = prompt('user: ');
+    my $pass = prompt('pass: ', -echo => '*');
+    # request with basic auth.
+    my $res = request_basic($me, $pass);
+    if ($res->is_success) {
+        save_auth_result($res);
+        return;
+    } else {
+        if ($res->header('X-GitHub-OTP') =~ 'required') {
+            my $otp = prompt('otp for 2-factor authentication: ');
+            my $res = request_basic($me, $pass, $otp);
+            save_auth_result($res);
+            return;
+        } else {
+            die $res->as_string;
+        }
+    }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ph - Github CLI client
+
+=head1 SYNOPSIS
+
+    $ ph info mattn gal-vim
+    $ ph clone mattn gal-vim
+    $ ph import
+
+=head1 DESCRIPTION
+
+ph is yet another Github CLI client.
+
+=head1 SUB COMMANDS
+
+=head2 ph import
+
+    % ph import
+
+This command import current directory to the github.
+
+=head2 ph fork
+
+    % ph fork tokuhirom Minilla
+
+This command forks the repository to your github account.
+
+=head2 ph info
+
+   % ph info mattn gal-vim
+
+This command displays information of the repository.
+
+=head2 ph help
+
+    % ph help
+
+Shows this help page.
+
+=head2 ph all
+
+    % ph all $USERNAME
+
+Clone all repository in your account
+
+=head2 ph version
+
+Show the version number.
+
+=head2 ph issues
+
+    % ph issues
+
+Show list of issues for current project.
+

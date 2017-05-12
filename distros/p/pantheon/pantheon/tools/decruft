@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use lib '/home/kan/pantheon/lib';
+use strict;
+use warnings;
+
+use Vulcan::OptConf;
+use Vulcan::Cruft;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+=head1 SYNOPSIS
+
+Remove extraneous regular files from directories.
+
+=head3 show cruft
+
+ $0 directories
+
+=head3 remove cruft
+
+ $0 directories --remove
+
+=cut
+my %o = Vulcan::OptConf->load()
+    ->get( qw( count=i regex=s size=s age=s remove ) )->dump();
+
+my @cruft = Vulcan::Cruft->new( @ARGV )->cruft( %o );
+
+print join( "\n", sort @cruft ), "\n" if @cruft;
+exit 0;

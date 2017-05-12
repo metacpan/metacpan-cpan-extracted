@@ -1,0 +1,146 @@
+NAME
+    package::compute - stop hard-coding your package names
+
+SYNOPSIS
+       package Foo::Bar;  # this is a hard-coded package name
+       use 5.010;
+   
+       {
+          use package::compute "../Quux";
+          say __PACKAGE__;              # says "Foo::Quux";
+          say __RPACKAGE__("./Xyzzy");  # says "Foo::Quux::Xyzzy";
+      
+          sub hello { say __PACKAGE__ };
+       }
+   
+       say __PACKAGE__;   # says "Foo::Bar" (lexically scoped!)
+       Foo::Quux->hello;  # says "Foo::Quux"
+
+DESCRIPTION
+    This module allows you to compute package names on the fly at compile
+    time, rather than hard-coding them as barewords. It is the solution to the
+    problem (if indeed you consider it to be a problem at all) that you cannot
+    write this in Perl:
+
+       package $blah;
+
+    This module uses B::Hooks::Parser to accomplish its evil goals.
+
+    Using this module at all is probably a very bad idea.
+
+  Package Specification
+    The general syntax for specifying a package with this module is:
+
+       use package::compute EXPR;
+
+    Where EXPR is an arbitrary expression which will (caveat!) be evaluated at
+    compile time, and interpreted roughly the way Perl interprets package
+    names, with the following bonus features:
+
+    *   If the package name expression is a coderef, then that coderef is
+        called and the return value is used instead.
+
+    *   Slashes may be used to separate package name components in addition to
+        the usual Perl "::" and deprecated "'" package separators.
+
+    *   The component "." at the start of the package name refers to the
+        caller. ("." elsewhere is a no-op.)
+
+    *   The component ".." climbs "up" the package hierarchy.
+
+    *   The component "..." climbs "up" the package hierarchy by two levels.
+        Et cetera.
+
+    Thus the following are all valid ways of expressing package "Foo::Bar":
+
+       ### 
+       use package::compute "Foo::Bar";
+       ####
+   
+       ### Using a coderef
+       use package::compute sub { join q(::) qw( Foo Bar ) };
+       ####
+   
+       #### Relative package name
+       package Foo;
+       use package::compute "./Bar";
+       ####
+   
+       ### Climbing the package hierarchy
+       package Foo::XXX;
+       use package::compute "../Bar";
+       ####
+   
+       ### Climbing the package hierarchy twice
+       package Foo::XXX::YYY;
+       use package::compute "../../Bar";
+       ####
+   
+       ### Climbing the package hierarchy twice - shortcut
+       package Foo::XXX::YYY;
+       use package::compute ".../Bar";
+       ####
+
+    As a special case, you can also do:
+
+       use package::compute -filename;
+
+    Which will attempt to determine the package name based on the filename it
+    is defined in, much like `autopackage` does.
+
+    Also:
+
+       use package::compute -anon;
+
+    Will compute an "anonymous" (i.e. arbitrary) package name.
+
+  Utility Function
+    This module also exports a utility function:
+
+    `__RPACKAGE__($name)`
+        Returns a package name as a string, computed in the same way as `use
+        package::compute` does. An example of its use for object-oriented
+        code:
+
+                package MyProject;
+        
+                {
+                        use package::compute './Person';
+                        use Moose;
+                        has name => (is => 'ro');
+                }
+        
+                my $bob = __RPACKAGE__('./Person')->new(name => "Robert");
+
+        As you can see, this makes it possible to avoid hard-coded references
+        to the MyProject::Person class.
+
+        `__RPACKAGE__` doesn't support the special `-filename` and `-anon`
+        options.
+
+        It is possible to import the `__RPACKAGE__` function alone, without
+        the package declaration magic using:
+
+           use package::compute undef;
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=package-compute>.
+
+SEE ALSO
+    autopackage, Package::Relative.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

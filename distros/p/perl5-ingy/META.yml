@@ -1,0 +1,32 @@
+---
+abstract: "Ingy's Favorite Perl 5 Feature Set"
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: perl5-ingy
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Capture::Tiny: '0.11'
+  IO::All: '0.43'
+  XXX: '0.17'
+  YAML::XS: '0.35'
+  perl: v5.8.1
+  perl5: '0.10'
+resources:
+  bugtracker: https://github.com/ingydotnet/perl5-ingy-pm/issues
+  homepage: https://github.com/ingydotnet/perl5-ingy-pm
+  repository: https://github.com/ingydotnet/perl5-ingy-pm.git
+version: '0.13'

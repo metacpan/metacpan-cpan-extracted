@@ -1,0 +1,12 @@
+CHANGES
+INSTALL
+README
+lib/PerlConsole/Preferences.pm
+lib/PerlConsole/Commands.pm
+lib/PerlConsole/Console.pm
+lib/PerlConsole.pm
+COPYING
+perlconsole
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP

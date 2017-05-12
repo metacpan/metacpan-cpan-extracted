@@ -1,0 +1,72 @@
+<HTML>
+<HEAD><TITLE> 15.1. How do I get a Dialog box?</TITLE></HEAD>
+<BODY><a name="A15.1"> 15.1. How do I get a <kbd>Dialog</kbd> box?</a>
+
+<hr>
+</p><p>
+For things like a simple &quot;are you sure?&quot; dialog box you might want to
+take a look at <KBD>perl5/Tk/Dialog.pm</KBD>. This module may be invoked with 
+<KBD>require Tk::Dialog;</KBD> <I>etc.</I> - there are much more extensive 
+directions inside the comment fields at the top of the <KBD>Dialog.pm</KBD> 
+file itself. The module has a lot of options and has a tutorial driver script
+in <KBD>perl5/Tk/demos/dialog</KBD>. Dialog.pm is also used by the 
+<KBD>perl5/Tk/demos/widget</KBD> demo.  In particular look at 
+<KBD>perl5/Tk/demos/widget_lib/dialog1.pl</KBD> and <KBD>dialog2.pl</KBD> for
+examples of how one makes use of Tk::Dialog. A snippet of a script that uses
+this module could look like:
+<pre>
+    require Tk::Dialog;
+
+    my $mw = MainWindow-&gt;new;
+    my $D = $mw-&gt;Dialog(
+                 -title =&gt; 'Are you sure?',
+                 -text  =&gt; "You have requested rm \*\nAre you sure?",
+                 -default_button =&gt; 'No',
+                 -buttons        =&gt; ['No','yes']
+                       );
+    my $choice = $D-&gt;Show;  # use Show for Tk-b9.01
+# if using Tk-b8:    my $choice = $D-&gt;show;
+
+    print " you chose $choice \n";
+</pre>
+A question concerning configuration of the Subwidgets on the Dialogs 
+came up recently:
+<pre>
+&lt;Greg_Cockerham@avanticorp.com&gt; wrote:<i>
+! I want to reconfigure the colors of the Dialog and
+! ErrorDialog buttons.  How do I do this?
+! Thanks in advance.</i>
+
+   $dialog_widget-&gt;configure(-background =&gt; 'purple'); 
+</PRE><BLOCKQUOTE>
+Since these two widgets are composites you manage them like any 'ol
+widget.  If the default delegate subwidget(s) aren't to your liking
+you can always get to individual component widgets of the composite
+via the <KBD>-&gt;Subwidget()</KBD> method.
+<p>
+I see these subwidgets:
+</BLOCKQUOTE>
+<DL>
+<DT>Dialog</DT>
+<DD>'message' is the label subwidget with the dialog text, and
+    'bitmap' is the label subwidget showing the dialog bitmap</DD>
+<DT>ErrorDialog</DT>
+<DD>'error_dialog' is Dialog subwidget, 'text' is text subwidget</DD>
+</DL>
+<BLOCKQUOTE>
+You can even do things like this:
+</BLOCKQUOTE><PRE>
+  $error_dialog-&gt;Subwidget('error_dialog')-&gt;Subwidget('bitmap')-&gt;configure(..);
+</PRE><BLOCKQUOTE>
+to "get to" the label widget of the dialog component of the error_dialog
+widget.....
+<p>
+Be sure to also check out the "<KBD>dialog</KBD>" demo.
+</BLOCKQUOTE>
+
+
+<hr>
+	<p><a href="qna15.html">Previous</a> | Return to <a href="ptkTOC.html#TOC15.1">table of contents</a> | <a href="qna15.2.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

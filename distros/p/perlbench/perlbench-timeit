@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+
+use strict;
+use PerlBench qw(timeit sec_f make_timeit_sub_code);
+use Getopt::Long qw(GetOptions);
+
+sub compilable {  # early so that no lexicals are in scope
+    no strict;
+    eval qq(#line 1 "code"\n{ $_[0] });
+    return !$@;
+}
+
+my %opt;
+GetOptions(\%opt,
+   'repeat=i',
+   'enough=f',
+   'show-timing-code',
+   'show-avg',
+   'show-loop-overhead',
+   'verbose+',
+) || usage();
+
+my $code = shift || usage();
+usage() if @ARGV;
+
+$code .= ";" unless $code =~ /;\s*$/;
+unless (compilable($code)) {
+    die "The speficied code does not compile.\n$@";
+}
+
+my $delim = qr/;;;/;
+my $init;
+if ($code =~ $delim) {
+    ($init, $code) = split($delim, $code, 2);
+}
+
+if ($opt{'show-timing-code'}) {
+    print "require Time::HiRes;\n\nprint ";
+    print make_timeit_sub_code($code, $init, 999, $opt{repeat});
+    print "->();\n";
+    exit;
+}
+
+my $res = timeit($code, init => $init, repeat => $opt{repeat}, enough => $opt{enough}, verbose => $opt{verbose});
+die "Failed" unless $res;
+
+print "med = " if $opt{'show-avg'} || $opt{verbose};
+print sec_f($res->{med}, $res->{med} - $res->{min}), "\n";
+print "avg = ", sec_f($res->{avg}, 2 * $res->{stddev}), "\n" if $opt{'show-avg'} || $opt{verbose};
+
+if (my $o = $res->{loop_overhead_relative}) {
+    $o *= 100;
+    if ($o > 10 || $opt{'show-loop-overhead'} || $opt{verbose}) {
+	printf "(%.*f%% loop overhead", ($o > 10 ? 0 : 1), $o;
+	print ", try higher --repeat values" if $o > 10;
+	print ")\n";
+    }
+}
+
+if ($opt{verbose} && $opt{verbose} > 1 && eval { require Data::Dump }) {
+    delete $res->{x};
+    delete $res->{t};
+    print "\n\$res = ", Data::Dump::dump($res), "\n";
+}
+
+sub usage {
+    (my $progname = $0) =~ s,.*/,,;
+    die "Usage: $progname [options] <perlcode>\n";
+}

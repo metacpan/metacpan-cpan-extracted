@@ -1,0 +1,78 @@
+POP Documentation : TRANSACTIONS
+-----------------   ------------
+
+POP provides a number of options for transactional support. For the most part,
+these are passed through to the database.  Note that these variables and
+functions are forcibly inserted into the main:: namespace.  That's why they
+all have the POP prefix, and why they're so darn long.  The best way to get a
+handle on these things is to play around with them in several simultaneous
+debugger sessions.
+
+---------------------
+$POP_TRANSACTION_MODE
+---------------------
+
+POP has two modes; ANSI and auto-commit.  The default mode is ANSI.  You can
+change the mode by assigning either $POP_TRANSACTION_ANSI or
+$POP_TRANSACTION_AUTO to $POP_TRANSACTION_MODE.
+
+If the mode is $POP_TRANSACTION_ANSI, you need to explicitly call POP_COMMIT()
+or POP_ROLLBACK() to commit or rollback the transaction, respectively.
+
+When the mode is $POP_TRANSACTION_AUTO, every modification you make to an
+object will be immediately visible to every other process.
+
+Note that $POP_TRANSACTION_ANSI is more efficient.
+
+---------------
+POP_ISOLATION()
+---------------
+
+You can adjust the isolation level of the process to one of the following
+values:
+
+$POP_ISOLATION_DIRTY_READ
+
+$POP_ISOLATION_COMMITTED_READ
+
+$POP_ISOLATION_REPEATABLE_READ
+
+by calling POP_ISOLATION() with that value.  The default value is
+$POP_ISOLATION_COMMITTED_READ, which will block the process when it attempts
+to read data which another process is updating in a transaction.
+$POP_ISOLATION_DIRTY_READ will allow the process to read data which another
+transaction is in the process of modifying.  This can be useful to avoid
+deadlocks and to improve concurrency for instances where transactionally
+correct data is not necessary.  Actually, if the processes which are updating
+use a $POP_UPDATE_VERSION_GRANULARITY of $POP_UPDATE_VERSION_ON_COMMIT (see
+below), you can greatly guarantee the correctness of the data read by a process
+in $POP_ISOLATION_DIRTY_READ for objects which were already restored into
+memory at the time the other process modified it.  An isolation level of
+$POP_ISOLATION_REPEATABLE_READ is an even stronger condition than
+$POP_ISOLATION_COMMITTED_READ, and results in less concurrency and greater
+chance of deadlock.  It is sometimes referred to as serializable.
+
+The ->all() method uses an isolation level of $POP_ISOLATION_DIRTY_READ by
+default, even if the rest of the process is using a different isolation level.
+You can override this by providing an 'isolation' key to the options hash given
+as the first argument to all.  The value of that key should be one of the
+levels given above, or $POP_ISOLATION_CURRENT, to force the use of the current
+isolation level.
+
+-------------------------------
+$POP_UPDATE_VERSION_GRANULARITY
+-------------------------------
+
+This controls exactly when POP updates the version number for each object which
+is modified.  This version number is used by POP to detect if the object has
+been modified by another process.  There are two options:
+
+$POP_UPDATE_VERSION_ON_COMMIT
+
+$POP_UPDATE_VERSION_ON_CHANGE
+
+The default value is $POP_UPDATE_VERSION_ON_COMMIT, which means that the
+version number is only incremented when POP_COMMIT is called.  When the value
+is $POP_UPDATE_VERSION_ON_CHANGE, the version number is incremented each time
+any attribute is modified.  Notice that this has no meaning when the
+$POP_TRANSACTION_MODE is $POP_TRANSACTION_AUTO.

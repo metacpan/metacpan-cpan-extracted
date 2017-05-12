@@ -1,0 +1,37 @@
+0.12 Sat Aug 16 12:00:06 PDT 2014
+ - Meta 0.0.2
+
+0.11 Fri Aug 15 21:25:47 PDT 2014
+ - Remove t/use_ok.t
+
+0.10 Fri Aug 15 20:32:05 PDT 2014
+ - Add t/000-require-modules.t
+
+0.09 Wed Jul 30 16:03:11 PDT 2014
+ - Fix Meta and add Contributing
+ - Switch IRC to
+
+0.08 Fri Jun 27 19:24:20 PDT 2014
+ - Switch to Zilla::Dist
+
+0.07 Sun Jul 17 22:52:57 PDT 2011
+ - Switch to new perl5 API
+
+0.06 Sun Jun 12 03:41:59 EST 2011
+ - Upgrade Module::Package to make sure perl5.pm gets required
+
+0.05 Sun Jun 12 00:42:13 EST 2011
+ - Add a warning for Schwern.
+
+0.04 Fri Jun 10 14:59:52 EST 2011
+ - Add Time::y2038 as prereq until perl5i does so itself.
+
+0.03 Wed Jun  8 02:00:01 EST 2011
+ - Make sure perl5i is picked up as a prereq
+
+0.02 Tue Jun  7 17:28:47 EST 2011
+ - Make sure that perl5.pm is a prerequisite
+
+0.01 Sun Jun  5 23:29:22 EST 2011
+ - First Release
+

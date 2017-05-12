@@ -1,0 +1,73 @@
+From PVHP@LNS62.LNS.CORNELL.EDU Mon Feb 12 18:33:56 1996
+Received: from lns61.tn.cornell.edu (LNS61.TN.CORNELL.EDU [128.84.219.61]) by lns598.lns.cornell.edu (8.6.11/8.6.11)
+	with ESMTP id SAA13805 for <pvhp@LNS598.LNS.CORNELL.EDU>; Mon, 12 Feb 1996 18:33:54 -0500
+From: PVHP@LNS62.LNS.CORNELL.EDU
+Received: from LNS62.LNS.CORNELL.EDU by lns61.tn.cornell.edu
+ (PMDF V4.3-10 #13710) id <01I14W9U7MZK8ZEV4R@lns61.tn.cornell.edu>; Mon,
+ 12 Feb 1996 18:33:47 -0400 (EDT)
+Received: from LNS62.LNS.CORNELL.EDU by LNS62.LNS.CORNELL.EDU
+ (PMDF V4.3-13 #13710) id <01I14W9C3TIW8WYXHF@LNS62.LNS.CORNELL.EDU>; Mon,
+ 12 Feb 1996 18:33:30 -0500 (EST)
+Date: Mon, 12 Feb 1996 18:33:30 -0500 (EST)
+Subject: perl version timeline
+To: pvhp@lns598.lns.cornell.edu
+Message-id: <01I14W9C3TIY8WYXHF@LNS62.LNS.CORNELL.EDU>
+X-VMS-To: IN%"pvhp@cesr20.lns.cornell.edu"
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; CHARSET=US-ASCII
+Content-transfer-encoding: 7BIT
+Status: R
+
+From:	IN%"tchrist@mox.perl.com"  "Tom Christiansen" 12-FEB-1996 13:16:55.86
+To:	IN%"h.b.furuseth@usit.uio.no"
+CC:	IN%"perl5-porters@africa.nicoh.com", IN%"tchrist@mox.perl.com"
+Subj:	RE: non-#! scripts do not use absolute perl-pathname
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I14L6D188G8WYN5R@LNS62.LNS.CORNELL.EDU>; Mon,
+ 12 Feb 1996 13:16:27 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA299588831; Mon, 12 Feb 1996 13:13:51 -0500
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA299018822; Mon,
+ 12 Feb 1996 13:13:42 -0500
+Received: from mox.perl.com (perl.com) by africa.nicoh.com with ESMTP
+ (1.37.109.15/16.2) id AA298948816; Mon, 12 Feb 1996 11:13:37 -0700
+Received: from localhost.perl.com (localhost.perl.com [127.0.0.1])
+ by mox.perl.com (8.6.12/8.6.12) with SMTP id LAA24103; Mon,
+ 12 Feb 1996 11:13:29 -0700
+Date: Mon, 12 Feb 1996 11:13:26 -0700
+From: Tom Christiansen <tchrist@mox.perl.com>
+Subject: Re: non-#! scripts do not use absolute perl-pathname
+In-reply-to: h.b.furuseth@usit.uio.no's missive
+ <199602121752.SAA07673@durin.uio.no> of Mon, 12 Feb 1996 18:52:35 +0100.
+Sender: owner-perl5-porters@nicoh.com
+To: h.b.furuseth@usit.uio.no
+Cc: perl5-porters@africa.nicoh.com, tchrist@mox.perl.com
+Message-id: <24098.824148806@mox>
+Content-type: text/plain; charset=ISO-8859-1
+Content-transfer-encoding: 8bit
+List-Name: perl5-porters
+Precedence: bulk
+References: <199602121752.SAA07673@durin.uio.no>
+
+hm.... corrected timeline is more like
+
+    86 	perl0
+    87	perl1
+    88	perl2
+    89	perl3
+    91	perl4 (well, around Christmas 90, actually, I think)
+    92	perl4.036
+    93	perl5 alpha/beta
+    94	perl5 production
+    95 	perl5.001
+    96	perl5.002
+
+When you say "until perl5 is tried and tested" -- what do you
+think we've been doing for the last three years?  
+
+Sigh.  
+
+--tom
+

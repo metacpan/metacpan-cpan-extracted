@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use MIO::TCP;
+use Poros::Query;
+use Vulcan::Sudo;
+use Vulcan::OptConf;
+
+our $PORT = 12345;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 -r range users
+
+=cut
+Vulcan::Sudo->sudo();
+
+my $option = Vulcan::OptConf->load();
+my %o = Vulcan::OptConf->load()->get( 'range=s' )->dump();
+my @conf;
+
+for my $user ( @ARGV )
+{
+    next unless my @pw = getpwnam $user;
+
+    my $home = $pw[7];
+    my $chown = sprintf '%s:%s', $user, getgrgid( $pw[3] );
+
+    for my $file ( map { "$home/.ssh/$_" } qw( id_dsa authorized_keys ) )
+    {
+        next unless -f $file;
+        my %conf = ( chown => $chown, path => $file );
+
+        $conf{chmod} = sprintf "%04o", ( stat $file )[2] & 07777;
+        $conf{md5} = Digest::MD5->new()
+            ->add( $conf{file} = `cat $file` )->hexdigest();
+
+        push @conf, \%conf;
+    }
+}
+
+my %query = ( code => 'dump', argv => \@conf );
+my $range = Hermes->new( $option->dump( 'range' ) );
+
+my ( %result, %mesg ) = MIO::TCP
+    ->new( map { join ':', $_, $PORT } $range->load( delete $o{range} )->list )
+    ->run( %o, input => Poros::Query->dump( \%query ) );
+
+while ( my ( $type, $mesg ) = each %result )
+{
+    while ( my ( $mesg, $node ) = each %$mesg )
+    {
+        map { $_ =~ s/:$PORT$// } @$node;
+        $mesg =~ s/--- \d+\n$//;
+        $node = $range->load( $node )->dump();
+        $mesg{$type}{$node} = YAML::XS::Load( $mesg ) if $mesg;
+    }
+}
+
+YAML::XS::DumpFile \*STDOUT, \%mesg if %mesg;
+exit 0;

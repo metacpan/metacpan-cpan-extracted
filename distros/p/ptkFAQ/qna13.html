@@ -1,0 +1,116 @@
+<HTML>
+<HEAD><TITLE> How do I install new scripts | modules | extensions?</TITLE></HEAD>
+<BODY><a name="A13"> How do I install new scripts | modules | extensions?</a>
+
+<hr>
+</p><p>
+(Thanks to Ilya Zakharevich 
+<a href="mailto:ilya@math.ohio-state.edu">&lt;ilya@math.ohio-state.edu&gt;</a> 
+for pointing out that perl code comes in a variety of flavors and some code 
+requires more work than others to install. Hence I have expanded this topic 
+and will refer to three distinct categories here: 
+<b>Scripts</b> <b>Modules</b> and <b>Extensions</b>:)
+
+<h4>Scripts</h4>
+A &quot;self-contained&quot; script needs little modification (in principle!)
+to run. It is a good idea to check the <kbd>#!</kbd> line at the very top of
+the file to reflect your local perl setup (<i>e.g.</i>
+<kbd>#!/usr/bin/perl -w</kbd> (<em>change to</em>)
+<kbd>#!/usr/gnu/local/perl -w</kbd> or what have you). There are allegedly
+&quot;more portable&quot; ways to invoke the perl interpretor as well -
+they are more fully documented in the 
+<a href="http://www.perl.com/perl/faq/">perl FAQ</a> and the
+<a href="http://www.metronet.com/perlinfo/perl5/manual/perlrun.html">
+<kbd>perlrun(1)</kbd></a> man page, however.
+<p>
+Other things you do not want to forget when trying to run a perl script include
+giving yourself permission to do so, <i>e.g.</i>:
+<pre>
+    chmod u+x newscriptname
+</pre>
+You also want to be sure your <kbd>DISPLAY</kbd> environment variable is set up
+properly when attempting to run a perl/Tk script. You may also need to look at
+the <kbd>xhost(1)</kbd> or the <kbd>xauth(1)</kbd> man pages for setting up 
+your X-display properly.
+<p>
+If you are still experiencing difficulty check to be sure that extraneous
+/newsgroup|e-mail|HTML headers|footers|markup//; are not in the file and 
+that you have on hand all that is <kbd>require</kbd>ed or <kbd>use</kbd>ed by 
+the script (if not you may need to install a module - or even a perl4 style 
+<i>lib</i><kbd>.pl</kbd> file).
+
+<h4>Modules</h4>
+Check out the module - make sure it is OK and will run on your system - does it
+require a specific location?
+For testing purposes (always a good idea) or if you do not have root 
+priveleges set the file in a directory that you do have write access to and try
+to include it in a test script.
+Assuming you have a module to test called &quot;<KBD>Foo.pm</KBD>&quot; and are 
+simply running the test script in the same directory as the 
+module begin by adding to the @INC array like so:
+<pre>
+    #!/usr/bin/perl -w
+     BEGIN { @INC = ("$ENV{'PWD'}",@INC); }
+     use Tk;
+     use Foo;
+</pre>
+<i>or</i>
+<pre>
+    #!/usr/bin/perl -w
+     use lib $ENV{PWD};
+     use Tk;
+     use Foo;
+</pre>
+Another approach is to set either the PERLLIB or PERL5LIB environment variable
+from your shell. This method allows invoking the test script from within a
+number of different directories without having to edit a hard coded 
+<kbd>use lib</kbd> or <kbd>push(@INC,".")</kbd> kind of statement within the
+script. Yet another way to do it is with the <KBD>-I</KBD> switch on the
+command line like so:
+<pre>
+    perl -Ipath/to/Foo -e fooscriptname
+</pre>
+
+<p>
+After a successful test; if you are a system administrator, or have root 
+priveleges, or are modifying your own copy of <b>perl</b>; then copy it to the
+<KBD>perl5/Tk</KBD> directory. Depending on how the module was written it
+should be possible to use it either with the <KBD>use Tk;</KBD> statement
+itself or with an explicit <KBD>use Tk::Foo;</KBD> (for module
+<KBD>perl5/Tk/Foo.pm</KBD>).
+
+<h4>Extensions (Overgrown Modules)</h4>
+These may come as a multi-file kit (tape archive usually) and may require a C 
+compiler for part of the installation (Tk-b&#35; itself falls into this 
+category). You know you have an <b>Overgrown Module (Extension)</b> when 
+there is one or more files with an <kbd>.xs</kbd> extension 
+(perl-&gt;C meta code) and a <kbd>Makefile.PL</kbd> (perl-&gt;make meta code).
+ One invokes the perl 
+<kbd>MakeMaker</kbd> on the file called <kbd>Makefile.PL</kbd> in order to 
+create a <kbd>Makefile</kbd> via:
+<pre>
+    perl Makefile.PL
+</pre>
+You may now run <kbd>make</kbd> on the resultant <kbd>Makefile</kbd> - but the
+details of this process are module dependent and should be documented in a 
+<kbd>README</kbd> or an <kbd>INSTALL</kbd> file. A very standard perl extension
+requires 4 (or 5 if making static) standard commands to make and install:
+<pre>
+    perl Makefile.PL
+    make
+    make test
+    make install
+</pre>
+If you have the appropriate CPAN and FTP modules already installed you can 
+retrieve a module from <a href="qna4.html">CPAN</a> and carry out all of the above 
+steps with a perl one-liner like this:
+<PRE>
+    perl -MCPAN -e 'install "Foo"'
+</PRE>
+
+
+<hr>
+	<p><a href="qna12.html">Previous</a> | Return to <a href="ptkTOC.html#TOC13">table of contents</a> | <a href="qna14.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

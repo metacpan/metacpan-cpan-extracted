@@ -1,0 +1,169 @@
+Re: nTk and Tk4.0
+*****************
+
+
+
+From: Malcolm Beattie <mbeattie@sable.ox.ac.uk>
+Subject: Re: nTk and Tk4.0
+Date: Thu, 5 Jan 1995 11:54:15 +0000 (GMT)
+
+Next Article (by Date): Re: hv_delete() Malcolm Beattie
+Previous Article (by Date): Re: 2 MakeMaker questions Tim Bunce
+Top of Thread: nTk and Tk4.0 Nick.Ing-Simmons@tiuk.ti.com
+Next in Thread: Re: nTk and Tk4.0 Tim Bunce
+Articles sorted by: [Date] [Author] [Subject] 
+
+
+
+John Stoffel writes:
+> I don't have a problem with using tk4.0 right now, but I DO have a
+> problem with the various flavors of tkperl5a5, nTk-a5, etc that are
+> floating around.  I would LOVE to see a definitive answer from Malcolm
+> on the status of tkperl5a5 and whether or not we should just nuke it
+> and move people to nTk-a5 (with -a6 being the start to tk4.0).  I know
+> Malcolm has his tcl/tk wrapper stuff done, but I haven't played with
+> it at all.  
+> 
+> Malcolm?
+
+I got back yesterday after a long Christmas break and it looks as though
+I've got some decisions to make. Nick appears to be able to spend far
+more of his time on a Tk extension than I have been able to up until now.
+My workload will reduce somewhat if (and only if) we manage to kick our
+big DEC 2100 into submission and stop it from crashing every few days.
+If DEC get their act together this may happen soon or it may still be
+weeks/months before they fix OSF/1 enough.
+
+Nick has taken a rather different route from mine for his Tk extension
+and it's different too from the rough intentions I had for a Tk extension
+based on a "pure" (i.e. language independent) Tk. He has kept a lot
+closer to out-of-the-box Tcl/Tk and that does indeed make development a
+lot quicker. What worries me now (I'm always worried about something ;-)
+is the disadvantages that this has. Here are a few things to think about
+and they all have bearings on each other:
+  Performance
+  Perlishness
+  OO-ness
+  Widget writers
+Performance is a worry because without major changes to Tk, simply
+adding on a Perl interface is going to leave all those extra
+conversions to/from strings that Perl has already done; the extra hash
+lookups in Tk's widget tables and window tables even though Perl
+can supply a widget/window "object" with all data immediately accessible;
+the re-parsing of arguments to select which method/function to call;
+the string-to-foo conversion routines which Perl could cache differently
+and better and so on.
+
+Perlishness is a worry because Tcl uses different conventions from Perl.
+I've just now been reading messages from people noticing the problems with
+""/undef/" "/0. Without changing the behaviour of tkConfig and all the
+config tables for the widgets, there's no way of obeying the principle of
+least surprise for Perl users as opposed to Tcl users. It took me quite a
+while to go through tkConfig changing the code so that undef did "the
+right thing" when used to configure various things and rewriting widget
+methods so that one could "overload" arguments. By that I mean that since
+Perl knows whether something is a string or an object or a list reference
+or whatever it can do the Right Thing when you pass it as an argument
+instead of having to use different commands or different flags.
+
+OO-ness. This is my main worry at the moment. There is a difference
+between a toolkit which is truly object oriented and one which just
+lets you write things->like(this). For example, what about
+    $w->pack();
+The widget $w doesn't have a method which knows how to pack itself.
+THe actual object that should be involved is a geometry manager object
+which manages a number of widgets in another widget (usually frame or
+toplevel). The objects's instance data is the list of children, the
+frame and details of how the packing is to be done (ipad, expand, fill
+and so on). Unlike other X toolkits, the geometry manager isn't a widget
+itself, but it's still an object. Think about packing together two widgets
+of different classes, $foo and $bar. Tcl's "pack a.foo a.bar" becomes
+    $foo->pack($bar);
+and packing in the other order would be
+    $bar->pack($foo);
+But why are we asking $foo to pack itself in the first one and $bar to
+pack itself in the second? What about inheritance? There's no way to
+inherit a new geometry manager class from the old one to tweak its
+pack method (for example, just to dribble debug messages saying what's
+been packed) because $foo and $bar are in two separate widget classes
+which are completely different. You can't even force all widget classes
+to inherit from a geometry manager class since you may want to use a
+new geometry manager and you'd have to change all the @ISA's then.
+"pack" has a fairly simple workaround: just have it as an ordinary
+function like Tcl does. A real OO approach would introduce the packer
+object explicitly: you could control non-trivial packings more easily
+than with Tcl: something like
+    $p = new Packer $frame; # $frame could default to parent of first child
+    $p->manage($foo, $bar, $baz);
+    $oldpad = $p->ipad($foo);
+    $p->ipad($foo, $oldpad + 3);
+Other geometry classes could then inherit from Packer: maybe a debugging
+one or a "stretchy" packer that just overrode ipad and friends to
+increase padding. The degenerate (but common) case of packing a few
+widgets with default parameters (pack .a .b .c) wouldn't be too complex;
+something like:
+    (new Packer)->manage($a, $b, $c);
+Event delivery in the presence of inherited widgets is another case
+where the right design may provide much more functionality with a
+properly designed model. Most of this could be provided for by wrappers
+but I've talked to many people who want/expect Tk with Perl to be *fast*.
+Unlike Tcl, Perl does not have the excuse that people expect it to be
+slow; Perl is in the league of comparison with C. There are other things
+which ought to be methods and be inheritable: Tcl finds coords relative
+to the root window with
+    winfo rooty .foo
+In Perl, doing something like
+    $y = winfo("rooty", path($foo));
+is a nightmare; sub calls, string comparisons, hash lookups, coord output
+converted to a string and then back again to a number when needed.
+With a real Window object that widgets inherit from,
+    $y = $foo->rooty();
+is a single method call that slams the instantly available coord from
+the instance data straight into the return value. Take a look at
+Tk_WinfoCmd in tkCmds.c though; it can't just be changed automatically.
+
+Widget writers: I've had conversations with quite a few people who
+are interested in writing widgets for Perl Tk and they don't mind if
+things are rather different to Tcl/Tk widgets (and, in fact, they would
+prefer certain changes). A widget should be able to be written in C
+and/or Perl and both should have easy access to instance data (even
+for inherited widgets). The current config table for widgets is fairly
+inflexible, not easily available from Perl and forces everything to be
+a string (unsurprisingly). There's no generic way of having classes in
+an inheritance chain from hanging their own data on the object but being
+able to get at all data easily (from Perl and C). A base Configurer
+class would solve this nicely but requires a considerable rewrite of
+the Config code and the conversion routines.
+
+In summary, I can see that nTk is/will be more stable and complete
+than an extension which requires rewriting non-trivial portions of
+libtk but my intention with tkperl was to have a truly native and
+OO X toolkit. If a semi-OO semi-native Tk extension is available
+then a fully native/OO one is probably not worth (me) pursuing anymore
+but I feel that may lock us out of moving later from nTk to such an
+extension without far more design work on Tk itself.
+My intention for the last couple of months has been to (find time to)
+patch tkperl5a5 (config bugs, leaks, text widget), release tkperl5a6/b1
+and then work in parallel on the design stage and initial stages of a
+native Tk (based on Tk4.0). I think that may well no longer be a viable
+plan.
+
+--Malcolm
+
+-- 
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>
+Unix Systems Programmer
+Oxford University Computing Services
+
+
+
+Next Article (by Date): Re: hv_delete() Malcolm Beattie
+Previous Article (by Date): Re: 2 MakeMaker questions Tim Bunce
+Top of Thread: nTk and Tk4.0 Nick.Ing-Simmons@tiuk.ti.com
+Next in Thread: Re: nTk and Tk4.0 Tim Bunce
+Articles sorted by: [Date] [Author] [Subject] 
+
+
+
+   Go to www.nicoh.com LWGate Home Page.
+

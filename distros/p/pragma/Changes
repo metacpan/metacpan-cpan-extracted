@@ -1,0 +1,12 @@
+Revision history for pragma
+
+0.02 - Mon Dec 11 10:55:45 2006
+	...
+
+0.01 - Fri Dec  8 21:56:26 2006
+        First version, released on an unsuspecting world.
+
+0.02 - Mon Dec 11
+        Added -base to ->import.
+        Documented subclassing a bit more.
+        Added namespaces.

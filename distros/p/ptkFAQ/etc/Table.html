@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><title>BLT Table geometry manager</title></head><body>
+<h1>Table geometry manager</h1>
+<ul>
+<li><a href="#description">Description</a>
+<li><a href="#table">Creating a table</a>
+<li><a href="#cell">Creating a cell</a>
+<li><a href="#column">Columns and rows configuration</a>
+<li><a href="#other">Other commands</a>
+<li><a href="#bounding">Bounding list format</a>
+<li><a href="#example">Example</a>
+</ul>
+<h2><a name="description">Description</a></h2>
+
+ The blt_table command is a geometry manager for Tk.  It arranges
+windows tabularly.  The table consists of individual rows and columns
+whose spacing define its layout. Windows, called slaves, are
+positioned in the table by specifying the row and column.  Only one
+slave can be specified at a single position in the table.  But slaves
+may span multiple rows and columns.<p>
+
+ By default, blt_table tries to arrange all its slaves in the minimum
+space required. It determines this by querying each slave window for
+its requested size.  The maximum requested height all slaves spanning
+a particular row is the row's normal size.  Similarly, the maximum
+requested width of all slaves spanning a particular column is the
+column's normal size.  This, in turn, specifies the table's size,
+which is the sum of the normal sizes of the rows and columns.  The
+number of rows and columns a table contains is determined by the
+indices specified.<p>
+
+<h2><a name="table">Creating a table</a></h2>
+
+ Tables are created by invoking the blt_table command.
+<pre>
+	$table = $frame->Table(%options)
+</pre>
+
+ $frame is the pathname of a window which must already exist.
+Blt_table will arrange its slave windows inside of $table.  Slave
+windows are added by designating the slave window's pathname and table
+position.<p>
+
+ The following arguments are available for the blt_table (all frame
+arguments are also available) :<p>
+<dl>
+   <dt>-height <dd>Specifies a desired window height that the table
+widget should request from its geometry manager.
+
+   <dt>-width <dd> Specifies a desired window width that the table
+widget should request from its geometry manager.
+
+   <dt>-row <dd> the rows of the table specified in argument will have the
+same heigth than the rows of the table.
+
+   <dt>-col <dd> the columns of the table specified in argument will have the
+same width than the columns of the table.
+
+    <dt>-xscrollincrement<dd>
+    <dt>-yscrollincrement<dd>
+    <dt>-xscrollcommand<dd>
+    <dt>-yscrollcommand<dd>
+</dl>
+
+<h2><a name="cell">Creating a cell</a></h2>
+
+  The 2 possibilities are :
+<pre>
+$cell = $table->Create($row, $column, 'name_of_Widget', %options);
+</pre>
+  or :
+<pre>
+$widget = $table->What_you_want;
+$table->put($row, $column, $widget);
+</pre>
+<h3>Cell configuration</h3> 
+<pre>
+   $table->Cell('configure', [$row, $column], %options);
+   $table->Cell('configure', $widget, %options);
+</pre>
+ Possible options are :
+<dl>
+ <dt>-anchor
+   <dd> Specifies how the slave window will be arranged if there is
+extra space in the span surrounding the window.  may have any of the
+forms accepted by Tk_GetAnchor.  For example, if is center then the
+window is centered in the rows and columns it spans; if is w then the
+window will be drawn such it touches the leftmost edge of the
+span. This option defaults to center.
+
+ <dt>-columnspan 
+  <dd> Specifies the number of columns spanned by the slave. The
+default span is 1.
+
+ <dt>-fill
+  <dd> Indicates if the slave should be expanded to occupy any extra
+space in the span.  must be one of the following: none, x, y, both.
+If is x, the width slave window is expanded.  If is y, the height is
+expanded. The default is none.
+
+ <dt>-ipadx 
+   <dd> Specifies an extra padding in addition to the width requested
+by the slave window.  can be any value accepted by Tk_GetPixels.  The
+default is 0.
+
+ <dt>-ipady 
+   <dd> Specifies an extra padding in addition to the height requested
+by the slave window.  can be any value accepted by Tk_GetPixels.  The
+default is 0.
+
+ <dt>-padx 
+   <dd> Specifies an extra padding to the width of the span occupying
+the slave window.  can be any value accepted by Tk_GetPixels.  The
+default is 0.
+
+ <dt>-pady 
+   <dd> Specifies an extra padding to the height of the span occupying
+the slave window.  can be any value accepted by Tk_GetPixels.  The
+default is 0.
+
+ <dt>-reqheight 
+   <dd> Specifies limits for the requested height of the slave window.
+These limits also constrain the amount of internal padding given to
+the slave.  is a list of bounding values.  See the section <a
+href="#bounding">bounding list format</a> for a description of this
+list.  By default there are no constraints.
+
+ <dt>-reqwidth 
+   <dd> Specifies the limits of the width which a slave may request.
+These limits also affect the amount of internal padding given to the
+slave.  is a list of bounding values.  See the section <a
+href="#bounding">bounding list format</a> for a description of this list.
+By default there are no constraints.
+
+ <dt>-rowspan 
+   <dd> Specifies the number of rows spanned by the slave window. The
+default span is 1.
+</dl>
+
+
+<h2><a name="column">Columns and rows configuration</a></h2>
+
+<pre>
+       $table->Row('configure', $row, %options);
+       $table->Columns('configure', $columns, %options);
+</pre>
+
+Valid options are :
+
+<dl>
+ <dt>-pady (row) -padx (column)
+   <dd> Specifies an extra padding to the normal width of the column.
+can be any value accepted by Tk_GetPixels.  The default padding is 0.
+
+ <dt>-resize 
+  <dd> Indicates that the column can expand or shrink from its normal
+width when the table is resized.  must be one of the following: none,
+expand, shrink, or both.  If is expand the width of the column is
+expanded if there is extra space in the master window.  If is shrink
+its width may be reduced beyond its normal width if there is not
+enough space in the master.  The default is none.
+
+ <dt>-height (row) -width (column)
+  <dd> Specifies the limits within which the width of the column may
+expand or shrink.  is a list of bounding values.  See the section <a
+href="#bounding">bounding list format</a> for a description of this
+list.  By default there are no constraints.  </dl>
+
+<h2><a name="other">Other commands</a></h2>
+<h3>Row and Column</h3>
+<ul>
+  <li>size :
+<pre>
+  $table->Row('sizes', $row);
+  $table->Column('sizes', $column);
+</pre>
+
+ Returns the sizes of the given column (row) in the table.
+<p>
+
+  <li>forget :
+<pre>
+   $table->Cell('forget', [$row, $column]);
+   $table->Cell('forget', $widget);
+   $table->Row('forget', $row);
+   $table->Column('forget', $column);
+</pre>
+
+    Requests that cell (row, column) no longer have its geometry
+managed. The window will be unmapped so that it no longer appears on
+the screen.  If slave is not currently managed by any table, an error
+message is returned, otherwise the empty string.<p>
+  <li> configure
+<pre>
+   $table->Cell('configure');
+   $table->Row('configure');
+   $table->Column('configure');
+</pre>
+</ul>
+<h3>Table</h3>
+<dl>
+ <dt><tt>$table->get($row, $column);</tt>
+  <dd> return the slave in the
+cell ($row, $column).<p>  
+ <dt><tt>$table->under($x, $y);</tt>
+ <dd> return the slave located at $x, $y<p>
+ <dt><tt>$table->dimension;</tt>
+ <dd> return the number of rows and columns of
+the table.<p>
+ <dt><tt>$table->tablex($x);</tt>
+ <dd> Given a screen x-coordinate <tt>$x</tt> this command returns the
+table x-coordinate that is displayed at that location.<p>
+ <dt><tt>$table->tabley($y);</tt>
+ <dd> Given a screen y-coordinate <tt>$y</tt> this command returns the
+table y-coordinate that is displayed at that location.<p>
+ <dt><tt>$table->layout;</tt>
+  <dd> Forces layout of the table geometry manager. This is useful to get the
+geometry manager to calculate the normal width and height of each row and
+column.
+</dl>
+<h2><a name="bounding">Bounding list format</a></h2>
+
+ Constraints for various options (<tt>-reqheight, -reqwidth, -height,
+and -width</tt>) are specified by supplying a bounding list of values.
+Each value must be in a form accepted by Tk_GetPixels.  The
+interpretation of this list is based upon the number of values it
+contains:
+<dl>
+ <dt><tt>[]</tt>
+  <dd>empty list. No bounding is performed.<p>
+ <dt><tt>[ $x ]</tt>
+   <dd> Set the size of the window or partition at <tt>$x</tt>.  The
+size  of  the  partition  or window cannot grow or shrink.<p>
+ <dt><tt>[ $min,  $max ]</tt>
+   <dd>Bound the size of the window or partition  between <tt>$min</tt>
+and <tt>$max</tt>.<p>
+ <dt><tt>[ $min, $max, $nom ]</tt>
+   <dd>Bound the size of the window or partition  between
+<tt>$min</tt>  and <tt>$max</tt>.  In addition, set the normal size to
+<tt>$nom</tt>.
+</dl>
+
+ The maximum bound max can also be specified as <tt>"Inf"</tt> to
+indicate a unlimited maximum bound.  This can be useful when you wish
+only to set the minimum or nominal size of a window or partition.
+
+<h2><a name="example">Example</a></h2>
+<hr>
+<pre>
+#!/usr/local/bin/perl
+BEGIN { unshift (@INC,qw(./blib .)) }
+use Tk;
+use Tk::Table;
+#
+%attribx = (-fill => 'x', -border => 1, -relief => 'sunken');
+#
+$top = new MainWindow;
+$table = Table $top -relief => 'ridge';
+configure $table -border => 5;
+#
+$entry = Entry $table;
+put $table 0, 0, $entry;
+Create $table 
+    0, 1, 'Button', -text => "Button 1", -command => \&amp;foo,
+    0, 2, 'Entry',
+    1, 2, 'Button', -text => "Button 3",
+    2, 0, 'Entry',
+    2, 1, 'Button', -text => "Button 5",
+    2, 2, 'Entry';
+#
+Cell $table 'configure',[1, 2], -anchor => "se";
+# $table->Row('forget', 0);
+# $table->Column('forget', 1);
+# $table->Column('configure', 1);
+#
+$table1 = Create $table 
+    1, 0, 'Table', -anchor => 'nw',-border => 5, -relief => 'raised';
+Create $table1
+    0, 0, 'Button', -text => "But 1", -columnspan => 2, -fill => 'both',
+    0, 2, 'Button', -text => "But 2", -rspan => 2, -fill => 'both',
+    1, 0, 'Button', -text => "But 4", -rspan => 2, -fill => 'both',
+    2, 1, 'Button', -text => "But 3", -cspan => 2, -fill => 'both',
+    1, 1, 'Button', -text => "But 5", -fill => 'both';
+#
+$table0 = Create $table 
+    1, 1, 'Table', -border => 10, -relief => 'sunken', -fill => 'both';
+#
+$tablet = Create $table0 0, 1, 'Table',-fill => 'x';
+Create $tablet 
+    0, 0, 'Label', -text => '1', %attribx,
+    0, 1, 'Label', -text => '2', %attribx;
+#
+$tables = Create $table0 2, 1, 'Table',-fill => 'x';
+Create $tables 
+    0, 0, 'Label', -text => '4', -fill => 'x', -border => 1, -relief => 'sunken',
+    0, 1, 'Label', -text => '3', -fill => 'x', -border => 1, -relief => 'sunken';
+#
+($table3, $scrollv1, $scrollv2) = Create $table0 
+    1, 1, 'Table', -height => 200,
+    1, 0, 'Scrollbar', -orient => 'vertical', -fill => 'y',
+    1, 2, 'Scrollbar', -orient => 'vertical', -fill => 'y';
+configure $scrollv1 -command => ['yview', $table3];
+configure $scrollv2 -command => ['yview', $table3];
+configure $table3 
+    -yscrollcommand => sub { $scrollv1->set(@_); $scrollv2->set(@_); },
+    -col => [$tablet, $tables];
+#
+Create $table3 
+    0, 0, 'Text', -width => 6, -height => 8,
+    5, 1, 'Button', -text => "Button 3", -command => sub {$table3->under(50, 50);},
+    1, 0, 'Button', -text => "Button 4",
+    1, 1, 'Entry',
+    2, 0, 'Entry',
+    2, 1, 'Button', -text => "Button 5",
+    3, 0, 'Button', -text => "Button 6",
+    3, 1, 'Entry',
+    4, 0, 'Entry',
+    4, 1, 'Button', -text => "Button 7",
+    5, 0, 'Button', -text => "Button 8";
+#
+$table4 = Create $table3 0, 1, 'Table', -border => 2, -relief => 'groove';
+Create $table4 
+    1, 0, 'Button', -text => "Button 4",
+    1, 1, 'Entry',
+    2, 0, 'Entry',
+    2, 1, 'Button', -text => "Button 5",
+    3, 0, 'Button', -text => "Button 6",
+    3, 1, 'Entry',
+    4, 0, 'Entry';
+#
+$table->pack(-fill => 'both', -expand => 1);
+# print $table->tablex(20)," ",$table->tabley(20),"\n";
+MainLoop;
+
+sub foo {
+    @dim =  $table->dimension;
+    $, = ' ';
+    for($i=0; $i<$dim[0];$i++) {
+	print "$i : ",$table->Row('size', $i)," ",
+	$table->Column('size',$i),"\n";
+    }
+}
+</pre>
+</body>
+</html>
+
+

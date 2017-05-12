@@ -1,0 +1,61 @@
+<HTML>
+<HEAD><TITLE>18. How do I &quot;clear the screen&quot;?</TITLE></HEAD>
+<BODY><a name="A18">18. How do I &quot;clear the screen&quot;?</a>
+
+<hr>
+</p><p>
+What screen are you trying to clear?
+<p>
+If you are trying to clear a <KBD>tty</KBD> (<i>e.g.</i> <KBD>xterm</KBD>) 
+screen then try either of the following within your script:
+<pre>
+    system "clear";
+<i>or</i>
+    print `clear`;
+</pre>
+(where the choice between these two depends on the rest of the script: the
+first is fast - but proceeds via <kbd>fork</kbd> and may not occur at exactly 
+the time that you want it to in the script). <p>
+David and Rachel Weintraub &lt;davidw@cnj.digex.net&gt; recommend using the old
+<kbd>termcap.pl</kbd> p4 library. You might also consider the perl 5 
+equivalents: <kbd>Term.pm</kbd> (especially the 
+<kbd>Term::Control</kbd> module), <kbd>Curses.pm</kbd>, <kbd>Perlmenu.pm</kbd>,
+<kbd>PV</kbd>.
+<p>
+If you are trying to eliminate a <KBD>TopLevel</KBD> or a <KBD>MainWindow</KBD> 
+then try:
+<pre>
+    $main -&gt; destroy;
+</pre>
+If you would rather not destroy then try:
+<pre>
+    $main-&gt;withdraw;    # remove
+
+    $main-&gt;deiconify;   # put back
+</pre>
+If <kbd>$w</kbd> is a sub-window (sub-widget) then
+<pre>
+    $w-&gt;pack('forget'); # remove if packed (newer Tk-b9.01++) 
+    $w-&gt;packForget;     # remove if packed (older versions)
+    $w-&gt;pack(...);      # put back
+</pre>
+There are also ways to call low level C-ish versions:
+<pre>
+    $w-&gt;UnmapWindow; 
+</pre>
+but that is for special purposed only....
+<p>
+If you are trying to erase an <kbd>$item</kbd> on a <KBD>Canvas</KBD> then try:
+<pre>
+    delete($item);
+</pre>
+<p>
+(Thanks to the post by &lt;a904209@pluto.tiuk.ti.com&gt; which extended this
+answer considerably.)
+
+
+<hr>
+	</p><p><a href="qna17.5.html">Previous</a> | Return to <a href="ptkTOC.html#TOC18">table of contents</a> | <a href="qna19.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

@@ -1,0 +1,151 @@
+	    <!-- \$RCSfile\$\$Revision\$\$Date\$ -->
+	    <!-- \$Log\$ -->
+	    <HTML>
+	    <TITLE>WAITBOX.PM</TITLE>
+<p><hr>
+
+<H1> </H1>
+
+Tk::WaitBox - An Object Oriented Wait Dialog for Perl/Tk, of the Please Wait variety.
+<p><p><hr>
+
+<H1> </H1>
+
+A WaitBox consists of a number of subwidgets:
+<p>
+<DL>
+<DT><STRONG>
+<EM></EM>
+</STRONG></DT>
+<DD>
+</DD>
+<H2> </H2>
+
+A bitmap (configurable via the <EM>-bitmap</EM> command, the default is an hourglass) on the left side of the WaitBox
+<p>
+<H2> </H2>
+
+A label (configurable via the <EM>-txt1</EM> command), with text in the upper portion of the right hand frame
+<p>
+<H2> </H2>
+
+Another label (configurable via the <EM>-txt2</EM> command, the default is 'Please Wait'), with text in the lower portion of the right hand frame
+<p>
+<H2> </H2>
+
+A frame displayed, if required, between the label and the secondary label.  For details, see the example code and the Advertised Widget section
+<p>
+<H2> </H2>
+
+If a cancelroutine (configured via the <EM>-cancelroutine</EM> command) is defined, a frame will be packed below the labels and bitmap, with a single button.  The text of the button will be 'Cancel' (configurable via the <EM>-canceltext</EM> command), and the button will call the supplied subroutine when pressed.
+<p>
+</DL>
+.
+<p><p><hr>
+
+<H1> </H1>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="WaitBox.pm_usage_0">
+Usage Description</A>
+
+</STRONG></DT>
+<DD>
+<p></DD>
+<DT><STRONG>
+<EM></EM>
+</STRONG></DT>
+<DD>
+</DD>
+<H2> </H2>
+
+To use, create your WaitDialog objects during initialization, or at least before a Show.  When you wish to display the WaitDialog object, invoke the 'Show' method on the WaitDialog object; when you wish to cease displaying the WaitDialog object, invoke the 'unShow' method on the object.
+<p>
+<H2> </H2>
+
+Configuration may be done at creation or via the configure method.  
+<p>
+<H2> </H2>
+<p>
+<DT><STRONG>
+
+</STRONG></DT>
+<DD>
+
+ use Tk;
+ use Tk::WaitBox;
+ use strict;
+<p>
+<XMP>
+ my($root) = MainWindow->new;
+ my($utxt) = "Initializing...";
+ my($wd) = $root->WaitBox(
+        -bitmap =>'questhead', # Default would be 'hourglass'
+        -txt2 => 'tick-tick-tick', #default would be 'Please Wait'
+        -title => 'Takes forever to get service around here',
+        -cancelroutine => sub {
+            print "\nI'm canceling....\n";
+            $wd->unShow;
+            $utxt = undef;
+        });
+ $wd->configure(-txt1 => "Hurry up and Wait, my Drill Sergeant told me");
+ $wd->configure(-foreground => 'blue',-background => 'white');
+ ### Do something quite boring with the user frame
+ my($u) = $wd->{SubWidget}(uframe);
+ $u->pack(-expand => 1, -fill => 'both');
+ $u->Label(-textvariable => \$utxt)->pack(-expand => 1, -fill => 'both');
+ ## It would definitely be better to do this with a canvas... this is dumb
+ my($base) = $u->Frame(-background =>'gray',
+                       -relief => 'sunken',
+                       -borderwidth => 2,
+                       -height => 20)
+         ->pack(-side => 'left', -anchor => 'w',-expand => 1,
+                -fill => 'both');
+ my($bar) = $base->Frame(-borderwidth => 2,
+                         -relief => 'raised', -height => 20,
+                         -width => 0, -background => 'blue')
+         ->pack(-fill => 'y', -side => 'left');
+ $wd->configure(-canceltext => 'Halt, Cease, Desist'); # default is 'Cancel'
+ $wd->Show;
+ for (1..15) {
+     sleep(1);
+     $bar->configure(-width => int($_/15*$base->Width));
+     $utxt = 100*$_/15 . "% Complete";
+     $root->update;
+     last if !defined($utxt);
+ }
+ $wd->unShow;
+
+</XMP>
+<p></DD>
+</DL>
+.
+<p><p><hr>
+
+<H1> </H1>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="WaitBox.pm_uframe_0">
+uframe</A>
+
+</STRONG></DT>
+<DD>
+
+uframe is a frame created between the two messages.  It may be used for anything the user has in mind... including exciting cycle wasting displays of sand dropping through an hour glass, Zippy riding either a Gnu or a bronc, et cetera.
+<p>Assuming that the WaitBox is referenced by <STRONG>$w</STRONG>, the uframe may be addressed as <STRONG>$w</STRONG>-&gt;subwidget{'uframe'}.  Having gotten the address, you can do anything (I think) you would like with it
+<p></DD>
+</DL>
+.
+<p><p><hr>
+
+<H1> </H1>
+
+<STRONG>Brent B. Powers, Merrill Lynch (B2Pi)</STRONG>
+ powers<STRONG>@ml</STRONG>.com
+<p>This code may be distributed under the same conditions as perl itself.
+<p>
+</HTML>

@@ -1,0 +1,48 @@
+POP Documentation  :  POX
+-----------------     ---
+
+POX is a markup language conforming to the XML specification which is used to
+describe the structure of persistent classes in the POP system.  POX stands
+for Persistent Object (XML|eXoskeleton).
+
+Each POX file is a valid XML document describing the structure of one
+persistent class.  Typically, a system will consist of many POX files, known
+collectively as POXen.
+
+TAGS:				COMMENT
+
+<class  name     = 'Class_name' <class> is the top-level (root) tag
+      [ abbr     = 'clss' ]	Abbreviation for database table names
+      [ isa      = 'Foo::Bar' ]	Superclass, fully-qualified
+      [ type     = 'link' ]	Only if this is a link (relationship) class
+      [ abstract = '1' ]>	Only if this is an abstract base class
+
+<attribute  name = 'attr_name'
+	  [ abbr = 'attnm' ]	Abbreviation for database tables & columns
+	  [ type = 'int' ]	See below for valid types
+	  [ list = '1' ]	Only if this attribute is a list
+	  [ hash = '1' ]	Only if this attribute is a hash
+	  [ key_type = 'int' ]	Only if hash, type of key, can't be object
+	  [ val_type = 'int' ]> Only if hash, type of value
+
+(Either 'type' or 'hash', 'key_type' & 'val_type' must be specified)
+
+<participant name = 'part_name'	Only used for link (relationship) classes
+	     type = 'Foo::Bar'
+	   [ abbr = 'prtnm' ]>
+
+<method ...>
+<class-method ...>
+<constructor ...>
+
+Any data in the POX is interpreted as comments, describing whatever tag the
+data is contained within.
+
+VALID TYPES
+
+Currently supported types are:
+
+  int, numeric(w,p), char(w), varchar(w), bit, Foo::Bar
+
+where Foo::Bar is an embedded object of class "Foo::Bar"
+

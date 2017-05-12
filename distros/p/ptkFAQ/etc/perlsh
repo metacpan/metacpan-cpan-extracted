@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+ $/ = '';        # set paragraph mode
+ $SHlinesep = "\n";
+ while ($SHcmd = <>) {
+     $/ = $SHlinesep;
+     eval $SHcmd; print $@ || "\n";
+     $SHlinesep = $/; $/ = ''; 
+ }

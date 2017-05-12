@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Argos::Reduce;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = 1;
+$Vulcan::OptConf::THIS = 'argos';
+
+=head1 SYNOPSIS
+
+Launch argos reduce.
+
+$0 name [--check]
+
+=cut
+my %o = Vulcan::OptConf->load()->get( qw( check ) )->dump();
+
+$o{conf} = delete $o{reduce};
+my $argos = Argos::Reduce->new( %o, name => shift );
+
+$argos->run() unless $o{check}; 
+exit 0;

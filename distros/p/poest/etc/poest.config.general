@@ -1,0 +1,14 @@
+# For POEST::Server
+Port 2525
+Hostname localhost
+
+PidFile var/poest.pid
+
+# Plugins
+
+Plugin POEST::Plugin::Check::Hostname
+
+RequireHost Yes
+AllowedHost localhost
+
+Plugin POEST::Plugin::General

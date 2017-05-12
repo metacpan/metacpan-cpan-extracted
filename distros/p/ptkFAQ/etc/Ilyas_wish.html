@@ -1,0 +1,185 @@
+<H2>[PREV]  [NEXT]  <A HREF="0099C49D.7F132718@lns62.lns.cornell.edu">[PREV Thread]</A>  <A HREF="4d6omt$k05@monk.mps.ohio-state.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> ilya@math.ohio-state.edu (Ilya Zakharevich)
+</ADDRESS>
+<TITLE> HowTo: Debugging Tk</TITLE>
+<ADDRESS><H1> HowTo: Debugging Tk</H1>
+</ADDRESS>
+<ADDRESS> 12 Jan 1996 17:48:15 -0500
+ Department of Mathematics, The Ohio State University
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+</DL>
+<HR>
+<PRE>
+Today I'm finally able to debug Tk without a lot of pain. Components:
+my newest debugger (posted to p5-p 2 or 3 days ago, should be in the
+next perl patch), Chips's patch for pp_caller (applied after a patch
+of mine), and (optionally) not-yet-releases Term::ReadLine 0.81.
+
+One may use the released version 0.8 of ReadLine, but should change
+a line near 895 to read
+      Tk_register_Tk();
+instead of 
+      Tk_register;
+, or just apply the following (bigger) patch.
+
+This correction enables running Perl debugger as a smart_wish, i.e.,
+it is possible to have Tk running while you are editing the debugger
+command line (with ReadLine! ;-), and may examine whatever data you
+like. You may change the status of the application using
+	O t[kRunning]=whatever
+
+The problem what to do if you cannot enable any binding is not yet
+solved: currently if you press ^C in the debugger window you need to
+go to your application and invoke some binding _which calls Perl
+code_, since the debugger may stop in a perl code only.
+
+Bugs: No matter how I exit the application after enabling 
+
+	O t 
+
+I get a segfault. If I press Quit button on the
+application it dies (probably) in the fileevent code (on the debugger
+read filehandle?), if I say q to the debugger it dies somethere else.
+
+In the first case the stack dump looks like this:
+
+  DB<2> InterpHv (1):
+ 0 0x4100e0 NULL f=00000500 undef(1)
+signal ABRT (abort) in kill at 0xef6618a4
+kill+8: bgeu    kill+0x30
+Current function is InterpHv
+  409      abort();
+(dbx) where
+  [1] kill(0x0, 0x6, 0x1, 0xef67dd48, 0xef680810, 0x3fbb08), at 0xef6618a4
+  [2] abort(0xef5ae684, 0x1, 0xefffd334, 0x0, 0x0, 0xffffffd7), at 0xef62d820
+=&gt;[3] InterpHv(interp = 0x4100e0), line 409 in "tkGlue.c"
+  [4] FindAv(interp = 0x4100e0, who = 0xef5ae81c "Tcl_ResetResult", create = 0, key = 0xef5ae724 "_TK_RESULT_"), line 424 in "tkGlue.c"
+  [5] ResultAv(interp = 0x4100e0, who = 0xef5ae81c "Tcl_ResetResult", create = 0), line 507 in "tkGlue.c"
+  [6] Tcl_ResetResult(interp = 0x4100e0), line 916 in "tkGlue.c"
+  [7] LangDoCallback(interp = 0x4100e0, sv = 0x54d380, result = 0, argc = 0, ...), line 3261 in "tkGlue.c"
+  [8] FileEventProc(clientData = 0x3fba88, mask = 1, flags = 30), line 1561 in "pTk/tkEvent.c"
+  [9] Tk_DoOneEvent(flags = 30), line 746 in "pTk/tkEvent.c"
+  [10] XS_Tk_Tk_DoOneEvent(cv = 0x290074), line 278 in "Tk.c"
+  [11] pp_entersub(), line 1710 in "/home/ilya/get/perl5.002b1h/pp_hot.c"
+  [12] run(), line 54 in "/home/ilya/get/perl5.002b1h/run.c"
+  [13] perl_call_sv(sv = 0x2ce910, flags = 22), line 746 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [14] sv_clear(sv = 0x65a1f4), line 2212 in "/home/ilya/get/perl5.002b1h/sv.c"
+  [15] sv_free(sv = 0x65a1f4), line 2357 in "/home/ilya/get/perl5.002b1h/sv.c"
+  [16] sv_clear(sv = 0x6620b0), line 2259 in "/home/ilya/get/perl5.002b1h/sv.c"
+  [17] sv_free(sv = 0x6620b0), line 2357 in "/home/ilya/get/perl5.002b1h/sv.c"
+  [18] free_tmps(), line 105 in "/home/ilya/get/perl5.002b1h/scope.c"
+  [19] perl_call_sv(sv = 0x2f4cbc, flags = 6), line 720 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [20] CallCallback(sv = 0x5bb928, flags = 6), line 3086 in "tkGlue.c"
+  [21] LangDoCallback(interp = 0x58302c, sv = 0x5bb928, result = 0, argc = 0, ...), line 3276 in "tkGlue.c"
+  [22] MenuWidgetCmd(clientData = 0x5c4308, interp = 0x58302c, argc = 3, args = 0x3a1418), line 901 in "pTk/tkMenu.c"
+  [23] Call_Tk(info = 0x5e1788, items = 3, args = 0x3a1418), line 1445 in "tkGlue.c"
+  [24] XStoWidget(cv = 0x2a3958), line 1726 in "tkGlue.c"
+  [25] pp_entersub(), line 1710 in "/home/ilya/get/perl5.002b1h/pp_hot.c"
+  [26] run(), line 54 in "/home/ilya/get/perl5.002b1h/run.c"
+  [27] perl_call_sv(sv = 0x5d10ec, flags = 6), line 746 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [28] perl_call_method(methname = 0x5de1c8 "Invoke", flags = 6), line 645 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [29] CallCallback(sv = 0x5db2a8, flags = 6), line 3094 in "tkGlue.c"
+  [30] LangEventCallback(interp = 0x58302c, sv = 0x5db2a8, event = 0xefffe3a0, keySym = 1), line 3458 in "tkGlue.c"
+  [31] Tk_BindEvent(bindingTable = 0x59b408, eventPtr = 0xefffe820, tkwin = 0x12a008, numObjects = 0, objectPtr = 0xefffe674), line 1236 in "pTk/tkBind.c"
+  [32] TkBindEventProc(winPtr = 0x12a008, eventPtr = 0xefffe820), line 241 in "pTk/tkCmds.c"
+  [33] Tk_HandleEvent(eventPtr = 0xefffe820), line 674 in "pTk/tkXEvent.c"
+  [34] TkXFileProc(clientData = 0x134408, mask = 1, flags = 30), line 818 in "pTk/tkXEvent.c"
+  [35] Tk_DoOneEvent(flags = 30), line 746 in "pTk/tkEvent.c"
+  [36] XS_Tk_Tk_DoOneEvent(cv = 0x290074), line 278 in "Tk.c"
+  [37] pp_entersub(), line 1710 in "/home/ilya/get/perl5.002b1h/pp_hot.c"
+  [38] run(), line 54 in "/home/ilya/get/perl5.002b1h/run.c"
+  [39] perl_call_sv(sv = 0x649f20, flags = 6), line 746 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [40] CallCallback(sv = 0x649fec, flags = 6), line 3086 in "tkGlue.c"
+  [41] LangEventCallback(interp = 0x58302c, sv = 0x649fec, event = 0xefffed70, keySym = 0), line 3458 in "tkGlue.c"
+  [42] Tk_BindEvent(bindingTable = 0x650408, eventPtr = 0xeffff01c, tkwin = 0x5eac08, numObjects = 0, objectPtr = 0x598a10), line 1236 in "pTk/tkBind.c"
+  [43] TkTextPickCurrent(textPtr = 0x5fba08, eventPtr = 0xeffff280), line 1314 in "pTk/tkTextTag.c"
+  [44] TkTextBindProc(clientData = 0x5fba08, eventPtr = 0xeffff280), line 1101 in "pTk/tkTextTag.c"
+  [45] Tk_HandleEvent(eventPtr = 0xeffff280), line 659 in "pTk/tkXEvent.c"
+  [46] TkXFileProc(clientData = 0x134408, mask = 0, flags = 30), line 818 in "pTk/tkXEvent.c"
+  [47] Tk_DoOneEvent(flags = 30), line 746 in "pTk/tkEvent.c"
+  [48] Tk_MainLoop(), line 883 in "pTk/tkXEvent.c"
+  [49] XS_Tk_Tk_MainLoop(cv = 0x290050), line 248 in "Tk.c"
+  [50] pp_entersub(), line 1710 in "/home/ilya/get/perl5.002b1h/pp_hot.c"
+  [51] run(), line 54 in "/home/ilya/get/perl5.002b1h/run.c"
+  [52] perl_run(sv_interp = 0x126408), line 522 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [53] main(argc = 3, argv = 0xeffff6ec, env = 0xeffff6fc), line 89 in "/home/ilya/get/perl5.002b1h/perlmain.c"
+
+
+in the second case like this:
+
+signal SEGV (no mapping at the fault address) in TkEventDeadWindow at line 924 in file "pTk/tkXEvent.c"
+  924               if (ipPtr-&gt;nextHandler == handlerPtr) {
+(dbx) p ipPtr
+ipPtr = 0x4
+(dbx) where
+=&gt;[1] TkEventDeadWindow(winPtr = 0x12a008), line 924 in "pTk/tkXEvent.c"
+  [2] Tk_DestroyWindow(tkwin = 0x12a008), line 1011 in "pTk/tkWindow.c"
+  [3] Tk_DestroyWindow(tkwin = 0x36e808), line 950 in "pTk/tkWindow.c"
+  [4] Tk_DestroyWindow(tkwin = 0x59d808), line 950 in "pTk/tkWindow.c"
+  [5] Tk_DestroyWindow(tkwin = 0x464f08), line 950 in "pTk/tkWindow.c"
+  [6] Tk_DestroyCmd(clientData = 0x464f08, interp = 0x582780, argc = 2, args = 0x3a140c), line 418 in "pTk/tkCmds.c"
+  [7] Call_Tk(info = 0xeffff2a4, items = 2, args = 0x3a140c), line 1445 in "tkGlue.c"
+  [8] XStoTk(cv = 0x297fe0), line 1916 in "tkGlue.c"
+  [9] pp_entersub(), line 1710 in "/home/ilya/get/perl5.002b1h/pp_hot.c"
+  [10] run(), line 54 in "/home/ilya/get/perl5.002b1h/run.c"
+  [11] perl_call_sv(sv = 0x2f53d4, flags = 6), line 746 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [12] calllist(list = 0x32e140), line 1847 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [13] perl_run(sv_interp = 0x126408), line 489 in "/home/ilya/get/perl5.002b1h/perl.c"
+  [14] main(argc = 3, argv = 0xeffff6ec, env = 0xeffff6fc), line 89 in "/home/ilya/get/perl5.002b1h/perlmain.c"
+
+I do not understand what exactly happens, and have no idea how to fix it.
+
+Below is the patch, (you probably need to delete all these ^M first, ;-)
+
+Enjoy,
+Ilya
+
+*** ReadLine/readline.pm~	Thu Dec 14 00:06:54 1995
+--- ReadLine/readline.pm	Fri Jan 12 16:39:01 1996
+***************
+*** 863,875 ****
+  
+  sub rl_getc {
+  	  if (defined $term_readkey) { # XXXX ???
+- 	    #print "b"; sleep 1;
+  	    $Tk_count_rk++;
+  	    &Tk_loop if $Tk_toloop;
+  	    $key = Term::ReadKey::ReadKey(0, $term_IN);
+- 	    #if($key eq "") {$key = Term::ReadKey::ReadKey(0,$term_IN)} # Still buggy
+- 	    #print "a"; sleep 1;
+- 	    #print "Got `$key', ", ord($key), "", length($key), "\n";
+  	  } else {
+  	    &Tk_loop if $Tk_toloop;
+  	    $key = getc $term_IN;
+--- 863,871 ----
+***************
+*** 895,905 ****
+  ##
+  sub readline
+  {
+!     if (defined &Tk::fileevent && !$Tk_registered) {
+!       Tk_register;
+      }
+      if ($stdin_not_tty) {
+!         &Tk_loop if $Tk_toloop;
+  	return undef if !defined($line = <$term_IN>);
+  	chop($line);
+  	return $line;
+--- 891,901 ----
+  ##
+  sub readline
+  {
+!     if ($Tk_toloop && defined &Tk::fileevent && !$Tk_registered) {
+!       Tk_register_Tk();
+      }
+      if ($stdin_not_tty) {
+!         #&Tk_loop if $Tk_toloop;
+  	return undef if !defined($line = <$term_IN>);
+  	chop($line);
+  	return $line;
+</PRE>
+<HR><H2>[PREV]  [NEXT]  <A HREF="0099C49D.7F132718@lns62.lns.cornell.edu">[PREV Thread]</A>  <A HREF="4d6omt$k05@monk.mps.ohio-state.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

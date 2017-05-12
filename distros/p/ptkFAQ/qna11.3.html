@@ -1,0 +1,122 @@
+<HTML>
+<HEAD><TITLE> 11.3. What happened to the quotation marks?</TITLE></HEAD>
+<BODY><a name="A11.3"> 11.3. What happened to the quotation marks?</a>
+
+<hr>
+</p><p>
+Perl 4 programmers especially may be surprised to find a serious 
+dearth of quotation marks around strings in perl 5 scripts such as in 
+perl/Tk. The &quot;rules have been relaxed&quot; somewhat for the use
+of quotation marks. Basically it is OK to leave them out if the context
+of the string in question is unambiguous. However, it never hurts to leave
+them in and may help readability.
+<p>
+Here is Larry Wall's synopsis of the string situation:
+<DL>
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.misc">comp.lang.perl.misc</A>
+<DT> Subject:
+<DD> Re: To string or not to string...
+</DL>
+<PRE>In article &lt;4e49fv$j0u@panix3.panix.com&gt;,
+Andy Finkenstadt &lt;genie@panix.com&gt; wrote:<I>
+! Back when I was learning perl (after receiving a review copy of
+! learning perl, and buying the real perl book, each from ORA),
+! I always got bit by when I needed to use "strings" and when
+! I could get away with bare_words within braces for associative
+! arrays.  (Yes, this is under 4.036 if it matters.)
+! 
+! the most typical example would be:
+! 
+! When must I use $assoc{"trailer"} and when can I get away with
+! $assoc{trailer}?   Similarly, $ENV{CONTENT_LENGTH} versus
+! $ENV{"CONTENT_LENGTH"}?  Unfortunately sometimes my strings
+! end up being numbers in their own right, i.e.:  $message{"0"}
+! or $msg=0; $message{$msg}.  Which is more appropriate,
+! which are merely stylistic, and which are stricly perl5
+! features now that I'm upgrading most of my installations
+! of perl.</I></PRE><BLOCKQUOTE>
+Perl 4 let you use a "bareword" for a string if it had no other
+interpretation.  It would warn you under -w if you used a word consisting
+entirely of lower-case characters, since such a word might gain
+an interpretation someday as a keyword.
+<P>
+Perl 5 still works the same way, but with several twists.
+</BLOCKQUOTE><OL>
+  <LI>) Since you can now call predeclared subroutines as though they
+     were builtins, you have to worry about collisions with
+     subroutine names too.  However...</LI>
+
+  <LI>) You can completely disallow the default interpretation of
+     barewords by saying "use strict subs", which requires any such
+     bareword to be a predeclared subroutine.  But...</LI>
+
+  <LI>) Overriding all that, Perl 5 (in recent versions) will FORCE
+     string interpretation of any bare identifier used where a
+     single hash subscript is expected, either within curlies or
+     before a =&gt;.  (Those are the places you might usually want the
+     old barewords anyway.)</LI></OL>
+<BLOCKQUOTE>
+The upshot of these rules is that you can write Perl 5 with much less
+punctuation than Perl 4, yet also with less ambiguity.  If you so choose.
+<P>
+Larry
+</BLOCKQUOTE>
+<p>
+Tcl programmers should note that in Perl the single quotation marks <KBD>''</KBD> 
+act much as the curly brace <KBD>{}</KBD> enclosure does in Tcl 
+(no escaping special characters <KBD>$@\ <i>etc.</i></KBD>).
+Whereas the double quotation marks <KBD>&quot;&quot;</KBD> allow for substitution of
+<KBD>$variables</KBD> (the rules are a little different between Tcl and Perl however).
+<p>
+Note also that a frequently seen short hand in perl5/Tk scripts is the @list
+returned by qw():
+<pre>
+    @list = qw(zoom schwartz bufigliano);
+</pre>
+which is equivalent to:
+<pre>
+    @list = split(' ','zoom schwartz bufigliano');
+</pre>
+or more simply:
+<pre>
+    @list = ('zoom','schwartz','bufigliano');
+</pre>
+<i>i.e.</i> the <KBD>qw/STRING/</KBD> @list is not equivalent to the 
+quotation marks provided by <KBD>q/STRING/</KBD>, <KBD>qq/STRING/</KBD>, 
+or <KBD>qq(STRING)</KBD>...
+<p>
+There are, ironically enough, situations in perl/Tk where one needs to use
+quotation marks as in the following by post by &lt;a904209@pluto.tiuk.ti.com&gt;:
+<PRE><I>
+ Paul Wickman wrote in article &lt;4b4o0fINNlu8@CS.UTK.EDU&gt;:
+!
+!    Why does the following statement work fine:
+!
+!$day-&gt;pack(-before =&gt; $year, -side =&gt; 'left');
+!
+!    But the below generates the given error:
+!
+!$day-&gt;pack(-after =&gt; $year, -side =&gt; 'left');
+!
+!Ambiguous use of after =&gt; resolved to "after" =&gt; at line 191.
+!
+</I></PRE><BLOCKQUOTE>
+Because there is a sub <kbd>after</kbd> in scope, probably imported from Tk
+via <kbd>use Tk;</kbd>.
+<p>
+There are two workrounds:
+</BLOCKQUOTE><PRE>
+    use Tk qw(MainLoop exit ...); # just ones you use
+</PRE><BLOCKQUOTE>
+or 
+</BLOCKQUOTE><PRE>
+    $day-&gt;pack('-after' =&gt; $year, -side =&gt; 'left');
+</PRE>
+ 
+
+<hr>
+	<p><a href="qna11.2.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.3">table of contents</a> | <a href="qna11.4.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

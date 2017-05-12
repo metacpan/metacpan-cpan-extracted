@@ -1,0 +1,87 @@
+<!-- $Id$ -->
+<HTML><HEAD>
+<CENTER><TITLE>./Table.pm</TITLE>
+</HEAD>
+<BODY></CENTER><p><hr>
+
+<H1> 
+<A NAME="./Table.pm_name_0">
+NAME</A>
+</H1>
+Tk::Table - Scrollable 2 dimensional table of Tk widgets
+<p><p><hr>
+
+<H1> 
+<A NAME="./Table.pm_synopsis_0">
+SYNOPSIS</A>
+</H1>
+
+<XMP>
+  use Tk::Table;
+  $table = $parent->Table(-rows => number,
+                          -columns => number,
+                          -scrollbars => anchor,
+                          -fixedrows => number,
+                          -fixedcolumns => number,
+                          -takefocus => boolean);
+  $widget = $table->Button(...);
+  $old = $table->put($row,$col,$widget);
+  $old = $table->put($row,$col,"Text");  # simple Label 
+  $widget = $table->get($row,$col);
+  $cols = $table->totalColumns;
+  $rows = $table->totalRows;
+  $table->see($widget);
+  $table->see($row,$col);
+  ($row,$col) = $table->Posn($widget);
+
+</XMP>
+<p><p><hr>
+
+<H1> 
+<A NAME="./Table.pm_description_0">
+DESCRIPTION </A>
+</H1>
+Tk::Table is an all-perl widget/geometry manager which allows a two dimensional
+table of arbitary perl/Tk widgets to be displayed.
+<p>Entries in the Table are simply ordinary perl/Tk widgets. They should
+be created with the Table as their parent. Widgets are positioned in the 
+table using:
+<p>
+<XMP>
+ $table->put($row,$col,$widget)
+
+</XMP>
+<p>All the widgets in each column are set to the same width - the requested
+width of the widest widget in the column.
+Likewise, all the widgets in each row are set to the same height - the requested
+height of the tallest widget in the column.             
+<p>A number of rows and/or columns can be marked as 'fixed' - and so can serve
+as 'headings' for the remainder the rows which are scrollable.
+<p>The requested size of the table as a whole is such that the number of rows
+specified by -rows (default 10), and number of columns specified by -columns
+(default 10) can be displayed.
+<p>If the Table is told it can take the keyboard focus then cursor and scroll
+keys scroll the displayed widgets.
+<p>The Table will create and manage its own scrollbars if requested via 
+-scrollbars.
+<p>The Tk::Table widget is derived from a Tk::Frame, so inherits all its
+configure options.
+<p><p><hr>
+
+<H1> 
+<A NAME="./Table.pm_bugs_0">
+BUGS / Snags / Possible enhancements</A>
+</H1>
+<p>
+<UL>
+<LI><EM>* </EM>
+Very large Tables consume a lot of X windows
+<p>
+<LI><EM>* </EM>
+No equivalent of pack's -anchor/-pad etc. options 
+<p>
+</UL>
+.
+<p>
+</BODY>
+</HTML>

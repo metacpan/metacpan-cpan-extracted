@@ -1,0 +1,71 @@
+$Id: README,v 1.12 2002/01/14 09:15:49 jmorris Exp $
+
+INTRODUCTION
+  Perlipq is a Perl extension to Linux iptables userspace queueing via libipq.
+  
+  Packets may be selected from the stack via the iptables QUEUE target
+  and passed to userspace.  Perlipq allows these packets to be manipulated in
+  Perl and passed back to the stack.
+  
+  This is version 1.25, released against iptables 1.2.5 with support for
+  IPv6.
+  
+REQUIREMENTS
+
+  * Linux Kernel 2.4/2.5
+  * iptables 1.2.5+
+
+INSTALLATION
+  First, ensure you have a 2.4/2.5 kernel installed and running with
+  Netfilter, Userspace queuing (experimental) and IP tables support.
+  
+  Build and install iptables as per the iptables documentation, then use
+  'make install-devel' to install libipq development components under
+  /usr/local.
+  
+  Please read the libipq(3) man page for an overview of userspace
+  packet queueing.
+  
+  Next, generate the perlipq makefile:
+  
+  	# perl Makefile.PL
+  	
+  The script will prompt you to provide the location of iptables so it can
+  find the libipq library and headers, which should be under /usr/local as
+  mentioned above.
+
+  To build the perl module and extension, type:
+  
+	# make
+
+  If you want to run the tests, you'll need to load the necessary iptables
+  modules, then install a rule to invoke queuing.
+  
+  For example, a test setup used during development is as follows:
+	
+	# modprobe iptable_mangle
+	# modprobe ip_queue
+	# iptables -t mangle -F
+	# iptables -t mangle -A OUTPUT -p icmp -j QUEUE
+	
+  These iptables commands flush the mangle table and install a rule to send
+  any locally generated ICMP packets (e.g. ping) to the ip_queue module for
+  userpace queuing.
+	
+  To run the tests:
+
+	# make test
+	
+  and 
+  	# make install
+  	
+  will install perlipq.
+
+EXAMPLES
+  passer.pl  -  Passes all packets back to kernel with NF_ACCEPT verdict.
+  passer6.pl -  Same as above, but for the IPv6 queue handler.
+  dumper.pl  -  Dumps packet metadata and IP headers.
+
+COPYRIGHT
+  Copyright (c) 2000-2002 James Morris <jmorris@intercode.com.au>
+  This package is released under the GPL.

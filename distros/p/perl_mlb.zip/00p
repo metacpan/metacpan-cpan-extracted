@@ -1,0 +1,57 @@
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- ./CPAN.pm.orig	Tue Sep 30 09:10:44 2003
+|+++ ./CPAN.pm	Wed Dec  3 19:58:58 2003
+--------------------------
+Patching file CPAN.pm using Plan A...
+Hunk #1 succeeded at 64 (offset -1 lines).
+Hunk #2 succeeded at 255 (offset -1 lines).
+Hunk #3 succeeded at 807 (offset -1 lines).
+Hunk #4 succeeded at 846 (offset -1 lines).
+Hunk #5 succeeded at 865 (offset -1 lines).
+Hunk #6 succeeded at 1296 (offset -1 lines).
+Hunk #7 succeeded at 1385 (offset -1 lines).
+Hunk #8 succeeded at 1505 (offset -1 lines).
+Hunk #9 succeeded at 2059 (offset -1 lines).
+Hunk #10 succeeded at 2214 (offset -1 lines).
+Hunk #11 succeeded at 3460 (offset -15 lines).
+Hunk #12 succeeded at 3539 (offset -1 lines).
+Hunk #13 succeeded at 3876 (offset -15 lines).
+Hunk #14 succeeded at 3912 (offset -1 lines).
+Hunk #15 succeeded at 4059 (offset -15 lines).
+Hunk #16 succeeded at 4151 (offset -1 lines).
+Hunk #17 succeeded at 4475 (offset -15 lines).
+Hunk #18 succeeded at 4626 (offset -1 lines).
+Hunk #19 succeeded at 4663 (offset -15 lines).
+Hunk #20 succeeded at 4734 (offset -1 lines).
+Hunk #21 succeeded at 4808 (offset -15 lines).
+Hunk #22 succeeded at 4958 (offset -1 lines).
+Hunk #23 succeeded at 4991 (offset -15 lines).
+Hunk #24 succeeded at 5027 (offset -1 lines).
+Hunk #25 succeeded at 5087 (offset -15 lines).
+Hunk #26 succeeded at 5224 (offset -1 lines).
+Hunk #27 succeeded at 5351 (offset -15 lines).
+Hunk #28 succeeded at 5417 (offset -1 lines).
+Hunk #29 succeeded at 5437 (offset -15 lines).
+Hunk #30 succeeded at 5730 (offset -1 lines).
+Hunk #31 succeeded at 5739 (offset -15 lines).
+Hunk #32 succeeded at 5782 (offset -1 lines).
+Hunk #33 succeeded at 5788 (offset -15 lines).
+Hunk #34 succeeded at 5833 (offset -1 lines).
+Hunk #35 succeeded at 6298 (offset -15 lines).
+Hunk #36 succeeded at 6506 (offset -1 lines).
+Hunk #37 succeeded at 6540 (offset -15 lines).
+Hunk #38 succeeded at 7084 (offset -1 lines).
+Hunk #39 succeeded at 7080 (offset -15 lines).
+Hunk #40 succeeded at 7111 (offset -1 lines).
+Hmm...  The next patch looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- ./CPAN/FirstTime.pm.orig	Tue Sep 30 09:10:44 2003
+|+++ ./CPAN/FirstTime.pm	Wed Dec  3 19:58:38 2003
+--------------------------
+Patching file CPAN/FirstTime.pm using Plan A...
+Hunk #1 succeeded at 168.
+Hunk #2 succeeded at 382.
+done

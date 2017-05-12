@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/Services/MA/Status.pm
+perl-perfSONAR_PS-Services-MA-Status.spec
+psCreateStatusDB
+META.yml                                 Module meta-data (added by MakeMaker)

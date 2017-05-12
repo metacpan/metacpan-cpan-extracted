@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                pragma
+version:             0.02
+abstract:            A pragma for controlling other user pragmas
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31_01
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Joshua ben Jore <jjore@cpan.org>

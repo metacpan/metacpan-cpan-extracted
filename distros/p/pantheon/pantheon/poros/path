@@ -1,0 +1,3 @@
+root: $RealBin/../../poros
+code: $root/code
+run: $root/run

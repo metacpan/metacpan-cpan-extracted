@@ -1,0 +1,127 @@
+#!# perl: UPDATE
+use strict;
+use warnings;
+
+use POSIX;
+use Tie::File;
+use File::Basename;
+use FindBin qw( $Bin $Script );
+
+use lib "$Bin/lib";
+use Vulcan::Manifest;
+
+$| ++;
+
+our ( $HIST, $MAKE, $LIST, $INST ) = qw( Changes Makefile.PL MANIFEST INSTALL );
+
+=head3 update
+
+ $0 [--minor|--major]
+
+=cut
+chdir $Bin;
+
+my $module = File::Basename::basename( $Bin ); $module =~ s/-[\d.]+$//g;
+my $list = Vulcan::Manifest->new( $INST )->dump();
+my @inst = @{ $list->list( 'in' ) };
+
+if ( @ARGV && $ARGV[0] eq $INST && -f $INST )
+{
+    exit 0 unless @inst;
+
+    if ( $ENV{MUNGE_PERL} ) ## munge perl invocation path
+    {
+        my $perl = $ENV{PERL_PATH} || $^X;
+        warn "Munging invocation perl path to $perl ..\n";
+
+        for my $file ( map { `find $_ -type f` } @inst )
+        {
+            chomp $file;
+            tie my ( @file ), 'Tie::File', $file;
+
+            next unless @file && $file[0] =~ /#![^#]*perl(.*$)/o;
+            $file[0] = "#!$perl$1";
+            warn "$file\n";
+            untie @file;
+        }
+    }
+
+    if ( my $dir = $ENV{ uc $module } ) ## install
+    {
+        my %file = map { $_ => $list->file( $_ ) } qw( in ex );
+        my $inst = 
+            "tar -T $file{in} -X $file{ex} -cf - | \( cd $dir && tar xvf - \)";
+
+        warn "$inst\n";
+        system "mkdir -p $dir && $inst";
+
+        my $user = $ENV{OWNER} || 'root';
+        map { system "cd $dir && sudo chown -R $user:root $_" } @inst;
+    }
+}
+else
+{
+    ## version
+    my @module = split '-', $module;
+    my $module = join( '/', @module ) . '.pm';
+    my $path = "$Bin/lib/$module";
+
+    require $path;
+    my $version = eval '$' . join '::', @module, 'VERSION';
+    my @version = $version =~ /(\d+)\.(\d+)/;
+
+    if ( @ARGV && @version )
+    {
+        my $bump = lc shift @ARGV;
+
+        if ( $bump =~ /minor/ ) { $version[-1] ++ }
+        elsif ( $bump =~ /major/ ) { $version[-1] =~ s/./0/g; $version[0] ++ }
+
+        system sprintf "$^X -pi -e 's/$version/%s/' $path",
+            ( $version = join '.', @version );
+    }
+
+    tie my @hist, 'Tie::File', $HIST;
+    my $tag = POSIX::strftime
+        ( "$version    %Y.%m.%d\n\n", localtime( ( stat $path )[9] ) );
+
+    for ( my $i = 0; $i < @hist; $i ++ )
+    {
+        next if $hist[$i] !~ /^(\d+\S+)/;
+        splice @hist, $i, 0, $tag if $1 ne $version;
+        untie @hist; last;
+    }
+
+    ## manifest
+    unless ( $version[-1] % 2 ) ## remove alpha for even version
+    {
+        my @alpha = map { chomp; $_ =~ s/\s*#.+//; qr{^$_} }
+            grep { $_ =~ /^[^-#]/ } `egrep '# *alpha' $INST`;
+
+        @inst = grep { my $path = $_; ! grep { $path =~ $_ } @alpha } @inst;
+    }
+
+    die $! unless open my $handle, '>', $LIST;
+    map { print $handle "$_\n" }
+        'README', $HIST, $MAKE, $LIST, $INST, "$INST.PL", $Script;
+
+    my %inst = map { $_ => 1 } map { `find $_ -type f -not -name .*.swp` }
+        qw( lib t ), @inst;
+
+    print $handle sort keys %inst;
+    close $handle;
+
+    ## changes
+    system "vi $HIST && cat $LIST"; ## update changes
+    warn << "MEMO";
+
+*** Be sure that the following are up to date ***
+
+    $module : VERSION and MODULES
+    $MAKE : PREREQ_PM
+    $INST : installation list
+
+MEMO
+}
+
+exit 0;

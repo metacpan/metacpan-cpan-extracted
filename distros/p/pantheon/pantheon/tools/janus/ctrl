@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Hermes;
+use Janus::Path;
+use Janus::Conf;
+use Janus::Ctrl;
+use Vulcan::OptConf;
+use Vulcan::ProcLock;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+@Vulcan::OptConf::CONF = qw( no_ignore_case );
+$Vulcan::OptConf::THIS = 'janus';
+
+my $option = Vulcan::OptConf->load();
+my %o = $option
+    ->get( qw( pause resume kill clear exclude=s Pause=s Resume=s ) )->dump();
+
+my $path = Janus::Path->new( $o{path} );
+die "janus not set up.\n" unless $path->check();
+
+=head1 SYNOPSIS
+
+Control janus processes.
+
+=cut
+my $range = Hermes->new( $option->dump( 'range' ) );
+my ( @name, @list ) = map { $range->load( $_ )->list() } @ARGV;
+my $who = operator();
+
+=head3 pause
+
+If no names are given, pause all known janus events, regardless running or not.
+
+$0 [name ..] --pause
+
+=cut
+if ( $o{pause} )
+{
+    @name = Janus::Conf->new( $o{conf} )->names() unless @ARGV;
+
+    for my $name ( @name )
+    {
+        my $ctrl = $path->path( run => "$name.ctrl" );
+        next unless -f $ctrl || -l $ctrl;
+
+        $ctrl = Janus::Ctrl->new( $name => $ctrl );
+        $ctrl->pause( Janus::Ctrl->any(), $who );
+    }
+    exit 0;
+}
+
+if ( @list = grep { $o{$_} } qw( Pause Resume exclude ) )
+{
+    @list = $range->load( $o{ $list[0] } )->list();
+}
+
+for my $name ( @name )
+{
+    my $ctrl = $path->path( run => "$name.ctrl" );
+    next unless -f $ctrl || -l $ctrl;
+    $ctrl = Janus::Ctrl->new( $name => $ctrl );
+
+=head3 resume
+
+$0 name .. --resume
+
+=cut
+    if ( $o{resume} ) { $ctrl->resume() }
+
+=head3 exclude
+
+$0 name .. --exclude nodes
+
+=cut
+    elsif ( $o{exclude} ) { map { $ctrl->exclude( $_, $who ) } @list }
+
+=head3 Pause
+
+$0 name .. --Pause stages
+
+=cut
+    elsif ( $o{Pause} ) { map { $ctrl->pause( $_, $who ) } @list }
+
+=head3 Resume
+
+$0 name .. --Resume stages
+
+=cut
+    elsif ( $o{Resume} ) { $ctrl->resume( @list ) }
+
+=head3 clear
+
+$0 name .. --clear
+
+=cut
+    elsif ( $o{clear} ) { $ctrl->clear() }
+
+=head3 kill
+
+$0 name .. --kill
+
+=cut
+    elsif ( $o{kill} )
+    {
+        my $pid = Vulcan::ProcLock->check( $path->path( run => "$name.lock" ) );
+        kill 2, $pid if $pid;
+    }
+} 
+
+exit 0;
+
+sub operator
+{
+    #return unless my @p = qx( klist | grep Default );
+    #return $p[0] =~ /: ([^@]+)@/ ? $1 : undef;
+    my $name = `logname`; chop $name; return $name;
+}

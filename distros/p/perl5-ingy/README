@@ -1,0 +1,26 @@
+NAME
+    perl5-ingy - Ingy's Favorite Perl 5 Feature Set
+
+SYNOPSIS
+        use perl5-ingy;
+
+DESCRIPTION
+    Using this module is the same as:
+
+        use 5.010;
+        use strict;
+        use warnings;
+        use IO::All;
+        use YAML::XS;
+        use Capture::Tiny ':all';
+        use XXX -with => 'YAML::XS';
+
+    This is an early release. More modules will be added as this framework
+    matures.
+
+STATUS
+    this module is brand new. Don't use it. I wouldn't if I were you. But
+    I'm not you. I use it. But I'm Ingy. This module is named after me. You
+    are not Ingy. This module is not named after you.
+    iykwimaittydrotflmaowtfbbqstfuftwkthxbai.
+

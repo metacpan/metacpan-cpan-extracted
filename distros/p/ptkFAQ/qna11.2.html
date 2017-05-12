@@ -1,0 +1,39 @@
+<HTML>
+<HEAD><TITLE> 11.2. What happened to the ampersands &amp;?</TITLE></HEAD>
+<BODY><a name="A11.2"> 11.2. What happened to the ampersands <KBD>&amp;</KBD>?</a>
+
+<hr>
+</p><p>
+Perl 4 programmers especially may be surprised to find that 
+as of Perl 5.0 the ampersand <KBD>&amp;</KBD> may be omitted in a call to a
+subroutine if the subroutine has been declared before being used. Actually you
+can even get around the declare before omit ampersand rule by using the 
+<KBD>subs.pm</KBD> pragma, or by pre-declaring (without defining) as in a 
+script like:
+<PRE>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    sub Mysub;  #pre-declare allows calling Mysub()
+
+    ...<i>Other main/Tk stuff - 
+            including call to Mysub() sans &amp;</i>...
+
+    sub Mysub {
+
+        ...<i>Mysub stuff</i>...
+
+    }
+</PRE> 
+Note however that one place the <KBD>\&amp;</KBD> <em>reference</em> is 
+sometimes used in perl/Tk in the setting up a callback for a widget.
+Other references are possible: <i>e.g.</i> <KBD>\$foo</KBD> is a
+reference to the scalar variable <KBD>$foo</KBD> (this was true even 
+under perl 4).
+
+
+<hr>
+	<p><a href="qna11.1.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.2">table of contents</a> | <a href="qna11.3.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

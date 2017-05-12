@@ -1,0 +1,13 @@
+MANIFEST
+t/provide.t
+t/lib/exporty1/pass.pm
+t/lib/Test/Easy.pm
+t/lib/exporty2/pass.pm
+README
+MANIFEST.SKIP
+lib/provide.pm
+.gitconfig
+Makefile.PL
+LICENSE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

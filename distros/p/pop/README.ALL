@@ -1,0 +1,47 @@
+POP Documentation : ALL
+-----------------   ---
+
+The persistent base class, POP::Persistent, implements a powerful method,
+currently called ->all.  This name is almost certainly going to change.  Given
+a persistent class, say, Foo::User, with attributes 'name', 'email' and 'group',
+where name and email are character data and group is an embedded object, the
+following commented examples illustrate the use of ->all:
+
+  DB<1> x Foo::User->all;
+  0  31 # These are the pids (persistent ids) of all the objects in the
+  1  53 # system which are in the Foo::User class
+  2  54
+  DB<2> x Foo::User->all('pid', 'name'); # Only scalar attributes
+  0  ARRAY(0x28207c)			 # can be selected.
+     0  31				 # Note that this now returns
+     1  'Bob Smith'			 # array refs, instead of a simple
+  1  ARRAY(0x2b37a4)			 # element.
+     0  53
+     1  'Tom Ashton'
+  2  ARRAY(0x2c44e0)
+     0  54
+     1  'Nancy Klein'
+  DB<3> x Foo::User->all({'sort' => 'name'},'email');
+  0  'bsmith@foo.com'		# Only scalar attributes can be sorted by.
+  1  'nancy.klein@aha.net	# The attribute sorted by doesn't have to 
+  2  'ashton_tom@baz.ca		# be returned.
+  DB<4> x Foo::User->all({'where' => [['pid', '>', '50']]},'name','group');
+  # The 'where' argument gets converted into a SQL where clause.  Currently,
+  # its syntax is a little hokey, and it doesn't really express all the power
+  # of SQL.  This will be fixed eventually. 
+  0  ARRAY(0x28207c)
+     0  'Tom Ashton'
+     1  Foo::Group=HASH(0x2a8070)	# Note that the actual group object
+	'_pop__persistent_pid' => 8	# is returned here
+	'name' => 'users'
+  1  ARRAY(0x24cc2c)
+     0  'Nancy Klein'
+     1  Foo::Group=HASH(0x2a8070)
+	-> REUSED_ADDRESS
+  DB<6> $g = new Foo::Group 8;  # Restore the 'users' group seen above
+  DB<5> x Foo::User->all({'where' => \
+	  [['group', '=', $g], 'or', ['name', 'like', 'Nancy%']], \
+	  'sort' => 'name'}, 'name');
+  # Note that an actual group object is supplied.
+  0  'Nancy Klein'
+  1  'Tom Ashton'

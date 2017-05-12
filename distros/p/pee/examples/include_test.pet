@@ -1,0 +1,20 @@
+include_test.pet
+
+This file includes the "included.txt" file:
+---
+<?! include included.txt ?>
+---
+The "README" in "generator/":
+---
+<?! include generator/README
+?>
+---
+The "run ning" in "../":
+---
+<?! include ../run ning ?>
+---
+And the "haha.txt" in /tmp:
+---
+<?!include 
+/tmp/haha.txt ?>
+---

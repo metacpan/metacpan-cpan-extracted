@@ -1,0 +1,27 @@
+Pake is an application which can resolve dependencies in a project. It's based on Jimi Weirich rake tool.
+
+Instalation notes:
+
+1) untar: gzip -d pake-VERSION.tar.gz
+2) go into pake directory
+
+perl Makefile.PL
+make
+make test
+
+3) make install (You need special permisions for it)
+4) Hope you enjoy
+
+Please query me with issues and observations: krzysztof.suchomski at gmail dot com
+
+pake -T will list all tasks from Pakefile
+pake task_name will execute the task with dependencies
+
+Example:
+pake test3
+pake program
+
+You can find more info in pake script documentation
+
+Type:
+man pake

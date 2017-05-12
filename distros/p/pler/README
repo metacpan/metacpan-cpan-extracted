@@ -1,0 +1,42 @@
+NAME
+    pler - The DWIM Perl Debugger
+
+DESCRIPTION
+    pler is a small script which provides a sanity layer for debugging test
+    scripts in Perl distributions.
+
+    While prove has proven itself to be a highly useful program for manually
+    running one or more groups of scripts in a distribution, what we also
+    need is something that provides a similar level of intelligence in a
+    debugging context.
+
+    pler checks that the environment is sound, runs some cleanup tasks if
+    needed, makes sure you are in the right directory, and then hands off to
+    the perl debugger as normal.
+
+TO DO
+    - Tweak some small terminal related issues on Win32
+
+SUPPORT
+    All bugs should be filed via the bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=pler>
+
+    For other issues, or commercial enhancement and support, contact the
+    author
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    prove, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2006 - 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

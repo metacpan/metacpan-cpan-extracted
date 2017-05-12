@@ -1,0 +1,46 @@
+<HTML>
+<HEAD><TITLE> 9.1. How do I get a Button to call a Perl subroutine?</TITLE></HEAD>
+<BODY><a name="A9.1"> 9.1. How do I get a <KBD>Button</KBD> to call a Perl subroutine?</a>
+
+<hr>
+</p><p>
+You may specify the <KBD>-command</KBD> option in the call to create &amp; pack
+the button as in:
+<PRE>
+    $main-&gt;Button(-text =&gt; 'Print',
+                   -command =&gt; sub{do_print($filename, $font)}
+                   )-&gt;pack;
+</PRE>
+Where <KBD>sub do_print { }</KBD> is a subroutine that handles two arguments
+and is declared elsewhere in the script.  A full script example of the use of 
+the above code is presented in the second example(s) 
+in <a href="pod/UserGuide.html">UserGuide.pod</a>
+<p>
+	 (Full source code for <a href="pod/ex1.pl">this</a> and other examples 
+	 from <a href="pod/UserGuide.html">UserGuide.pod</a> may be 
+	 found at <a href="pod/">http://w4.lns.cornell.edu/~pvhp/ptk/pod/</a>. 
+	 To load code from the web save as a local file say <KBD>ex1.pl</KBD>, 
+	 edit the first line to point to your perl interpreter, 
+	 then change permission: <KBD>%chmod u+x ex1.pl</KBD>, then execute 
+	 the script: <KBD>%ex1.pl</KBD>.)
+<p>
+The above method is called the &quot;anonymous subroutine (closure)&quot; 
+method. As discussed in 
+<a href="pod/Callback.html"><KBD>Callback.pod</KBD></a> one might have
+re-written that statement to use the &quot;reference to a sub&quot; method
+thusly: 
+<PRE>
+    $main-&gt;Button(-text =&gt; 'Print',
+                   -command =&gt; [ \&amp;do_print , $filename, $font ]
+                   )-&gt;pack;
+</PRE>
+Note the backslash in front of <KBD>\&amp;do_print</KBD>.  This causes perl to 
+generate a reference to <KBD>sub do_print</KBD> rather than call it. 
+(thanks Jim Stern :-)
+
+
+<hr>
+	<p><a href="qna9.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.1">table of contents</a> | <a href="qna9.2.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

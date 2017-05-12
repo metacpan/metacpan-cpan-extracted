@@ -1,0 +1,215 @@
+=head1 NAME
+
+PCSC - Smarcard reader interface library
+
+=head1 SYNOPSIS
+
+ my $hContext = new PCSC();
+ 
+ @ReadersList = $hContext->ListReaders ();
+
+ $hContext->SetTimeout($timeout);
+
+ $apdu = PCSC::array_to_ascii(@apdu);
+
+ @apdu = PCSC::ascii_to_array($apdu);
+
+ $hContext = undef;
+ 
+
+=head1 DESCRIPTION
+
+The PCSC module implements the PCSC class. Objects of this class are
+used to communicate with the PCSClite daemon (see L<PCSClite> for more
+information).
+ 
+PCSC represents an abstraction layer to smartcard readers. It provides
+a communication layer with a wide variety of readers through a
+standardized API.
+ 
+A PCSC object can be used to communicate with more than one reader
+through PCSCCard objects. Please read L<PCSC::Card(3pm)> for extended
+information on how to talk to a smart card reader.
+
+A PCSC object uses the following propoerty:
+ $pcsc_object->{hContext}  the context returned by the pcsc library
+
+=head1 CONSTRUCTORS
+
+The following methods can be used to construct a PCSC object:
+
+=over 4
+
+=item * B<$hContext = new PCSC($scope, $remote_host);>
+
+- $scope is the scope of the connection to the PCSC daemon. It can be
+any of the following:
+ $PCSC::SCARD_SCOPE_USER     (not used by PCSClite);
+ $PCSC::SCARD_SCOPE_TERMINAL (not used by PCSClite);
+ $PCSC::SCARD_SCOPE_SYSTEM   Services on the local machine;
+ $PCSC::SCARD_SCOPE_GLOBAL   Services on a remote host.
+
+- $remote_host is the host name of the remote machine to contact. It
+is only used when $scope is equal to $PCSC::SCARD_SCOPE_GLOBAL. A
+null value means 'localhost'.
+
+=item * B<$hContext = new PCSC($scope);>
+
+This methos is eqivalent to:
+ $hContext = new PCSC($scope, 0);
+
+=item * B<$hContext = new PCSC();>
+
+This methos is eqivalent to:
+ $hContext = new PCSC($PCSC::SCARD_SCOPE_SYSTEM, 0);
+
+=back
+
+=head1 CONSTRUCTION FAILURE
+
+PCSC constructors return an undef value when the object can not
+be created. $PCSC::errno can be used to get more information about the error.
+(See section L<ERROR HANDLING> below for more information)
+
+=head1 PCSC METHODS
+
+Here is a list of all the methods that can be used with a PCSC object.
+
+=over 4
+
+=item * B<$hContext-E<gt>ListReaders( $group );>
+
+This method returns the available readers in the given $group. If ommited,
+$group defaults to a null value meaning "all groups". Please note that as
+of this writing, $group can safely be ommited as it is not used by PCSClite.
+
+The return value upon succesful completion is an array of strings: one
+string by available reader. If an error occured, the undef value is returned
+and $PCSC::errno should be used to get more informations about the error.
+(See section L<ERROR HANDLING> below for more information)
+The following example describes the use of ListReaders():
+
+ $hContext = new PCSC();
+ die ("Can't create the pcsc object: $PCSC::errno\n") unless (defined $hContext);
+
+ @ReadersList = $hContext->ListReaders ();
+ die ("Can't get readers' list: $PCSC::errno\n") unless (defined($ReadersList[0]));
+
+ $, = "\n  ";
+ print @ReadersList . "\n";
+
+=item * B<$apdu_ref = PCSC::ascii_to_array($apdu);>
+
+The method PCSC::Card::Transmit uses references to arrays as in and out
+parameters. The PCSC::ascii_to_array is used to transform an APDU in
+ASCII format to a reference to an array in the good format.
+
+Example:
+ $SendData = PCSC::ascii_to_array("00 A4 01 00 02 01 00");
+
+=item * B<$apdu = PCSC::array_to_ascii($apdu_ref);>
+
+This method is used to convert the result of a PCSC::Card::Transmit into
+ASCII format.
+
+Example:
+ $RecvData = $hCard->Transmit($SendData);
+ print PCSC::array_to_ascii($RecvData);
+
+=item * B<$hContext-E<gt>SetTimeout( $timeout );>
+
+This method sets the working time that RPC uses when waiting for a
+server.
+
+It returns true upon successful exacution or false otherwise.
+
+- $timeout contains the new timeout value in seconds.
+
+=item * B<$hContext-E<gt>SetTimeout();>
+
+This function is equivalent to
+ $hContext->SetTimeout(5);
+
+=back
+
+=head1 ERROR HANDLING
+
+All functions from PCSC objects save the return
+value in a global variable called $PCSC::errno. This variable therefore
+holds the latest status of PCSC. It is a double-typed magical
+variable that behaves just like $!. This means that it both holds a
+numerical value describing the error and the corresponding string.
+The numerical value may change from a system to another as it depends on
+the PCSC library... Here is a small example of how to use it:
+
+ $hContext = new PCSC();
+ die ("Can't create the pcsc object: $PCSC::errno\n")
+     unless (defined $hContext);
+
+In case the last call was successful, $PCSC::errno contains the
+'SCARD_S_SUCCESS' status. Here is a list of all possible error codes
+They are defined as read-only variables with in the PCSC module:
+
+ $PCSC::SCARD_S_SUCCESS
+ $PCSC::SCARD_E_CANCELLED
+ $PCSC::SCARD_E_CANT_DISPOSE
+ $PCSC::SCARD_E_INSUFFICIENT_BUFFER
+ $PCSC::SCARD_E_INVALID_ATR
+ $PCSC::SCARD_E_INVALID_HANDLE
+ $PCSC::SCARD_E_INVALID_PARAMETER
+ $PCSC::SCARD_E_INVALID_TARGET
+ $PCSC::SCARD_E_INVALID_VALUE
+ $PCSC::SCARD_E_NO_MEMORY
+ $PCSC::SCARD_E_UNKNOWN_READER
+ $PCSC::SCARD_E_TIMEOUT
+ $PCSC::SCARD_E_SHARING_VIOLATION
+ $PCSC::SCARD_E_NO_SMARTCARD
+ $PCSC::SCARD_E_UNKNOWN_CARD
+ $PCSC::SCARD_E_PROTO_MISMATCH
+ $PCSC::SCARD_E_NOT_READY
+ $PCSC::SCARD_E_SYSTEM_CANCELLED
+ $PCSC::SCARD_E_NOT_TRANSACTED
+ $PCSC::SCARD_E_READER_UNAVAILABLE
+ $PCSC::SCARD_E_PCI_TOO_SMALL
+ $PCSC::SCARD_E_READER_UNSUPPORTED
+ $PCSC::SCARD_E_DUPLICATE_READER
+ $PCSC::SCARD_E_CARD_UNSUPPORTED
+ $PCSC::SCARD_E_NO_SERVICE
+ $PCSC::SCARD_E_SERVICE_STOPPED
+
+ $PCSC::SCARD_W_UNSUPPORTED_CARD
+ $PCSC::SCARD_W_UNRESPONSIVE_CARD
+ $PCSC::SCARD_W_UNPOWERED_CARD
+ $PCSC::SCARD_W_RESET_CARD
+ $PCSC::SCARD_W_REMOVED_CARD
+ $PCSC::SCARD_W_INSERTED_CARD
+
+PCSClite users will also be able to use the following (PCSClite specific) codes
+ $PCSC::SCARD_E_UNSUPPORTED_FEATURE
+ $PCSC::SCARD_W_INSERTED_CARD
+ $PCSC::SCARD_SCOPE_GLOBAL
+ $PCSC::SCARD_RESET
+ $PCSC::SCARD_INSERTED
+ $PCSC::SCARD_REMOVED
+
+In addition, the wrapper defines
+ $PCSC::SCARD_P_ALREADY_CONNECTED
+ $PCSC::SCARD_P_NOT_CONNECTED
+
+=head1 SEE ALSO
+
+L<PCSClite> manpage has useful informations about PCSClite.
+L<PCSCCard(3pm)> manpage gives informations about how to communicate with
+a reader and the smart card inside.
+
+=head1 COPYRIGHT
+
+Please see the copyright file included with your distribution
+
+=head1 AUTHORS / ACKNOWLEDGEMENT
+
+ Lionel VICTOR <lionel.victor@unforgettable.com>
+               <lionel.victor@free.fr>
+
+=cut
+

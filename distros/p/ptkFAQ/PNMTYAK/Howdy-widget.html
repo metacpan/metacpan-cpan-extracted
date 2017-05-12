@@ -1,0 +1,284 @@
+<HTML>
+<HEAD>
+<TITLE>Howdy Widgets!</TITLE>
+</HEAD><BODY>
+<H1>Howdy Perl/Tk Widgets!</H1>
+
+This document is an outgrowth of the <a href="../ptkPORT.html">ptkPORT.html</a>
+page that I wrote. The concentration here is on stepping through the build of
+the <a href="Howdy-0.1.tar.gz"><kbd>Howdy</kbd></a> extension to Perl/Tk.
+
+<HR>
+<HR>
+
+<B><I>Lesson 0: hiworld.c</I></B><BR>
+
+In an effort to test your ability to program for Xlib consider writing
+and compiling a <em>very</em> simple C program that uses Xlib. For illustrative 
+purposes I will use the (not too exciting) 
+<a href="hiworld.c"><kbd>hiworld.c</kbd></a> example. 
+(You Xlib and widget experts out there will please
+bear with me on this ;-)
+<p>
+On a typical UNIX computer 
+I can compile and link that program with a command like:
+<pre>
+    cc -o hiworld.exe hiworld.c -lX11
+</pre>
+whereas if I used the GNU C compiler that would simply be:
+<pre>
+    gcc -o hiworld.exe hiworld.c -lX11
+</pre>
+(and you may very well need other <KBD>-l</KBD> and/or <KBD>-L</KBD> arguments 
+ depending on the details of your system, these will be discussed in the next 
+ lesson.)
+<p>
+<A HREF="hiworld.c"><kbd>hiworld.c</kbd></A> has a very simple interface: it pops 
+up with the '<KBD>Hello!</KBD>' string in place, mouse &lt;Button-1&gt; clicks put 
+'<KBD>Hi.</KBD>' strings in place, and any keyboard keystroke stops the primitive 
+event handler loop and exits the program.
+<p>
+It is amusing to note that the equivalent functionality of that 
+<A HREF="hiworld.c">roughly 73 line C program</A> can, 
+with Perl/Tk to the rescue, be written in 
+<a href="hiworld.pl">about 10 lines</a>:
+<pre>
+    #!/usr/bin/perl -w
+    use Tk;
+    my $m = MainWindow-&gt;new;
+    my $c = $m -&gt; Canvas(-height =&gt; 200, -width =&gt; 300,);
+    $c -&gt; pack;
+    $c -&gt; create('text', 40, 50, '-text' =&gt; "Hello World!");
+    $m -&gt; bind('&lt;Any-KeyPress&gt;' =&gt; sub{exit});
+    $m -&gt; bind('&lt;Button-1&gt;' =&gt; sub {
+        $c -&gt; create('text',$c-&gt;XEvent-&gt;x,$c-&gt;XEvent-&gt;y, -text =&gt; "Hi.") });
+    MainLoop;
+</pre>
+(Note that a tcl/tk version can be as few as <A HREF="hiworld.tcl">6 lines!</A> 
+ Neither the perl/tk nor tcl/tk versions are really fair to the C version since 
+ it cannot even refresh the additional '<kbd>Hi.</kbd>' strings on expose events 
+ the way the <b>perl</b> and <b>wish</b> scripts do automatically.)
+
+<HR>
+
+<B>[optional] <I>Lesson 1: Makefile</I></B><BR>
+
+Assuming you are able to figure out how to compile and link 
+<A HREF="hiworld.c"><kbd>hiworld.c</kbd></A>, an additional step to 
+take would be to try coming up with a <kbd>Makefile</kbd> for it (although this
+would <em>not</em> be necessary if you have <b>MakeMaker</b> and can follow the
+steps in Lesson 2 below - so this lesson is strictly optional). The crude way to 
+create a <kbd>Makefile</kbd> is to simply use a text editor to write something 
+like this:
+<pre>
+    hiworld : hiworld.c
+            cc -o hiworld hiworld.c -lX11
+</pre>
+which would be invoked with "<kbd>make hiworld</kbd>" for example. It is considered
+much more fashionable to throw in a bunch of <i>macros</i> into one's 
+<kbd>Makefile</kbd>'s as in the following:
+<pre>
+    CC = cc
+    X11 = -lX11
+    all : hiworld
+    hiworld : hiworld.c
+            $(CC) -o hiworld hiworld.c $(X11)
+</pre>
+which is still invoked via "<kbd>make hiworld</kbd>" even though it looks a little
+more complicated. Perl's <b>ExtUtils::MakeMaker</b> facility is much more adept
+at making <KBD>Makefile</KBD>s though, its use is discussed in the next lesson.
+
+<HR>
+
+<B><I>Lesson 2: h2xs, hiworld.c-&gt;Howdy.xs, Makefile.PL, xsubpp</I></B><BR>
+
+Following the 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlxstut.html">perlxstut(1)</a>
+man page we go to an otherwise unused directory and type:
+<pre>
+    h2xs -A -n Howdy
+</pre>
+and note the creation of a new <kbd>Howdy/</kbd> directory with several new files.
+With version 1.16 of <a href="h2xs.html">h2xs</a> the directory appears as follows:
+<pre>
+    -rw-r--r--   user     118 Changes
+    -rw-r--r--   user     982 Howdy.pm
+    -rw-r--r--   user     158 Howdy.xs
+    -rw-r--r--   user      54 MANIFEST
+    -rw-r--r--   user     371 Makefile.PL
+    -rw-r--r--   user     650 test.pl
+</pre>
+The remainder of this lesson concerns itself with modifying (at least) four 
+of the new files that were automatically generated: 
+<A HREF="Howdy.xs"><kbd>Howdy.xs</kbd></A>, 
+<A HREF="Howdy.pm"><kbd>Howdy.pm</kbd></a>, 
+<A HREF="Makefile.PL"><kbd>Makefile.PL</kbd></a>, 
+and <A HREF="test.pl"><kbd>test.pl</kbd></a>. 
+<p>
+For those of you curious about the above options passed to h2xs try taking
+a look through <kbd>perldoc h2xs</kbd> or 
+<a href="h2xs.html"><kbd>tkpod h2xs</kbd></a>. Note that <kbd>-A</kbd> specifies 
+omission of the AutoLoader, and the <kbd>-n</kbd> option is given the package 
+name we will be creating: <kbd>Howdy</kbd>.
+<p>
+One way to get our C Xlib code into Howdy would be to 
+append (and slightly modify) the contents of 
+<A HREF="hiworld.c"><kbd>hiworld.c</kbd></A> to the (initially) blank stub of 
+<A HREF="Howdy.xs"><kbd>Howdy.xs</kbd></A> (on Unix that would be
+something like <kbd>cat hiworld.c >> Howdy.xs</kbd>.) We edit Howdy.xs to
+add the required <kbd>CODE:</kbd> and <kbd>OUTPUT: RETVAL</kbd> statements, as
+well as to change function <kbd>main(argv argc)</kbd> to a funtion 
+<kbd>hiworld(argv argc)</kbd> (clever name eh?). So that now the head of 
+<A HREF="Howdy.xs"><kbd>Howdy.xs</kbd></A> now appears like:
+<PRE>
+    #include "EXTERN.h"
+    #include "perl.h"
+    #include "XSUB.h"
+    #include <X11/Xlib.h>
+    #include <X11/Xutil.h>
+
+
+    MODULE = Howdy          PACKAGE = Howdy
+
+    int 
+    hiworld(argc, argv)
+            int argc
+            char argv
+            CODE:
+ </PRE>
+(note the function type of <kbd>int</kbd>, although <kbd>void</kbd> would have been 
+just as appropriate.) 
+<p>
+The tail of <A HREF="Howdy.xs"><kbd>Howdy.xs</kbd></A>
+now appears something like this:
+<PRE>
+            XCloseDisplay(mydisplay);
+            OUTPUT:
+            RETVAL
+</PRE>
+Note the absence of a call to <kbd>exit(0);</kbd> that we had in
+<A HREF="hiworld.c"><kbd>hiworld.c</kbd></A>, and an absence of the 
+ braces <kbd>{}</kbd> for a <kbd>main</kbd> since there is no longer a 
+ <kbd>main</kbd> (we are turning out a hiworld() subroutine call for perl 
+ after all and perl.c already has a <kbd>main{}</kbd>).
+<p>
+We turn our attention to the <A HREF="Makefile.PL"><kbd>Howdy/Makefile.PL</kbd></A> 
+file and change the line that initially says:
+<pre>
+    'LIBS'      => [''],   # e.g., '-lm' 
+</pre>
+to read something like what we needed to use to compile hiworld.c from the
+command line, like:
+<pre>
+    'LIBS'      => ['-lX11'],   # e.g., '-lm' 
+</pre>
+better still would be something like what is in the Makfile.PL for Tk, as of
+Tk-b11.02 that would be:
+<pre>
+    'LIBS'    => ["$xlib -lX11 -lpt -lsocket -lnsl -lm"],
+</pre>
+Hmm... we don't know what "$xlib" interpolates to, so let's keep it simple:
+<pre>
+    'LIBS'      => ['-lX11 -lpt -lsocket -lnsl -lm -ldnet'],   
+</pre>
+(The very observant will note that I also added a line to Howdy's
+ <A HREF="Makefile.PL"><kbd>Howdy/Makefile.PL</kbd></A> that reads:
+<PRE>
+    'dist'      => { COMPRESS => "gzip -9f" },
+</PRE>
+ which is for <KBD>make dist</KBD> to make a nice compact 
+ <a href="Howdy-0.01.tar.gz">distribution file</a>.)
+<p>
+Before attempting to build our Howdy extension lets put in some non-trivial 
+code into the <KBD>test.pl</KBD> file so that <KBD>make test</KBD> will be 
+interesting. Since test &#35; 1 is the loading via a <kbd>use Howdy;</kbd> 
+statement let us add a second test so that we set <kbd>last_test_to_print</kbd> 
+to 2 and add a couple of careful lines to <a href=""><kbd>test.pl</kbd></a>:
+<PRE>
+    eval '$retval = &amp;Howdy::hiworld($foo,$bar);';
+    if ($@) {print "not ok 2: $@\n";} else {print "ok 2\n";}
+</PRE>
+We can now type the following standard commands to build and install our 
+Howdy::hiworld extension to perl:
+<PRE>
+    perl Makefile.PL
+    make
+    make test
+    make install
+</PRE>
+(Note also, statically linked Howdy perl binaries can be made by running 
+ something like this:
+<pre>
+    make -f Makefile.aperl inst_perl MAP_TARGET=howdyperl
+</pre>
+ after <KBD>make</KBD> and before <KBD>make test</KBD>. Scripts written with a 
+ statically linked howdyperl will need to start with 
+ <kbd>#!/path/to/howdyperl</kbd>.)
+<p>
+After <KBD>make install</KBD> it is possible to run perl scripts that call the 
+<kbd>hiworld()</kbd> subroutine in as little as three simple lines of perl:
+<pre>
+    #!/usr/bin/perl
+    use Howdy;
+    $return = &amp;Howdy::hiworld($a, $b);
+</pre>
+For illustrative and testing purposes I have made a
+distribution copy of the 
+<a href="Howdy-0.1.tar.gz"><kbd>Howdy</kbd></a> "module" for perl, as it 
+appears up to this point in the discussion.
+
+<HR>
+
+<B><I>Lesson 3: @ISA &amp; Tk::Howdy</I></B><BR>
+
+Hmm... the 3 line test script from lesson 2 uses a fully qualified 
+subroutine name. What happens if we try:
+<pre>
+    #!/usr/bin/perl
+    use Howdy;
+    $return = &amp;hiworld($a, $b);
+</pre>
+we get error messages like:
+
+<HR>
+
+<B><I>Lesson 4: Typemaps</I></B><BR>
+
+Hmm... the 3 line test script above in lesson 2 provides for
+<pre>
+    $return = &amp;Howdy::hiworld($a, $b);
+</pre>
+which will complain under <kbd>-w</kbd> about $a and $b not being 
+initialized. Let's re-write that sample use script as:
+<pre>
+    #!/usr/bin/perl -w
+    use Howdy;
+    my ($a, $b) = (0, 0);
+    $return = &amp;Howdy::hiworld($a, $b);
+    print "\$return = $return, \$a = $a, \$b = $b\n";
+</pre>
+
+
+<HR>
+<HR>
+<ADDRESS>
+I am:<BR>
+<A HREF="http://w4.lns.cornell.edu/~pvhp/">Peter Prymmer</A><BR>
+<A HREF="http://w4.lns.cornell.edu/">Wilson Synchrotron Laboratory</A><BR>
+<A HREF="http://www.cornell.edu/">Cornell University</A><BR>
+<A HREF="http://www.ithaca.ny.us/">Ithaca</A>, 
+ <A HREF="http://wings.buffalo.edu/world/nywww.html">NY</A> 
+ <A HREF="http://www.mit.edu:8001/geo?Ithaca">14853</A><BR><BR>
+<A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A><BR>
+</ADDRESS>
+<p><A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A> | 
+ <A HREF="../ptkFAQ.html">perl/Tk FAQ</A> | 
+ <A HREF="../ptkTOC.html">FAQ Table of Contents</A>
+
+</BODY>
+</HTML>
+
+
+
+
+

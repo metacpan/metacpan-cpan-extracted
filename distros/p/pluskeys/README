@@ -1,0 +1,57 @@
+pluskeys
+
+This pragma provides a declarative way to have compile-time 
+typo safety on hash keys, usually for objects.
+
+After use pluskey qw(INITIALIZED), then $self->{ +INITIALIZED } is 
+fine but $self->{ +INITILIZED } is a compile-time error.
+
+Multiple inheritance even using duplicate keynames is supported
+because the pluskeys are actually constant functions that return
+package-qualified strings.
+
+See the included documentation for details.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+standard Unix man command:
+
+    man pluskeys
+
+If that fails, your MANPATH is probably set up wrong and you
+will probably be forced to use the awful perldoc program instead.
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=pluskeys
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/pluskeys
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/pluskeys
+
+    Search CPAN
+        http://search.cpan.org/dist/pluskeys/
+
+
+LICENCE AND COPYRIGHT
+
+Copyright (C) 2005-2015 Tom Christiansen
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+
+See L<http://dev.perl.org/licenses/> for more information.
+

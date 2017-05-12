@@ -1,0 +1,531 @@
+<HTML>
+<HEAD><TITLE>6. Where is the Documentation?</TITLE></HEAD>
+<BODY><a name="A6">6. Where is the Documentation?</a>
+
+<hr>
+</p><p>
+
+Documentation is &quot;in the works&quot;:  there are several books 
+dealing with perl/Tk in progress, and a growing FAQ (the document you
+are presently reading).
+</p><p>
+In the meantime the available information resources can be split into 
+<a href="#PTKDOCS">Perl/Tk</a>, <a href="#PERLDOCS">Perl</a>, and 
+<a href="#TCL-TKDOCS">Tcl/Tk</a> documentation categories:
+
+<H3><a name="PTKDOCS">Perl/Tk Specific Documentation</a></H3>
+<H4>The man pages</H4>
+As of Tk-b9.01 the various perl/Tk pod documents are converted to roff format
+and installed as part of the perl/Tk &quot;<kbd>make install</kbd>&quot; 
+process. If you have a recent
+verion of perl/Tk try something like <kbd>man 3 Tk::Tk</kbd> if this does not
+work check with you system administrator for the proper MANPATH. (Tk-b9.01
+people may be interested in applying 
+<a href="etc/ptkpod-b9.01.patch">Nick's document patch</a> 
+to keep <CODE>pod2man</CODE> from complaining too much during 
+<kbd>make install</kbd>.)
+
+<H4>The newsgroup</H4>
+The newsgroup name is <a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a>
+and this FAQ will be periodically posted to that group. The newsgroup is the
+appropriate place to post questions - yes even simple ones! (Although answers
+may be long in coming ... :-(
+
+<H4>The nTk/pTk mailing list</H4> 
+The mailing list is a supplement and a complement to the newsgroup 
+<a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a>. All messages mailed to
+the list are forwarded to the newsgroup. 
+The nTk/pTk Mailing List Archive remains a useful source of 
+information however, and is accesible at either 
+<a href="http://pubweb.bnl.gov/~ptk/">http://pubweb.bnl.gov/~ptk/</a>, or 
+via <CODE>ftp</CODE> at <a href="ftp://ftp.ccd.bnl.gov/pub/ptk/archives/">
+ftp://ftp.ccd.bnl.gov/pub/ptk/archives/</a> (both in the USA). You may
+<em>search</em> the contents of the mailing list archives thanks to a cgi-bin 
+script written by Achim Bohnet in Germany at:
+<pre>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/</a>
+</pre>
+To subscribe to the mailing list you can send mail to 
+<a href="mailto:majordomo@lists.stanford.edu">majordomo@lists.stanford.edu</a> 
+(<i>i.e.</i> 
+<a href="mailto:majordomo@lists.stanford.edu">&lt;majordomo@lists.stanford.edu&gt;</a>)
+with the following command in the body of your e-mail message:
+<pre>
+    subscribe ptk joe.user@somewhere (Joe D. User)
+</pre>
+<p>
+To send a message to <EM>all</EM> recipients of the mailing list
+send e-mail to <a href="mailto:ptk@lists.stanford.edu">&lt;ptk@lists.stanford.edu&gt;</a>. 
+<p>
+To remove yourself from the mailing list send mail 
+to <a href="mailto:majordomo@lists.stanford.edu">majordomo@lists.stanford.edu</a> 
+(<i>i.e.</i> <a href="mailto:majordomo@lists.stanford.edu">&lt;majordomo@lists.stanford.edu&gt;</a>)
+with the following command in the body of your e-mail message:
+<pre>
+    unsubscribe ptk joe.user@somewhere (Joe D. User)
+</pre>
+
+<H4>The demo programs</H4>
+Examine (and try running) the code in your <KBD>Tk-b&#35;/</KBD>, 
+<KBD>perl5/Tk/demos/</KBD>, and <KBD>perl5/Tk/demos/widget_lib/</KBD> 
+directories.<BR>
+In order to determine where on your system the <KBD>perl5/</KBD> 
+directory is located type the following one-line perl command (at your shell
+prompt - this is not a line from a perl script):
+<pre>
+    perl -e 'print join("\n",@INC),"\n";'
+</pre>
+If that command does not turn up a <KBD>perl5/</KBD> directory then 
+make sure that you are running perl 5 with the following: <KBD>perl -v</KBD>
+(again this can be entered at the shell prompt).
+
+<H4>The pod documentation</H4>
+As of Tk-b9.01 the various perl/Tk pod documents are converted to roff format
+and installed as part of the perl/Tk installation process. If you have a recent
+verion of perl/Tk try something like <kbd>man 3 Tk::Tk</kbd>. If this does not
+work check your man path with
+<pre>
+    perl -e 'use Config; print $Config{'man1dir'},"\n",$Config{'man3dir'},"\n"'
+</pre>
+And if you still cannot find the manual pages check with your system 
+administrator for the proper MANPATH and/or Tk-&#35; installation version.
+<p>
+In your <KBD>perl5/Tk/</KBD> directory there should be 
+a number of <KBD>.pod</KBD> files including (but not limited to) 
+<KBD>UserGuide.pod</KBD>. The files are examples of the perl &quot;plain old 
+documentation&quot; format and are just about human readable as they 
+are (<i>e.g.</i> you may <CODE>more</CODE>, <CODE>cat</CODE>, or
+<CODE>less</CODE> them; or send them to a printer). They are intended to be 
+run through a re-formatting program however. Such programs include 
+<CODE>pod2man</CODE>, <CODE>pod2html</CODE>, and <CODE>pod2latex</CODE> 
+(which get installed when you install <CODE>perl</CODE>) or 
+<a href="etc/pod2text"><kbd>pod2text</kbd></a> which was written by Tom
+Christiansen.
+ A command line <EM>like</EM> the following (but subject to local variations) 
+should work for you:
+<pre>
+    pod2man perl5/Tk/UserGuide.pod | nroff -man | more
+</pre>
+There should even be a perl script to run the above command for you. It is
+executed as:
+<pre>
+    perldoc perl5/Tk/UserGuide
+</pre>
+Note that <em>if</em> there is pod like documentation in a perl module you 
+may also execute <kbd>perldoc</kbd> on it as in:
+<pre>
+    perldoc ColorEditor.pm
+</pre>
+(please note that not all <KBD>.pm</KBD> mod files have pod embedded.)
+If you want that GUI look and feel (like <KBD><i>xman</i></KBD>) make the 
+appropriate changes to the following script:
+<pre>
+    #!/usr/bin/perl
+    use Tk;
+    use Tk::Pod;
+    my $m = new MainWindow;
+    $m -&gt; Pod(-file =&gt; 'Tk/ColorEditor.pm');
+    MainLoop;
+</pre>
+Or better still use the <b>tkpod</b> program that gets installed when you 
+'<kbd>make install</kbd>' Tk. It can be used like this:
+<PRE>
+    tkpod /usr/local/lib/perl5/pod/perl
+</PRE>
+<p>
+The pod conversion to latex proceeds as you might guess, namely:
+<pre>
+    pod2latex UserGuide.pod 
+</pre>
+(according to the 1.1 version of <KBD>pod2latex</KBD> this will automatically 
+generate a <KBD>UserGuide.tex</KBD> file hence you must have 
+write access to the directory in which the above command is carried out.)
+<p>
+You may also convert the pod pages to HTML (the <B>H</B>yper<B>T</B>ext 
+<B>M</B>arkup <B>L</B>anguage of World Wide Web documents).
+For example, command lines <EM>like</EM> the following (but subject to local 
+variations - is your <i>web_browser</i> configured to allow local access to a 
+file? - if not do this on a web-serving machine) should work for you:
+<pre>
+    pod2html perl5/Tk/UserGuide.pod &gt; UserGuide.html
+    <i>web_browser_invocation</i> UserGuide.html
+</pre>
+In addition there is, on an experimental basis, a place to view the 
+Tk-b9.01 <KBD>.pod-&gt;.html</KBD> files from the <KBD>perl5/Tk</KBD> directory 
+at:
+<pre>
+    <a href="pod/">http://w4.lns.cornell.edu/~pvhp/ptk/pod/</a>
+</pre>
+(Please note that the 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlpod.html">
+perl pod specification</a> does not allow for markup within a verbatim 
+paragraph - yet font changes often seem to be in either the 
+&lt;XMP&gt;&lt;/XMP&gt; or the &lt;PRE&gt;&lt;/PRE&gt; HTML environments
+generated by running many of these <KBD>.pod</KBD> files through the latest
+version of <a href="http://www.metronet.com/0/perlinfo/perl5/manual/pod2html">
+<KBD>pod2html</KBD></a>. Alert browsers are welcome to 
+<a href="mailto:pvhp@lns62.lns.cornell.edu">notify me</a> of any 
+errors in the hand-altered <a href="pod/">html files</a>.)
+<p>
+Translators <kbd>pod2texinfo</kbd>, <kbd>pod2fm</kbd>, <i>etc.</i>, also exist.
+Check a <a href="qna4.html">CPAN site</a> for these scripts if you do not already 
+have them.
+<p>
+<b>Newer versions:</b> In your <KBD>Tk-b10++/doc</KBD> directory there should be  
+a number of <KBD>.htm</KBD> files. These were originally Tcl/Tk man pages, but 
+have been converted to Perl syntax in html format.
+<pre>
+    <a href="http://w4.lns.cornell.edu/~pvhp/ptk/doc/">http://w4.lns.cornell.edu/~pvhp/ptk/doc/</a>
+</pre>
+<p>
+<b>Older versions:</b> In your <KBD>Tk-b&#35;/doc</KBD> directory there should be  
+a number of <KBD>.ht</KBD> files. These are conversions of Tcl/Tk man pages to 
+html. (If you wish to browse them at your own site you may wish to look at 
+Mark Elston's <a href="etc/cvtht">cvtht</a> script, or configure your
+web-server/browser to recognize the <KBD>.ht</KBD> extension as a text/html 
+mime.type.)
+The <KBD>.ht</KBD> are helpful to the perl/Tk programmer trying to remember 
+the name of an optional argument to pass to a given widget primitive. 
+Note that insofar as these pages do specify syntax it pertains to Tcl/Tk not 
+perl/Tk, hence they must be translated. The pages are on the web at:
+<pre>
+    <a href="http://pubweb.bnl.gov/~ptk/doc/index.html">http://pubweb.bnl.gov/~ptk/doc/index.html</a>
+    <a href="http://w4.lns.cornell.edu/~pvhp/ptk/b9.01-docnpod/doc/">http://w4.lns.cornell.edu/~pvhp/ptk/b9.01-docnpod/doc/</a>
+</pre>
+A miscellany of internet perl/Tk resources includes:
+<pre>
+World Wide Web - perl/Tk man pages
+    <a href="http://pubweb.bnl.gov/~ptk/doc/index.html">http://pubweb.bnl.gov/~ptk/doc/index.html</a>
+    <a href="http://w4.lns.cornell.edu/~pvhp/ptk/doc/">http://w4.lns.cornell.edu/~pvhp/ptk/doc/</a>
+    <a href="http://w4.lns.cornell.edu/~pvhp/ptk/pod/">http://w4.lns.cornell.edu/~pvhp/ptk/pod/</a>
+Newsgroups
+    <a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a>
+    <a href="news:comp.lang.perl.misc">comp.lang.perl.misc</a>
+    <a href="news:comp.lang.perl.announce">comp.lang.perl.anounce</a>
+    <a href="news:comp.lang.tcl">comp.lang.tcl</a>
+    <a href="news:comp.lang.tcl">comp.lang.tcl.announce</a>
+    <a href="news:comp.answers">comp.answers</a>
+    <a href="news:news.answers">news.answers</a>
+Perl/Tk FAQ-Archives (ftp sites) [Note: FAQ may be many separate files]
+ (see also <a href="qna4.html">CPAN sites</a>)
+    <a href="ftp://rtfm.mit.edu/pub/usenet/comp.lang.perl.tk">ftp://rtfm.mit.edu/pub/usenet/comp.lang.perl.tk</a>
+    <a href="ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/lang/perl/tk">ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/lang/perl/tk</a>
+    <a href="ftp://ftp.uu.net/usenet/news.answers/perl-faq/ptk-faq">ftp://ftp.uu.net/usenet/news.answers/perl-faq/ptk-faq</a>
+    <a href="ftp://ftp.ccd.bnl.gov/pub/ptk/">ftp://ftp.ccd.bnl.gov/pub/ptk/</a>                   130.199.54.188
+    <a href="ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt">ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt</a>         130.199.54.188
+    <a href="ftp://ftp.wpi.edu/perl5/pTk-FAQ">ftp://ftp.wpi.edu/perl5/pTk-FAQ</a>                  130.215.24.209
+    <a href="ftp://perl.com/pub/perl/doc/ptkFAQ.gz">ftp://perl.com/pub/perl/doc/ptkFAQ.gz</a>            199.45.129.30
+    <a href="ftp://perl.com/pub/perl/doc/ptkFAQ.ps.gz">ftp://perl.com/pub/perl/doc/ptkFAQ.ps.gz</a>         199.45.129.30
+WWW-FAQ for perl/Tk
+    <a href="ptkTOC.html">http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html</a>
+    <a href="ptkFAQ.html">http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html</a>
+World Wide Web - perl/Tk info sites
+    <a href="http://pubweb.bnl.gov/~ptk/">http://pubweb.bnl.gov/~ptk/</a>
+    <a href="http://fxfx.com/kgr/compound/">http://fxfx.com/kgr/compound/</a> (Perl Tk Compound Widget Page)
+    <a href="ptkIMG.html">http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html</a> (FAQ image supplement)
+    <a href="etc/">http://w4.lns.cornell.edu/~pvhp/ptk/etc/</a>
+    <a href="misc/">http://w4.lns.cornell.edu/~pvhp/ptk/misc/</a>
+    <a href="PNMTYAK/">http://w4.lns.cornell.edu/~pvhp/ptk/PNMTYAK/</a>
+    <a href="http://www.mirai.com/wks/">http://www.mirai.com/wks/</a>
+The Mailing list
+    <a href="mailto:majordomo@lists.stanford.edu">majordomo@lists.stanford.edu</a> 
+    <a href="mailto:ptk@lists.stanford.edu">ptk@lists.stanford.edu</a> 
+</pre>
+
+<H3><a name="PERLDOCS">Perl Specific Documentation</a></H3>
+There are a growing number 
+<a href="http://www.perl.com/perl/faq/Q2.2.html">Perl books</a> available. A
+more complete Perl-bibliographic discussion than that given here is available 
+in the <a href="http://www.perl.com/perl/faq/">Perl FAQ</a> at:
+<pre>
+    <a href="http://www.perl.com/perl/faq/Q2.2.html">http://www.perl.com/perl/faq/Q2.2.html</a>
+</pre>
+The two early Perl books by Schwartz and Wall are very helpful (even if they do
+pertain to perl 4 and not 5. Beware that perl/Tk makes extensive use of 
+perl 5 features.):
+	<p><blockquote>
+	<a href="http://www.ora.com/gnn/bus/ora/item/lperl.html"><B>Learning Perl</B></a> (<a href="http://www.ora.com/info/perl/">The Llama</a>)<br>
+	 <a href="http://www.teleport.com/~merlyn">Randal L. Schwartz</a><br>
+	Copyright (c) 1993 
+	 <a href="http://gnn.com/gnn/bus/ora/aboutora.html">
+	 O'Reilly &amp; Associates Inc.</a><br>
+	ISBN 1-56592-042-2 (English)<br>
+	ISBN 2-84177-005-2 (French)<br>
+	ISBN 3-930673-08-8 (German)<br>
+	ISBN 4-89502-678-1 (Japanese)<br>
+	</blockquote>
+	<p><blockquote>
+	<a href="http://www.metronet.com/perlinfo/perl5/manual/perlbook.html"><B>Programming Perl</B></a> (<a href="http://www.ora.com/gnn/bus/ora/item/pperl.html">The Camel</a>)<br>
+	Larry Wall and Randal L. Schwartz<br>
+	Copyright (c) 1991 
+	 <a href="http://gnn.com/gnn/bus/ora/aboutora.html">
+	 O'Reilly &amp; Associates Inc.</a><br>
+	<a href="http://nearnet.gnn.com/gnn/bus/ora/catalog/pperl.desc.html">
+	 ISBN 0-937175-64-1 (English)</a><br>
+	ISBN 3-446-17257-2 (German) (Programmieren in Perl, translator: Hanser Verlag)<br>
+	ISBN 4-89052-384-7 (Japanese)<br>
+	</blockquote>
+For Perl 5 there will be an update to the Camel 
+(&quot;<em>Learning More Perl</em>&quot;? the Alpaca?) in preparation 
+by <a href="http://www.teleport.com/~merlyn">Randal L. Schwartz</a>,
+<a href="mailto:tchrist@perl.com">Tom Christiansen</a>, 
+Larry Wall, 
+and <a href="mailto:spp@psa.pencom.com">Stephen Potter</a>, with a draft due 
+at O&#39;Reilly by the end of April 1996.
+There is some Perl5 (book material) information at:
+<pre>
+    <a href="http://www.metronet.com/1h/perlinfo/perl5/">http://www.metronet.com/1h/perlinfo/perl5/</a>
+</pre>
+Jon Orwant (the organizer of the 
+<a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a> newgroup) 
+will have a book on Perl 5 out in January 1996. (Please note that it is mostly 
+about Perl 5, there is a some discussion of four simple Perl/Tk programs, but 
+it is not a book wholly devoted to Perl/Tk.) The relevant info:
+	<p><blockquote>
+	<B>Perl 5 Interactive</B><BR>
+	<a href="mailto:orwant@media.mit.edu">Jon Orwant</a><BR>
+	<a href="http://www.dnai.com/waite/">The Waite Group Press</a><BR>
+	ISBN: 1-57169-064-6<BR>
+	</blockquote>
+The 
+<a href="http://www.xs4all.nl/~jvromans/perlref.html">perl 5 Quick Reference Guide</a> 
+(may require <b>LaTeX</b> for installation)
+can be obtained from any <a href="qna4.html">CPAN ftp site</a>. Detailed location
+information is also available at the author's website:
+<pre>
+    <a href="http://www.xs4all.nl/~jvromans/perlref.html">http://www.xs4all.nl/~jvromans/perlref.html</a>
+</pre>
+The quick reference guide has been turned into a small Nutshell handbook:
+	<p><blockquote>
+	<a href="http://www.ora.com/gnn/bus/ora/item/perlqr.html"><B>Perl 5 Desktop Reference</B></a><BR>
+	<a href="http://www.ora.com/gnn/bus/ora/item/perlqr.author.html">Johan</a> <a href="mailto:jv@squirrel.nl">Vromans</a><BR>
+	Copyright (c) February 1996 
+        <a href="http://www.ora.com/">O'Reilly &amp; Associates Inc.</a><br>
+        ISBN: 1-56592-187-9; Order number: 1879<BR>
+	</blockquote>
+<p>
+Additional book information may be found at Tom Christiansen's 
+<a href="http://www.perl.com/perl/info/books.html">perl &amp; cgi books
+page</a>.
+
+The multi-part perl 5 man pages are available (assuming they have been
+installed in your <KBD>MANPATH</KBD>, type <KBD>man perl</KBD>, 
+<KBD>man perlmod</KBD> <I>etc.</I>). 
+<p>
+The perl man pages are also available on the web at a number of locations 
+including: 
+<pre>
+World Wide Web - perl 5.001m man pages 
+ (the 5.002 pages [listed below] are more useful though)
+  Australia
+    <a href="http://www.cs.mu.oz.au/~slf/perl5/perl.html">http://www.cs.mu.oz.au/~slf/perl5/perl.html</a>
+    <a href="http://bwyan.anu.edu.au/perl.html">http://bwyan.anu.edu.au/perl.html</a>
+  Austria
+    <a href="http://www.cosy.sbg.ac.at/comp/lang/perl/perl5man/perl.html">http://www.cosy.sbg.ac.at/comp/lang/perl/perl5man/perl.html</a>
+  Brazil
+    <a href="http://www.lsi.usp.br/perl5/">http://www.lsi.usp.br/perl5/</a>
+  Canada
+    <a href="http://csclub.uwaterloo.ca/perldoc/perl.html">http://csclub.uwaterloo.ca/perldoc/perl.html</a>
+    <a href="http://stoner.eps.mcgill.ca/perl/perl.html">http://stoner.eps.mcgill.ca/perl/perl.html</a>
+  Germany
+    <a href="http://www.t-informatik.ba-stuttgart.de/Perl5/perl.html">http://www.t-informatik.ba-stuttgart.de/Perl5/perl.html</a>
+    <a href="http://www.dfv.rwth-aachen.de/doc/perl/perl.html">http://www.dfv.rwth-aachen.de/doc/perl/perl.html</a>
+  Norway
+    <a href="http://www.pvv.unit.no/sw/perl5/index.html">http://www.pvv.unit.no/sw/perl5/index.html</a>
+  Slovak Republic
+    <a href="http://www.savba.sk/autori/perl/perl.html">http://www.savba.sk/autori/perl/perl.html</a>
+  Slovenia
+    <a href="http://www.ijs.si/perl/">http://www.ijs.si/perl/</a>
+  Taiwan
+    <a href="http://www.ccu.edu.tw/perl5/index.html">http://www.ccu.edu.tw/perl5/index.html</a>
+  UK
+    <a href="http://www.cs.man.ac.uk/~richardd/perl5/perl.html">http://www.cs.man.ac.uk/~richardd/perl5/perl.html</a>
+    <a href="http://ppewww.ph.gla.ac.uk/perl/perl.html">http://ppewww.ph.gla.ac.uk/perl/perl.html</a>
+  USA
+    <a href="http://rhine.ece.utexas.edu/~kschu/perlman.html">http://rhine.ece.utexas.edu/~kschu/perlman.html</a>
+    <a href="http://duggy.extern.ucsd.edu/perl/perl.html">http://duggy.extern.ucsd.edu/perl/perl.html</a>
+    <a href="http://tbone.biol.scarolina.edu/~dean/perl/perl.html">http://tbone.biol.scarolina.edu/~dean/perl/perl.html</a>
+    <a href="http://www.mit.edu:8001/perl/perl.html">http://www.mit.edu:8001/perl/perl.html</a>
+    <a href="http://icg.stwing.upenn.edu/perl5/perl.html">http://icg.stwing.upenn.edu/perl5/perl.html</a>
+    <a href="http://w4.lns.cornell.edu/public/compdoc/info/perl/perl.html">http://w4.lns.cornell.edu/public/compdoc/info/perl/perl.html</a>
+
+World Wide Web - perl 5.002 man pages 
+ (also very useful for previous versions of perl 5)
+  Canada
+    <a href="http://dymaxion.ns.ca/www/dv/perl_manual/index.html">http://dymaxion.ns.ca/www/dv/perl_manual/index.html</a>
+    <a href="http://wepil.uwaterloo.ca/~mathers/perl/perl.html">http://wepil.uwaterloo.ca/~mathers/perl/perl.html</a>
+  Czech Republic
+    <a href="http://infog.eunet.cz/~muaddib/perl5/index.html">http://infog.eunet.cz/~muaddib/perl5/index.html</a>
+  Finland
+    <a href="http://www.hut.fi/~jhi/perl5/index.html">http://www.hut.fi/~jhi/perl5/index.html</a>
+  Germany
+    <a href="http://nat-www.uia.ac.be/perl/perl.html">http://nat-www.uia.ac.be/perl/perl.html</a>
+  Netherlands
+    <a href="http://www.cs.ruu.nl/pub/mirrors/CPAN/doc/manual/html/frame_index_long.html">http://www.cs.ruu.nl/pub/mirrors/CPAN/doc/manual/html/frame_index_long.html</a>
+  USA
+    <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perl.html">http://www.metronet.com/0/perlinfo/perl5/manual/perl.html</a>
+    <a href="http://www.lafayette.edu/doughera/doughera/perl/manual/perl.html">http://www.lafayette.edu/doughera/doughera/perl/manual/perl.html</a>
+    <a href="http://www.va.pubnix.com/staff/stripes/perlinfo/">http://www.va.pubnix.com/staff/stripes/perlinfo/</a>
+    <a href="http://www.perl.com/perl/manual/">http://www.perl.com/perl/manual/</a>
+    <a href="http://128.84.219.39/public/perl/manual/">http://128.84.219.39/public/perl/manual/</a>
+    <a href="http://www.ilap.com/perl/">http://www.ilap.com/perl/</a>
+    <a href="http://saturn.lbcc.cc.or.us/www_root/docs/perl5/PERL.HTML">http://saturn.lbcc.cc.or.us/www_root/docs/perl5/PERL.HTML</a>
+</pre>
+<p>
+In addition to the <a href="qna4.html">CPAN ftp source sites</a>, a miscellany of 
+internet perl resources includes:
+<pre>
+Newsgroups
+    <a href="news:comp.lang.perl.misc">comp.lang.perl.misc</a>
+    <a href="news:comp.lang.perl.announce">comp.lang.perl.announce</a>
+    <a href="news:comp.lang.perl.modules">comp.lang.perl.modules</a>
+    <a href="news:comp.infosystems.www.authoring.cgi">comp.infosystems.www.authoring.cgi</a>
+    <a href="news:comp.answers">comp.answers</a>
+    <a href="news:news.answers">news.answers</a>
+Perl FAQ-Archives (ftp sites) [Note: FAQ may be many separate files]
+    (see also the <a href="qna4.html">CPAN sites</a>)
+  North America
+    <a href="ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/">ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/</a>
+    <a href="ftp://ftp.uu.net/usenet/news.answers/perl-faq/">ftp://ftp.uu.net/usenet/news.answers/perl-faq</a>  192.48.96.9
+    <a href="ftp://ftp.khoros.unm.edu/pub/perl/faq.gz">ftp://ftp.khoros.unm.edu/pub/perl/faq.gz</a>       198.59.155.28
+  Europe 
+    <a href="ftp://ftp.cs.ruu.nl/pub/NEWS.ANSWERS/perl-faq/">ftp://ftp.cs.ruu.nl/pub/NEWS.ANSWERS/perl-faq/</a> 131.211.80.17
+    <a href="ftp://src.doc.ic.ac.uk/packages/perl/FAQ">ftp://src.doc.ic.ac.uk/packages/perl/FAQ</a>       146.169.2.10
+Gopher Perl FAQ 
+    <a href="gopher://gopher.metronet.com/11/perlinfo/faq">gopher://gopher.metronet.com/11/perlinfo/faq</a>
+WWW-FAQ for Perl
+    <a href="http://www.perl.com/perl/faq/">http://www.perl.com/perl/faq/</a>
+    <a href="http://www.smartpages.com/bngfaqs/comp/lang/perl/top.html">http://www.smartpages.com/bngfaqs/comp/lang/perl/top.html</a>
+    <a href="http://www.smartpages.com/bngfaqs/comp/lang/perl/misc/top.html">http://www.smartpages.com/bngfaqs/comp/lang/perl/misc/top.html</a>
+    <a href="http://www.smartpages.com/bngfaqs/comp/lang/perl/announce/top.html">http://www.smartpages.com/bngfaqs/comp/lang/perl/announce/top.html</a>
+    <a href="http://www.cis.ohio-state.edu/hypertext/faq/usenet/perl-faq/top.html">http://www.cis.ohio-state.edu/hypertext/faq/usenet/perl-faq/top.html</a>
+Perl for Win32 FAQ  (discusses Win95)
+    <a href="http://www.perl.hip.com/PerlFaq.htm">http://www.perl.hip.com/PerlFaq.htm</a>
+
+<b>Perl info sites</b>
+Gopher (gopher:70)
+  USA
+    <a href="gopher://gopher.metronet.com/11h/perlinfo">gopher://gopher.metronet.com/11h/perlinfo</a>
+World Wide Web (http:80)
+  USA
+    <a href="http://www.yahoo.com/Computers_and_Internet/Languages/Perl/index.html">http://www.yahoo.com/Computers_and_Internet/Languages/Perl/index.html</a>
+    <a href="http://www.perl.com/">http://www.perl.com/</a>
+    <a href="http://www.khoros.unm.edu/staff/neilb/perl/home.html">http://www.khoros.unm.edu/staff/neilb/perl/home.html</a>
+    <a href="http://www.khoros.unm.edu:80/staff/neilb/perl/metaFAQ/">http://www.khoros.unm.edu:80/staff/neilb/perl/metaFAQ/</a>
+    <a href="http://www.metronet.com/perlinfo/">http://www.metronet.com/perlinfo/</a>
+    <a href="http://www.metronet.com/perlinfo/perl5.html">http://www.metronet.com/perlinfo/perl5.html</a> (Perl 5)
+    <a href="http://www.eecs.nwu.edu/perl/perl.html">http://www.eecs.nwu.edu/perl/perl.html</a>
+    <a href="http://128.84.219.39/public/perl/">http://128.84.219.39/public/perl/</a>
+    <a href="http://www.virtualschool.edu/mon/Perl.html">http://www.virtualschool.edu/mon/Perl.html</a>
+    <a href="http://www.hermetica.com/technologia/unexec/">http://www.hermetica.com/technologia/unexec/</a>
+    <a href="http://www.oac.uci.edu/indiv/ehood/perlWWW/">http://www.oac.uci.edu/indiv/ehood/perlWWW/</a>
+    <a href="http://web.sau.edu/~mkruse/www/scripts/">http://web.sau.edu/~mkruse/www/scripts/</a>
+    <a href="http://orwant.www.media.mit.edu/the_perl_journal/">http://orwant.www.media.mit.edu/the_perl_journal/</a>
+    <a href="http://www.perl.com/Architext/AT-allperl.html">http://www.perl.com/Architext/AT-allperl.html</a>
+    <a href="http://www.mispress.com/introcgi/">http://www.mispress.com/introcgi/</a>
+    <a href="http://www.walrus.com/~smithj/webcan/">http://www.walrus.com/~smithj/webcan/</a>
+    <a href="http://web.syr.edu/~chsiao05/cps600_project.html">http://web.syr.edu/~chsiao05/cps600_project.html</a>
+    <a href="http://www.iftech.com/classes/webdev/webdev_perl.htm">http://www.iftech.com/classes/webdev/webdev_perl.htm</a>
+    <a href="http://www.cc.iastate.edu/perlmenu/">http://www.cc.iastate.edu/perlmenu/</a>
+  UK
+    <a href="http://pubweb.nexor.co.uk/public/perl/perl.html">http://pubweb.nexor.co.uk/public/perl/perl.html</a>
+    <a href="http://www.bio.cam.ac.uk/web/form.html">http://www.bio.cam.ac.uk/web/form.html</a>
+Web references to Perl mailing lists
+    <a href="http://www.perl.com/perl/info/mailing-lists.html">http://www.perl.com/perl/info/mailing-lists.html</a>
+    <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/</a>
+    <a href="http://www.hut.fi/~jhi/perl5-porters.html">http://www.hut.fi/~jhi/perl5-porters.html</a>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/</a>
+</pre>
+
+<H3><a name="TCL-TKDOCS">Tcl/Tk Specific Documentation</a></H3>
+The two Tcl/Tk books by Ousterhout and Welch are very good starting points (you
+must however, translate the tcl-isms to perl in the sample scripts):
+	<P><BLOCKQUOTE>
+	<B>Tcl and the Tk Toolkit</B><BR>
+	John K. Ousterhout<BR>
+	Copyright (c) 1994 Addison-Wesley Publishing Company<BR>
+	ISBN 0-201-63337-X (alk. paper)<BR>
+	LOC QA76.73.T44097 1994; 005.13'3--dc20<BR>
+	</BLOCKQUOTE>
+	<P><BLOCKQUOTE>
+	<a href="http://www.smli.com/~bwelch/book/index.html">
+	 <B>Practical Programming in Tcl and Tk</B></a><br>
+	<a href="mailto:welch@parc.xerox.com">Brent Welch</a><br>
+	Copyright (c) 1995 
+	 <a href="http://www.prenhall.com/">Prentice Hall</a><br>
+	ISBN 0-13-182007-9 <BR>
+	</blockquote>
+<p>
+Within the <CODE>tclsh</CODE> or <CODE>wish</CODE> shells your manpath 
+includes the tcl/tk man pages (which may <em>not</em> be in your login 
+manpath). Thus from the <KBD>%</KBD> prompt within either shell type commands
+like:
+<pre>
+    % man -k Tk
+</pre>
+<p>
+The Tcl/Tk Reference Guide is also a source of useful information. 
+Although it's Tcl specific most perl/Tk commands can be, more or less, 
+easily derived from it.  [As of Tk-b9.01 the names of some functions and some
+configuration options have changed slightly from their Tcl/Tk counterparts. 
+With Tk-b9.01 (and higher) a great many functions start with an upper 
+case letter and continue with all lower case letters 
+(<i>e.g.</i> there is a perl/Tk <kbd>Entry</kbd> widget but no <kbd>entry</kbd> 
+widget), and many configuration options are all lower case 
+(<i>e.g.</i> there is a perl/Tk <kbd>highlightthickness</kbd> option 
+but no <kbd>highlightThickness</kbd> option).]
+You may fetch the Tcl/Tk Reference Guide 
+(may require <b>LaTeX</b> for installation) from:
+<pre>
+    <a href="ftp://ftp.slac.stanford.edu/software/TkMail/tkref-4.0.1.tar.gz">ftp://ftp.slac.stanford.edu/software/TkMail/tkref-4.0.1.tar.gz</a> 134.79.18.30
+    <a href="ftp://ftp.aud.alcatel.com/tcl/docs/tkref-4.0.1.tar.gz">ftp://ftp.aud.alcatel.com/tcl/docs/tkref-4.0.1.tar.gz</a>          198.64.191.10
+</pre>
+There are a number of other Tcl/Tk resources on the internet including:
+<pre>
+Newsgroups
+    <a href="news:comp.lang.tcl">comp.lang.tcl</a>
+    <a href="news:comp.lang.tcl">comp.lang.tcl.announce</a>
+    <a href="news:comp.infosystems.www.authoring.cgi">comp.infosystems.www.authoring.cgi</a>
+    <a href="news:comp.answers">comp.answers</a>
+    <a href="news:news.answers">news.answers</a>
+FAQ-Archive (ftp) [Note: Tcl FAQ may be many files, Tk FAQ is one file]
+    <a href="ftp://ftp.aud.alcatel.com/tcl/docs/">ftp://ftp.aud.alcatel.com/tcl/docs/</a>                            198.64.191.10
+    <a href="ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq">ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq</a>
+    <a href="ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq/tk">ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq/tk</a>
+WWW-FAQ for Tcl/Tk
+    <a href="http://www.smartpages.com/faqs/tcl-faq/top.html">http://www.smartpages.com/faqs/tcl-faq/top.html</a>
+    <a href="http://www.smartpages.com/bngfaqs/comp/lang/tcl/top.html">http://www.smartpages.com/bngfaqs/comp/lang/tcl/top.html</a>
+    <a href="http://www.cis.ohio-state.edu/hypertext/faq/usenet/tcl-faq/top.html">http://www.cis.ohio-state.edu/hypertext/faq/usenet/tcl-faq/top.html</a>
+    <a href="http://www.cis.ohio-state.edu/hypertext/faq/bngusenet/comp/lang/tcl/top.html">http://www.cis.ohio-state.edu/hypertext/faq/bngusenet/comp/lang/tcl/top.html</a>
+    <a href="http://www.sco.com/Technology/tcl/Tcl.html">http://www.sco.com/Technology/tcl/Tcl.html</a>
+World Wide Web - Tcl/Tk info sites
+  Canada
+    <a href="http://web.cs.ualberta.ca/~wade/Auto/Tcl.html">http://web.cs.ualberta.ca/~wade/Auto/Tcl.html</a>
+  UK
+    <a href="http://http2.brunel.ac.uk:8080/~csstddm/TCL2/TCL2.html">http://http2.brunel.ac.uk:8080/~csstddm/TCL2/TCL2.html</a>
+    <a href="http://www.cis.rl.ac.uk/proj/TclTk/">http://www.cis.rl.ac.uk/proj/TclTk/</a>
+  USA
+    <a href="http://www.yahoo.com/Computers_and_Internet/Languages/Tcl_Tk/index.html">http://www.yahoo.com/Computers_and_Internet/Languages/Tcl_Tk/index.html</a>
+    <a href="http://www.sunlabs.com/research/tcl/docs.html">http://www.sunlabs.com/research/tcl/docs.html</a>
+    <a href="http://www.sunlabs.com/research/tcl/4.0.html">http://www.sunlabs.com/research/tcl/4.0.html</a>
+    <a href="http://www.sco.com/Technology/tcl/Tcl.html">http://www.sco.com/Technology/tcl/Tcl.html</a>
+    <a href="http://www.neosoft.com/tcl/">http://www.neosoft.com/tcl/</a>
+    <a href="http://www.elf.org/tcltk-man-html/contents.html">http://www.elf.org/tcltk-man-html/contents.html</a>
+Tcl/Tk - miscellaneous extensions
+    <a href="ftp://ftp.cme.nist.gov/pub/expect/">ftp://ftp.cme.nist.gov/pub/expect/</a>
+    <a href="http://www.cs.hut.fi/~kjk/porttk.html">http://www.cs.hut.fi/~kjk/porttk.html</a>
+    <a href="http://www.cis.upenn.edu/~ioi/tix/tix.html">http://www.cis.upenn.edu/~ioi/tix/tix.html</a>
+    <a href="http://www.ece.cmu.edu/afs/ece/usr/svoboda/www/th/homepage.html">http://www.ece.cmu.edu/afs/ece/usr/svoboda/www/th/homepage.html</a>
+    <a href="http://www.tcltk.com/">http://www.tcltk.com/ [incr Tcl]</a>
+    <a href="http://www.neosoft.com/tcl/TclX.html">http://www.neosoft.com/tcl/TclX.html</a>
+    <a href="http://www.eolas.com/eolas/webrouse/tcl.htm">http://www.eolas.com/eolas/webrouse/tcl.htm [WebWish]</a>
+    <a href="http://www.se.cuhk.hk/~hkng2/big5tk/big5tk.html">http://www.se.cuhk.hk/~hkng2/big5tk/big5tk.html</a>
+    <a href="http://www.cs.uoregon.edu/~jhobbs/work/">http://www.cs.uoregon.edu/~jhobbs/work/ [BLT <i>etc.</i>]</a>
+</pre>
+
+
+<hr>
+	<p><a href="qna5.html">Previous</a> | Return to <a href="ptkTOC.html#TOC6">table of contents</a> | <a href="qna7.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

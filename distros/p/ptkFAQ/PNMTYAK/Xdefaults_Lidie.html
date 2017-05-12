@@ -1,0 +1,64 @@
+<H2><A HREF="199604031503.WAA25532@edun05.ipl.ca">[PREV]</A>  [NEXT]  <A HREF="9604031453.AA29456@pluto.tiuk.ti.com">[PREV Thread]</A>  <A HREF="4jukts$ddk@brokaw.comm.mot.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> lusol@Turkey.CC.Lehigh.EDU (Stephen O. Lidie)
+</ADDRESS>
+<TITLE> Re: Changing the default font for all buttons</TITLE>
+<ADDRESS><H1> Re: Changing the default font for all buttons</H1>
+</ADDRESS>
+<ADDRESS> 3 Apr 96 19:19:25 GMT
+ ptk@guest.wpi.edu mailing list gateway
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<199604031503.WAA25532@edun05.ipl.ca"><199604031503.WAA25532@edun05.ipl.ca></A>
+</DL>
+<HR>
+<PRE>&gt; 
+&gt; I know how to change the font when I create a button, but how can I
+&gt; changed the default font for all buttons that I create. Or, more
+&gt; generally, how can I change the default configuration of any
+&gt; particular widget? 
+&gt; 
+&gt; I'm receptive to methods via .Xdefaults, app-defaults or
+&gt; programmatically.
+
+Here are some ideas, but remember the option database isn't one of my strong
+points (:
+
+Examine:
+
+#!/usr/local/bin/perl
+use Tk;
+
+$MW = MainWindow-&gt;new;
+$l1 = $MW-&gt;Label(Name =&gt; 'l1', -text =&gt; 'Label 1')-&gt;pack;
+#$MW-&gt;optionAdd('*font', '9x15');
+$l2 = $MW-&gt;Label(Name =&gt; 'l2', -text =&gt; 'Label 2')-&gt;pack;
+MainLoop;
+
+Two worthy items to note:
+
+	. All widget constructors can have Name =&gt; 'widget_name', which 
+	  becomes the name in the X option database associated with the
+	  widget.
+	. A commented-out optionAdd() command.
+
+Make sure this program is called "frog" and then run it, you'll see 2 labels
+with identical (default) font.  Next add these lines to your ~/.Xdefaults
+file:
+
+frog.l1.font: helvr30
+frog.l2.font: fixed
+
+and rerun the program.  The font for the two labels has been overridden.
+
+Next "active" the optionAdd() statement and rerun frog again.  This time
+optionAdd() overrides the font for "l2".
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+</PRE>
+<HR><H2><A HREF="199604031503.WAA25532@edun05.ipl.ca">[PREV]</A>  [NEXT]  <A HREF="9604031453.AA29456@pluto.tiuk.ti.com">[PREV Thread]</A>  <A HREF="4jukts$ddk@brokaw.comm.mot.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

@@ -1,0 +1,114 @@
+<HTML>
+<HEAD><TITLE> 11.9. How do I determine the version of perl/Tk that I am running?</TITLE></HEAD>
+<BODY><a name="A11.9"> 11.9. How do I determine the version of perl/Tk that I am running?</a>
+
+<hr>
+</p><p>
+Version numbering has changed recently and determining the version of perl/Tk
+that you are running now depends on what version you are running:
+<p>
+<STRONG>Tk-b10++</STRONG>:<br>
+Tk-b10 (and higher) has changed to <KBD>$Tk::VERSION</KBD> rather than
+<KBD>$Tk:Version</KBD> to be consistent with other packages.
+<p>
+<STRONG>Tk-b9.01</STRONG>:<br>
+The version numbers as of Tk-b9.01 are stored in the following variables:
+<pre>
+    Core Tk version : $Tk::version
+    Tk patchLevel :   $Tk::patchLevel
+    library :         $Tk::library
+    perl/Tk Version : $Tk::Version 
+</pre>
+At your shell prompt you could say something like the following to determine
+you perl/Tk Version:
+<pre>
+    perl -e 'use Tk; print "$Tk::Version\n";'
+</pre>
+The switch to Tk-b9.01 from previous versions included a large number of method
+name changes. Nick was kind enough to include a <KBD>b9names</KBD> script in
+the distribution that assists with the job of updating your older scripts. See
+the <KBD>b9names</KBD> script for a rather complete discussion of the name
+changes. Geoffroy Ville also posted a notice of some of the changes. Here is a
+brief (and very incomplete!) summary:
+<PRE>
+<B>
+older                         Tk-b9.01++</B>
+packslaves                    pack('slaves')
+packpropagate                 pack('propagate')
+packForget                    pack('forget')
+                              pack('info')
+
+$w-&gt;delete if ($w);            $w-&gt;destroy if ($w);
+</PRE>
+<p>
+<STRONG>Tk-b8(--)</STRONG>:<br>
+A little script (<a href="etc/Tk_module">Tk_module</a>) can tell you and
+return the value:
+<pre>
+    #!/usr/bin/perl
+    use Tk;
+    local(*Tk_m) = \$Tk::Tk_module;
+    print "$Tk_m\n";
+</pre>
+Or more succintly say something like the following (at
+your shell prompt):
+<pre>
+    perl -e 'use Tk; print "$Tk::Tk_module\n";'
+</pre>
+You can obtain the version of <b>Tk</b> in use with the following 
+(at your shell prompt):
+<pre>
+    perl -e 'use Tk; print "$Tk::tk_version\n";'
+</pre>
+where this command returned &quot;4.0&quot; when the previous one 
+(or <a href="etc/Tk_module">Tk_module</a>) returned &quot;b8&quot;.  
+
+<p>
+<STRONG>All Tk versions</STRONG>:<br>
+Don't forget that you can always determine your Perl 
+version/patchlevel/<i>etc.</i> with:
+<pre>
+    perl -v
+</pre>
+(at the shell prompt - it's actually a little harder to get as much 
+information  from  within a #!script.) As of perl 5.002 you can use 
+<kbd>perl -V</kbd> to determine your perl <kbd>Config</kbd>uration.
+<p>
+Ozawa Sakuro <a href="mailtp:ozawa@prince.pe.u-tokyo.ac.jp">&lt;ozawa@prince.pe.u-tokyo.ac.jp&gt;</a> 
+points out some ways to do it in a script:
+<ol>
+<li> <KBD>'$]'</KBD> holds the version number.
+<li> In Perl5, <KBD>'require NUMBER;'</KBD> will complain if version is younger
+     than NUMBER. (<i>e.g.</i> <KBD>require 5.001;</KBD>)
+<li> Of course, newly imported (and incompatible) features in newer 
+     scripts will bailout before execution if parsed by an old interpreter.
+</ol>
+Note that if you <kbd>use English;</kbd> then <kbd>$PERL_VERSION</kbd> holds
+the version number.
+<p>
+To determine your MakeMaker version number try something like this (5.002):
+<pre>
+    perl -MExtUtils::MakeMaker -e 'print "$ExtUtils::MakeMaker::VERSION\n";'
+</pre>
+or this (5.001m ok):
+<pre>
+    perl -e 'use ExtUtils::MakeMaker; print "$ExtUtils::MakeMaker::VERSION\n";'
+</pre>
+or even this (older perls and MakeMakers):
+<pre>
+    perl -e 'use ExtUtils::MakeMaker; print "$ExtUtils::MakeMaker::Version\n";'
+</pre>
+Please note that thoughout this FAQ document there are references to things 
+like <b>Tk-b10(++)</b> or <b>Tk-b10++</b> which roughly translated to 
+<KBD>use English;</KBD> means something like "I think this will work with this 
+version of Tk and (masybe) higher versions...". You might also see 
+<b>Tk-b8(--)</b> which means something like "it worked with that old version 
+and probably worked with prior versions and if you are stuck with an old Tk 
+version you might have to do it this way...".
+
+
+<hr>
+	<p><a href="qna11.8.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.9">table of contents</a> | <a href="qna11.10.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

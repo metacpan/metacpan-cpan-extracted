@@ -1,0 +1,66 @@
+
+
+
+punctuation(3) User Contributed Perl Documentation punctuation(3)
+
+
+NAME
+	 punctuation - Forbid uses of punctuation variables
+
+
+SYNOPSIS
+	 no punctuation;
+
+	 no punctuation 'anon';
+
+
+DESCRIPTION
+       Use of the "no punctuation" pragma in a package forbids
+       all uses of punctuation variables such as "$"", "$!",
+       "$^O", and so on in named subroutines defined in that
+       package.
+
+       "no punctuation 'anon'" forbids the use of punctuation
+       variables in all anonymous subroutines in the program.
+
+       "use punctuation" does nothing.
+
+       EXPORT
+
+       None by default.
+
+AUTHOR
+       Mark Jason Dominus, "mjd-perl-nopunct+@plover.com"
+
+PREREQUISITE
+       Requires "B::Utils".  However, the version of "B::Utils"
+       available on CPAN at this time of this writing (version
+       0.02) has many bugs.  You may obtain a corrected copy of
+       0.02 from "http://perl.plover.com/punctuation/" .
+
+TODO
+       Probably none of it works the way you wish it would, but
+       as they say: If a thing's not worth doing at all, it's not
+       worth doing well.
+
+SEE ALSO
+       the B::Utils manpage
+
+
+
+2002-02-07		   perl v5.6.1				1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

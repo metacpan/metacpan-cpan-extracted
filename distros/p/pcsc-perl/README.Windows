@@ -1,0 +1,9 @@
+
+Remarks for Windows users:
+
+Status behaves different on Unix and from Win32
+	it returns the Atr len
+	it does not return any error like
+
+$Id: README.Windows,v 1.1 2001/10/18 07:14:12 rousseau Exp $
+

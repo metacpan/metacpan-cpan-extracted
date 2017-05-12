@@ -1,0 +1,8 @@
+Changelog for pod2pdf (see http://perl.jonallen.info/projects/pod2pdf)
+
+0.42 - 26 October 2007
+  Fixed failing "compile.t" test
+
+0.41 - 11 September 2007
+  First public release to CPAN
+  Now compatible with the latest PDF::API2 distribution

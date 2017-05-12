@@ -1,0 +1,277 @@
+=head1 NAME
+
+Apache2::LogUtil - Simple logging API with run-time context
+
+
+=head1 SYNOPSIS
+
+
+  use Apache2::LogUtil;
+  my $log = Apache2::LogUtil->new();
+
+Or, to capture elapsed time:
+
+  use Apache2::LogUtil;
+  use Misc::Stopwatch;
+  my $sw = Misc::Stopwatch->new;
+  my $log = Apache2::LogUtil->new($sw);
+
+In a perl handler, initialize the objects on each request:
+
+  $sw->reset->start();      # Elapsed time starts now
+
+  $log->set_request();      # Will use $s-log_serror> (Server log file)
+  $log->set_request($r);    # Will use $r-log_rerror> (VirtualHost log file)
+
+Call logging methods:
+
+  $log->error('The code is smoking');
+  $log->warn('The code is hot');
+  $log->notice('The code is warm');
+  $log->info('The code is lighting up');
+  $log->debug('The code is doing what?');
+
+
+
+=head1 EXPORTS
+
+Nothing exported by default
+
+=over
+
+
+
+=back
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Apache2::Const
+    Apache2::Log
+    Apache2::ServerUtil
+    APR::Const
+    Apache2::MPM
+    APR::OS
+
+=head1 DESCRIPTION
+
+
+Calls C<$s-E<gt>log_serror> or C<$r-E<gt>log_rerror> if a C<$r> has been passed to 
+L</set_request>. Log-file entries are formatted as:
+
+  Fieldset 1 - Inserted by Apache
+  Fieldset 2 - Inserted by this module
+  Fieldset 3 - Inserted by this module
+  Fieldset 4 - The log message
+
+   .----------------------------------------- 1a) Apache date/time stamp
+   |     .----------------------------------- 1b) Logging level
+   |     |
+   |     |      .---------------------------- 2)  HTTP Request Cycle Phase
+   |     |      |         .------------------ 3a) Process ID, i.e., $$
+   |     |      |         |     .------------ 3b) Thread ID (for threaded perl), or 0
+   |     |      |         |     | .---------- 3c) Elapsed time, or 0
+   |     |      |         |     | |       .-- 4)  Log Message
+   |     |      |         |     | |       |
+   |     |      |         |     | |       |
+   v     v      v         v     v v       v
+  [...] [warn] <Cleanup> [22933-0:0.0229] ...
+               ^------------------------^
+                (inserted by this module)
+
+  1) Log prefix as per your Apache configuration, normally these values are:
+
+  1a) The date and time of the request.
+
+  1b) The log level of the message. The Apache directive LogLevel determines 
+  which messages are displayed.
+
+  2) The phase name is a shortened form of the current callback name.  As in the 
+  above example, the callback name PerlCleanupHandler is trimmed by removing
+  the and the leading Perl and trailing Handler.
+
+  3) Process information
+
+  3a) As in $$
+
+  3b) ID of the child thread of $$.  If not running with threads, zero.
+
+  3c) Elapsed time if a Misc::Stopwatch has been set up, otherwise zero.
+
+  4) The message which we're here to log
+
+
+
+
+=head1 PUBLIC INTERFACE
+
+=head2 new
+
+=over
+
+=item Construct a new instance
+
+  new
+  new $stopwatch
+  new $stopwatch $request
+
+
+where:
+
+  $stopwatch isa Misc::Stopwatch
+  $request isa Apache2::RequestRec
+
+
+
+=back
+
+
+=head2 debug
+
+=over
+
+=item Write a debug message to the apache log
+
+  debug $message
+
+
+
+
+
+=back
+
+
+=head2 warn
+
+=over
+
+=item Write a warning to the apache log
+
+  warn $warn
+
+
+
+
+
+=back
+
+
+=head2 error
+
+=over
+
+=item Write an error to the apache log
+
+  error $error
+
+
+
+
+
+=back
+
+
+=head2 notice
+
+=over
+
+=item Write a notice to the apache log
+
+  notice $notice
+
+
+
+
+
+=back
+
+
+=head2 info
+
+=over
+
+=item Write an informational message to the apache log
+
+  info $message
+
+
+
+
+
+=back
+
+
+=head2 message
+
+=over
+
+=item Write to the apache log
+
+  message $LOG_TYPE, $message
+
+
+
+
+
+=back
+
+
+
+=head1 SEE ALSO
+
+
+  Apache2::Testing::LogUtil
+
+  Apache2::Trace
+
+  Misc::Stopwatch
+
+  http://perl.apache.org/docs/2.0/user/handlers/http.html#HTTP_Request_Cycle_Phases
+
+
+
+
+=head1 AUTHORS
+
+Ryan Gies <ryangies@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006-2010 by Livesite Networks, LLC. All rights reserved.
+
+Copyright (C) 2000-2005 by Ryan Gies. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, 
+this list of conditions and the following disclaimer.
+
+* The origin of this software must not be misrepresented; you must not 
+claim that you wrote the original software. If you use this software in a 
+product, an acknowledgment in the product documentation would be 
+appreciated but is not required.
+
+* Altered source versions must be plainly marked as such, and must not be 
+misrepresented as being the original software.
+
+* The name of the author may not be used to endorse or promote products 
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
+EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+OF SUCH DAMAGE.
+
+To the best of our knowledge, no patented algorithms have been used. However, we
+do not have the resources to carry out a patent search, and therefore cannot 
+give any guarantee of the above statement.
+
+=cut

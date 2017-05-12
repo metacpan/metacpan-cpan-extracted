@@ -1,0 +1,20 @@
+### perl: poros/code/seco
+
+use strict;
+use warnings;
+
+use Vulcan::OptConf;
+
+my %seco;
+
+BEGIN { %seco = Vulcan::OptConf->load()->dump( 'seco' ) }
+
+use lib $seco{lib};
+use SECO::Engine;
+
+return sub
+{
+    my %param = @_;
+    my ( $sub, @argv ) = @{ $param{argv} };
+    return $sub ? $SECO::Engine->new()->$sub( @argv ) : 1;
+};

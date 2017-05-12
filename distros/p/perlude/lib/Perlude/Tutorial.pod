@@ -1,0 +1,160 @@
+
+=head1 Write your own generators
+
+Have you ever miss the shell pipe in Perl? Such a clever operator: it streams
+data from programs to programs on demand, which means that nothing will compute
+more than expected by the whole stream, any part the pipe can stop the whole
+stream.
+
+    seq 1000
+
+will compute 1000 lines
+
+    seq 1000 | sed 5q
+
+will compute only 5 lines as sed ends its job there. We somehow miss it in
+perl. Sure, we have grep and map but they are only acting in complete arrays.
+
+Perlude comes with all most common filters, i doubt you'll missing one. If you
+do so: please feedback and i'll probably add it! So your job is about writing
+generators (or using those written in Perlude::Stuff and Perlude::Sh). If you
+have to write a generic one, please contribute.
+
+To write them, you have to understand the Perlude conventions. When you're
+using an iterator, say C<range 1,4>, you have to think about the whole list
+of potential results. Those can be written as
+
+    ( 1, 2, 3, 4     )
+    ( 1, 2, 3, 4,    )
+    ( 1, 2, 3, 4, () )
+
+so C<()> is used as a list terminator. your iterator must return one scalar by
+call and last it work sending a terminator. As exemple:
+
+    sub read_file {
+        open my $fh, shift; 
+        sub { <$fh> // () }
+    }
+
+now you can write 
+
+    now {say}
+        filter {/foo/}
+        take 5,
+        read_file "test.txt"
+
+which is equivalent to 
+
+    sed 5q test.txt | grep foo 
+
+Not only it's easy to read and write, its behaviour is also the best expected:
+
+=over
+
+=item *
+
+it reads one record, use it and forget it before reading the next record. This
+is a memory friendly behavior
+
+=item *
+
+whoever in the pipe can decide to stop it. For example: it's fine for grep to
+release 3 records only. 
+
+=back
+
+Writing unix filters is really easy. Also note that filters/generators
+compositions rules are simple and powerfull
+
+    G | F => G 
+    F | F => F
+
+If you wrote shell, powershell, perl6 or any other functionnal langage, you
+probably miss it coming back to perl5. 
+
+Basically, on demand lists are just iterators. Perlude is just a pleasant way
+to deal with them stealing keywords from haskell Perlude. 
+
+=head3 example
+
+As example: What are the 5 first naturals containing a 3?
+
+A perl implementation would be:
+
+    for
+    ( my $_=0, my $count=0
+    ; $count <= 5
+    ; $_++ )
+    { if (/3/) { $count++; say } }
+
+Hard to read ... and worth: nothing is reusable at all
+
+The shell counterpart would be
+
+    nat () { while {true} { print $[i++] } }
+    nat | grep 3 | head -n5
+
+There are things to understand about the shell elegance:
+
+=over 2
+
+=item * 
+
+there is no need of a counter variable, neither a for loop: head is the single
+command which handles it for you.
+
+=item *
+
+the implementation of nat is bare simple: you just focus on your nat problem,
+you don't care how many elements the filter could need.
+
+=item *
+
+you added nat to your toolkit, it's much more pain to resuse it in perl ...
+before Perlude
+
+=back
+
+also, it's easy to create a new function 'top5' by passsing a an argument to
+head (looks like a partial application):
+
+    top5 () { head -n5 }
+    contains3 () { grep 3 }
+    nat | contains3 | top5
+
+No perl builtin provide this power.
+
+=head2 I can haz nat in perl ? 
+
+Perlude is a set of functions that takes closures as arguments, and returns
+others
+
+nat is the basic closure exemple:
+
+    my $nat = sub { state $x=0; $x++ }
+
+a reusable way to write it would be:
+
+    sub nat_from {
+        my $x = shift;
+        sub { $x++ }
+    }
+
+    sub nat { nat_from 0 }
+
+now you can use Perlude keywords on this functions
+
+    sub evens_in { filter { not( $_ % 2 ) } shift }
+    sub top5 { take 5, shift }
+
+=head1 Other dynamic langages stuff
+
+    Ruby       : Rubylude was written by Nono after RMLL'11 https://github.com/nono/Rubylude
+    Javascript :
+	http://weepy.github.com/kaffeine/ was quoted it the python pipe intro but i guess it's useless
+	as http://jashkenas.github.com/coffee-script/ is javascript made right.
+    Python     : https://github.com/JulienPalard/Pipe with an introduction here: http://dev-tricks.net/pipe-infix-syntax-for-python
+
+=head1 Contribute
+
+    http://github.com/eiro/p5-perlude

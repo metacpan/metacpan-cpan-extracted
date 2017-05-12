@@ -1,0 +1,8 @@
+
+use 5.010;
+
+use lib::glob '~/g/perl/p5*/lib';
+
+say "using lib $_" for @INC;
+
+printf "running code in package %s\n", __PACKAGE__;

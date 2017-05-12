@@ -1,0 +1,29 @@
+perfSONAR_PS::DB::RRD README File
+=================================
+
+Description
+-----------
+
+perfSONAR_PS::DB::RRD is a module that provides a perfSONAR_PS::DB interface
+to an RRD database.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::DB::RRD'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

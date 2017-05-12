@@ -1,0 +1,41 @@
+Revision history for pmcheck
+
+1.1.11 Wed Mar 21 02:14:01 EST 2012
+       Update dependencies
+
+1.1.10 Tue Mar 20 18:50:18 EST 2012
+       Add Term::Activity support if available
+
+1.1.9  Wed Mar 14 14:44:45 EST 2012
+       Add missing script_files option to Build.PL
+
+1.1.8  Thu Jan  5 15:30:56 EST 2012
+       Enable PPI readonly optimisation
+       Change sub modules_used to return cleanly on find failure
+
+1.1.7  Wed Jan  4 19:03:56 EST 2012
+       Add tests
+
+1.1.6  Wed Jan  4 09:55:46 EST 2012
+       Change shebang line to #!/usr/bin/perl
+       Use $ENV{TEST_AUTHOR} to enable perlcritic.t
+
+1.1.5  Tue Jan  3 14:48:30 EST 2012
+       Add perlcriticrc
+       Use File::Spec::Functions in tests
+
+1.1.4  Tue Jan  3 12:22:08 EST 2012
+       Minor perlcritic cleanup
+       Change load test to require_ok
+
+1.1.3  Fri Dec 30 15:37:27 EST 2011
+       Add LICENSE and MIN_PERL_VERSION to Makefile.PL
+
+1.1.2  Fri Dec 30 14:26:43 EST 2011
+       Also add missing dependency to Build.PL
+
+1.1.1  Fri Dec 30 11:51:49 EST 2011
+       Add missing dependency to Makefile.PL
+
+1.1.0  Wed Dec 28 12:47:48 EST 2011
+       Initial release under the App:: namespace

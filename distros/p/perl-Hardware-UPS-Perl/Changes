@@ -1,0 +1,39 @@
+# $Id: Changes,v 1.7 2007/04/18 15:23:06 creile Exp $
+
+Changelog for Hardware-UPS-Perl:
+
+0.10 2007/01/21  
+   * initial distribution.
+
+0.20 2007/01/29
+   * support for remote control via TCP added.
+
+0.30 2007/02/05
+   * locking of serial device using flock
+   * reconnection if agent (or host) dies until available again
+   * OO PID files
+   * OO methods for logging to files
+   * separation of variables (constants) and functions for scripts
+   * variables are in @EXPORT_OK, except $UPSSCRIPT 
+   * driver support using package Hardware::UPS::Perl::Driver
+   * update of documentation
+
+0.40 2007/04/07
+   * Megatec protocol completed
+   * scripts upsadm.pl and upsstat.pl added
+   * restart using SIGHUP added
+   * connection support using package Hardware::UPS::Perl::Connection
+
+0.41 2007/04/14
+   * minor bugfixes
+
+0.42 2007/04/14
+   * documentation bugfix in upsagent.pl
+
+0.43 2007/04/17
+   * documentation bugfixes
+   * missing import of Hardware::UPS::Perl::Logging added to
+     Hardware::UPS::Perl::Connection.pm and Hardware::UPS::Perl::Driver.pm
+   * test suite added
+   
+ 

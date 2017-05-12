@@ -1,0 +1,303 @@
+=head1 NAME
+
+Misc::Stopwatch - Measure elapsed time
+
+
+=head1 SYNOPSIS
+
+
+  #!/usr/bin/perl
+  use Misc::Stopwatch;
+  my $sw = Misc::Stopwatch->new()->start();
+  for (1 .. 3) {
+    sleep 1;
+    $sw->lap();
+  }
+  $sw->stop();
+  printf "Lap 1: %f\n", $sw->elapsed(1);
+  printf "Lap 2: %f\n", $sw->elapsed(2);
+  printf "Lap 3: %f\n", $sw->elapsed(3);
+  printf "Total: %f\n", $sw->elapsed();
+
+Will output something like:
+
+  Lap 1: 1.000244
+  Lap 2: 2.000375
+  Lap 3: 3.000527
+  Total: 3.000544
+
+
+
+=head1 EXPORTS
+
+Nothing exported by default
+
+=over
+
+
+
+=back
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Time::HiRes
+
+=head1 DESCRIPTION
+
+
+This module provides convenient methods as expected from a stopwatch.
+
+  start       Starts the stopwatch
+  lap         Marks a lap time
+  stop        Stops it
+  elapsed     Returns the elapsed time
+  reset       Stops if running and clears all laps
+  is_running  True or False
+
+Similar modules:
+
+C<Time::Stopwatch> - provides a tied interface and will work without 
+C<Time::HiRes>.
+
+C<Benchmark::Stopwatch> - is mostly identical, however does not have the 
+C<elapsed> method.
+
+
+
+
+=head1 PUBLIC INTERFACE
+
+=head2 new
+
+=over
+
+=item Construct a new Misc::Stopwatch
+
+  new
+
+
+
+
+This example will B<not> abort:
+
+
+  use Misc::Stopwatch;
+
+This example will return true:
+
+
+  my $sw = Misc::Stopwatch->new();
+
+
+=back
+
+
+=head2 start
+
+=over
+
+=item Reset and Start the stopwatch
+
+  start
+
+
+Returns C<$self>.
+
+Note that calling this on an already-running instance will reset it.
+
+
+This example will B<not> abort:
+
+
+  my $sw = Misc::Stopwatch->new()->start();
+
+
+=back
+
+
+=head2 lap
+
+=over
+
+=item Preserve the elapsed time without stopping
+
+  lap
+
+
+
+Returns C<$self>.
+
+This is is a no-op unless the stopwatch is running.
+
+
+This example will B<not> abort:
+
+
+  my $sw = Misc::Stopwatch->new()->start()->lap();
+
+
+=back
+
+
+=head2 stop
+
+=over
+
+=item Stop
+
+  stop
+
+
+Returns C<$self>.
+
+
+This example will B<not> abort:
+
+
+  my $sw = Misc::Stopwatch->new()->start()->stop();
+
+
+=back
+
+
+=head2 elapsed
+
+=over
+
+=item Return the elapsed time
+
+  elapsed $lap
+  elapsed
+
+
+In its second form, elapsed will return the time from L</start> to now (or when
+L</stop> was called).
+
+C<undefined> is returned when:
+
+
+1.) C<$lap> is provided but no such lap exists
+
+2.) L</is_running> returns a false value
+
+
+This example will return true:
+
+
+  Misc::Stopwatch->new()->start()->elapsed();
+
+
+=back
+
+
+=head2 reset
+
+=over
+
+=item Stop and clear data
+
+  reset
+
+
+Returns C<$self>.
+
+
+This example will B<not> abort:
+
+
+  my $sw = Misc::Stopwatch->new()->reset();
+
+
+=back
+
+
+=head2 is_running
+
+=over
+
+=item Boolean logic
+
+  is_running
+
+
+Returns a true value if the stopwatch has been started and has not been 
+stopped.
+
+
+This example will return false:
+
+
+  Misc::Stopwatch->new()->is_running();
+
+This example will return true:
+
+
+  Misc::Stopwatch->new()->start()->is_running();
+
+
+=back
+
+
+=head1 PACKAGE INTERNALS
+
+=head2 _capture
+
+=over
+
+=item Capture the moment
+
+  _capture
+
+
+
+
+
+=back
+
+
+
+=head1 AUTHORS
+
+Ryan Gies <ryangies@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006-2010 by Livesite Networks, LLC. All rights reserved.
+
+Copyright (C) 2000-2005 by Ryan Gies. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, 
+this list of conditions and the following disclaimer.
+
+* The origin of this software must not be misrepresented; you must not 
+claim that you wrote the original software. If you use this software in a 
+product, an acknowledgment in the product documentation would be 
+appreciated but is not required.
+
+* Altered source versions must be plainly marked as such, and must not be 
+misrepresented as being the original software.
+
+* The name of the author may not be used to endorse or promote products 
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
+EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT 
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+OF SUCH DAMAGE.
+
+To the best of our knowledge, no patented algorithms have been used. However, we
+do not have the resources to carry out a patent search, and therefore cannot 
+give any guarantee of the above statement.
+
+=cut

@@ -1,0 +1,23 @@
+Makefile.PL
+VERSION
+Ponfish/Menu/Main.pm
+Ponfish/Menu/Articles.pm
+Ponfish/Menu/Servers.pm
+Ponfish/Menu/Newsgroups.pm
+Ponfish/Menu/MultiGroup.pm
+Ponfish/ArticleJoiner.pm
+Ponfish/ANSIColor.pm
+Ponfish/TermSize.pm
+Ponfish/ThreadHandler.pm
+Ponfish/Config.pm
+Ponfish/Utilities.pm
+Ponfish/News/MyNNTP.pm
+Ponfish/News/Decoder.pm
+manual.txt
+ponfish
+ponfishd
+ponfishr
+pextract
+MANIFEST
+README.TXT
+META.yml                                 Module meta-data (added by MakeMaker)

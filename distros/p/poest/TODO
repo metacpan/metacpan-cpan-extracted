@@ -1,0 +1,18 @@
+# $Id: TODO,v 1.3 2003/04/08 00:27:30 cwest Exp $
+
+For next release.
+
+- bin/poest should be built by bin/poest.PL.
+
+Soon.
+
+- Logging class to facilitate logging to files.
+
+Nearly everything.  But the plate kind of looks like this.
+
+- Tests can start and stop servers with custom configurations.
+- Test running server.
+- Accept messages.
+- Queue messages.
+- Send messages via SMTP.
+- Everything else.

@@ -1,0 +1,38 @@
+perfSONAR_PS::Services::Daemon README File
+==========================================
+
+Description
+-----------
+
+The perfSONAR_PS::Services::Daemon is the main daemon that is used to start the
+perfSONAR services. To use the daemon, install the modules for the services one
+is interested in and configure the services in perfsonar.conf.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Services::Daemon'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Configuration
+-------------
+
+Once installed, run the program "psConfigureDaemon". This program will ask a
+series of questions allowing you to specify which services to make available
+and how each service is configured.
+
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

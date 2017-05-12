@@ -1,0 +1,33 @@
+<HTML>
+<HEAD><TITLE> 10.3. Display an Image?</TITLE></HEAD>
+<BODY><a name="A10.3"> 10.3. Display an Image?</a>
+
+<hr>
+</p><p>
+Just as for the other widget types there is a two step process of
+first getting a &quot;<KBD>Photo</KBD>&quot; handle on the file of interest. 
+For the <KBD>Canvas</KBD> (unlike the other widgets) one then makes a call to 
+<KBD>create</KBD> an <KBD>image</KBD> as in 
+the following example where <kbd>'imggif'</kbd> is the Photo handle for a gif 
+file that is distributed with Tk-b&#35;:
+<pre>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $main = new MainWindow;
+    my $canvar = $main -&gt;Canvas;
+
+    $main-&gt;Photo('imggif', 
+                  -file =&gt; "$Tk::tk_library/demos/images/earth.gif");
+    $canvar-&gt;create(qw(image 5c 5c), '-image' =&gt; 'imggif');
+
+    $canvar-&gt;pack;
+    MainLoop;
+</pre>
+
+
+<hr>
+	<p><a href="qna10.2.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.3">table of contents</a> | <a href="qna10.4.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

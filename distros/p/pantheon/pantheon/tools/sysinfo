@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use Vulcan::SysInfo;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+my ( $info, %info ) = Vulcan::SysInfo->new( interval => 1 );
+my $range = Hermes->new();
+
+=head1 SYNOPSIS
+
+=head3 data
+
+ $0 metrics ..
+
+=cut
+if ( @ARGV = map { $range->load( $_ )->list } @ARGV )
+{
+    %info = map { $_ => { $info->info( $_ ) } } @ARGV;
+}
+=head3 info
+
+ $0
+
+=cut
+else
+{
+    %info = $info->info();
+
+    for my $info ( values %info )
+    {
+        map { $info->{$_} = $range->load( $info->{$_} )->dump() } keys %$info;
+    }
+}
+
+YAML::XS::DumpFile \*STDERR, \%info;
+exit 0;
+

@@ -1,0 +1,102 @@
+---
+abstract: 'Emacs major mode for editing .pod-files'
+author:
+  - 'Steffen Schwigon <ss5@renormalist.net>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: pod-mode
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=pod-mode
+  homepage: http://search.cpan.org/dist/pod-mode
+  repository: git://github.com/renormalist/emacs-pod-mode.git
+version: 1.04
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: GatherDir
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: ManifestSkip
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: Readme
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: Manifest
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: ConfirmRelease
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: UploadToCPAN
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101640
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: Authority
+      version: 1.000
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102341
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102341
+x_authority: cpan:SCHWIGON

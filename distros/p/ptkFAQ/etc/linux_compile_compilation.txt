@@ -1,0 +1,406 @@
+
+Dear Linux Users,
+
+Here is a collection of recommendations on compiling the Tk extension to Perl
+on various Linux setups. There is no particular order here - so read carefully
+through _all_ of this and take careful note of version numbers. Always make 
+sure you are using the recommended version of everything - including Perl.
+
+                        - Peter Prymmer
+
+P.S. Some day when I get a huge amount of spare time I will re-write this in 
+html markup - til then I can only offer it in plaintext:
+
+/* ======================================================================== */
+
+From:	awasser@hermes.sgc.com 14-NOV-1995 22:17:45.21
+To:	PVHP@LNS62.LNS.CORNELL.EDU
+CC:	
+Subj:	perl/Tk -- README.linux
+
+>From PVHP@LNS62.LNS.CORNELL.EDU Tue Nov 14 03:44:19 1995
+> 
+> Hi. I was recently going over the ptk hypermail archive and I noticed
+> your message dated 10 Aug 1995 Re: We Need a FAQ.
+> You mentioned that you could provide information on building Tk-b# on
+> Linux.  I am writing to ask if you have any info you might share with
+> a Linux newbie such as myself?
+> 
+
+My volunteering time for the FAQ was DEFINITELY before my project kicked 
+in to 10-12 hour days and Sundays! :-)
+
+Below is a message sent out from Nick wherein he collected significant
+linux mail, mine included.  Should be all you need to know.  I don't 
+know about ELF, but people say its wonderful.  But as I say below,
+I don't use it, and once I did the updates I list out, everything built
+without a hitch.
+
+Best of luck putting it together!
+
+Regards,
+Adam
+
+----- Begin Included Message -----
+
+>From owner-ptk@WPI.EDU Tue Sep 19 12:04:43 1995
+From: Nick.Ing-Simmons@tiuk.ti.com
+Date: Tue, 19 Sep 95 16:20:00 BST
+To: gzoller@imonics.com
+Cc: ptk@WPI.EDU
+Subject: README.linux
+Sender: owner-ptk@WPI.EDU
+Content-Length: 3120
+
+In <9509191438.AA08333@antioch.imonics.com>
+On Tue, 19 Sep 1995 10:38:56 -0400
+Gregory Zoller <gzoller@imonics.com> writes:
+>
+>Speaking of pTk on PC's... what about Linux?  Has anyone ported it
+>to Linux?  
+
+Doesn't need 'porting' linux is UNIX. It should "just work"
+with either new-enough 'dld' or ELF/dlopen() 
+
+>(If so, can I get the binary :-))  Because of the shared
+>library thing, 
+
+
+>I've been able to compile, but not run pTk under Linux.
+>
+>Greg
+
+Here is current README.linux:
+
+This is written by Nick - who never tried linux...
+
+There are several ways to build Tk-b* for linux.
+
+1. Build it static - should work on *any* platform, but will be 
+   larger than dynamic load version.
+   Hassle here is all the demos etc. really need the #! line
+   changing to point at 'tkperl' rather than 'perl'.
+
+2. Use a.out and dld 
+     - you need dld-3.2.6 
+     - You also need the "right" 'bash'.
+     - " Fall 1994 Yggdrasil Linux" + above dld has been known to work
+     - you may need to run ranlib on libX11.* 
+
+On Wed, 30 Aug 95 12:04:19 EDT
+Adam Wasserman <awasser@hermes.sgc.com> writes:
+>
+>Let me state for the record that I'm using Linux 1.2.1 (Infomagic Mar '95
+>Slackware), with gcc 2.6.3, dld 3.2.6, Tk-b6 and perl5.001m, and it
+>all compiled and worked with dynamic loading with little effort or 
+>problem under /usr/local (besides the Pretty.pm stuff).  I DID have to
+>do "ranlib libX11.a" and get the updated dld.  I don't believe my system
+>is configured for ELF.
+
+
+3. Use ELF, either distributed that way, or by building yourself. 
+     - I believe ELF versions are 'new enough' to have 'right' bash
+     - Make sure *perl* is configured to use dl_dlopen rather than dld
+       as the load method. Or you get this symptom:
+
+> Can't load './blib/auto/Tk/Tk.so' for module Tk: File not found at 
+> /usr/lib/perl5/DynaLoader.pm line 450.
+> 
+> at blib/Tk.pm line 31
+> BEGIN failed--compilation aborted at ./basic_demo line 5.
+
+
+Chris. (stoner@cs.buffalo.edu)  http://www.cs.buffalo.edu/~stoner
+Says:
+
+I had the same problem, I had to reconfigure perl to get it to work. Here is a
+summary of my perl configuration that works:
+
+Summary of my perl5 (patchlevel 1) configuration:
+  Platform:
+    osname=linux, osver=1, archname=i486-linux
+    uname='linux valhalla 1.2.8 #6 sun aug 20 16:49:00 edt 1995 i486 '
+    hint=recommended
+  Compiler:
+    cc='cc', optimize='-O2', ld='cc'
+    cppflags='-D__USE_BSD_SIGNAL -Dbool=char -DHAS_BOOL'
+    ccflags ='-D__USE_BSD_SIGNAL -Dbool=char -DHAS_BOOL'
+    ldflags =''
+    stdchar='char', d_stdstdio=define, usevfork=false
+    voidflags=15, castflags=0, d_casti32=undef, d_castneg=define
+    intsize=4, alignbytes=4, usemymalloc=n, randbits=31
+  Libraries:
+    so=so
+    libpth=/lib /usr/lib /usr/local/lib
+    libs=-lgdbm -ldbm -ldb -ldl -lm -lc -lbsd
+    libc=/usr/lib/libc.a
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef
+    cccdlflags='-fpic', ccdlflags='-rdynamic', lddlflags='-shared'
+
+You can get this output with the myconfig script that comes with the perl5
+distribution. I think it was using dl_dlopen that fixed the problem for me.
+
+
+
+
+
+----- End Included Message -----
+
+/* ======================================================================== */
+
+On October 29 1995 The following recomendation appeared:
+<H2><A HREF="news:comp.lang.perl.tk">[Index]</A></H2>
+<HR>
+<ADDRESS> Marti Rijken <mrijken@inter.NL.net></ADDRESS>
+<TITLE> Static X11 -- Something for the FAQ ?</TITLE>
+<H1> Static X11 -- Something for the FAQ ?</H1>
+<ADDRESS> NLnet
+ Sun, 29 Oct 1995 18:41:36 GMT
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+</DL>
+<HR>
+<PRE>After some futile trials to get Tk-b8 running, I discovered it needs
+a static X11 library on my system (Linux 1.2).
+A shared library doesn't seem to be enough, because I got lots of
+undefined symbols when I tried to run anything.
+
+After I added static libX11.a to my system I could make and run it out
+of the box.
+
+Here's part of my Tk.bs.  Note libX11 is static, while the other
+libraries are shared (*.sa).
+---
+@DynaLoader::dl_resolve_using =
+	qw(/usr/X11R6/lib/libX11.a /usr/lib/libm.sa /usr/lib/libc.sa);
+---
+
+I don't know if this is regular behaviour.  At least I wasn't prepared
+for it -- couldn't find anything in the docs.
+
+So perhaps this is somethig for the FAQ.  Please correct me if I
+overlooked something, or got something wrong.
+
+
+___ Marti Rijken ____ mrijken@inter.nl.net ____ Arnhem, Netherlands ___
+_______  Province of Gelderland, nature conservation department  ______
+
+</PRE>
+
+/* ======================================================================== */
+
+From:	IN%"nik@tiuk.ti.com"  "Nick Ing-Simmons"  5-DEC-1995 15:15:16.62
+To:	IN%"andreas.koenig@mind.de"
+CC:	IN%"perl5-porters@nicoh.com", IN%"lusol@Turkey.CC.Lehigh.EDU", IN%"ptk@WPI.EDU"
+Subj:	RE: pTk on Linux
+
+In <199512051651.RAA09642@anna.mind.de>
+On Tue, 5 Dec 1995 17:51:46 +0100
+Andreas Koenig <andreas.koenig@mind.de> writes:
+>
+> stephen> Cannot find -lX11 anywhere at ./myConfig line 184 
+>
+>
+>MakeMaker-5.10 is broken. 5.11 is being tested while I'm writing
+>this. Expect it in an hour or two.
+>
+MakeMaker-5.10 _is_ broken - I sent mail last night regarding 
+
+/\Q$self->{LIBEXT}$/        # match files /\.a\$/ I don't have Tk.a$ ...
+
+vs
+
+/\Q$self->{LIBEXT}\E$/      # match files /\.a$/  I do have Tk.a
+
+However Steve's problem is in Tk's myConfig which fails *before* 
+Makefile.PL calls WriteMakefile().
+
+Linux folk need to let me know where X11 can 'hide' so I can look there.
+Workround is 
+
+perl Makefile.PL X11=/path/to/X11
+
+Also recent Configure change to (perhaps) add -L/use/local/lib is messing 
+up *my* default search for X11 on my hacked Sun configurations.
+(It is finding link /usr/local/lib/libX11.a and building 
+static linked - ugh.)
+
+/* ======================================================================== */
+
+From: lusol@Turkey.CC.Lehigh.EDU  "Stephen O. Lidie" 10-DEC-1995 15:12:31.98
+To: mergl@nadia.s.bawue.de
+CC: ptk@WPI.EDU
+Subj:	RE: perl + Tk + Linux
+
+> 
+> >just installed Slackware 3 I can no longer compile Perl or Tk.  Does
+> >anyone have patches for the new slackware, or even an ftp site where I
+> >can grab the executables?  Or advice (-:
+> 
+> I have compiled perl and Tk numerous times with all kind
+> of slackware distributions. The only problem I ever had,
+> sometimes signals didn't work correct. I had to make some
+> changes in hints/linux.sh. Besides that, I never had any
+
+What hint changes were made.... should get them into the Perl
+distribution.
+
+> problems.
+> 
+> What errors do you get when compiling perl or Tk ?
+
+See below...
+
+> 
+> Edmund
+> 
+> +-------------------+------------------------+
+> | Edmund Mergl      | mergl@nadia.s.bawue.de |
+> | Im Haldenhau 9    | fon: +49=711-747503    |
+> | D 70565 Stuttgart | fax: +49=711-742857    |
+> |-------------------+------------------------|
+> |     http://sls-isdn.s.bawue.de/~mergl/     |
+> +--------------------------------------------+
+
+Last week I wrote:
+
+>In the past I built Perl 5.001m and Tk-b8 on Slackware 2.?.  Having
+>just installed Slackware 3 I can no longer compile Perl or Tk.  Does
+>anyone have patches for the new slackware, or even an ftp where I can
+>grab the executables?
+
+At last, success.  Although I spent two days on this, meeting with
+failure after failure, I can reliably build both Perl5.001m and
+Tkb8.  
+
+Briefly, 16 MB Pentium 100 with 1 GB disk, running Windows 95 in a 511
+MB partition and Slackware 3.0 in a 255 MB partion with 32 MB swap.
+Linux/Slackware comes with Perl 5.001m pre-installed, so I tried to
+build just Tk, but  "perl Makefile.PL" failed.
+
+ . Problem 1, Cannot find -lX11 anywhere at myConfig line 184, first
+   noted by John C. Wingenbach.
+
+Debugging myConfig.pl showed that file name globbing was failing!  So I
+hardwired $xlib = /usr/X11R6/lib and continued (both ELF and static X11
+libraries were there).
+
+ . Problem 2, make complained that it couldn't find the Perl source
+   tree, nor could I, so I figured it was time to build Perl.
+
+Took all the Perl 5.001m defaults via "Configure -des", make depend OK.
+
+ . Problem 3, make failed in function pp_dbmopen, file pp_sys.c lines 
+   499, 518 and 638 - could not find symbols O_CREAT, O_RDWR and O_RDONLY.
+   After an hour I couldn't find them either so I punted and commented
+   out the statements (sorry, but have to get some real work done (-:).
+
+ . Problem 4, make failed again in SDBM, same symbols missing, and so was
+   my solution.
+
+Perl build completed, all tests passed, install OK.  Now back to Perl/Tk.
+
+At this point I discovered that file name globbing with the new ELF perl
+worked!  Seriously, I removed all my debug code from myConfig.pl and it
+found /usr/X11R6/lib!  Anyway, after serveral build attempts where I 
+kept running out of disk space Perl/Tk build completed.
+
+ . Problem 5, nothing would run, it seemed like a hundred or so X11
+   externals were missing.  This sympton was noted by Marti Rijken.
+
+Now everything was ELF/dynamic so I wasn't about to try to stuff libX11.a
+in somehow, so .... I punted.  I deleted the entire Tk directory and
+re-fetched it - something was hosed from all the repeated build attempts
+and running out of disk space.
+
+This build was clean, everything works.  Whew.
+
+Perl and Tk are both -O2, which required about 10MB of free space.
+If you use -g, which I did at first, you need about 40 MB just for Tk!
+
+Also, default Slackware Perl is in /usr/bin, which might be part of
+my initial problems. I installed both perl and Tk in /usr/local.
+
+/* ======================================================================== */
+
+March 1996: Peter Prymmer successfully compiles Tk-b8 against a RedHat ELF 
+linux installation on a i486 box (with perl in /usr e.g. /usr/bin/perl).
+The only trick was to put a soft link in /usr/include/X11R6/X11 -> cd-rom X11
+directory.  No success (yet! Tue Mar 26 00:55:41 EST 1996) with creating an rpm
+type distribution. (It's not my machine but borrowed :-(
+
+/* ======================================================================== */
+
+From:	lusol@Turkey.CC.Lehigh.EDU  "Stephen O. Lidie" 23-MAR-1996 21:08:49.98
+To:	nick_at_home@tiuk.ti.com
+CC:	ptk@guest.WPI.EDU
+Subj:	RE: Tk-b10
+
+> 
+> Tk-b10 is now in CPAN.
+
+
+Tk-b10-4real summary:
+
+1) AIX make;make test; make install prefect.
+2) Linux 1.2.13, SW 3.0, had 1 problem with gettimeofday() (but not in
+   b10-tobe).  Stupid hack follows, but Nick will have a proper fix I'm
+   sure.  After that make; make test; make install perfect.
+3) Only problem I've seen is:
+
+   Usage: Tk::Callback(package, what) at ../perl5/site_perl/Tk/After.pm.36
+
+   To reproduce, run widget/vertical_scale and click B1 in scrollbar trough.
+
+Else, all looks very good!
+
+Some numbers for benchmark freaks (all unloaded, multi-user systems).  Note
+that these data were mostly taken from the bezel of my watch (;
+
+
+machine	     |  	make		make test	make install
+-------------|-------------------------------------------------
+	     |
+RS/6000	     |	100 min.	7 min.		9 min.
+220 32 MB    |
+	     |
+RS/6000      |	 46 min.	4 min.		6 min.
+340 32 MB    |
+	     |
+P5 Triton    |      18 min.	1 min.		20 sec.
+100 MHz 16 MB
+
+
+
+
+Stupid Linux hack follows.  If may well *NOT* work for you (and all that
+disclaimer stuff.)
+---------------------------myConfig------------------------------------------
+*** myConfig~   Sun Mar 10 05:59:28 1996
+--- myConfig    Sat Mar 23 18:39:20 1996
+***************
+*** 8,14 ****
+  $inc    = "";        
+  $xlib   = "";        
+  $define = '-DBASEEXT=\\"$(BASEEXT)\\"';
+! $gccopt = "";
+  @macro  = ();
+  
+  #
+--- 8,14 ----
+  $inc    = "";        
+  $xlib   = "";        
+  $define = '-DBASEEXT=\\"$(BASEEXT)\\"';
+! $gccopt = " -DTIMEOFDAY_TZ ";
+  @macro  = ();
+  
+  #
+--------------------------end of stupid myConfig hack-------------------------
+
+/* ======================================================================== */
+

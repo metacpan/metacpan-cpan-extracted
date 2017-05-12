@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Spec;
+use File::Basename;
+
+use Hermes;
+use Vulcan::OptConf;
+
+$| ++;
+
+my %seco; BEGIN { %seco = Vulcan::OptConf->load()->dump( 'seco' ) }
+
+use lib $seco{lib};
+use SECO::Conf;
+
+my $range = Hermes->new();
+my $conf = $seco{conf};
+
+map { warn $@ unless eval { SECO::Conf->load( $_ ) } }
+    map { glob $_ } @ARGV ? map { File::Spec->join( $conf, $_ ) }
+    map { $range->load( basename( $_ ) )->list } @ARGV :
+    File::Spec->join( $conf, '*' );
+
+exit 0;

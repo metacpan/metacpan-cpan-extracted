@@ -1,0 +1,25 @@
+plsvgalib v0.03 (c)1998 scottvr@netcomi.com
+
+perl version of svgalib for linux. 
+not yet complete. see file testplvgalib.pl for
+an example of what *is* currently implemented.
+
+INSTALLATION:
+On a linux box, untar this into its own directory.
+(if you run some old version of perl, you may need to
+untar it into the source tree.. )
+run the following commands (as root):
+perl Makefile.PL
+make
+make test
+make install
+
+then, you should be able to tun the testplvgalib.pl file
+and start writing your own perl graphics programs! w00p!
+Have fun porting your favorite C games.. ;)
+
+scottvr@netcomi.com
+scottvr@dfw.net
+scottvr@differ.net
+scottvr@xcon.org
+scottvr@hastoomanyeddresses.org

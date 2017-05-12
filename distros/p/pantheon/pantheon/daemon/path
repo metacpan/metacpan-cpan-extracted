@@ -1,0 +1,4 @@
+---
+root: $RealBin/../daemon
+conf: $root/conf
+service: $root/service

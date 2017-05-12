@@ -1,0 +1,28 @@
+<HTML>
+<HEAD><TITLE> 9.13. How do I group Radiobuttons together?</TITLE></HEAD>
+<BODY><a name="A9.13"> 9.13. How do I group <KBD>Radiobutton</KBD>s together?</a>
+
+<hr>
+</p><p>
+Specify the <KBD>-variable</KBD> option on each one. Here is an example pulled
+from the <KBD>icon.pl</KBD> demo script:
+<pre>
+     $letters = '';
+     my $w_frame_left_b3 = $w_frame_left-&gt;Radiobutton(
+         -bitmap   =&gt; "\@$tk_library/demos/images/letters",
+         -variable =&gt; \$letters,
+         -value    =&gt; 'full',
+     );
+     my $w_frame_left_b4 = $w_frame_left-&gt;Radiobutton(
+         -bitmap   =&gt; "\@$tk_library/demos/images/noletters",
+         -variable =&gt; \$letters,
+         -value    =&gt; 'empty',
+     );
+</pre>
+
+
+<hr>
+	<p><a href="qna9.12.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.13">table of contents</a> | <a href="qna9.14.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

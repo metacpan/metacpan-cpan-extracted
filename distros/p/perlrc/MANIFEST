@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/perlrc.t
+t/pods.t
+lib/perlrc.pm
+samples/.perlrc
+META.yml                                 Module meta-data (added by MakeMaker)

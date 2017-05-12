@@ -1,0 +1,201 @@
+                             podlators Thanks
+
+Thanks to all of the following people for helping with the development of
+these modules.
+
+Tom Christiansen, for writing the original Pod::Text and pod2man.  These
+modules are based very heavily on those, particularly the termcap handling
+and pretty much all of Pod::Man.
+
+Brad Appleton, for writing Pod::Parser, which made writing Pod::Text the
+work of a single Saturday and Pod::Man the work of another single
+Saturday, and for finding lots of bugs in the first try.
+
+Sean Burke, for writing up a detailed specification of the POD language
+that cleaned up a lot of edge cases and for his patience in explaining and
+defending the decisions of that specification.  Thanks also for writing
+detailed instructions on how to parse L<> codes that I just implemented
+nearly verbatim for Pod::ParseLink.  Sean also contributed the initial
+port of Pod::Man to Pod::Simple, so much of the current Pod::Man code is
+heavily based on his work.
+
+Gurusamy Sarathy, for pointing out the need for a pod2text() compatibility
+interface for older applications, and for being willing to roll this code
+into the Perl core distribution.
+
+Larry Virden, for feedback on the section on writing a man page in
+pod2roff and lots of good suggestions for improving it.
+
+Michael Schwern, for pointing out that pod2text() needs to be exported for
+backwards compatibility and for pointing out a bug in the collapsing of
+adjacent L</foo> links in Pod::Man.
+
+Marek Rochal, for pointing out a bug in handling of Z<> in Pod::Man, that
+even periods preceded by font escapes need protection at the beginning of
+lines from *roff, and that the handling of =item text with embedded
+newlines was buggy in a previous version of Pod::Man.  Thanks also for
+finding a bug with C<> in headings confusing nroff.
+
+Tim Jenness, for providing the remaining ISO 8859-1 escapes for Pod::Text.
+Volunteers to implement the same for Pod::Man are welcome.
+
+Johan Vromans, for pointing out a bug in the filename parsing in Pod::Man
+and help with various packaging problems.
+
+Abigail, for better error handling code for unknown command paragraphs.
+
+Zack Weinberg, for suggesting the right *roff magic to prevent blank lines
+between consecutive =item tags in lists and for explaining \fP and how to
+prevent escapes like C<> from breaking the font in headings.
+
+Nicholas Clark, for the original patch to pod2man to allow it to process
+multiple files with one invocation and for the analysis of problems with F
+register handling with roffitall.
+
+Joe Smith, for Pod::Text::Overstrike.
+
+Robin Barker, for finding problems with multiline =head* headings and
+input filenames containing spaces.
+
+Brendan O'Dea and Robin Barker (again!), for finding problems with
+Pod::Man guesswork and function and man page references that contained
+words in all caps and proposing fixes.
+
+Barrie Slaymaker, for the initial version of the heuristics in Pod::Man
+and Pod::Text used to decide whether to add quotes around the argument of
+C<>.
+
+Colin Watson, for finally pointing me in the right direction to find the
+problem with excessive double-quoting of text in =item's on some platforms
+and see how to fix it, and also for finding a problem with Pod::Man's
+output of section headings for troff.
+
+Jarkko Hietaniemi, for the original language for pod2man.PL explaining the
+COPYRIGHT AND LICENSE section, the modifications to the test suite needed
+to run it as part of Perl's core tests, and testing and bug reports for
+OS/390 and EBCDIC.
+
+Peter Prymmer, for pointing out the error reporting in Pod::Text and
+Pod::Man didn't include enough information to find the errant POD.
+
+Michael Schwern, for the initial patch to support --code in pod2text, the
+patch for --verbose in pod2man, finding a problem with the handling of
+X<>, and diagnosing a problem with the pod2text() backward compatibility
+function..
+
+Kurt Hirchert, for pointing out that the path mangling used to derive the
+man page name should only be done for section three manual pages, and for
+suggesting a --name option for pod2man.
+
+Mike Fry, for pointing out that the intuiting of the manual page name from
+the directory path didn't deal with three-component version numbers,
+serving as the impetus to rewrite that code to use File::Spec, and finding
+another bug with the module name intuition on OS/2.
+
+Craig A. Berry, for reporting that POSIX::Termios doesn't work on VMS and
+providing the information necessary to add a workaround in
+Pod::Text::Termcap, and for lots of help with build system changes for the
+merge with Perl core.
+
+Autrijus Tang, for finding a bug in error reporting in Pod::Text and
+providing a couple of test cases that became the beginning of the error
+test suite.
+
+Marcus Shawcroft, for suggesting that guesswork not be applied to the
+NAME section since that text is frequently pulled out by tools like
+catman that don't understand *roff.
+
+Hugo van der Sanden, for reporting that the anti-quoting regexes thought
+that a period was a number.
+
+Martin Quinson, for finding a bug in the handling of =item 0.
+
+Allison Randal, for taking over maintainership of Pod::Simple and
+providing a fix for reusing the same formatting object for multiple
+pages.
+
+Sergey Skvortsov, for a patch for compatibility with Perl 5.005.
+
+Yitzchak Scott-Thoennes, for diagnosing and providing patches for a few
+incompatibilities with the Pod::Simple calling syntax, pointing out that
+Pod::Simple didn't provide parse_from_filehandle, and pointing out the
+initial hash of options that parse_from_file and parse_from_filehandle
+accepted with Pod::Parser.
+
+Ron Savage, for pointing out a problematic regular expression construct in
+Pod::Text::Termcap and Pod::Text::Color that broke in older versions of
+Perl.
+
+Steve Peters, for ongoing work integrating into Perl core and reporting
+problems that crop up when that is done.
+
+Jerry D. Hedden, for finding a test suite problem on Windows with
+Pod::Simple 3.04.
+
+Craig A. Berry, for pointing out a bug in the Pod::Man devise_title logic
+that may cause it to look past the end of the path array and produce Perl
+warnings.
+
+Brendan O'Dea, for the initial patch to escape apostrophes in C<> and
+verbatim text so that they won't be converted to Unicode single quotes and
+the preamble magic to work with non-groff formatters.
+
+Colin Watson, for the preamble change to define the IX macro to an empty
+macro when indexing is not requested, thus suppressing groff warnings.
+
+Kevin Ryde, for diagnosing and providing a patch for the =head2 problem
+with some *roff implementations "looking through" the font escapes at the
+beginning of a line and still seeing *roff metacharacters, and for finding
+and fixing an issue with X<> formatting codes containing newlines.
+
+Steve Peters, for finding a problem with font settings in headings with
+multiple C<> formatting codes.
+
+H. Merijn Brand and Juerd Waalboer, for explaining the Unicode test suite
+failures, PERL_UNICODE support, and the correct way to handle Unicode
+input and output in Perl.  This resolved several confusions, including a
+bad assumption about how non-breaking spaces should be handled.
+
+Niko Tyni, for lots of helpful bug reports and testing in combination with
+the Perl packages in Debian, for the proposal and implementation of
+POD_MAN_DATE and SOURCE_DATE_EPOCH to support reproducible builds, and for
+Pod::Man graceful fallback from a missing Encode module.
+
+Jerry D. Hedden, for spelling fixes and pointing out differences in
+aspell's dictionary on different systems.
+
+Steve Hay, for a test suite bug fix on Windows.
+
+Renee Baecker, for a patch to fix indentation of verbatim paragraphs that
+contain lines with only whitespace.
+
+John E. Malmberg, for pointing out problems with the test suite leaving
+versions of temporary files behind on VMS.
+
+David Hull, for pointing out the problem with choosing whether an item tag
+will fit in the margin of the paragraph in Pod::Text subclasses that add
+zero-length formatting codes and providing a patch to fix the problem.
+
+Bjarni Ingi Gislason, for help in suppressing groff warnings from
+undefined strings and numeric registers.
+
+James E. Keenan, for reporting an issue with formatting L<> links
+containing only URLs when the URL receives some formatting (such as
+escaping of hyphens).
+
+Brian Gottreu, for fixing excessively long lines across all of the Perl
+core documentation, including perlpodstyle.
+
+Andreas Koenig, for discovering an error in handling otherwise empty
+documents that have POD syntax errors and a POD ERRORS section.
+
+Dagfinn Ilmari Mannsåker, for multiple performance optimizations after
+profiling all of the modules in Perl core.
+
+Peter Rabbitson, for lots of assistance in getting the right build
+configuration for a dual-life module included in Perl core, including
+correct installation with old versions of Perl.
+
+Dave Mitchell, for a bug fix for warnings when determining the man page
+title of a simple module and for how best to suppress Encode warnings
+during Perl core builds.

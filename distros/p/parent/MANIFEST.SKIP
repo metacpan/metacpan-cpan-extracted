@@ -1,0 +1,12 @@
+.releaserc
+blib/
+CVS/
+.git/
+MYMETA.*
+.bak$
+Makefile$
+^parent-.*/
+^parent-.*.tar$
+^parent-.*.tar.gz$
+pm_to_blib
+.travis.yml

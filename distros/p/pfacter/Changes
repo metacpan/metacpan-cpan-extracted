@@ -1,0 +1,69 @@
+Revision history for pfacter
+
+1.13
+* Tue May 20 2008 Scott Schneider <sschneid@gmail.com>
+- Added filesystems (per Christopher Horton), productid and swap facts
+- Fixed memory fact broken on AIX in 1.12
+
+1.12
+* Mon Mar 17 2008 Scott Schneider <sschneid@gmail.com>
+- Increased AIX, SunOS, and Darwin pfact support
+- Pfact output chomping done by main 'pfact' method instead of within individual pfact modules
+- Standardized individual pfact modules, added template.pm example to distro
+- Separated POD from script/modules
+- Added (very basic) tests for CPAN
+
+1.11
+* Fri Feb 22 2008 Scott Schneider <sschneid@gmail.com>
+- POD clean-up
+- Inclusion of pfHost.ldif schema LDIF
+
+1.10
+* Thu Feb 21 2008 Scott Schneider <sschneid@gmail.com>
+- Fixed hardwareproduct module bugs
+- Increased SunOS (Solaris) support
+
+1.9
+* Thu Jan 31 2008 Scott Schneider <sschneid@gmail.com>
+- Support for multiple object output (ie: ipaddress) with --multi
+- Support for third-party modules with --moduledir
+
+1.8
+* Tue Aug 21 2007 Scott Schneider <sschneid@gmail.com>
+- Added memory fact
+- Updated AIX processing of processor and serialnumber facts
+- Virtual address (e.g. eth0:1) within macaddress
+- Parsing uber-dynamic (time/day/month-stamped) and seemingly worthless (entropy_*) data from cfclasses fact
+- Debugging routine tweaked; additional relayed debugging information
+- Multiple server values supported (with timeout)
+- Various speed/redundancy code patches
+
+1.7
+* Tue May 01 2007 Scott Schneider <sschneid@gmail.com>
+- Added cfversion and disk facts
+- Kernel and application-specific module support
+- Virtual address (e.g. eth0:1) within ipaddress
+- Net::LDAP no longer required unless writing
+
+1.6
+* Wed Apr 18 2007 Scott Schneider <sschneid@gmail.com>
+- Added cfclasses, localtime and serialnumber facts
+
+1.5
+* Thu Dec 21 2006 Scott Schneider <sschneid@gmail.com>
+- Added lsbdescription, lsbid, lsbrelease, and processor facts
+
+1.4
+* Mon Nov 06 2006 Scott Schneider <sschneid@gmail.com>
+- Added LDAP write support
+
+1.3
+* Wed Oct 11 2006 Scott Schneider <sschneid@gmail.com>
+- Added domain, fqdn, ipaddress, and macaddress fact modules
+- Added XML and YAML output support
+- Most of the fact modules work under AIX now
+
+1.2
+* Tue Oct 10 2006 Scott Schneider <sschneid@gmail.com>
+- initial changelog created
+

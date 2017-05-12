@@ -1,0 +1,62 @@
+Revision history for Perl extension GPS::Garmin.
+
+0.17
+	- support for etrex yellow (patch by Ulrich Habel)
+	- GPS::NMEA: refactored parse_line out of parse
+
+0.16
+	- added more support for some Garmin devices (eTrex vista hcx)
+	- added an additional delay in readline
+	- changed default serial device for FreeBSD 6.x
+	- added examples to distribution
+	- new nmea.t test
+	- in connect.t test, check for more connection errors
+	- some warning fixes
+	- fixed release rules in Makefile.PL (which break dmake,
+	  spotted by Jamie Lahowetz)
+
+0.15
+	- added support for some Garmin devices (eTrex vista/vista c,
+	  gecko)
+	- beginning support for route up/download
+	- documentation improvements
+	- use "weaken" to avoid circular references (and thus leaking
+	  filehandles, which could lead to blocking GPS up/downloads)
+	- "return_as_hash" feature
+	- all VERSIONs incremented to 1.something (which does not mean
+	  any improvements in stability)
+
+0.14
+	- no code changes, only administrativa
+
+0.13  Mi 28 Jan 2004 08:51:50 CET
+	- added support for newer Garmin devices: eTrex Venture and emap
+	- added optional /bin/stty support to Garmin::Serial
+	- no dependencies to (even standard) modules like POSIX and
+	  FileHandle in Garmin::Serial --- useful for devices with
+	  small memory footprints (e.g. handhelds)
+	- more constants in Garmin::Constant: symbols, display types, colors,
+	  waypoint types etc.
+	- changed parameters of Garmin::upload_data - INCOMPATIBLE CHANGE!
+	- still in construction: new module GPS::Base serves as a
+	  factory class for GPS::Garmin, GPS::NMEA and may be extended
+	  for other modules
+	- removed unnecessary Exporter/Autoloader calls
+	- whitespace fixes in source code
+
+0.12  Qua Dez  6 03:06:56 WET 2000
+	- added Win32 support (through Win32::SerialPort)
+	- added Device::SerialPort support
+	- added upload code
+	- optimized transfer speeds
+
+0.10  Qui Nov 30 02:59:16 WET 2000
+	- revamped
+
+0.02  Wed Feb 10 17:15:33 1999
+	- downloading tracks is now ok
+	- created some aliases to gps_do() stuff
+	- added some docs
+
+0.01  Fri Feb  5 15:28:24 1999
+        - original version; Lot's of bugs, lacks several functions

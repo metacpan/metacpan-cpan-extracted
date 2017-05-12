@@ -1,0 +1,75 @@
+2000-05-21  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.10';
+
+	* examples/basic.cgi now uses blade_page().
+
+	* move_to_argv() now uses $0 in argv[0] instead of "perl".
+
+	* Fixed bug in blade_color() return value.
+
+	* Added blade_hash_load_file(), blade_hash_load_string(),
+	blade_titlebox().
+
+2000-03-14  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.09';
+
+	* Minor documentation updates.
+
+	* Changes to mirror libblade-0.30 - blade_page(), blade_accept() added,
+	API changes in blade_form(), blade_run().
+
+2000-02-04  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.08';
+
+	* Classes renamed BLADEENV and BLADEHASH.
+
+	* blade_hashPtr::DESTROY() removed.
+
+	* Added BLADEENV methods links(), colors(), tags(), web_vars(),
+	web_root(), header(), sysconfdir(), bladeconfdir(), web_page_name(),
+	page_name(), web_context(), user(), passwd(). All of these are for
+	obtaining the data inside a blade_env*.
+
+	* Documentation updates.
+
+2000-02-03  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.07';
+
+	* Added blade_url_encode(). Minor documentation changes.
+
+2000-01-28  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.06';
+
+	* RPM target fixes. Output of pod2text, pod2html in BLADE docs
+	directory. Added docs to uninstall.
+
+2000-01-27  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Fixed some compiler warnings. Versions are ad-hoc for now, until
+	some real testing is done.
+
+2000-01-25  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* unregister_blade_run_callback() for releasing the entry for a given
+	blade_envPtr.
+
+	* Added RPM-related targets to Makefile.PL. What a mess.
+
+	* Bug fixes in util.c.
+
+	* Minor cosmetic fixes. blade_disp() works now. Package renamed
+	to pBLADE. Example theme.cgi renamed to obj_define.cgi.
+
+	* Added blade_theme_simple_init(). The module is now complete, and
+	only requires testing.
+
+	* Additional documentation. Minor changes in Makefile.PL. Minor
+	changes to example scripts. Minor changes to LICENSE.
+
+	* First revision, missing blade_theme_simple_init(), needs testing.
+

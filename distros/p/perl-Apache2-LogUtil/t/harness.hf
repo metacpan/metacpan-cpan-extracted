@@ -1,0 +1,120 @@
+# HashFile 2.1
+testcases => @{
+  %{
+    test => ${
+  use Misc::Stopwatch;
+    }
+    summary => 
+    comparator => abort
+    num => 1
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 1
+    lineno => 10
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  my $sw = Misc::Stopwatch->new();
+    }
+    summary => 
+    comparator => true
+    num => 2
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 0
+    lineno => 11
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  my $sw = Misc::Stopwatch->new()->start();
+    }
+    summary => 
+    comparator => abort
+    num => 3
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 1
+    lineno => 25
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  my $sw = Misc::Stopwatch->new()->start()->lap();
+    }
+    summary => 
+    comparator => abort
+    num => 4
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 1
+    lineno => 41
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  my $sw = Misc::Stopwatch->new()->start()->stop();
+    }
+    summary => 
+    comparator => abort
+    num => 5
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 1
+    lineno => 54
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  Misc::Stopwatch->new()->start()->elapsed();
+    }
+    summary => 
+    comparator => true
+    num => 6
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 0
+    lineno => 76
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  my $sw = Misc::Stopwatch->new()->reset();
+    }
+    summary => 
+    comparator => abort
+    num => 7
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 1
+    lineno => 97
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  Misc::Stopwatch->new()->is_running();
+    }
+    summary => 
+    comparator => false
+    num => 8
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 0
+    lineno => 111
+    package => Misc::Stopwatch
+    result => 
+  }
+  %{
+    test => ${
+  Misc::Stopwatch->new()->start()->is_running();
+    }
+    summary => 
+    comparator => true
+    num => 9
+    lib => /var/src/build/out/perl-Apache2-LogUtil-00.01001/lib/Misc/Stopwatch.pm
+    invert => 0
+    lineno => 112
+    package => Misc::Stopwatch
+    result => 
+  }
+}

@@ -1,0 +1,41 @@
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+
+# This file is part of PodLinkCheck.
+
+# PodLinkCheck is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# PodLinkCheck is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PodLinkCheck.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: podlinkcheck
+Section: perl
+Priority: optional
+Build-Depends: libtest-more-perl | perl (>= 5.6.2), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.8
+Homepage: http://user42.tuxfamily.org/podlinkcheck/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: podlinkcheck
+Architecture: all
+Depends: perl (>= 5.6), libconstant-defer-perl, libfile-find-iterator-perl, libfile-homedir-perl, libintl-perl, libipc-run-perl, libpod-simple-perl | perl (>= 5.10), libpod-find-perl | perl (>= 5.6), libscalar-list-utils-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}
+Suggests: libintl-xs-perl
+Description: Check L<> links in Perl POD
+ Link target module name and sections are checked.  Target section
+ checking parses the POD in the target module or document.  Module
+ existence is checked from the CPAN, CPAN::SQLite, CPANPLUS or
+ cpanminus indexes too.  Man page links are checked by running the man
+ program.

@@ -1,0 +1,41 @@
+<H2><A HREF="31890708.3AC2@wsadmin2.cv.hp.com">[PREV]</A>  [NEXT]  <A HREF="jerrym.829779106@talos4">[PREV Thread]</A>  <A HREF="9604180643.AA15516@susanoo.sbi.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> lusol@Turkey.CC.Lehigh.EDU
+</ADDRESS>
+<TITLE> Re: Control Menu control...??</TITLE>
+<ADDRESS><H1> Re: Control Menu control...??</H1>
+</ADDRESS>
+<ADDRESS> 3 May 1996 18:25:09 GMT
+ Lehigh University Computing Center
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<31753520.3199@wsadmin2.cv.hp.com"><31753520.3199@wsadmin2.cv.hp.com> </A><A HREF="news:<4m5cla$6ku@tilde.csc.ti.com"><4m5cla$6ku@tilde.csc.ti.com> </A><A HREF="news:<31890708.3AC2@wsadmin2.cv.hp.com"><31890708.3AC2@wsadmin2.cv.hp.com></A>
+</DL>
+<HR>
+<PRE>     "Khile T. Klock" <klockk@wsadmin2.cv.hp.com> wrote in article <31890708.3AC2@wsadmin2.cv.hp.com> :
+&gt;
+&gt;Fred Wagner wrote:
+&gt;&gt; 
+&gt;&gt; In article 3199@wsadmin2.cv.hp.com, "Khile T. Klock" <klockk@wsadmin2.cv.hp.com> writes:
+&gt;&gt; &gt;Does anybody have a method for removing the "Close" option from
+&gt;&gt; &gt;the main Window Control Menu?
+&gt;&gt; &gt;
+&gt;&gt; &gt;I need to ensure the only way out of my application is by utilizing
+&gt;&gt; &gt;one of my other control buttons on the main application screen...
+&gt;&gt; &gt;I do NOT want the user to be able to "Close" the application from
+&gt;&gt; &gt;the control window and thus abort this routine....
+&gt;&gt; 
+&gt;&gt; Are you asking how to disable, from within Perl/Tk, the "Close" option on the
+&gt;&gt; window menu owned and operated by whatever window manager your workstation is
+&gt;&gt; using?
+&gt;
+&gt;That's exactly what I would like..... Yes... Is there a method for doing
+&gt;this from within Perl/Tk using calls to wm during the window setup?
+
+	$MW-&gt;protocol('WM_DELETE_WINDOW' =&gt; sub {});
+
+</PRE>
+<HR><H2><A HREF="31890708.3AC2@wsadmin2.cv.hp.com">[PREV]</A>  [NEXT]  <A HREF="jerrym.829779106@talos4">[PREV Thread]</A>  <A HREF="9604180643.AA15516@susanoo.sbi.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

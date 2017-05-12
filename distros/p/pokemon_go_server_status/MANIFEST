@@ -1,0 +1,9 @@
+bin/pokemon_go_server_status.pl
+Build.PL
+CHANGES
+lib/pokemon_go_server_status.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+META.yml
+META.json

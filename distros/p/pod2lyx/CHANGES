@@ -1,0 +1,62 @@
+Revision history for Perl extension Pod::Lyx and pod2lyx.
+
+0.25
+
+    - Fixed a bug that caused multi-word lists to not be output correctly.
+
+    - Set default page margins such that we get more of the document on the
+      page. The default margin is set such that there is room for you to punch
+      holes in the page and not punch through any of the print. For now
+      if you don't like the default margins you will need to use LyX's paper
+      format menu to change it. If I get a bunch of complaints I will change
+      this.
+
+    - Added Labels to all of the sections in the document. This will be used
+      for internal cross referances. Labels do not affect the printed output
+      of the document.
+
+    - Added initial support for the L<> pod command. For now if the L<>
+      sequance includes text for the link I output that. Otherwise I output
+      the contents of the link. I hope to have links completly working by the
+      0.30 release.
+
+    - Added a foot note to the first page that indicates what file was used to
+      to generate the document. And if possible the version of the document.
+      pod2lyx has an option to turn this feature off if you don't like it.
+
+    - Fixed a bug that caused a list item to not get output correctly. Bassicly
+      if a list item did not have a paragraph asciated with it then the item
+      did not get output correctly. Like so:
+
+        =item test
+
+        =item test2
+
+        =item test3
+
+        some paragraph explaining the above items.
+
+      What would happen in the above example is that test3 would be output but
+      test and test2 would not. This is now fixed. This was caught when
+      converting perlfunc. perlfunc.pod does this sort of thing quite a bit.
+      And I believe other function referance pod's do it as well.
+
+    - And of course some more minor bug fixes.
+
+0.20
+
+    - Added usage output from pod2lyx.
+    - Added pod documentation to pod2lyx.
+    - Moved ToDo list out of the README file and put in the TODO file.
+    - Added and fixed the handling of multiparagraph lists. Run pod2lyx on
+        ExtUtils::MakeMaker to see what I mean as it puts all kinds of stuff
+        in a list.
+    - Added the ability to handle multilevel lists.
+    - Added the ability to automaticly place a pagebreak after the contents.
+        See pod2lyx -help for information on how to do this.
+    - Fixed many small bugs.
+
+0.10  Tuesday May 3, 2000
+
+    - Initial release.
+

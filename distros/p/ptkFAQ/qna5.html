@@ -1,0 +1,352 @@
+<HTML>
+<HEAD><TITLE>5. How do I build it?</TITLE></HEAD>
+<BODY><a name="A5">5. How do I build it?</a>
+
+<hr>
+</p><p>
+In general, building perl/Tk requires:
+	<ol>
+	<li>A made &amp; installed perl (requires a C language compiler). You 
+	may need different versions of perl depending on which version of Tk 
+	you wish to run.</li>
+	<li>A C language compiler for the Tk code itself.</li>
+	<li>A linkable <a href="http://www.x.org/">Xlib</a> (.o, .so, .a, <i>etc.</i>) for X-windows.</li>
+	</ol>
+Perl/Tk has been successfully built using various vendors' <code>cc</code>
+compilers, as well as with the free GNU <code>gcc</code> compiler. A
+<code>make</code> utility of some sort (<code>make</code>/<code>gmake</code>)
+will be extremely helpful.
+<p>
+The versions of the various Perl utilities that you need on hand are 
+roughly as follows:
+<PRE>
+<b>
+  Utility     Version              Tk version/comments</b>
+  perl        5.001m               Tk-b8 (not 5.001n)
+  perl        5.002b1f (or higher) Tk-b9 (9.01 recommended)
+  perl        5.002b1f (or higher) Tk-b9.01
+  perl        5.002                Tk-b10
+  perl        5.002                Tk-b11
+  perl        5.002                Tk-b11.01
+  perl        5.002 (or 002_01)    Tk-b11.02
+
+  MakeMaker   4.18 (or higher)     Tk-b8
+  MakeMaker   5.14 (or higher)     Tk-b9.01 
+  MakeMaker   5.21 (not? higher)   Tk-b11+
+
+  xsubpp
+</PRE>
+Step - by - step the commands to build the Tk extension to Perl are (for the 
+dynamically linked version) roughly as follows: 
+	<ol>
+	<li> <KBD>make install</KBD> # the appropriate version of perl.
+	<li> <KBD>uninstall</KBD> # prior versions of the Tk extension to perl.
+	<li> <KBD>gunzip -c Tk-b*.tar.gz | tar xvf -</KBD>
+	<li> <KBD>cd Tk-b*</KBD>
+	<li> read <KBD>INSTALL</KBD>
+	<li> <KBD>perl Makefile.PL</KBD>
+	<li> <KBD>make</KBD>
+	<li> <KBD>make test</KBD>
+	<li> <KBD>make install</KBD>
+	</ol>
+For the statically linked version you would <KBD>`make tkperl`</KBD> just after
+executing the <KBD>`make`</KBD> step and before the <KBD>`make test`</KBD> step.
+A relatively easy way to determine if the perl on your system allows for
+dynamic linking was mentioned by  Kenneth Albanowski &lt;kjahds@kjahds.com&gt;.
+If the following does not say <kbd>"dl_none.xs"</kbd> then you probably do not
+have dynamically linked perl (or perhaps a very non-Unix perl):
+<pre>
+    perl -e 'use Config; print $Config{dlsrc},"\n"'
+</pre>
+<p>
+Here is a little more detailed discussion of each the steps just given:
+	<ul>
+	<li> <b>Install Perl</b> (5.001m for Tk-b8 [not 5.001n], at least 
+                5.002b1f for b9.01, 5.002 for b11.01, 5.002 for b11.02)
+		For code locations 
+		see a <a href="qna4.html">CPAN site (separate question in this FAQ)</a>, 
+		the actual installation instructions come bundled in the 
+		perl***.tar.gz distribution file. 
+		(Perl Configure &amp; make troubles are beyond the scope of 
+		this FAQ - please see the 
+		<a href="http://www.perl.com/perl/faq/">Perl FAQ</a> 
+		itself for more help with this critical step.)<BR>
+		You can install perl almost anywhere you like by specifying the
+		<KBD>-Dprefix=<i>/path</i></KBD> argument to 
+		<KBD>sh Configure</KBD></li>
+	<li> Unpack perl/Tk <b>outside</b> the Perl distribution<br>
+		(<i>i.e.</i> outside the perl build, perl install, or perl lib
+		areas).<br>
+		<kbd>gunzip Tk-b*.tar.gz</kbd><br>
+		<kbd>tar -xvf Tk-b*.tar</kbd><br>
+		(this area <kbd>Tk-b*/</kbd> will be referred to as your 
+		``Tk build'' directory)<br>
+		(<em>optional:</em> with Tk-b9.01, to avert most 
+		<kbd>pod2man</kbd> errors later on you may wish to apply 
+		<a href="etc/ptkpod-b9.01.patch">Nick's document patch</a>.)</li>
+	<li> Read <A HREF="etc/INSTALL-Tk.html"><KBD>INSTALL</KBD></A> carefully<BR>
+		<kbd>cd Tk-b*</kbd><br>
+		<kbd><i>pager</i> INSTALL</kbd><br>
+		where <kbd><i>pager</i></kbd> is the program you use to scroll
+		through text files more or less. Be sure to read it and don't
+		just pound away on the spacebar.</li>
+	<li> If necessary remove any previously installed version of perl/Tk<BR>
+		If you had a previously working version of Tk installed, you 
+		may need to resurrect the Makefile for it and execute:<BR>
+		<KBD>make uninstall</KBD><BR>
+		<KBD>make realclean</KBD><BR>
+		before you unpack the new version. (The uninstall target of 
+		MakeMaker is relatively new so please be careful here.)<BR>
+		Also note that as of Tk-b10 there is now an 
+		<CODE>uninstall</CODE> perl script in the Tk build directory. 
+		Run that script before the <KBD>perl Makefile.PL</KBD> step if
+		you had a previously installed Tk extension (especially if the
+		version number was prior to b10, <i>e.g.</i> Tk-b9.01 or Tk-b8).
+		</li>
+	<li> Compile and test.<br>
+		<kbd>perl Makefile.PL</kbd><br>
+		(see below for more on this step.)<BR>
+		<kbd>make</kbd><br>
+		(if and only if building static: <kbd>make tkperl</kbd><br>
+		<kbd>make test</kbd> (Tk-b10++ not prior versions)<br>
+	<li> Install.<br>
+		<kbd>make install</kbd></li>
+	<li> Play with it.<br>
+		<kbd>basic_demo</kbd> (modify <kbd>#!</kbd> line if nec., or
+		specify <kbd>/<i>path</i>/<i>to</i>/perl ./basic_demo</kbd>)<br>
+		<em>warning</em> if you build Tk-b9.01 with perl5.002gamma then
+		change the line in <kbd>basic_demo</kbd> from<br>
+		<kbd>use lib ./blib;</kbd><br>
+		to<br>
+		<kbd>use lib qw(blib/arch blib/lib);</kbd></li>
+	</ul>
+On the <kbd>perl Makefile.PL</kbd> step it may be necessary to give explicit
+locations of the required X11 libraries and/or include headers. For example:
+<pre>
+    perl Makefile.PL X11=/usr/local/X11R5
+</pre>
+or
+<pre>
+    perl Makefile.PL X11INC=/usr/local/share/X11R5/include \
+                     X11LIB=/usr/local/arch/X11R5/lib
+</pre>
+There are system and site dependencies in all of the above steps. 
+However, the largest single source of build trouble comes from not using the
+latest versions of the various utilities (<CODE>C compiler</CODE>, 
+<CODE>make</CODE>, <I>etc.</I>). In particular ensure that when you say 
+<kbd>perl Makefile.PL</kbd> that the <kbd>perl</kbd> that gets invoked is up to
+date - use <kbd>which perl</kbd> and <kbd>perl -v</kbd> to determine this. If 
+necessary specify the full path name to your perl5 interpreter/compiler. 
+(Some people do not <KBD>rm</KBD> their older perl interpreters 
+ when upgrading to a more recent version - beware.)
+<p>
+If you still run into trouble take a look at the 
+<a href="etc/INSTALL-Tk.html"><KBD>INSTALL</KBD></a>, the  
+<a href="etc/README"><KBD>README</KBD></a> 
+and the <KBD>README</KBD> file for your specific system
+(<I>e.g.</I> <KBD>README.AIX</KBD>, <KBD>README.OSF</KBD>, <I>etc.</i>).
+You might also find your system mentioned in the ptk hyper-mail archive at:
+<pre>
+    <a href="http://pubweb.bnl.gov/~ptk/">http://pubweb.bnl.gov/~ptk/</a>
+<i>or</i>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/</a>
+<i>or</i>
+    <a href="ftp://ftp.ccd.bnl.gov/pub/ptk/archives/">ftp://ftp.ccd.bnl.gov/pub/ptk/archives/</a>
+</pre>
+or the Perl 5 Porters page at one of the following URLs:
+<pre>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/</a>
+    <a href="http://www.hut.fi/~jhi/perl5-porters.html">http://www.hut.fi/~jhi/perl5-porters.html</a>
+    <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/</a>
+</pre>
+If you wish to discuss your Tk build problems with others run and save the
+output from the <kbd>myConfig</kbd> script in the Tk build directory
+(the output may already be in the <kbd>myConfig.out</kbd> file from your 
+Tk-b&#35; build directory), as well as the <kbd>myconfig</kbd> script in your 
+perl build directory. It is often helpful to include the output of either 
+(or both) of these scripts in your discussion.
+<p>
+Presented here are the <EM>beginnings</EM> of a list of problems associated with
+building Tk-b&#35; on various platforms (for help building perl itself please 
+refer to the <a href="http://www.perl.com/perl/faq/">Perl FAQ</a>). This list 
+is in no way complete nor authoritative (nor is it necessarily even 
+up-to-date!) but simply lists problems people have reported. Keep in mind that 
+your <EM>installation</EM> may differ (<I>e.g.</I> location differences such as 
+<KBD>/usr/bin/perl</KBD> <I>vs.</I> <KBD>/usr/local/bin/perl</KBD>) even if 
+its the same platform listed here:
+
+<h3><a href="ptkPORT.html">Platforms</a>:</h3>
+<DL>
+<DT>AIX:
+<DD>
+ As of perl5.002b &amp; Tk-b9.01 <KBD>README.AIX</KBD> says no patching is
+ necessary. 
+ <p>
+ For Tk-b8: modifying the <KBD>perl.exp</KBD> file may be necessary. There is 
+ a patch in <KBD>Tk-b8/README.AIX</KBD>. It may be necessary to 
+ <KBD>make regen_headers</KBD> after the patch.
+
+<DT>HPUX:
+<DD>
+ For Tk-b11: One person reports a need to add <KBD>#define TIMEOFDAY_TZ</KBD>
+ to the <KBD>tkConfig.h</KBD> header file in order to compile on HPUX 9.05.
+ <P>
+ Previous versions: Most people seem to prefer the dynamic linking afforded by 
+ a <em>recent</em> version of the gcc compiler on this system.
+
+<DT>Linux:
+<DD>
+ John C. Wingenbach indicates that should you encounter an error message
+ like <KBD>Cannot find -lX11 anywhere at ./myConfig line 184</KBD> when running
+ your <KBD>perl Makefile.PL</KBD> (under Slakware 3.0) that you should be
+ more specific about <KBD>-l/<I>path</I>/<I>to</I>/libX11.a</KBD>.<BR>
+ Adam Wasserman &lt;awasser@hermes.sgc.com&gt; has graciously provided a 
+ compilation of Linux compilation trials &amp; tribulations. It is an (as yet
+ un-edited) document available at:
+ <a href="etc/linux_compile_compilation.txt">
+ <KBD>http://w4.lns.cornell.edu/~pvhp/ptk/etc/linux_compile_compilation.txt</KBD></a>
+
+<DT>MachTen:</DT>
+ <DD>
+ Mark Pease <a href="mailto:pease@act.sps.mot.com">&lt;pease@act.sps.mot.com&gt;</a>
+ mentions that:<BR><I>
+ I was able to get Tk-b11.02 running under MachTen 2.2 perl5.002_01. 
+ I did need to make one change to get a round a MachTen problem. In 
+ pTk/tclUnix.h, pwd.h is included, but it is also included pTk/tkPort.h 
+ (which is included in Lang.h, which is use by tclUnixUtil.c, whew!)</I>
+ <p>
+ <I>MachTen's pwd.h can't be included more that once or you get an error.</I>
+ <p>
+ <I>It looked to me like tclUnix.h was only used in tclUnixUtil.c, so I 
+ commented out the #include &lt;pwd.h&gt; in tclUnix.h.</I>
+ </DD>
+
+<DT>NetBSD:</DT>
+ <DD>
+ Jesus M. Gonzalez &lt;jgb@gsyc.inf.uc3m.es&gt; mentions success with:<BR>
+ <i>"Tk-b11.01 compiles, installs and runs just out of
+ the box in NetBSD-1.1/i386. I just followed the INSTALL
+ instructions"</i>
+ </DD>
+
+<DT>NeXTSTEP:</DT>
+<DD>
+ Gerd Knops recently posted a <a href="etc/next.steps.txt">discussion 
+ of the steps to get perl running on several NeXTSTEP</a>s  to p5p.</DD>
+
+<DT>OSF/1:
+<DD>
+ As of perl5.002b &amp; Tk-b9.01 you will probably be able to follow the
+ usual instructions. John Stoffel &lt;john@wpi.edu&gt; reports that if you use
+ gcc (rather than cc) you should use at least version 2.7.2
+ <p>
+ For Tk-b8: <KBD>make</KBD> is reputedly not up to the task on this system.
+ <KBD>Tk-b8/README.OSF</KBD> recommends <KBD>gmake</KBD> instead.<BR>  
+ Stephane Bortzmeyer 
+ <a href="mailto:bortzmeyer@pasteur.fr">&lt;bortzmeyer@pasteur.fr&gt;</a>
+ reports a successful build with <b>Perl 5.001m</b>, <b>xsubpp 1.922</b>, 
+ <b>MakeMaker 4.23</b>. He points out that it was necessary for him to 
+ upgrade the xsubpp and MakeMaker that he received with his copy of 
+ Perl5.001m.
+
+<DT>SCO:
+<DD>
+ For Tk-b8: Eric J. Bohm 
+ <a href="mailto:bohm@cs.Buffalo.EDU">&lt;bohm@cs.Buffalo.EDU&gt;</a>  
+ reported a need to
+ comment out line(s) from <KBD>myConfig</KBD> and <KBD>GNUMakefile</KBD>s using
+ GNU make 3.67. (See <KBD>Tk-b8/README.SCO</KBD> for specifics.)
+
+<DT>SGI (Irix):
+<DD>
+ For Tk-b11.02: Phillip Moore &lt;wpm@morgan.com&gt; reports a clean build on
+ IRIX 5.3.
+ <p>
+ Matthew Black 
+ <a href="mailto:black@csulb.edu">&lt;black@csulb.edu&gt;</a> recently
+ mentioned a need to apply &quot;patchSG0000596&quot; to get perl sockets
+ to work. His message was copywritten and is not included here. Send 
+ <a href="mailto:black@csulb.edu">e-mail to him</a> 
+ to find out where the get &quot;patchSG0000596&quot;. 
+
+<DT>Suns:
+<DD>
+  <STRONG>SunOS (BSD):</STRONG><BR>
+  For Tk-b10 on SunOS 4.1.3_U1<BR>
+  using SparcWorks acc 3.0.1 Frederick L. Wagner &lt;derf@ti.com&gt; reports
+  needing to use the perl malloc rather than the system malloc() when building
+  perl.<BR>
+  For Tk-b8: 
+  Tom Tignor <a href="mailto:tpt2@BBN.COM">&lt;tpt2@BBN.COM&gt;</a> reports the 
+  following on SunOS (sun4m sparc):
+	<I>
+	Tue, 28 Nov 1995 13:19:42<BR>
+	In trying to make, I got a "write: argument mismatch" error
+	for the file ptK/Lang.h. I looked at the file and found the offending
+	function, Tcl_GetOpenFile, which has a third argument called "doWrite"
+	(not "write") in tkGlue.c. I changed the argument from "write" to
+	"doWrite" in Lang.h and it's compiling fine (for the moment. :)
+	</I><BR>
+  <STRONG>Solaris (System V):</STRONG><BR>
+  For Tk-b8: 
+  There is trouble getting <b>perl</b> to use <b>Socket</b> routines
+  (<i>i.e.</i> trouble with <kbd>make</kbd> perl itself not necessarily
+  trouble with Tk-b&#35;). See the <a
+  href="http://www.perl.com/perl/faq/Q4.21.html">perl FAQ</a> for more 
+  info or the <a href="etc/SolSock.shar"><kbd>.shar</kbd></a> file that 
+  Tom Christiansen occasionally 
+  posts to <a href="news:comp.lang.perl.misc">comp.lang.perl.misc</a>.
+  Further information on perl <b>i</b>nter <b>p</b>rocess
+  <b>c</b>ommunication can be found in the <kbd>perlipc*</kbd> files at:
+  <a href=" ftp://ftp.perl.com/perl/info/everything_to_know/">
+  <kbd>ftp://ftp.perl.com/perl/info/everything_to_know/</kbd></a>.
+
+<DT>SVR4:
+<DD>
+ For Tk-b8: 
+ Martha G. Armour and Len Reed report on two separate hardware platforms
+ running SVR4 - extensive details in <KBD>Tk-b8/README.SVR4</KBD>. 
+ Interestingly, they report no trouble at all on Linux. 
+</DD>
+
+<DT>Ultrix:</DT>
+<DD>
+ Peter Prymmer reports that with Tk-b11 it was necessary to change the line in
+ Makefile.PL that reads:<br>
+ <kbd>'LIBS'    => ["$xlib -lX11 -lpt -lsocket -lnsl -lm"],</kbd><br>
+ to read:<br>
+ <kbd>'LIBS'    => ["$xlib -lX11 -lpt -lsocket -lnsl -lm -ldnet"],</kbd><br>
+ because of a newer X11 in /usr/local that needed the DECnet protocol linking.
+ <p>
+ John Stoffel reports a successful build of static Tk-b10 on Ultrix 4.5.
+</DD>
+</DL>
+
+<h3><a href="../perl/nixnix.html">non-Unix(ish)es:</a></h3>
+Information on non-Unix(ish) perl platforms may be obtained from the 
+perl metaFAQ <b>(pmFAQ)</b> at
+<pre>
+   <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html</a>
+</pre>
+or the Perl 5 Porters <b>(p5p)</b> page at:
+<pre>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/</a>
+    <a href="http://www.hut.fi/~jhi/perl5-porters.html">http://www.hut.fi/~jhi/perl5-porters.html</a>
+    <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/</a>
+</pre>
+In general your non-Unix platform must be able to support perl 5 and 
+<a href="http://www.x.org/">Xlib</a> 
+(a C compiler and a make utility are tremendously useful too). 
+The long list of UNIX and <a href="../perl/nixnix.html">non-unix</a>
+perl 5 ports, Tcl/Tk ports, and Perl/Tk ports that used to
+appear here has now moved to a separate web page at:
+<pre>
+    <a href="ptkPORT.html">http://w4.lns.cornell.edu/~pvhp/ptk/ptkPORT.html</a>
+</pre>
+  
+
+<hr>
+	<p><a href="qna4.html">Previous</a> | Return to <a href="ptkTOC.html#TOC5">table of contents</a> | <a href="qna6.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

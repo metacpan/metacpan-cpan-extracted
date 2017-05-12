@@ -1,0 +1,7 @@
+---
+sysinfo:
+  target: localhost
+  map: m.test
+  batch: b.generic
+  thread: 16
+  interval: 5min

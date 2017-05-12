@@ -1,0 +1,62 @@
+	    <!-- \$RCSfile\$\$Revision\$\$Date\$ -->
+	    <!-- \$Log\$ -->
+	    <HTML>
+	    <TITLE>AXIS.PM</TITLE>
+<p><hr>
+
+<H1> 
+<A NAME="Axis.pm_name_0">
+NAME </A>
+</H1>
+
+Axis - Canvas with Axes
+<p><p><hr>
+
+<H1> 
+<A NAME="Axis.pm_synopsis_0">
+SYNOPSIS</A>
+</H1>
+
+  <STRONG>$mw</STRONG> = MainWindow-&gt;new;                                           
+  <STRONG>$t</STRONG> = <STRONG>$mw</STRONG>-&gt;Axis(-xmax =&gt; 10, -ymax =&gt; 10);                        
+  <STRONG>$t</STRONG>-&gt;create('line',<STRONG>$t</STRONG>-&gt;plx(2),<STRONG>$t</STRONG>-&gt;ply(3.1),<STRONG>$t</STRONG>-&gt;plx(4),<STRONG>$t</STRONG>-&gt;ply(4));
+<p><p><hr>
+
+<H1> 
+<A NAME="Axis.pm_description_0">
+DESCRIPTION</A>
+</H1>
+
+This is an improved version of the axis widget. Changes with respect to the
+previous version are :
+<p>
+<DL>
+<DT><STRONG>
+<EM>* </EM>
+</STRONG></DT>
+<DD>
+
+the 'pack' has been moved out the widget. One has to do his own packing
+<p></DD>
+<DT><STRONG>
+<EM>* </EM>
+</STRONG></DT>
+<DD>
+
+it is now possible to work in the coordinates of the axis. The following
+piece of code draws a line between the points (2 , 3.1)  (4 , 4).
+<p></DD>
+</DL>
+.
+<p><p><hr>
+
+<H1> 
+<A NAME="Axis.pm_author_0">
+AUTHOR</A>
+</H1>
+
+ Kris Boulez		(Kris.Boulez<STRONG>@rug</STRONG>.ac.be)
+ Biomolecular NMR unit&lt;http://bionmr1.rug.ac.be/~kris&gt;
+ University of Ghent, Belgium
+<p>
+</HTML>

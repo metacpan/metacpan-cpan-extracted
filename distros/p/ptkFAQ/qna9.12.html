@@ -1,0 +1,63 @@
+<HTML>
+<HEAD><TITLE> 9.12. How do I select a range of tags in a Text widget?</TITLE></HEAD>
+<BODY><a name="A9.12"> 9.12. How do I select a range of tags in a <KBD>Text</KBD> widget?</a>
+
+<hr>
+</p><p>
+A question arose concerning getting a range of selections from a 
+<kbd>Text</kbd> widget.  <a href="mailto:nik@tiuk.ti.com">Nick Ing-Simmons'</a>
+answer mentions several possibilities including:
+<p>
+<BLOCKQUOTE>
+Keyboard Copy/Paste 'is' implemented of course...
+</BLOCKQUOTE><PRE><I>
+Subj:	RE: $Text-&gt;tag('ranges', 'sel') - does this work?
+
+In &lt;199512291957.OAA02609&#64;ohm.nrl.navy.mil&gt;
+On Fri, 29 Dec 1995 14:57:42 -0500
+Charles J Williams &lt;chas&#64;ohm.nrl.navy.mil&gt; writes:
+!I was writing a little tk perl today, and i decided to try to 
+!implement a copy/paste using the 'sel' tag
+!
+!I enabled exportselection, and then try to probe the select 
+!region with:
+!
+!    $buffer = $text-&gt;tag('ranges', 'sel');
+!
+!$buffer comes back with one entry, the end of the selection.
+</I></PRE><BLOCKQUOTE>
+That is to be expected - the scalar gets assigned the last element of
+the list.
+</BLOCKQUOTE><PRE><I>
+!I tried:
+!
+!    @buffer = $text-&gt;tag('ranges', 'sel');
+!
+!same difference.
+</I></PRE><BLOCKQUOTE>
+This seems to work for me:
+</BLOCKQUOTE><PRE>
+    ($start,$end) = $text-&gt;tagRanges('sel');
+</PRE><BLOCKQUOTE>
+In perl/Tk <kbd>-&gt;tagRanges(...)</kbd> is an alias for
+<kbd>-&gt;tag('ranges',...)</kbd>
+<p>
+The following subroutine can also probe and print the tagRanges:
+</BLOCKQUOTE><PRE>
+    sub showsel  
+    { 
+     my $text = @_;
+     my @info = $text-&gt;tagRanges('sel');
+     if (@info)
+      {
+       print "start=$info[0] end=$info[1]\n" 
+      }
+    }
+</PRE>
+
+
+<hr>
+	<p><a href="qna9.11.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.12">table of contents</a> | <a href="qna9.13.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

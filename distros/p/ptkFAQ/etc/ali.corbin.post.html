@@ -1,0 +1,1455 @@
+<H2>[PREV]  [NEXT]  <A HREF="199603262147.PAA21818@jordy.asic.sc.ti.com">[PREV Thread]</A>  <A HREF="01I2SVXVF3G88X3B3F@LNS62.LNS.CORNELL.EDU">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> john@wpi.edu (John Stoffel)
+</ADDRESS>
+<TITLE> Useful Scripts from Ali Corbin</TITLE>
+<ADDRESS><H1> Useful Scripts from Ali Corbin</H1>
+</ADDRESS>
+<ADDRESS> 26 Mar 96 20:43:12 GMT
+ ptk@guest.wpi.edu mailing list gateway
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+</DL>
+<HR>
+<PRE>
+I got this sent to me directly, I pass it on.
+
+John
+
+------- start of forwarded message -------
+From: Ali Corbin <corbin@nemo.fteil.ca.boeing.com>
+Subject: some Perl/Tk scripts
+
+
+Here are a few Perl/Tk scripts that people may find useful.
+
+Ali (corbin@nemo.ca.fteil.boeing.com)
+
+
+
+==============================================================================
+==============================  showcolors ===================================
+==============================================================================
+
+#!/usr/local/bin/perl -w
+
+#--------------------------------------------
+#	showcolors	- show X colors
+#--------------------------------------------
+
+@helpText = (
+"",
+"This Perl/Tk script permits you to look at X colors.",
+"You can move the scales to change the sample color based on rgb values",
+"or you can select named colors out of the listbox.",
+"",
+"Of the buttons at the bottom of the window:",
+"   Closest - finds the named color that is closest to the current sample",
+"   Undo    - undoes the last Closest",
+"   Put     - paints the root with the current sample",
+"   Filter  - brings up a filter dialog for the color names",
+""
+			 );
+
+#--------------------------------------------
+#	Included Library Modules
+#--------------------------------------------
+use Tk;
+
+
+#--------------------------------------------
+#	Global data
+#--------------------------------------------
+$rgbFile		= "/usr/lib/X11/rgb.txt";
+
+%name2value		= ();							# Sorted by color name
+%value2name		= ();							# Sorted by color value
+
+$value			= "#000000";
+$name			= "Black";
+
+$filter			= "";
+$caseSensitive	= 0;
+
+$closestButtonLabel = "Closest";
+$undoButtonLabel = "Undo";
+$putButtonLabel = "Put";
+$filterButtonLabel = "Filter...";
+
+$applyButtonLabel = 'Apply';
+$clearButtonLabel = 'Clear';
+$dismissButtonLabel = 'Dismiss';
+
+
+#--------------------------------------------
+#	Main
+#--------------------------------------------
+
+
+# If any arguments were given, assume that they're asking for help.
+if ($ARGV[0]) {
+	foreach $line (@helpText) {
+		print "$line\n";
+	}
+}
+
+# Assemble the list of colors.
+getColorList();
+
+
+# Initialize Tk
+$top = MainWindow-&gt;new();
+
+
+# Put a button bar on the bottom, a sample area above that, 
+# and two frames side-by-side at the top.
+$buttons = $top-&gt;Frame( );
+$buttons-&gt;pack( -side =&gt; 'bottom', -fill =&gt; 'x' );
+$sample = $top-&gt;Frame( -height =&gt; '2c', -relief =&gt; 'ridge' );
+$sample-&gt;pack( -side =&gt; 'bottom', -fill =&gt; 'x' );
+$left = $top-&gt;Frame;
+$left-&gt;pack( -side =&gt; 'left', -fill =&gt; 'y');
+$right = $top-&gt;Frame;
+$right-&gt;pack( -side =&gt; 'right', -fill =&gt; 'both', -expand =&gt; 'yes' );
+
+
+
+# Add the buttons to the button bar.
+makeButton( $buttons, \$closestButtonLabel, findClosestColor );
+$undo = makeButton( $buttons, \$undoButtonLabel, undoLastClosest );
+$undo-&gt;configure( -state =&gt; 'disabled' );
+
+makeButton( $buttons, \$putButtonLabel, sub{ system "xsetroot -solid $value" });
+
+$filterButton = makeButton( $buttons, \$filterButtonLabel, 
+		sub { &makeFilterDialog( $filterButton, \$filter, rereadColors ); } );
+
+
+# Make a scale for each color component.
+makeRGBAScales( $left, "Slide colors:" );
+
+
+# Make a listbox full of color names.
+$colorList = makeColorList( $right, "Double-Click on Name:", sort( keys %name2value ));
+
+
+# Fall into the event loop.
+MainLoop();
+
+
+#--------------------------------------------
+#	Functions
+#--------------------------------------------
+
+
+#--------------------------------------------
+#	Assemble the color list.
+#
+#	Sets global varibles %value2name and %name2value
+#--------------------------------------------
+
+sub	getColorList
+{
+
+	my ( $name, $value );
+
+
+
+	# Read the list of colors and intensities from the rgb file.
+	open RGB, $rgbFile	|| die "Couldn't open $rgbFile\n";
+	while (<RGB>)
+	{
+		/\s*(\d+)\s+(\d+)\s+(\d+)\s+(.*)\n/;		# (r) (g) (b) (color name)
+		$value	= sprintf( "#%02x%02x%02x", $1, $2, $3 );
+		$name	= $4;
+
+
+		# If a filter has been set, get rid of any color that doesn't match it.
+		if	( $filter )
+		{
+			my $f = ( $caseSensitive ) ? $filter : lc( $filter );
+			my $n = ( $caseSensitive ) ? $name : lc( $name );
+			if	( -1 == index( $n, $f ) )	{ next }
+		}
+
+
+		# Get rid of duplicately named colors.
+		# Also, get rid of Transparent (which doesn't really exist)
+		# and all grey100's (so that we'll use White instead).
+		next	if ( exists $value2name{$value} );
+		next	if ( substr($name, 1) eq "ransparent" );
+		next	if ( length($name) &gt; 4  &&  substr($name, 4) eq "100" );
+
+		$value2name{$value}	= $name;
+		$name2value{$name}	= $value;
+	}
+	close RGB;
+}
+
+
+#--------------------------------------------
+#	Makes a set of rgb scales
+#
+#	Sets global variables $redScale, $greenScale, $blueScale
+#	Accesses the global variable $value.
+#--------------------------------------------
+
+sub makeRGBAScales
+{
+	my ( $parent, $messageText ) = @_;
+
+
+	# Stick a message at the top.
+	$label = $parent-&gt;Label( -text =&gt; $messageText, -relief =&gt; "raised", -bd =&gt; 2 );
+	$label-&gt;pack( -side =&gt; 'top', -fill =&gt; 'x' );
+
+
+	# Display the current value at the bottom.
+	$label = $parent-&gt;Label( -textvariable =&gt; \$value, -relief =&gt; "ridge", -bd =&gt; 2 );
+	$label-&gt;pack( -side =&gt; 'bottom', -fill =&gt; 'x' );
+
+
+	# Make a scale for each color component.
+	$redScale	= makeScale( $parent, 'red' );
+	$greenScale	= makeScale( $parent, 'green' );
+	$blueScale	= makeScale( $parent, 'blue' );
+
+}
+
+
+#--------------------------------------------
+#	Make a scale
+#--------------------------------------------
+
+sub makeScale
+{
+	my ( $parent, $color ) = @_;
+	my ( $scale );
+
+	$scale = $parent-&gt;Scale( -label =&gt; substr( $color, 0, 1 ),
+							-from =&gt; 0, -to =&gt; 255,
+							-showvalue =&gt; 'no',
+							-orient =&gt; 'vertical',
+							-command =&gt; sub { &scaleCommand; } );
+	$scale-&gt;pack( -side =&gt; 'left', -fill =&gt; 'y' );
+	$scale-&gt;bind( '<1>' => sub { $scale->focus } );
+
+	$scale;
+}
+
+
+
+#--------------------------------------------
+#	Make a listbox with message and scrollbar
+#--------------------------------------------
+
+sub makeColorList
+{
+	my ( $parent, $messageText, @list ) = @_;
+	my ( $label, $button, $listbox );
+
+
+	# Stick a message at the top.
+	$label = $parent-&gt;Label( -text =&gt; $messageText, 
+								-relief =&gt; "raised", -bd =&gt; 2 );
+	$label-&gt;pack( -fill =&gt; 'x' );
+
+
+	# Display the current color name at the bottom.
+	$label = $parent-&gt;Label( -textvariable =&gt; \$name,
+								-relief =&gt; "ridge", -bd =&gt; 2 );
+	$label-&gt;pack( -side =&gt; 'bottom', -fill =&gt; 'x' );
+
+
+	# Make a listbox/scrollbar pair.
+	$listbox = &makeList( $parent, sub { setColorByName($_[0]); }, 
+											'right', @list );
+
+	$listbox;
+}
+
+
+#--------------------------------------------
+#	Reread the list of colors (possibly with a new filter).
+#--------------------------------------------
+
+sub rereadColors
+{
+
+	# Reread the list of colors.
+	%value2name = ();
+	%name2value = ();
+	getColorList();
+
+
+	# Delete the current contents of the listbox and replace it with the new list.
+	$colorList-&gt;delete( 0, 'end' );
+	$colorList-&gt;insert( 'end', sort( keys %name2value ));
+
+}
+
+#--------------------------------------------
+#	Called if the user changed a scale:
+#	
+#	Sets global variables $value and $name
+#--------------------------------------------
+
+sub scaleCommand
+{
+
+	# Get each scale's setting and recalculate the rgb value.
+	$value = sprintf( "#%02x%02x%02x", $redScale-&gt;get, $greenScale-&gt;get, $blueScale-&gt;get );
+
+	&newColor;
+
+}
+
+
+
+#--------------------------------------------
+#	Find the named color closest to the current value
+#--------------------------------------------
+
+sub findClosestColor
+{
+	$top-&gt;configure( -cursor =&gt; 'watch' );
+	$top-&gt;update;
+
+	$prevValue = $value;
+
+	my $diff = 3*255;
+	my $valueBest = "#000000";
+	my $nameBest = "Black";
+	my $rBest = hex2dec( substr( $valueBest, 1, 2 ));
+	my $gBest = hex2dec( substr( $valueBest, 3, 2 ));
+	my $bBest = hex2dec( substr( $valueBest, 5, 2 ));
+	my $r	 = hex2dec( substr( $value, 1, 2 ));
+	my $g	 = hex2dec( substr( $value, 3, 2 ));
+	my $b	 = hex2dec( substr( $value, 5, 2 ));
+
+	while ( ( $v, $n ) = each %value2name )
+	{
+		my $rTemp = hex2dec( substr( $v, 1, 2 ));
+		my $gTemp = hex2dec( substr( $v, 3, 2 ));
+		my $bTemp = hex2dec( substr( $v, 5, 2 ));
+
+		my $tempDiff = dif($r,$rTemp) + dif($g,$gTemp) + dif($b,$bTemp);
+		if	( $tempDiff &lt; $diff )
+		{
+			$diff = $tempDiff;
+			$rBest = $r;
+			$gBest = $g;
+			$bBest = $b;
+			$valueBest = $v;
+			$nameBest = $n;
+		}
+	}
+	
+	setColorByName( $nameBest );
+
+	$top-&gt;configure( -cursor =&gt; 'left_ptr' );
+	$undo-&gt;configure( -state =&gt; 'normal' );
+
+}
+
+
+sub undoLastClosest
+{
+	$value = $prevValue;
+	&newColor;
+	$undo-&gt;configure( -state =&gt; 'disabled' );
+}
+
+
+sub dif
+{
+	my ( $p1, $p2 ) = @_;
+	my	$result = ( $p1 &lt; $p2 ) ? ( $p2 - $p1 ) : ( $p1 - $p2 );
+}
+
+
+sub setColorByName
+{
+
+	# Set the global color name.
+	my ( $name ) = @_;
+
+
+	# Get its rgb value.
+	$value = $name2value{$name};
+
+	&newColor;
+}
+
+
+sub newColor
+{
+
+	# If this color has a name then set it.
+	if ( exists( $value2name{$value} ) )	{ $name = $value2name{$value}; }
+	else									{ $name = ""; }
+
+
+	# Set each of the scales to the proper setting.
+	$redScale-&gt;set( hex2dec( substr( $value, 1, 2 )));
+	$greenScale-&gt;set( hex2dec( substr( $value, 3, 2 )));
+	$blueScale-&gt;set( hex2dec( substr( $value, 5, 2 )));
+
+
+	# Repaint the sample area.
+	$sample-&gt;configure( -background =&gt; $value );
+}
+
+#--------------------------------------------
+#	Turn a hex number into a decimal number
+#--------------------------------------------
+
+sub hex2dec
+{
+	my ( $hex ) = @_;
+	my ( $dec ) = 0;
+
+
+	while ( length($hex) )
+	{
+		my ( $digit ) = substr( $hex, 0, 1 );
+
+		$hex = substr( $hex, 1 );
+
+		if		( $digit eq 'a' )	{ $digit = '10'; }
+		elsif	( $digit eq 'b' )	{ $digit = '11'; }
+		elsif	( $digit eq 'c' )	{ $digit = '12'; }
+		elsif	( $digit eq 'd' )	{ $digit = '13'; }
+		elsif	( $digit eq 'e' )	{ $digit = '14'; }
+		elsif	( $digit eq 'f' )	{ $digit = '15'; }
+
+		$dec = ( $dec * 16 ) + int($digit);
+	}
+
+	# Return the result.
+	$dec;
+}
+
+
+#--------------------------------------------
+#	makeList - Create a listbox and associated scrollbar.
+#--------------------------------------------
+
+sub makeList
+{
+	my ( $parent, $command, $side, @list ) = @_;
+	my ( $listbox, $scrollbar );
+
+
+	# Stick a scroll bar on the requested side.
+	$scrollbar = $parent-&gt;Scrollbar();
+	$scrollbar-&gt;pack( -side =&gt; $side, -fill =&gt; 'y' );
+
+
+	# Create a listbox and tie it to the scrollbar.
+	# (If the you move the listbox with button2, the scrollbar will also move.)
+	$listbox = $parent-&gt;Listbox( -setgrid =&gt; 'yes',
+								-yscrollcommand =&gt; [ 'set', $scrollbar ] );
+	$listbox-&gt;insert( 'end', @list );
+	$listbox-&gt;pack( -fill =&gt; 'both', -expand =&gt; 'yes' );
+
+
+	# Change the cursor when button2 is depressed to remind people that 
+	# they can move the listbox.  
+	$listbox-&gt;bind( '<ButtonPress-2>' => sub {
+								$listbox-&gt;configure( -cursor =&gt; 'spider' )}); 
+	$listbox-&gt;bind( '<ButtonRelease-2>' => sub { 
+								$listbox-&gt;configure( -cursor =&gt; 'left_ptr' )});
+
+
+
+	# Tie the scrollbar to the listbox
+	# (If you move the scrollbar, the listbox will also move.)
+	$scrollbar-&gt;configure( -command =&gt; [ 'yview', $listbox ] );
+
+
+	# If an element is selected with either the mouse or the keyboard,
+	# do what needs to be done.
+	$listbox-&gt;bind( '<Double-Button-1>' => sub {
+					 	my $selection = $listbox-&gt;get('active');
+						&$command( $selection );
+					} );
+
+	$listbox-&gt;bind( '<Return>' => sub {
+					 	my $selection = $listbox-&gt;get('active');
+						&$command( $selection );
+					} );
+
+
+
+	# Shift input focus to the listbox's components when the mouse touches them.
+	$listbox-&gt;bind( '<1>' => sub { $listbox->focus } );
+	$scrollbar-&gt;bind( '<1>' => sub { $scrollbar->focus } );
+
+
+	$listbox;
+}
+
+
+
+#--------------------------------------------
+#	Called when the Filter... button is pressed
+#--------------------------------------------
+
+sub makeFilterDialog
+{
+
+	my ( $frame, $button, $apply, $label );
+
+	$fButton = shift;
+	$filterP = shift;
+	my $command = shift;
+
+
+	# Disable the filter button while the filter dialog is up.
+	$fButton-&gt;configure( -state =&gt; 'disabled' );
+
+
+	# Find the right edge of the parent window.
+	$geom = getRightEdge( $fButton );
+
+
+	# Create the dialog box
+	$dialog = $fButton-&gt;Toplevel( -class =&gt; 'Filter' );
+	$dialog-&gt;geometry( $geom );
+	$dialog-&gt;wm( 'protocol', 'WM_DELETE_WINDOW', sub{ &destroyDialog; } );
+
+
+	# Put the filter text widget at the top.
+	$frame = $dialog-&gt;Frame();		$frame-&gt;pack( -fill =&gt; 'x');
+
+	$label = $frame-&gt;Label( -text =&gt; "Filter:", -relief =&gt; 'flat' );
+	$label-&gt;pack( -side =&gt; 'left' );
+
+	$filterText = $frame-&gt;Entry( -width =&gt; 10, -relief =&gt; 'sunken', -bd =&gt; 2 );
+	$filterText-&gt;insert( 'end', $$filterP );
+	$filterText-&gt;pack( -side =&gt; 'left', -fill =&gt; 'x', -expand =&gt; 'yes' );
+	$filterText-&gt;bind( '<Return>' => sub {	$apply->flash; 
+											$$filterP = $filterText-&gt;get; 
+											&$command } );
+	$filterText-&gt;focus;
+
+
+	# Put a case-sensitive check button under that.
+	$button = $dialog-&gt;Checkbutton( -text =&gt; "Case Sensitive",
+										-variable =&gt; \$caseSensitive );
+	$button-&gt;pack( -expand =&gt; 'yes', -pady =&gt; '1m' );
+
+
+	# Put some action buttons in the space at the bottom.
+	$frame = $dialog-&gt;Frame( -relief =&gt; 'groove', -bd =&gt; 5 );
+	$frame-&gt;pack( -side =&gt; 'left', -padx =&gt; '1m', -pady =&gt; '1m', -expand =&gt; 'yes' );
+	$apply = makeButton( $frame, \$applyButtonLabel, 
+					sub { $$filterP = $filterText-&gt;get; &$command } );
+
+
+	makeButton( $dialog, \$clearButtonLabel,
+					sub { $$filterP = ""; $filterText-&gt;delete( 0, 'end' );} );
+
+	makeButton( $dialog, \$dismissButtonLabel, destroyDialog );
+
+}
+
+
+#--------------------------------------------
+#	Destroy the dialog window and re-enable the filter button.
+#--------------------------------------------
+
+sub destroyDialog
+{
+	destroy $dialog; 
+	$fButton-&gt;configure( -state =&gt; 'normal' );
+}
+
+
+
+#--------------------------------------------
+#	Find the right edge of the parent window.
+#--------------------------------------------
+
+sub getRightEdge
+{
+	my ( $w ) = @_;
+	my $geom;
+
+	# Get the geometry of the eldest parent.
+	while ( $w )
+	{
+		$geom = $w-&gt;winfo( 'geometry' );
+		$w = $w-&gt;winfo( 'parent' );	
+	}
+
+	# Split it into its component parts.
+	my ( $xCoord, $yCoord, $xSize, $ySize  ) = parseGeometry( $geom );
+
+
+	# Add the x size and coordinate to get the right edge.
+	my $x = $xCoord + $xSize;
+
+
+	# Find the midpoint of that edge for the y coordinate.
+	my $y = $yCoord + int($ySize/2);
+
+
+	# Assemble x and y into a geometry statement (coordinates only, no size).
+	$geom = "+$x+$y";
+}
+
+
+sub parseGeometry
+{
+	my ( $geom ) = @_;
+	my ( $size, $xCoord, $yCoord, $xSize, $ySize );
+
+
+	# Split the geometry string into its component parts.
+	my ( $size, $xCoord, $yCoord ) = split '\+', $geom ;
+	my ( $xSize, $ySize ) = split 'x', $size;
+
+
+	# Return the components.
+	return ( $xCoord, $yCoord, $xSize, $ySize );
+}
+
+
+
+
+
+#--------------------------------------------
+#	Make a button
+#--------------------------------------------
+
+sub makeButton
+{
+	my ( $parent, $text, $command ) = @_;
+	my ( $button );
+
+	$button = $parent-&gt;Button( -textvariable =&gt; $text, -command =&gt; sub { &$command } );
+	$button-&gt;bind( '<Return>' => sub { &$command } );
+	$button-&gt;pack( -side =&gt; 'left', -padx =&gt; '1m', -pady =&gt; '1m', -expand =&gt; 'yes'  );
+
+	$button;
+}
+
+
+==============================================================================
+==============================  showcursors ==================================
+==============================================================================
+
+#!/usr/local/bin/perl -w
+
+#--------------------------------------------
+#	showcursors	- show standard X cursors
+#--------------------------------------------
+
+@helpText = (
+"",
+"This Perl/Tk script displays a matrix of frames",
+"one for each of the valid X cursors (those defined in X11/cursorfont.h).",
+"Move the mouse cursor into a frame to show its cursor.",
+""
+			 );
+
+
+#--------------------------------------------
+#	Included Library Modules
+#--------------------------------------------
+use Tk;
+
+
+#--------------------------------------------
+#	Global data
+#--------------------------------------------
+
+$messageText = "Place the cursor in any of the boxes below.";
+
+#	This list was extracted from X11/cursorfont.h
+@cursors = ( 
+	'arrow',
+	'draft_large',
+	'draft_small',
+	'top_left_arrow',
+	'double_arrow',
+	'sb_down_arrow',
+	'sb_h_double_arrow',
+	'sb_left_arrow',
+	'sb_right_arrow',
+	'sb_up_arrow',
+	'sb_v_double_arrow',
+	'based_arrow_down',
+	'based_arrow_up',
+	'left_ptr',
+	'center_ptr',
+	'right_ptr',
+	'leftbutton',
+	'middlebutton',
+	'rightbutton',
+
+	'top_left_corner',
+	'top_right_corner',
+	'bottom_left_corner',
+	'bottom_right_corner',
+	'ul_angle',
+	'ur_angle',
+	'll_angle',
+	'lr_angle',
+	'top_side',
+	'bottom_side',
+	'left_side',
+	'right_side',
+	'top_tee',
+	'bottom_tee',
+	'left_tee',
+	'right_tee',
+	'hand1',
+	'hand2',
+	'xterm',
+
+	'dot',
+	'circle',
+	'cross',
+	'crosshair',
+	'plus',
+	'tcross',
+	'cross_reverse',
+	'diamond_cross',
+	'iron_cross',
+	'fleur',
+	'box_spiral',
+	'dotbox',
+	'draped_box',
+	'icon',
+	'rtl_logo',
+	'sizing',
+	'target',
+	'exchange',
+	'question_arrow',
+
+	'boat',
+	'bogosity',
+	'clock',
+	'coffee_mug',
+	'gobbler',
+	'gumby',
+	'heart',
+	'man',
+	'mouse',
+	'pencil',
+	'pirate',
+	'sailboat',
+	'shuttle',
+	'spider',
+	'spraycan',
+	'star',
+	'trek',
+	'umbrella',
+	'watch'
+ );
+
+$numColumns = 4;
+$numRows	= scalar( @cursors ) / $numColumns;
+$column		= 0;
+$row		= 0;
+
+#--------------------------------------------
+#	Main
+#--------------------------------------------
+
+# If any arguments were given, assume that they're asking for help.
+if ($ARGV[0]) {
+	foreach $line (@helpText) {
+		print "$line\n";
+	}
+}
+
+
+# Initialize Tk
+$top = MainWindow-&gt;new();
+
+
+# Stick an explanatory message at the top.
+$message = $top-&gt;Label( -text =&gt; $messageText, -relief =&gt; "raised", -bd =&gt; 2 );
+$message-&gt;pack( -fill =&gt; 'x' );
+
+
+# Create a separate frame for each column.
+for ( $i=0; $i&lt;$numColumns; $i++ )
+{
+	$frame[$i] = $top-&gt;Frame();
+	$frame[$i]-&gt;pack( -side =&gt; 'left', -fill =&gt; 'y' );
+}
+
+
+# Create a frame for each cursor.
+foreach $cursor ( @cursors )
+{
+	$style = $frame[$column]-&gt;Frame( -relief =&gt; 'ridge', -bd =&gt; 2, 
+										-cursor =&gt; $cursor );
+	$style-&gt;pack( -side =&gt; 'top', -fill =&gt; 'x' );
+
+	$label = $style-&gt;Label( -text =&gt; $cursor );
+	$label-&gt;pack();
+
+	$row++;
+	if	( $row &gt;= $numRows )	{ $column++; $row=0; }
+}
+
+
+
+# Fall into the event loop.
+MainLoop();
+
+
+==============================================================================
+==============================  showfonts  ===================================
+==============================================================================
+
+#!/usr/local/bin/perl -w
+
+#--------------------------------------------
+#	showfonts	- show X fonts
+#--------------------------------------------
+
+@helpText = (
+"",
+"This Perl/Tk script permits you to look at X fonts.",
+"You can select fonts out of the listbox.",
+"",
+"Of the buttons at the bottom of the window:",
+"   Show/Hide Extended      - toggles between 7-bit and 8-bit characters",
+"   Show Full Names/Aliases - toggles between full font names and aliases",
+"   Filter  - brings up a filter dialog for the font names",
+""
+			 );
+
+#--------------------------------------------
+#	Included Library Modules
+#--------------------------------------------
+use Tk;
+
+
+#--------------------------------------------
+#	Global data
+#--------------------------------------------
+
+$messageText = "Double-click on a font to look at it.";
+$fullFontText = "-foundry-family-weight-slant-width--pixels-points-hres-vres-spacing-average-set";
+@normalText	=
+(
+	"\040\041\042\043\044\045\046\047\050\051\052\053\054\055\056\057" .
+	"\060\061\062\063\064\065\066\067\070\071\072\073\074\075\076\077",
+	"\100\101\102\103\104\105\106\107\110\111\112\113\114\115\116\117" .
+	"\120\121\122\123\124\125\126\127\130\131\132\133\134\135\136\137",
+	"\140\141\142\143\144\145\146\147\150\151\152\153\154\155\156\157" .
+	"\160\161\162\163\164\165\166\167\170\171\172\173\174\175\176",
+);
+@extendedText =
+(
+	"\200\201\202\203\204\205\206\207\210\211\212\213\214\215\216\217" .
+	"\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237",
+	"\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257" .
+	"\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277",
+	"\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317" .
+	"\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337",
+	"\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357" .
+	"\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377",
+); 
+@sampleText	= ( @normalText );
+
+$extended = 0;	$extendedButtonText = "Show Extended";
+
+$fullNames = 0;	$fullNameButtonText = "Show Full Names";
+@wildCards = ( '*', '*', '*', '*', '*', '', '*', '*', '*', '*', '*', '*', '*' );
+@fontElement = @wildCards;
+
+
+$filterButtonLabel = "Filter...";
+$filter = "";
+
+$applyButtonLabel = 'Apply';
+$clearButtonLabel = 'Clear';
+$dismissButtonLabel = 'Dismiss';
+
+
+#--------------------------------------------
+#	Main
+#--------------------------------------------
+
+
+# If any arguments were given, assume that they're asking for help.
+if ($ARGV[0]) {
+	foreach $line (@helpText) {
+		print "$line\n";
+	}
+}
+
+
+# Get the entire list of fonts, removing the carriage return from each name.
+open FONTS, "xlsfonts|"	|| die "Couldn't read fonts\n";
+@totalFonts = grep( chop, <FONTS> );
+close FONTS;
+
+
+# Start with the subset of aliased fonts (those without an initial '-').
+@allFonts = grep( !/^\-/, @totalFonts );
+@fonts = @allFonts;
+
+
+# Pick the first font to start with.
+$currentFont = $fonts[0];
+
+
+
+# Initialize Tk
+$top = MainWindow-&gt;new();
+
+
+# Stick a message at the top.
+$message = $top-&gt;Label( -text =&gt; $messageText, -relief =&gt; "raised", -bd =&gt; 2 );
+$message-&gt;pack( -fill =&gt; 'x' );
+
+
+# Place the list of fonts next.
+$listFrame = $top-&gt;Frame( -relief =&gt; "flat" );
+$listFrame-&gt;pack( -fill =&gt; 'both', -expand =&gt; 'yes' );
+$fontListbox = &makeList( $listFrame, fontSelected, 'left', @fonts );
+
+
+
+# Put some sample text at the bottom.
+$sampleFrame = $top-&gt;Frame( -relief =&gt; "ridge", -bd =&gt; 2 );
+$sampleFrame-&gt;pack( -side =&gt; 'bottom', -fill =&gt; 'x' );
+&displayText( 0, scalar(@sampleText) );
+
+
+# Put some option buttons above it
+$optionFrame = $top-&gt;Frame;
+$optionFrame-&gt;pack( -side =&gt; 'bottom', -fill =&gt; 'x' );
+&makeButton( $optionFrame, \$extendedButtonText, toggleExtended );
+&makeButton( $optionFrame, \$fullNameButtonText, toggleFullNames );
+$filterButton = makeButton( $optionFrame, \$filterButtonLabel, filterDialog );
+
+
+# Placing the above stuff in this order means that the optional explanation
+# for the full names will appear between the listbox and the option buttons.
+
+
+# Fall into the event loop.
+MainLoop();
+
+
+#--------------------------------------------
+#	Functions
+#--------------------------------------------
+
+
+sub fontSelected
+{ 
+	$currentFont = $_[0];
+
+	&working;
+
+	for ( $i=0; $i&lt;scalar(@sampleText); $i++ )
+	{
+		$sample[$i]-&gt;configure( -font =&gt; $currentFont );
+	}
+
+	&doneWorking;
+}
+
+
+sub	toggleExtended
+{
+
+	if	( $extended )
+	{
+		&destroyText( scalar(@normalText), scalar(@sampleText) );
+
+		@sampleText	= ( @normalText );
+		$extendedButtonText = "Show Extended";
+		$extended = 0;
+	}
+	else
+	{
+		@sampleText	= ( @normalText, @extendedText );
+		$extendedButtonText = "Hide Extended";
+		$extended = 1;
+
+		&displayText( scalar(@normalText), scalar(@sampleText) );
+	}
+}
+
+sub	toggleFullNames
+{
+
+	if	( $fullNames )
+	{
+		$fullText-&gt;destroy;
+		@allFonts = grep( !/^\-/, @totalFonts );
+		$fullNameButtonText = "Show Full Names";
+		$fullNames = 0;
+	}
+	else
+	{
+		$fullText = $top-&gt;Label( -text =&gt; $fullFontText, -relief =&gt; "ridge", -bd =&gt; 2 );
+		$fullText-&gt;pack( -fill =&gt; 'x' );
+
+		@allFonts = grep( /^\-/, @totalFonts );
+		$fullNameButtonText = "Show Aliases";
+		$fullNames = 1;
+	}
+
+	$filter = "";
+	&filterFonts;
+}
+
+sub destroyText
+{
+	my ( $start, $end ) = @_;
+
+	for $i ( $start .. $end )
+	{
+		$sample[$i]-&gt;destroy if	( $sample[$i] );
+	}
+}
+
+sub displayText
+{
+	my ( $start, $end ) = @_;
+
+	for $i ( $start .. $end )
+	{
+		$sample[$i] = $sampleFrame-&gt;Label( -text =&gt; $sampleText[$i],
+											-font =&gt; $currentFont );
+		$sample[$i]-&gt;pack( -anchor =&gt; 'w' );
+	}
+}
+
+
+
+#--------------------------------------------
+#	Called when the Filter... button is pressed
+#--------------------------------------------
+
+sub filterDialog
+{
+
+	if	( $fullNames )	{ &makeFullFilterDialog(); }
+	else				{ &makeFilterDialog( $filterButton, \$filter, 
+												filterFonts ); }
+}
+
+
+
+
+sub filterFonts
+{
+
+	# If a search pattern was given, use it to narrow down the list of fonts.
+	if ( $filter )	{ @fonts = grep( /$filter/, @allFonts ); }
+	else			{ @fonts = @allFonts; }
+
+
+	# Pick the first font to start with.
+	$currentFont = $fonts[0];
+
+
+	# Delete the current contents of the listbox and replace it with the new list.
+	if	( $fontListbox )
+	{
+		$fontListbox-&gt;delete( 0, 'end' );
+		$fontListbox-&gt;insert( 'end', @fonts );
+	}
+
+}
+
+sub makeFullFilterDialog
+{
+	my ( $frame, $message );
+	my $clearButtonLabel = 'Clear';
+	my $dismissButtonLabel = 'Dismiss';
+
+
+	# Disable the filter button while the filter dialog is up.
+	$filterButton-&gt;configure( -state =&gt; 'disabled' );
+
+
+	# Create the dialog box
+	$filterDialog = $filterButton-&gt;Toplevel( -class =&gt; 'Full Name Filter' );
+	$filterDialog-&gt;geometry( &getBottomEdge( $filterButton, 1 ) );
+
+
+	# Put the current filter at the top.
+	$frame = $filterDialog-&gt;Frame( -relief =&gt; 'sunken', -bd =&gt; 3 );
+	$frame-&gt;pack( -fill =&gt; 'x' );
+
+
+	for $i ( 0 .. 12 )
+	{
+		$frame-&gt;Label( -text =&gt; '-' )-&gt;pack( -side =&gt; 'left', -anchor =&gt; 'n' );
+
+		&addButton( $frame, $i )		if	( $wildCards[$i] );
+	}
+
+
+	# Put some action buttons in the space at the bottom.
+	$frame = $filterDialog-&gt;Frame( -relief =&gt; 'groove', -bd =&gt; 5 );
+	makeButton( $filterDialog, \$clearButtonLabel, clearFonts );
+
+	makeButton( $filterDialog, \$dismissButtonLabel, sub { 
+			destroy $filterDialog; $filterButton-&gt;configure( -state =&gt; 'normal' ); });
+
+	$filterDialog-&gt;wm( 'protocol', 'WM_DELETE_WINDOW', sub { 
+			destroy $filterDialog; $filterButton-&gt;configure( -state =&gt; 'normal' ); });
+}
+
+
+
+sub addButton
+{
+	my ( $parent, $index ) = @_;
+	my ( $button, $frame, $label );
+	my @labels = split( '-', $fullFontText );
+
+
+	$frame = $parent-&gt;Frame;	$frame-&gt;pack( -side =&gt; 'left' );
+
+	$label = $frame-&gt;Label( -text =&gt; $labels[$index+1] );	$label-&gt;pack;
+
+
+	$button = $frame-&gt;Button( -textvariable =&gt; \$fontElement[$index], 
+								-command =&gt; sub { selectFontElement($index) } );
+	$button-&gt;bind( '<Return>' => sub { selectFontElement($index) } );
+	$button-&gt;pack;
+
+	$button;
+}
+
+sub selectFontElement
+{
+	$elementIndex = $_[0];
+	my ( @selections ) = ( '*' );
+	my ( $font );
+
+
+	$fontElement[$elementIndex] = '*';
+	&adjustFonts;
+
+
+	# Find each unique element in the current font list.
+	foreach $font ( @fonts )
+	{
+		my @elements = split( '-', $font );
+		my $element = $elements[$elementIndex+1];
+
+		if	( $elementIndex == 12  &&  $elements[$elementIndex+2] ) {
+			$element .= '-' . $elements[$elementIndex+2];
+		}
+
+		push( @selections, $element ) if ( !grep( /^$element$/, @selections ));
+	}
+	@selections = sort( @selections );
+
+
+	# Create the dialog box
+	my @elements = split( '-', $fullFontText );
+	my $element = $elements[$elementIndex+1];
+	$selectDialog = $top-&gt;Toplevel( -class =&gt; $element );
+	$selectDialog-&gt;geometry( &getBottomEdge( $filterDialog ) );
+	my $frame = $selectDialog-&gt;Frame;
+	$frame-&gt;pack( -fill =&gt; 'both', -expand =&gt; 'yes' );
+ 	$frame-&gt;grab;
+	&makeList( $frame, elementSelected, 'right', @selections );
+}
+
+
+sub elementSelected
+{
+
+	$fontElement[$elementIndex] = $_[0];
+	$selectDialog-&gt;destroy;
+	&adjustFonts;
+
+}
+
+sub clearFonts
+{
+	my ( $i );
+
+	for $i ( 0 .. 12 ) { 
+		$fontElement[$i] = $wildCards[$i]; 
+	}
+
+	&adjustFonts 
+}
+
+sub adjustFonts
+{
+
+	&working;
+
+	$filter = "";
+
+	for $element ( @fontElement )
+	{
+		$filter .= '\-';
+		if	( $element eq '*' )	{ $filter .= '.*'; }
+		else					{ $filter .= $element; }
+	}
+
+	&filterFonts;
+
+	&doneWorking;
+}
+
+
+sub getBottomEdge
+{
+	my ( $w, $goUp ) = @_;
+	my $geom;
+
+	while ( $goUp  &&  $w-&gt;winfo( 'parent' ) )	{
+		$w = $w-&gt;winfo( 'parent' );	
+	}
+	$geom = $w-&gt;winfo( 'geometry' );
+
+
+	# Split it into its component parts.
+	my ( $xCoord, $yCoord, $xSize, $ySize  ) = parseGeometry( $geom );
+
+
+	my $x = $xCoord;
+	my $y = $yCoord + $ySize;
+
+
+	# Assemble x and y into a geometry statement (coordinates only, no size).
+	$geom = "+$x+$y";
+}
+
+
+sub working
+{
+	$top-&gt;configure( -cursor =&gt; 'watch' );
+	$top-&gt;update;
+
+	if	( $filterDialog )
+	{	
+		$filterDialog-&gt;configure( -cursor =&gt; 'watch' );
+		$filterDialog-&gt;update;
+	}
+}
+
+sub doneWorking
+{
+	$top-&gt;configure( -cursor =&gt; 'left_ptr' );
+
+	if	( $filterDialog )
+	{	
+		$filterDialog-&gt;configure( -cursor =&gt; 'left_ptr' );
+	}
+}
+
+
+#--------------------------------------------
+#	makeList - Create a listbox and associated scrollbar.
+#--------------------------------------------
+
+sub makeList
+{
+	my ( $parent, $command, $side, @list ) = @_;
+	my ( $listbox, $scrollbar );
+
+
+	# Stick a scroll bar on the requested side.
+	$scrollbar = $parent-&gt;Scrollbar();
+	$scrollbar-&gt;pack( -side =&gt; $side, -fill =&gt; 'y' );
+
+
+	# Create a listbox and tie it to the scrollbar.
+	# (If the you move the listbox with button2, the scrollbar will also move.)
+	$listbox = $parent-&gt;Listbox( -setgrid =&gt; 'yes',
+								-yscrollcommand =&gt; [ 'set', $scrollbar ] );
+	$listbox-&gt;insert( 'end', @list );
+	$listbox-&gt;pack( -fill =&gt; 'both', -expand =&gt; 'yes' );
+
+
+	# Change the cursor when button2 is depressed to remind people that 
+	# they can move the listbox.  
+	$listbox-&gt;bind( '<ButtonPress-2>' => sub {
+								$listbox-&gt;configure( -cursor =&gt; 'spider' )}); 
+	$listbox-&gt;bind( '<ButtonRelease-2>' => sub { 
+								$listbox-&gt;configure( -cursor =&gt; 'left_ptr' )});
+
+
+
+	# Tie the scrollbar to the listbox
+	# (If you move the scrollbar, the listbox will also move.)
+	$scrollbar-&gt;configure( -command =&gt; [ 'yview', $listbox ] );
+
+
+	# If an element is selected with either the mouse or the keyboard,
+	# do what needs to be done.
+	$listbox-&gt;bind( '<Double-Button-1>' => sub {
+					 	my $selection = $listbox-&gt;get('active');
+						&$command( $selection );
+					} );
+
+	$listbox-&gt;bind( '<Return>' => sub {
+					 	my $selection = $listbox-&gt;get('active');
+						&$command( $selection );
+					} );
+
+
+
+	# Shift input focus to the listbox's components when the mouse touches them.
+	$listbox-&gt;bind( '<1>' => sub { $listbox->focus } );
+	$scrollbar-&gt;bind( '<1>' => sub { $scrollbar->focus } );
+
+
+	$listbox;
+}
+
+
+
+
+#--------------------------------------------
+#	Called when the Filter... button is pressed
+#--------------------------------------------
+
+sub makeFilterDialog
+{
+
+	my ( $frame, $button, $apply, $label );
+
+	$fButton = shift;
+	$filterP = shift;
+	my $command = shift;
+
+
+	# Disable the filter button while the filter dialog is up.
+	$fButton-&gt;configure( -state =&gt; 'disabled' );
+
+
+	# Find the right edge of the parent window.
+	$geom = getRightEdge( $fButton );
+
+
+	# Create the dialog box
+	$dialog = $fButton-&gt;Toplevel( -class =&gt; 'Filter' );
+	$dialog-&gt;geometry( $geom );
+	$dialog-&gt;wm( 'protocol', 'WM_DELETE_WINDOW', sub{ &destroyDialog; } );
+
+
+	# Put the filter text widget at the top.
+	$frame = $dialog-&gt;Frame();		$frame-&gt;pack( -fill =&gt; 'x');
+
+	$label = $frame-&gt;Label( -text =&gt; "Filter:", -relief =&gt; 'flat' );
+	$label-&gt;pack( -side =&gt; 'left' );
+
+	$filterText = $frame-&gt;Entry( -width =&gt; 10, -relief =&gt; 'sunken', -bd =&gt; 2 );
+	$filterText-&gt;insert( 'end', $$filterP );
+	$filterText-&gt;pack( -side =&gt; 'left', -fill =&gt; 'x', -expand =&gt; 'yes' );
+	$filterText-&gt;bind( '<Return>' => sub {	$apply->flash; 
+											$$filterP = $filterText-&gt;get;
+											&$command } );
+	$filterText-&gt;focus;
+
+
+	# Put some action buttons in the space at the bottom.
+	$frame = $dialog-&gt;Frame( -relief =&gt; 'groove', -bd =&gt; 5 );
+	$frame-&gt;pack( -side =&gt; 'left', -padx =&gt; '1m', -pady =&gt; '1m', -expand =&gt; 'yes' );
+	$apply = makeButton( $frame, \$applyButtonLabel, 
+					sub { $$filterP = $filterText-&gt;get; &$command } );
+
+
+	makeButton( $dialog, \$clearButtonLabel,
+					sub { $$filterP = ""; $filterText-&gt;delete( 0, 'end' );} );
+
+	makeButton( $dialog, \$dismissButtonLabel, destroyDialog );
+
+}
+
+
+#--------------------------------------------
+#	Destroy the dialog window and re-enable the filter button.
+#--------------------------------------------
+
+sub destroyDialog
+{
+	destroy $dialog; 
+	$fButton-&gt;configure( -state =&gt; 'normal' );
+}
+
+
+
+sub getRightEdge
+{
+	my ( $w ) = @_;
+	my $geom;
+
+	# Get the geometry of the eldest parent.
+	while ( $w )
+	{
+		$geom = $w-&gt;winfo( 'geometry' );
+		$w = $w-&gt;winfo( 'parent' );	
+	}
+
+	# Split it into its component parts.
+	my ( $xCoord, $yCoord, $xSize, $ySize  ) = parseGeometry( $geom );
+
+
+	# Add the x size and coordinate to get the right edge.
+	my $x = $xCoord + $xSize;
+
+
+	# Find the midpoint of that edge for the y coordinate.
+	my $y = $yCoord + int($ySize/2);
+
+
+	# Assemble x and y into a geometry statement (coordinates only, no size).
+	$geom = "+$x+$y";
+}
+
+
+sub parseGeometry
+{
+	my ( $geom ) = @_;
+	my ( $size, $xCoord, $yCoord, $xSize, $ySize );
+
+
+	# Split the geometry string into its component parts.
+	my ( $size, $xCoord, $yCoord ) = split '\+', $geom ;
+	my ( $xSize, $ySize ) = split 'x', $size;
+
+
+	# Return the components.
+	return ( $xCoord, $yCoord, $xSize, $ySize );
+}
+
+
+
+sub makeButton
+{
+	my ( $parent, $text, $command ) = @_;
+	my ( $button );
+
+	$button = $parent-&gt;Button( -textvariable =&gt; $text, -command =&gt; sub { &$command } );
+	$button-&gt;bind( '<Return>' => sub { &$command } );
+	$button-&gt;pack( -side =&gt; 'left', -padx =&gt; '1m', -pady =&gt; '1m', -expand =&gt; 'yes'  );
+
+	$button;
+}
+------- end of forwarded message -------
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+</PRE>
+<HR><H2>[PREV]  [NEXT]  <A HREF="199603262147.PAA21818@jordy.asic.sc.ti.com">[PREV Thread]</A>  <A HREF="01I2SVXVF3G88X3B3F@LNS62.LNS.CORNELL.EDU">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

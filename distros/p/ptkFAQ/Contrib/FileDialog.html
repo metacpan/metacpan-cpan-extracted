@@ -1,0 +1,428 @@
+	    <!-- \$RCSfile\$\$Revision\$\$Date\$ -->
+	    <!-- \$Log\$ -->
+	    <HTML>
+	    <TITLE>FILEDIALOG.PM</TITLE>
+<p><hr>
+
+<H1> </H1>
+
+Tk::FileDialog - A highly configurable File Dialog widget for Perl/Tk.  
+<p><p><hr>
+
+<H1> </H1>
+
+The widget is composed of a number
+of sub-widgets, namely, a listbox for files and (optionally) directories, an entry
+for filename, an (optional) entry for pathname, an entry for a filter pattern, a 'ShowAll'
+checkbox (for enabling display of .* files and directories), and three buttons, namely
+OK, Rescan, and Cancel.  Note that the labels for all subwidgets (including the text
+for the buttons and Checkbox) are configurable for foreign language support.
+<p><p><hr>
+
+<H1> </H1>
+<p>
+<H2> </H2>
+
+To use FileDialog, simply create your FileDialog objects during initialization (or at
+least before a Show).  When you wish to display the FileDialog, invoke the 'Show' method
+on the FileDialog object;  The method will return either a file name, a path name, or
+undef.  undef is returned only if the user pressed the Cancel button.
+<p>
+<H2> </H2>
+
+The following code creates a FileDialog and calls it.  Note that perl5.002gamma is
+required.
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_usr_local_bin_perl_0">
+#!/usr/local/bin/perl -w</A>
+
+</STRONG></DT>
+<DD>
+
+ use Tk;
+ use Tk::FileDialog;
+ use strict;
+<p>
+<XMP>
+ my($main) = MainWindow->new;
+ my($Horiz) = 1;
+ my($fname);
+ my($LoadDialog) = $main->FileDialog(-Title =>'This is my title',
+                                    -Create => 0);
+ $LoadDialog->configure(-FPat => '*pl',
+                       -ShowAll => 'NO');
+ $main->Entry(-textvariable => \$fname)
+        ->pack(-expand => 1,
+               -fill => 'x');
+ $main->Button(-text => 'Kick me!',
+              -command => sub {
+                  $fname = $LoadDialog->Show(-Horiz => $Horiz);
+                  if (!defined($fname)) {
+                      $fname = "Fine,Cancel, but no Chdir anymore!!!";
+                      $LoadDialog->configure(-Chdir =>'NO');
+                  }
+              })
+        ->pack(-expand => 1,
+               -fill => 'x');
+ $main->Checkbutton(-text => 'Horizontal',
+                   -variable => \$Horiz)
+        ->pack(-expand => 1,
+               -fill => 'x');
+ $main->Button(-text => 'Exit',
+              -command => sub {
+                  $main->destroy;
+              })
+        ->pack(-expand => 1,
+               -fill => 'x');
+ MainLoop;
+ print "Exit Stage right!\n";
+ exit;
+
+</XMP>
+<p></DD>
+</DL>
+.
+<p><p><hr>
+
+<H1> </H1>
+<p>
+<DL>
+<DT><STRONG>
+
+</STRONG></DT>
+<DD>
+<p></DD>
+<DT><STRONG>
+<EM></EM>
+</STRONG></DT>
+<DD>
+</DD>
+<H2> </H2>
+<p>
+<DL>
+</DL>
+.
+<p>
+</DL>
+.
+<p><p><hr>
+
+<H1> </H1>
+
+Any of the following configuration items may be set via the configure (or Show) method,
+or retrieved via the cget method.
+<p>
+<H2> 
+<A NAME="FileDialog.pm_flags_0">
+Flags</A>
+</H2>
+
+Flags may be configured with either 1,'true', or 'yes' for 1, or 0, 'false', or 'no'
+for 0. Any portion of 'true', 'yes', 'false', or 'no' may be used, and case does not
+matter.
+<p>
+<DL>
+<DT><STRONG>
+<EM></EM>
+</STRONG></DT>
+<DD>
+</DD>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_enable_0">
+Enable the user to change directories. The default is 1. If disabled, the directory</A>
+
+</STRONG></DT>
+<DD>
+list box will not be shown.
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_enable_1">
+Enable the user to specify a file that does not exist. If not enabled, and the user</A>
+
+</STRONG></DT>
+<DD>
+specifies a non-existent file, a dialog box will be shown informing the user of the
+error (This Dialog Box is configurable via the EDlg* switches, below).
+<p>default: 1
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_determines_0">
+Determines whether hidden files (.*) are displayed in the File and Directory Listboxes.</A>
+
+</STRONG></DT>
+<DD>
+The default is 0. The Show All Checkbox reflects the setting of this switch.
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_disables_0">
+Disables the ability of the user to change the status of the ShowAll flag. The default</A>
+
+</STRONG></DT>
+<DD>
+is 0 (the user is by default allowed to change the status).
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_enables_0">
+Enables the File Dialog to do an application Grab when displayed. The default is 1.</A>
+
+</STRONG></DT>
+<DD>
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_true_0">
+True sets the File List box to be to the right of the Directory List Box. If 0, the</A>
+
+</STRONG></DT>
+<DD>
+File List box will be below the Directory List box. The default is 1.
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_if_0">
+If True, enables selection of a directory rather than a file, and disables the</A>
+
+</STRONG></DT>
+<DD>
+actions of the File List Box. The default is 0.
+<p></DD>
+</DL>
+.
+<p>
+</DL>
+.
+<p>
+<H2> 
+<A NAME="FileDialog.pm_special_0">
+Special</A>
+</H2>
+<p>
+<DL>
+<DT><STRONG>
+<EM></EM>
+</STRONG></DT>
+<DD>
+</DD>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_sets_0">
+Sets the default file selection pattern. The default is '*'. Only files matching</A>
+
+</STRONG></DT>
+<DD>
+this pattern will be displayed in the File List Box.
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_sets_1">
+Sets the geometry of the File Dialog. Setting the size is a dangerous thing to do.</A>
+
+</STRONG></DT>
+<DD>
+If not configured, or set to '', the File Dialog will be centered.
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_selhook_1">
+SelHook is configured with a reference to a routine that will be called when a file</A>
+
+</STRONG></DT>
+<DD>
+is chosen. The file is called with a sole parameter of the full path and file name
+of the file chosen. If the Create flag is disabled (and the user is not allowed
+to specify new files), the file will be known to exist at the time that SelHook is
+called. Note that SelHook will also be called with directories if the SelDir Flag
+is enabled, and that the FileDialog box will still be displayed. The FileDialog box
+should <STRONG>not</STRONG> be destroyed from within the SelHook routine, although it may generally
+be configured.
+<p>SelHook routines return 0 to reject the selection and allow the user to reselect, and
+any other value to accept the selection. If a SelHook routine returns non-zero, the
+FileDialog will immediately be withdrawn, and the file will be returned to the caller.
+<p>There may be only one SelHook routine active at any time. Configuring the SelHook
+routine replaces any existing SelHook routine. Configuring the SelHook routine with
+0 removes the SelHook routine. The default SelHook routine is undef.
+<p></DD>
+</DL>
+.
+<p>
+</DL>
+.
+<p>
+<H2> 
+<A NAME="FileDialog.pm_strings_0">
+Strings</A>
+</H2>
+
+The following two switches may be used to set default variables, and to get final
+values after the Show method has returned (but has not been explicitly destroyed
+by the caller)
+<p>
+<DL>
+<DT><STRONG>
+<STRONG>-File</STRONG>  The file selected, or the default file. The default is ''.
+</STRONG></DT>
+<DD>
+
+<STRONG>-Path</STRONG>  The path of the selected file, or the initial path. The default is <STRONG>$ENV</STRONG>{'HOME'}.
+<p></DD>
+</DL>
+.
+<p>
+<H2> 
+<A NAME="FileDialog.pm_labels_0">
+Labels and Captions</A>
+</H2>
+
+For support of internationalization, the text on any of the subwidgets may be
+changed.
+<p>
+<DL>
+<DT><STRONG>
+<STRONG>-Title</STRONG>  The Title of the dialog box. The default is 'Select File:'.
+</STRONG></DT>
+<DD>
+
+<STRONG>-DirLBCaption</STRONG>  The Caption above the Directory List Box. The default is 'Directories'.
+<p><STRONG>-FileLBCaption</STRONG>  The Caption above the File List Box. The default is 'Files'.
+<p><STRONG>-FileEntryLabel</STRONG>  The label to the left of the File Entry. The Default is 'Filename:'.
+<p><STRONG>-PathEntryLabel</STRONG>  The label to the left of the Path Entry. The default is 'Pathname:'.
+<p><STRONG>-FltEntryLabel</STRONG>  The label to the left of the Filter entry. The default is 'Filter:'.
+<p><STRONG>-ShowAllLabel</STRONG>  The text of the Show All Checkbutton. The default is 'Show All'.
+<p></DD>
+</DL>
+.
+<p>
+<H2> 
+<A NAME="FileDialog.pm_button_0">
+Button Text</A>
+</H2>
+
+For support of internationalization, the text on the three buttons may be changed.
+<p>
+<DL>
+<DT><STRONG>
+<STRONG>-OKButtonLabel</STRONG>  The text for the OK button. The default is 'OK'.
+</STRONG></DT>
+<DD>
+
+<STRONG>-RescanButtonLabel</STRONG>  The text for the Rescan button. The default is 'Rescan'.
+<p><STRONG>-CancelButtonLabel</STRONG>  The text for the Cancel button. The default is 'Cancel'.
+<p></DD>
+</DL>
+.
+<p>
+<H2> 
+<A NAME="FileDialog.pm_error_0">
+Error Dialog Switches</A>
+</H2>
+
+If the Create switch is set to 0, and the user specifies a file that does not exist,
+a dialog box will be displayed informing the user of the error. These switches allow
+some configuration of that dialog box.
+<p>
+<DL>
+<DT><STRONG>
+<EM></EM>
+</STRONG></DT>
+<DD>
+</DD>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+
+<A NAME="FileDialog.pm_the_1">
+The title of the Error Dialog Box. The default is 'File does not exist!'.</A>
+
+</STRONG></DT>
+<DD>
+<p></DD>
+</DL>
+.
+<p>
+<H2> </H2>
+<p>
+<DL>
+<DT><STRONG>
+The message of the Error Dialog Box. The variables <STRONG>$path</STRONG>, <STRONG>$file</STRONG>, and <STRONG>$filename</STRONG>
+</STRONG></DT>
+<DD>
+(the full path and filename of the selected file) are available. The default
+is 
+<p></DD>
+</DL>
+.
+<p>
+</DL>
+.
+<p><p><hr>
+
+<H1> </H1>
+
+<STRONG>Brent B. Powers, Merrill Lynch (B2Pi)</STRONG>
+<p>powers<STRONG>@ml</STRONG>.com
+<p>This code may be distributed under the same conditions as Perl itself.
+<p>
+</HTML>

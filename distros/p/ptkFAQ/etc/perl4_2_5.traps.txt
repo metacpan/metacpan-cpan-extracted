@@ -1,0 +1,213 @@
+From lns62::pvhp Mon Mar 18 14:09:03 1996
+Received: from cesr20.lns.cornell.edu (cesr20.lns.cornell.edu [128.84.170.20]) by lns598.lns.cornell.edu (8.6.11/8.6.11)
+	with ESMTP id OAA21311 for <pvhp>; Mon, 18 Mar 1996 14:09:00 -0500
+From: lns62::pvhp
+Received: from LNS62.DECnet MAIL11D_V3 (daemon@localhost) by cesr20.lns.cornell.edu (8.6.11/8.6.11) with SMTP id OAA13415 for <pvhp>; Mon, 18 Mar 1996 14:08:50 -0500
+Date: Mon, 18 Mar 1996 14:08:50 -0500
+Message-Id: <199603181908.OAA13415@cesr20.lns.cornell.edu>
+X-Authentication-Warning: cesr20.lns.cornell.edu: daemon owned process doing -bs
+To: cesr20::pvhp
+Subject: perl4 vs 5 gems
+Status: R
+
+From:	IN%"wjm@best.com"  "William J. Middleton" 18-MAR-1996 02:20:48.07
+To:	IN%"perl5-porters@africa.nicoh.com"
+CC:	IN%"lriener@adobe.com", IN%"jvromans@squirrel.nl", IN%"sgbeal@bangate.compaq.com"
+Subj:	New perl traps examples
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I2GUHFYVOG8X2G0J@LNS62.LNS.CORNELL.EDU>; Mon,
+ 18 Mar 1996 02:20:41 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA197573608; Mon, 18 Mar 1996 02:20:08 -0500
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA196983592; Mon,
+ 18 Mar 1996 02:19:52 -0500
+Received: from mail1.best.com by africa.nicoh.com with ESMTP (1.37.109.15/16.2)
+ id AA196943586; Mon, 18 Mar 1996 00:19:46 -0700
+Received: from shellx.best.com (shellx.best.com [206.86.0.11])
+ by mail1.best.com (8.6.12/8.6.5) with ESMTP id XAA11160; Sun,
+ 17 Mar 1996 23:19:12 -0800
+Received: (wjm@localhost) by shellx.best.com (8.6.12/8.6.5) id XAA20987; Sun,
+ 17 Mar 1996 23:18:38 -0800
+Date: Sun, 17 Mar 1996 23:18:37 -0800 (PST)
+From: "William J. Middleton" <wjm@best.com>
+Subject: New perl traps examples
+Sender: owner-perl5-porters@nicoh.com
+To: perl5-porters@africa.nicoh.com
+Cc: lriener@adobe.com, jvromans@squirrel.nl, sgbeal@bangate.compaq.com
+Message-id: <199603180718.XAA20987@shellx.best.com>
+MIME-version: 1.0
+X-Mailer: ELM [version 2.4 PL24]
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7bit
+Content-length: 14346
+List-Name: perl5-porters
+Precedence: bulk
+
+
+
+  Some of you may recall my asking for examples of perl4 -> perl5 differences.
+I got just a few of them, mostly 'coz merlyn wouldnt post my request.  (Boo!)
+Here's the summary of what I got, along with examples for each of the
+things I could figure out from perltrap.
+
+  I spent most of the day working on these, and although I've left a few
+out due to OS dependencies, most of the ones I did get are there.  Several
+have been submitted today as formal bugs.  I'll work the perltrap examples
+into a perltrap patch soon. Also, the undocumented ones (21-25) as I know, 
+in each case, whether they're bugs, or truly undocumented traps.
+
+  Comments, as before, are welcome.  Additional examples, where it says:
+
+# example needed
+
+  especially welcome.  I'll be posting this again soon.
+
+
+Bill
+
+
+#############################################################################
+# Example 1
+#############################################################################
+# @ now always interpolates an array in double-quotish strings.
+
+    print "To: someone@somewhere.com\n";
+
+# perl4 prints: To:someone@somewhere.com
+# perl5 errors : Literal @somewhere now requires backslash
+
+#############################################################################
+# Example 2
+#############################################################################
+# Barewords that used to look like strings to Perl will now look like subroutine
+# calls if a subroutine by that name is defined before the compiler sees them.
+# For example:
+
+       sub SeeYa { warn"Hasta la vista, baby!" }
+       $SIG{'TERM'} = SeeYa;
+       print "SIGTERM is now $SIG{'TERM'}\n";
+
+# perl4 prints: SIGTERM is main'SeeYa
+# perl5 prints: SIGTERM is now main::1
+# Use -w to catch this one
+
+#############################################################################
+# Example 3
+#############################################################################
+# Symbols starting with "_" are no longer forced into package C<main>, except
+# for $_ itself (and @_, etc.).
+
+	package test;
+	$_legacy = 1;
+
+	package main;
+	print "\$_legacy is ",$_legacy,"\n";
+
+# perl4 prints: $_legacy is 1
+# perl5 prints: $_legacy is 
+
+#############################################################################
+# Example 4
+#############################################################################
+# Double-colon is now a valid package separator in an identifier.  Thus these
+# behave differently in perl4 vs. perl5, since the packages dont exist.
+
+    $a=1;$b=2;$c=3;$var=4;
+    print "$a::$b::$c ";
+    print "$var::abc::xyz\n";
+
+# perl4 prints: 1::2::3 4::abc::xyz
+# perl5 prints: 3
+
+#############################################################################
+# Example 5
+#############################################################################
+# s'$lhs'$rhs' now does no interpolation on either side.  It used to
+# interpolate $lhs but not $rhs.  (Still does not match a literal $ in string)
+
+    $a=1;$b=2;
+    $string = '1 2 $a $b';
+    $string =~ s'$a'$b';
+    print $string,"\n";
+
+# perl4 prints: $b 2 $a $b
+# perl5 prints: 1 2 $a $b
+
+#############################################################################
+# Example 6
+#############################################################################
+# The second and third arguments of splice() are now evaluated in scalar
+# context (as the book says) rather than list context.
+
+    sub sub1{return(0,2) }          # return a 2-elem array
+    sub sub2{ return(1,2,3)}        # return a 3-elem array
+    @a1 = ("a","b","c","d","e");
+    @a2 = splice(@a1,&sub1,&sub2);  
+    print join(' ',@a2),"\n";
+
+# perl4 prints: a b
+# perl5 prints: c d e  
+
+#############################################################################
+# Example 7
+#############################################################################
+# These are now semantic errors because of precedence:
+
+    @list = (1,2,3,4,5);
+    %map = ("a",1,"b",2,"c",3,"d",4);
+    $n = shift @list + 2;   # first item in list plus 2
+    print "n is $n, ";
+    $m = keys %map + 2;     # number of items in hash plus 2
+    print "m is $m\n";
+
+# perl4 prints: n is 3, m is 6
+# perl5 errors and fails to compile
+
+#############################################################################
+# Example 8
+#############################################################################
+# The precedence of assignment operators is now the same as the precedence
+# of assignment.  Perl 4 mistakenly gave them the precedence of the associated
+# operator.  So you now must parenthesize them in expressions like
+
+    /foo/ ? ($a += 2) : ($a -= 2);
+
+# Otherwise
+
+    /foo/ ? $a += 2 : $a -= 2;
+
+# would be erroneously parsed as
+
+    (/foo/ ? $a += 2 : $a) -= 2;
+
+# On the other hand,
+
+    $a += /foo/ ? 1 : 2;
+
+# now works as a C programmer would expect.
+
+
+#############################################################################
+# Example 9
+#############################################################################
+
+    open FOO || die;
+
+# is now incorrect.  You need parens around the filehandle.
+# While temporarily supported, using such a construct will 
+# generate a non-fatal (but non-suppressible) warning.
+
+    
+#############################################################################
+# Example 10
+#############################################################################
+# The elements of argument lists for formats are now evaluated in list
+# context.  This means you can interpolate list values now.
+
+@fmt = ("foo","bar","baz");
+format STDOUT=
+@<<<<< @||||| @>>>>> 
+@fmt;
+

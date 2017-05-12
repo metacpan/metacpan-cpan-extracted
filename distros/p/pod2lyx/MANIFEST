@@ -1,0 +1,11 @@
+CHANGES             -- Change history file
+TODO                -- List of things ToDo.
+MANIFEST            -- shipping files
+Makefile.PL         -- Perl Makefile template.
+README              -- Read me file
+
+scripts/pod2lyx   -- A script to convert pod files to LyX files
+                       ( A wraper for Pod::Lyx )
+
+lib/Pod/Lyx.pm    -- Pod::Lyx class module. The main engine for this package.
+

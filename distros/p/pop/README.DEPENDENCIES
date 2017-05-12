@@ -1,0 +1,8 @@
+perl >= 5.005
+Devel::WeakRef;
+File::lockf;
+SelectSaver;
+DBI;
+DBD::Sybase;
+XML::Parser;
+Term::Readline;

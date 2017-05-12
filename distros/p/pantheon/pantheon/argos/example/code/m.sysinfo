@@ -1,0 +1,28 @@
+### perl: argos/code/m.sysinfo
+use strict;
+use warnings;
+
+use MIO::TCP;
+use Poros::Query;
+
+return sub
+{
+    my ( %param, %mesg ) = @_;
+    my ( $batch, $param ) = @param{ qw( batch param ) };
+    my ( $test, $port ) = @$param{ qw( test port ) };
+
+    my %query = ( code => 'sysinfo', argv => [ $test ] );
+    my %result = MIO::TCP
+        ->new( map { join ':', $_, $port } @$batch )
+        ->run( %$param, input => Poros::Query->dump( \%query ) );
+
+    while ( my ( $type, $mesg ) = each %result )
+    {
+        while ( my ( $mesg, $node ) = each %$mesg )
+        {
+            $mesg = 'no response' if $mesg !~ s/--- \d+\n$//;
+            $mesg{error}{$mesg} = $node if $mesg;
+        }
+    }
+    return \%mesg;
+};

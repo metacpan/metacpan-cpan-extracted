@@ -1,0 +1,36 @@
+<h3>Domain=<TMPL_VAR NAME=domain_name> NODE=<TMPL_VAR NAME=node_name></h3>
+Configure Node:<TMPL_VAR NAME=node_name><p>
+<table  class="smver_1"> 
+<tr> <td class="lc_st">Node Name:</td>   
+ <td class="lc_st">  
+    <input   type="text" size="30"  
+				     name="update_node_<TMPL_VAR NAME=node_name>"  
+				     id="update_node_<TMPL_VAR NAME=node_name>"
+                		     onmouseover="return overlib('Change the  name of the Node');" 
+	        		     onmouseout="return nd();" 
+                		     onChange="updateGlobal([{args:'update_nodename'},{args:'<TMPL_VAR NAME=urn>'},
+				                'update_node_<TMPL_VAR NAME=node_name>', 'NO_CACHE'],
+						 ['domain_table','LastActionResult', 'domainPage'  ]);"
+                		     value="<TMPL_VAR ESCAPE=HTML  NAME=node_name>"> 
+	</td>   
+ <TMPL_LOOP NAME=nodeparams>
+  <tr>
+     <td class="lc_st"> 
+         <TMPL_VAR NAME=what>
+	</td>  
+       <td class="lc_st"> 
+       <input type="text"     name="update_<TMPL_VAR NAME=what><TMPL_VAR  ESCAPE=HTML  NAME=urn>"   
+	                                         id="update_<TMPL_VAR NAME=what><TMPL_VAR   ESCAPE=HTML NAME=urn>" 
+                                                 onChange="updateNode([{args:'update_<TMPL_VAR NAME=what>'},
+						            {args:'<TMPL_VAR  ESCAPE=HTML NAME=urn>'}, 
+	                                                     'update_<TMPL_VAR NAME=what><TMPL_VAR  ESCAPE=HTML  NAME=urn>',  'NO_CACHE'],
+							     [ 'domain_table', 'LastActionResult', 'domainPage']);" 
+	                                         value=<TMPL_VAR ESCAPE=HTML NAME=valuen>>
+	 
+	</td>      
+   </tr> 
+ </TMPL_LOOP>       
+ </table>
+<p>
+<div>
+</div>

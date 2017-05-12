@@ -1,0 +1,85 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 532576c2c13aa0639173253724cd8012a97e5548 Changes
+SHA1 1b1364e3e32513a37887babbfad0285c29befde7 MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 d226fb940c58a04f3a56693b109df1044f6bfc8f META.json
+SHA1 14cb41b159d9a456d77f6923c31037268f8210d8 META.yml
+SHA1 380d30fde4f0fb6daaae5e304347d990daf0c33a Makefile.PL
+SHA1 0541a03416ec8c35d5dcf0fb14d446596203f360 debian/changelog
+SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
+SHA1 dddd179d224bbf57ce51928eeab1149b18cc9776 debian/control
+SHA1 9358a15c7f5e294fdfcc176b5bb3a698c46c9c9d debian/copyright
+SHA1 8242ef8c866b9eb3a970995459e891dff9a84d5e debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 53a196932bebde7d88cccc83689a6e82b31f5213 debian/watch
+SHA1 905dd6b8a22db95cf242ab15683913938234601f devel/SomeStrangeModule.pm
+SHA1 aec2b06be164b3a524a721d9a35d057fcc772d57 devel/cpan-sqlite.pl
+SHA1 46aee627e71f2234d0067d90edc9bdebc4ce9a03 devel/cpan.pl
+SHA1 0b842ff3019a427255c0a2212589840c84222677 devel/cpanminus.pl
+SHA1 493024a8edca5365df78961cbe53d98125e0e571 devel/cpanplus.pl
+SHA1 1c9c6f4d29483a80d5d542c08a1a9bedb4b55e46 devel/file-find.pl
+SHA1 448b3fdc936373af1cf61c5bbf34433deb793e14 devel/filter.pl
+SHA1 f3287299f972cdd324a019e3fb6e1b54e65c857e devel/htmlbatch.pl
+SHA1 bc4b21683ca6e0a1930ccb559875ec2b45dc47af devel/login-conf.pl
+SHA1 7b23a27a0aa9a161cc52e9eb74d0247acdcc14f8 devel/parselinks.pl
+SHA1 f93e3cbadfacae44fa6783ad90ec733de179bfa0 devel/podfind.pl
+SHA1 c2f191c83bc3b233b30a3818d532a6d8d9363901 devel/podparser.pl
+SHA1 b4323b30d54254690a5f788eb801ed3fd963c53d devel/run.pl
+SHA1 53e1d41d878b7de9206bc57ff9ac4e83800233e1 lib/App/PodLinkCheck.pm
+SHA1 d9ead1b99470cb57c6856916545c0a03f4ff6913 lib/App/PodLinkCheck/ParseLinks.pm
+SHA1 5969281ec74dc7627c7185421390ae5bac789133 lib/App/PodLinkCheck/ParseSections.pm
+SHA1 43f08bd662b89d800798e90ab5b3065093387f62 podlinkcheck
+SHA1 47ebbf1d71ebdc462f51055161de9cd0838f45dc t/MyTestHelpers.pm
+SHA1 5135c53edcc9e3df90eacd1859f13f5671840d27 t/ParseSections.t
+SHA1 b987f0ae81651a511fffbfbe06899a35f8fe208f t/PodLinkCheck.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 aeeab05c346c11824a2bb2cc3f3bdb0c522604e2 xt/0-Test-YAML-Meta.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 5a3534f315b40e6781c60cd1ca17cc5ea4f99021 xt/slow/cpanminus-slow.t
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 e9aa27fd220d39ef0054cfcf32516f8a033f75f1 xtools/my-check-spelling.sh
+SHA1 d76762639d4ac9a709b1de9d0ad61974aa5026b2 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
+SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
+SHA1 1bd36d3dace9c03f2609418991329da468c16641 xtools/my_pod2html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJZBEiWAAoJEPjQtOfS0hGRGkYP/RzUmEBsllQHMEL/7MmPjJqH
+8VppWdKOeo5PQTTNkmwYDQEBuVsLz+z0zT+wP8+T3I1hfjGY5+PMgjN6MMQqjbqF
+aFgpNH/Obk3K2U5woovVV0DU3KANnlBN/BOShB7hzc7V+to/XlVlJ7DrNzfjvYkP
+IqeIZLTpUYRHm1Wi7YgkddthFbtGC6SZUP0AnXNkiKV7LXTVEDnDJ7EWDYzcoyn8
+t5d8pjQ0sHDkt+lnpAVZtiz6r0X3at3JelqXuANQ/zC1c66W6z4/fej2qGvL7f0w
+CteXCA+aNyk0LZoQ4hTPzBkQYHO8jLdHrYQ6Wz4dEyBaNRI99ddRX/qBGL88Wu05
+iczKJzsWlZrkpefVKNC5V59jmjn1jhOAYDM6cJfv5TcL6En2xQdHHSiaIdD1PRgo
+WAQ+E+qhj0NUlYp8DwL26TYcnIMvwbIDqiHmZNc97hNz/S8tzRAvXJPDIGEOdwzB
+PjqIu2GXWf64UvO9V+rmm2jsyY5mAAoc+wAQ2vmltnlxm3QiSf+M9nb/LDLj2HJ2
+QF3EUSsXW1NI3Gu4nf68pjF48uqGuAW51pmhtFtsBMAfzh9wHENppBrj1/58+krG
+/ksGM1DjXNeNZjVaZ+FBvB8nKNhTIDP65Yjhmj/l6AU7/w0ejORBwXJ2bD5AYkRg
+J82ItJzU+PKUHxduMznd
+=2S5l
+-----END PGP SIGNATURE-----

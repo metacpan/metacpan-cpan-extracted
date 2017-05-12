@@ -1,0 +1,45 @@
+<H2><A HREF="4mq340$jn7@thetimes.pixel.kodak.com">[PREV]</A>  [NEXT]  <A HREF="Pine.SOL.3.91.960508084220.7201A-100000@fastss10">[PREV Thread]</A>  <A HREF="3190AE69.2781E494@e-commerce.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2><HR><ADDRESS> roehrich@cray.com (Dean Roehrich)
+</ADDRESS>
+<TITLE> Re: Passing a pointer to C function ?</TITLE>
+<ADDRESS><H1> Re: Passing a pointer to C function ?</H1>
+</ADDRESS>
+<ADDRESS> Cray Research, Inc.
+ 8 May 96 14:00:19 CDT
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.misc">comp.lang.perl.misc</A>
+<DT> References:
+<DD> <A HREF="news:<4mq340$jn7@thetimes.pixel.kodak.com"><4mq340$jn7@thetimes.pixel.kodak.com></A>
+</DL>
+<HR>
+<PRE>In article <4mq340$jn7@thetimes.pixel.kodak.com>,
+Tony Whyte <whyte@sector.kodak.com> wrote:
+&gt;
+&gt;
+&gt;I have created an extension to a C program one of whose parameters is a 
+&gt;pointer to a particular type of data structure. I've created a typemap 
+&gt;entry of T_PTROBJ for the data structure (not sure if I had to since Im
+&gt;not really passing the structure itself)
+
+T_PTROBJ, and similar maps, are used to handle the _pointer_ for the data
+structure.  The basic form of these maps creates an SV and stores the value
+of the pointer in that SV--a Perl object shadowing a C object.
+
+&gt; but Im not sure how I specify the 
+&gt;pointer parameter when calling the function from perl. I've CookbookB'd,
+&gt;and perldoc'd around  but cant find the trick. 
+
+You cannot fabricate a pointer out of nothing.  Somehow you have to give
+Perl the ability to allocate a copy of the structure and to get a pointer to
+that structure.  The "Struct1" and "Opaque" examples in CookBookB cover this
+basic case.
+
+[posted&mailed]
+
+Dean
+roehrich@cray.com
+</PRE>
+<HR><H2><A HREF="4mq340$jn7@thetimes.pixel.kodak.com">[PREV]</A>  [NEXT]  <A HREF="Pine.SOL.3.91.960508084220.7201A-100000@fastss10">[PREV Thread]</A>  <A HREF="3190AE69.2781E494@e-commerce.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2>

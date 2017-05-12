@@ -1,0 +1,27 @@
+<HTML>
+<HEAD><TITLE> 10.2. Erase a display?</TITLE></HEAD>
+<BODY><a name="A10.2"> 10.2. Erase a display?</a>
+
+<hr>
+</p><p>
+To erase something like a bitmap call <KBD>delete</KBD> on the item. Assuming
+your <KBD>Canvas</KBD> tag is <KBD>$canvar</KBD> and your item tag it 
+<KBD>$bittag</KBD> (as in the <a href="qna10.1.html">previous [10.1] question</a>) then 
+the call proceeds like:
+<pre>
+    $canvar -&gt; delete($bittag);
+</pre>
+This is of course useful in a callback. For example to configure a
+<KBD>Button</KBD> to do your deletion for you you could say something like:
+<pre>
+    $main-&gt;Button(-text   =&gt; 'clear', 
+                  -command=&gt;sub{$canvar -&gt; delete($bittag)}
+                 )-&gt;pack;
+</pre>
+
+
+<hr>
+	<p><a href="qna10.1.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.2">table of contents</a> | <a href="qna10.3.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

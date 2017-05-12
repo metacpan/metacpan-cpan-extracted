@@ -1,0 +1,50 @@
+<H2><A HREF="9601171758.AA14739@hermes">[PREV]</A>  [NEXT]  <A HREF="199601172113.PAA02705@nlsgi9.ncsa.uiuc.edu">[PREV Thread]</A>  <A HREF="4dkal9$7eo@monk.mps.ohio-state.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> nik@tiuk.ti.com (Nick Ing-Simmons)
+</ADDRESS>
+<TITLE> Re: Drag and Drop</TITLE>
+<ADDRESS><H1> Re: Drag and Drop</H1>
+</ADDRESS>
+<ADDRESS> 18 Jan 96 09:06:02 GMT
+ via, but not speaking for : Texas Instruments Ltd.
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<9601171758.AA14739@hermes"><9601171758.AA14739@hermes></A>
+</DL>
+<HR>
+<PRE>In <9601171758.AA14739@hermes>
+On Wed, 17 Jan 96 12:58:58 EST
+Adam Wasserman <awasser@hermes.sgc.com> writes:
+&gt;I've been looking at Drag and Drop as well.  What's the status of 
+&gt;SunDragDrop.pm and drop_test in Tk-b8?  I have to admit that drop_test 
+&gt;seemed not to work particularly well.  Is it useable? 
+
+It is probably suffering from 'bit rot' - have not been near it in months.
+When working at its best it would co-exist with OpenLook Drag&Drop
+provided you used the 'right' olv?wm or ran the drop-site daemon.
+
+&gt;
+&gt;From: Nick Ing-Simmons <nik@tiuk.ti.com>
+&gt;Date: Wed, 17 Jan 96 08:40:22 GMT
+&gt;&gt; There have been several Drag&Drop implementations _within_ one application
+&gt;&gt; done for Tk in its various forms. There is also a 'send' based one in 
+&gt;
+&gt;Is this implying that there is other d'n'd stuff floating around in the
+&gt;ptk universe waiting to be tried?
+
+'send' based one is in Tcl/Tk + BLT.
+Tix does something too.
+
+Basic same-app is 'easy' with grab and $widget-&gt;Containing(Ev('X'),Ev('Y'))
+
+
+'Right' one to do is Motif/CDE - when spec' is published.
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+</PRE>
+<HR><H2><A HREF="9601171758.AA14739@hermes">[PREV]</A>  [NEXT]  <A HREF="199601172113.PAA02705@nlsgi9.ncsa.uiuc.edu">[PREV Thread]</A>  <A HREF="4dkal9$7eo@monk.mps.ohio-state.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD><TITLE>17. Processes &amp; Inter-Process Communication under Perl/Tk.</TITLE></HEAD>
+<BODY><a name="A17">17. Processes &amp; Inter-Process Communication under Perl/Tk.</a>
+
+<hr>
+</p><p>
+Inter-Process Communication (IPC) is the subject of spawning and controlling 
+other programs or &quot;processes&quot; from within perl (sometimes using 
+sockets to do so). The subject is briefly discussed in the 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlipc.html">
+<KBD>perlipc(1)</KBD> man page</a>, 
+and was addressed towards the end of Chapter 6 of The Camel. The subject is 
+also discussed in the <a href="http://www.perl.com/perl/faq/">perl FAQ</a> and 
+at Tom Christiansen's ftp site (in the various <KBD>perlipc*</KBD> files) at:
+<pre>
+    <a href="ftp://ftp.perl.com/perl/info/everything_to_know/">ftp://ftp.perl.com/perl/info/everything_to_know/</a>    199.45.129.30
+</pre>
+as well as the web site at:
+<pre>
+    <a href="http://www.perl.com/perl/everything_to_know/ipc/index.html">http://www.perl.com/perl/everything_to_know/ipc/index.html</a>
+</pre>
+In addition to the usual perl IPC routines Tk allows (at least) three more
+special functions: <kbd>fileevent</kbd> (for handling I/O events), 
+<kbd>send</kbd> (for inter-widget communication), and 
+<kbd>after</kbd> (for time control like a <kbd>sleep</kbd> expressly for 
+widgets). <p>
+Remember:<BLOCKQUOTE>
+ If a packet hits a pocket on a socket on a port,<BR>
+ And the bus is interrupted as a very last resort,<BR>
+ And the address of the memory makes your floppy disk abort,<BR>
+ Then the socket packet pocket has an error to report!<BR>
+ <A HREF="http://www.infi.net/~cashman/humor/misc/drsuess_tech.html"><i>-Ken Burchill(?)</i></A>
+</BLOCKQUOTE>
+
+
+<hr>
+	<p><a href="qna16.4.html">Previous</a> | Return to <a href="ptkTOC.html#TOC17">table of contents</a> | <a href="qna17.1.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

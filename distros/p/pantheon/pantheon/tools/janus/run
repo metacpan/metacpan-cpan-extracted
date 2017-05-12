@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Janus;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = 1;
+$Vulcan::OptConf::THIS = 'janus';
+
+=head1 SYNOPSIS
+
+Launch janus.
+
+$0 name [--check]
+
+=cut
+my %o = Vulcan::OptConf->load()->get( qw( check ) )->dump();
+
+my $janus = Janus->new( %o, name => shift );
+my $stat = $o{check} ? 0 : $janus->run();
+exit $stat;

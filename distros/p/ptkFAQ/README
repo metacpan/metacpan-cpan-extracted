@@ -1,0 +1,62 @@
+
+=head1 ptkFAQ README
+
+This is the README file for the ptkFAQ kit.
+
+This package is intended to supplement and/or complement 
+the documents that come with Nick Ing-Simmon's object oriented 
+B<Tk> X-window extension to perl5. Please consult the Tk/doc/ 
+directory for the most up-to-date and accurate information on 
+the software.
+
+The version of this documentation is specified in ptkFAQ.pm (which is
+about the only useful thing that "module" does :)
+
+You should be able to set up a web site and/or a gopher site with this
+package. Your site will likely fall quickly out of date if you do not
+maintain it though :(
+
+Updates to this kit may be obtained from CPAN ftp sites or from the 
+world wide web master site at:
+
+    http://w4.lns.cornell.edu/~pvhp/ptk/
+
+(and assorted subdirectories.)
+
+The document highlights are:
+
+   *ptkFAQ.html   # list of questions & answers (large file).
+
+   *ptkTOC.html   # The FAQ split into a table of contents that
+                  # has relative hyperlinks to the qna*.html files.
+
+   *ptkIMG.html   # Has <IMG SRC=""> pictures - most images are kept
+                  # in a img sub-directory.
+
+   *ptkPORT.html  # Extending perl/Tk to other platforms
+
+*N.B. in order to have the relative URLs within these docs to point to 
+your copies (rather than mine) change or eliminate the single line in each 
+file that reads, for example:
+
+   <BASE HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html">
+
+The sub-directories include:
+
+    etc/          # various perl/Tk programs & info.
+    PNMTYAK/      # documentation directory.
+    0/ && 1/      # gopher versions of ptkTOC.html && qna*.html
+    history/      # mailing list and newsgroup posts of note.
+    Contrib/      # pod2html translations of Tk's Contrib/ directory.
+    img/          # some illustrative graphics.
+
+Good luck and let us on the ptk list know how you are doing!
+
+=head1 AUTHOR
+
+Peter Prymmer pvhp@lns62.lns.cornell.edu
+
+=head1 DATE
+
+Thu May 23 01:26:07 EDT 1996.
+

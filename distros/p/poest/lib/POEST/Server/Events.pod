@@ -1,0 +1,71 @@
+=pod
+
+=head1 NAME
+
+POEST::Server::Events - Document all the standard events.
+
+=head1 ABSTRACT
+
+Comprehensive documentation on all the standard events.  These are the
+basic events that a standard SMTP server should implement.
+
+
+=head1 DESCRIPTION
+
+Lots of events are created by the poest server.  We should probably
+write them down for someone, perhaps even you!
+
+=head2 SMTP Events
+
+SMTP events are only self explainitory to people who understand SMTP
+commands.  Of course, RFC 2821 can help with that, but there should
+be a quick explination here.
+
+=head3 HELO
+
+C<ARG0> is the host passed by the client, if there is one.
+
+=head3 QUIT
+
+The client has decided to close the connection.  A handler for this
+method should set C<$heap-E<gt>{shutdown}> to a true value.  This will
+tell the server to shutdown the connection.
+
+=head2 Special SMTP Events
+
+=head3 send_banner
+
+This event is called as soon as a connection is established.  An SMTP
+server sends a banner to tell the client who it is, that's what we
+do here.
+
+=head2 POEST::Plugin::Accept Events
+
+=head2 POEST::Plugin::Queue Events
+
+=head2 POEST::Plugin::Deliver Events
+
+=head1 AUTHOR
+
+Casey West, <F<casey@dyndns.org>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 DynDNS.org
+
+You may distribute this package under the terms of either the GNU
+General Public License or the Artistic License, as specified in the Perl
+README file, with the exception that it may not be placed on physical
+media for distribution without the prior written approval of the author.
+
+THIS PACKAGE IS PROVIDED WITH USEFULNESS IN MIND, BUT WITHOUT GUARANTEE
+OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. USE IT AT YOUR
+OWN RISK.
+
+For more information, please visit http://opensource.dyndns.org
+
+=head1 SEE ALSO
+
+L<perl>, L<POEST::Server>.
+
+=cut

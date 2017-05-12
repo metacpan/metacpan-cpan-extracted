@@ -1,0 +1,12 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+Makefile.PL
+lib/persona.pm
+t/01basic.t
+t/10constants.t
+t/20path2source.t
+t/30script.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

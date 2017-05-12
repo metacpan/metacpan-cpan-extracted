@@ -1,0 +1,10 @@
+---
+correct:
+  chown: search:search
+  root: /home/s/
+  link:
+    data:
+      regex: qr/Correct/
+      root: /home/s/data
+    conf:
+    app:

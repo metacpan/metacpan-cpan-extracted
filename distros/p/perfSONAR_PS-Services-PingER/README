@@ -1,0 +1,156 @@
+==============================================================================
+perfSONAR-PS PingER
+==============================================================================
+
+------------------------------------------------------------------------------
+Introduction
+------------------------------------------------------------------------------
+
+
+PingER (Ping End-to-end Reporting) is the name given to the Internet
+End-to-end Performance Measurement (IEPM) project to monitor end-to-end
+performance of Internet links. It is led by SLAC and development includes
+NUST/NIIT, FNAL, GATech and ICTP/Trieste.
+
+Originally in 1995 it was for the High Eneergy Physics community, however,
+this century it has been more focussed on measuring the Digital Divide from an
+Internet Performance viewpoint. The project now involves measurement to over
+600 sites in over 125 countries, and we are actively seeking new sites to
+monitor and monitoring sites for this project, as well as people interested in
+our data.
+
+PingER has a decade old data repository of network performance measurements
+from and to sites around the world. Currently, there are around 35 monitoring
+hosts in 13 countries monitoring over 300 sites in over 115 countries that
+amongst them contain around 99% of the worlds Internet connected population.
+
+PingER provides insight into a multitude of network activity. To summarize the
+results, it is necessary to aggregate the measurements by region and to
+divided them into measurements of long-term trends and of short-term glitches.
+
+------------------------------------------------------------------------------
+Uses for PingER
+------------------------------------------------------------------------------
+
+
+Technical: PingER data provides a lightweight way of monitoring the
+throughput, loss and response times, effectively measuring the quality of a
+particular link with little overhead. This also provides information for
+setting up and auditing Service Level Agreements
+
+Economical: Based on the presentation of the PingER findings, a recommendation
+can be made to the policy/funding people to increase the bandwidth.
+Furthermore, if one site in a certain region can attain credible connectivity,
+then other sites in that region should be able to have better connectivity as
+well. As a troubleshooting tool, PingER can be used to discern if a problem is
+network related, identify the time the problem started, whether it is still
+occurring, and provide quantitative analysis.
+
+Collaboration: In order for scientists to collaborate, a certain level of link
+quality is required. By using PingER to measure the loss and RTT, you are able
+to provide expectations for the performance for bulk data transfer and other
+applications. In case of real-time collaboration, by comparing the results
+from PingER with various recommendations for loss, RTT and jitter, together
+with the perceptions of voice quality from the users, you can determine how
+well VoIP and other interactive applications might work between various pairs
+of sites.
+
+
+------------------------------------------------------------------------------
+Architecture
+------------------------------------------------------------------------------
+
+PingER uses the ubiquitous Internet ping facility to measure the short and
+long term Response Time, Packet Loss percentages, the variability of the
+response time (jitter), and the lack of reachability (no response for a
+succession of pings).
+
+Ping is usually pre-installed on almost all platforms, so there is nothing to
+install on the clients. The server (i.e. the echo responder) runs at a high
+priority (e.g. in the kernel on UNIX) and so is more likely to provide a good
+measure of network performance than a user application.
+
+PingER is very modest in its network bandwidth requirements (~100 bps per
+monitoring-remote- host-pair for the way we use it).
+
+Due to the volume of data that can be collected by PingER, perfSONAR-PS PingER
+can be configured to utilize SQLite, MySQL or Postgres storage backends.
+
+perfSONAR-PS PingER is composed of two distinct components:
+
+1) Measurement Archive (MA): Which allows communication via XML document based
+Remote Procedure Call (XML) the data archive of PingER data.
+
+2) Measurement Point (MP): Which performs the measurement and calculation of
+derived statistics from Pings.
+
+
+------------------------------------------------------------------------------
+Installation
+------------------------------------------------------------------------------
+
+TODO
+
+Database creation
+
+A database backend will need to be installed before running PingER. Depending
+upon the size of your installation, you can choose to either use a file based
+database backend using SQLite, or a fully fledged database bakend using MySQL
+or Postgres.
+
+SQLite: Suitable for small installation where the number of hosts (TODO:
+number?) to be pinged is small and data retrieval is not expected to have a
+large volume.
+
+MySQL/Postgres: Suitable for large installations with a large number of hosts
+to be pinged or is expecting a large volume of data requests for PingER data.
+
+The default installation uses a SQLite database for storage.
+
+Scripts are provided to create the relevant database:
+
+util/create_pingerMA_SQLite.sql
+util/create_pingerMA_MySQL.sql
+
+For example, in order to install a SQLite based database, enter the following
+in a terminal prompt:
+
+  $ sqlite3 <path to database file> < util/create_pingerMA_SQLite.sql
+
+The database type, and database name must then be entered into the pinger.conf
+file as defined below. For MySQL and Postgres installations, you may also
+specify the hostname, port number, username and passwords for the database.
+
+If installing PingER from CPAN or trying to use 'make test', there are 
+problems with the test suite.  Please ignore the errors and continue/force the 
+install.
+
+------------------------------------------------------------------------------
+Configuration
+------------------------------------------------------------------------------
+
+1) pinger.conf: daemon configuration of MP and MA services. This file
+specifies the relevant perfSONAR specific services of PingER such as the port
+number, endpoints and registration service descriptions that the PingER MA and
+MP should use.  Use util/psConfigureDaemon to make a configuration file.
+
+2) pinger-landmarks.xml: A XML configuration file of the hosts to perform
+measurements to. This also contains the specification of the tests and
+measurement frequencies in which to perform the tests.  The actual name of the
+landmarks file is specified in pinger.conf.  Sample landmarks files are 
+included.
+
+
+------------------------------------------------------------------------------
+Starting PingER
+------------------------------------------------------------------------------
+
+To start the PingER suite, change to the bin/ directory and simply run:
+
+  $ perfsonar-daemon.pl
+
+This will parse the pinger.conf file and initiate the PingER services as
+defined for the MA and MP.
+
+
+

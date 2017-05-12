@@ -1,0 +1,74 @@
+<H2><A HREF="180.831761683@castor.humgen.upenn.edu">[PREV]</A>  [NEXT]  <A HREF="199605102030.QAA14357@cais.cais.com">[PREV Thread]</A>  <A HREF="9605102322.AA17488@GS213.SP.CS.CMU.EDU">[NEXT Thread]</A>  <A HREF="news:perl.porters-gw">[Index]</A>  </H2><HR><ADDRESS></ADDRESS>
+<TITLE> Re: how to tell object type?</TITLE>
+<ADDRESS><H1> Re: how to tell object type?</H1>
+</ADDRESS>
+<ADDRESS> Charles Bailey <bailey@genetics.upenn.edu>
+ Fri, 10 May 1996 17:51:26 -0400 (EDT)
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:perl.porters-gw">perl.porters-gw</A>
+<DT> References:
+<DD> <A HREF="news:<180.831761683@castor.humgen.upenn.edu"><180.831761683@castor.humgen.upenn.edu></A>
+</DL>
+<HR>
+<PRE>&gt; In perl5.002, how do I tell whether an item in an array is a scalar or an
+&gt; array?
+&gt; 
+&gt; I want to have and array containing @a = [a, 1, [b,c]];
+&gt; 
+&gt; Then iterate:
+&gt; 
+&gt; foreach $item (@a) {
+&gt;   if (is_scalar $item) {
+&gt;     # Do something scalar with $item.
+&gt;   }
+&gt;   elsif (is_array $item) {
+&gt;     # Do something arrayed with $item.
+&gt;     $first_sub_item = $item[0];
+&gt;   }
+&gt; }
+&gt; 
+&gt; I couldn't find anything that looked appropriate in perlref.
+
+If the only possibilities are simple scalars and refs to base types,
+then you can do this vis C<ref>:
+
+    if (ref $item eq 'ARRAY') {
+      # Do something arrayed with $item.
+      $first_sub_item = $item[0];
+    }
+    # Refs to anything else here
+    else {
+      # Do something scalar with $item.
+    }
+
+
+There's no simple way, however, to determine the type of a value if
+it's been blessed into some package.  You could try C<eval>, as in
+
+     $is_array = (eval {scalar(@$val)}, $@ eq '');
+
+or repeated C<ref>s:
+
+     while ($type = ref $val) {
+       last if $type eq 'SCALAR'   or
+               $type eq 'ARRAY'    or
+               $type eq 'HASH'     or
+               $type eq 'CODE'     or
+               $type eq 'GLOB'     or
+               $type eq 'REF'      or
+               $type eq 'FORMLINE' or
+               $type eq 'GLOB'     or
+               $type eq 'UNKNOWN';
+        $val = $$val;
+     }
+
+Regards,
+Charles Bailey  bailey@genetics.upenn.edu
+
+Inter alia, C<type> creandum est! :-)
+</PRE>
+<HR><H2><A HREF="180.831761683@castor.humgen.upenn.edu">[PREV]</A>  [NEXT]  <A HREF="199605102030.QAA14357@cais.cais.com">[PREV Thread]</A>  <A HREF="9605102322.AA17488@GS213.SP.CS.CMU.EDU">[NEXT Thread]</A>  <A HREF="news:perl.porters-gw">[Index]</A>  </H2>

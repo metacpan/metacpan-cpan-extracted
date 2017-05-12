@@ -1,0 +1,4 @@
+#!psh
+
+option ps1='\[\C{bold}\C{blue}\][$(date +%H%M)][\u@\h:\w]$\[\C{none}\] '
+

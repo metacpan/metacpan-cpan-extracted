@@ -1,0 +1,287 @@
+#!/usr/bin/perl
+
+use strict;
+use App::ProxyHunter;
+
+App::ProxyHunter->start(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+proxyhunter - free proxy searcher and checker
+
+=head1 DESCRIPTION
+
+C<proxyhunter> may be used to find free proxies, it performs searching using available adapters for search engines
+(like Google and so on). All found proxies may be checked for availability, proxy type and speed. C<proxyhunter>
+uses database as storage for found proxies, so you can easily perfrom any SELECT statement to find what you need.
+
+=head1 QUICK START
+
+First of all you should install one of the available database schema. The easiest for deploy is SQLite (but not very fast).
+See CPAN for other alternatives.
+
+	$ cpan App::ProxyHunter::Model::Schema::SQLite
+
+Then you should generate configuration file and edit if needed
+
+	$ proxyhunter --create-config proxyhunter.jconf
+
+Now it is time to create database schema
+
+	$ proxyhunter --config proxyhunter.jconf --create-schema
+
+And finally you can start the process
+
+	$ proxyhunter --config proxyhunter.jconf
+
+=head1 AVAILABLE OPTIONS
+
+=head2 --create-config /path/to/config
+
+Generates default configuration file 
+
+=head2 --create-schema
+
+Creates table structures inside database. This should be used with C<--config> option
+
+=head2 --config /path/to/config
+
+Which config file to use for creating schema or to run
+
+=head2 --daemon /path/to/pidfile
+
+Run proxyhunter as daemon. C</path/to/pidfile> may be omitted, otherwise pid of the daemon will be writed to this file.
+Proc::Daemon should be additionally installed for this to work.
+
+=head1 CONFIGURATION
+
+Use C<--create-config> option to create default configuration file. Configuration file format is JCONF (see L<Parse::JCONF>).
+
+=head2 db
+
+Database settings. Available options listed below
+
+=head3 driver
+
+DBI driver to use. You should have schema installed for this driver, which implemented as C<App::ProxyHunter::Model::Schema> subclass.
+See CPAN for available implementations. You can implement schema for preferred database yourself, see L<App::ProxyHunter::Model::Schema>.
+
+=head3 driver_cfg
+
+DBD driver specific options, like C<mysql_auto_reconnect> and so on
+
+=head3 host
+
+Host of the database, if needed
+
+=head3 name
+
+Database name
+
+=head3 login
+
+Login for database, if needed
+
+=head3 password
+
+Password for database, if needed
+
+=head2 search
+
+Proxy sercher settings. Searcher uses specified search engines to find out proxies. You can implement new search engine,
+see L<App::ProxyHunter::SearchEngine>. See CPAN for available implementations.
+
+=head3 enabled
+
+C<true> to enable proxy searching , C<false> to disable
+
+=head3 querylist
+
+A list of queries which will be passed to search engine (like "free proxy", "proxy list", ...)
+
+=head3 engines
+
+Which search engines to use. Search engine implementation should be in C<App::ProxyHunter::SearchEngine> namespace.
+
+=head2 check
+
+Checker settings. Checker checks proxy for availability and type. Checking performed right after proxy was
+inserted into database. If proxy will not pass check (e.g. bad proxy) it will be deleted. Available options listed below
+
+=head3 enabled
+
+C<true> to enable proxy checking , C<false> to disable
+
+=head3 strict
+
+C<true> to enable strict checking. Default is C<false> except http proxy checking (which always will be C<true> regardless this option).
+For strict checking description see L<Net::Proxy::Type/"STRICT CHECKING">.
+
+=head3 types
+
+Will check proxy only for specified types if presented. For available proxy types see
+L<Net::Proxy::Type/"PACKAGE CONSTANTS AND VARIABLES">. Example:
+
+	types = ["SOCKS5_PROXY", "CONNECT_PROXY"]
+
+=head3 http_url
+
+Use specified HTTP url to check http proxies. Optional.
+
+=head3 http_keyword
+
+Which keyword we should find in response for C<http_url> to mark proxy as good. Optional.
+
+=head3 https_url
+
+Use specified HTTPS url to check https proxies. Optional.
+
+=head3 https_keyword
+
+Which keyword we should find in response for C<https_url> to mark proxy as good. Optional.
+
+=head3 workers
+
+How many workers should perform checking in parallel. Bigger value causes higher check speed and higher resources usage
+
+=head3 speed_check
+
+Should checker perform speed checking right after successful checking for availability.
+If C<true> will perform checking even if speed checking disabled in C<speed_check> section
+
+=head2 recheck
+
+Rechecker settings. Rechecker checks proxy for availability and type, only proxies which passed first check by checker.
+Rechecker used to check proxies that passed at least one check and was not deleted from database yet
+(C<fails_before_delete> limit not exceeded). Available options listed below
+
+=head3 enabled
+
+Enable or disable rechecking
+
+=head3 strict
+
+C<true> to enable strict checking. Default is C<false> except http proxy checking (which always will be C<true> regardless this option).
+For strict checking description see L<Net::Proxy::Type/"STRICT CHECKING">.
+
+=head3 workers
+
+How many workers to use for rechecking
+
+=head3 interval
+
+How often proxy may be rechecked. For example C<180> means no more than each 180 seconds
+
+=head3 speed_check
+
+Perform speed check right after recheck
+
+=head3 fails_before_delete
+
+How much in a row proxy check may failed before it will be deleted from database. For example C<3> means
+that proxy will be deleted on fourth check fail
+
+=head2 speed_check
+
+Speed checker settings. Each proxy which passed initial check by checker may be checked for a speed. Available
+options listed below
+
+=head3 enabled
+
+Enable or disable speed checking
+
+=head3 workers
+
+How many workers to use for speed checking
+
+=head3 interval
+
+How often to recheck proxy speed
+
+=head3 http_url
+
+HTTP url to some file which will be downloaded to check proxy speed. For measurment accuracy file should be at least
+1 mb. Not whole file will be downloaded, but only part needed for measurment accuracy, so file may be much bigger. HTTP url
+used for those proxies that may be used for HTTP protocol
+
+=head3 https_url
+
+HTTPS url to some file which will be downloaded to check proxy speed. For measurment accuracy file should be at least
+1 mb. Not whole file will be downloaded, but only part needed for measurment accuracy, so file may be much bigger. HTTPS url
+used for those proxies that may be used for HTTPS protocol
+
+=head1 DATABASE STRUCTURE
+
+Database has one table called C<proxy>. This table has columns listed below
+
+=head2 id
+
+Primary id
+
+=head2 host
+
+Proxy host as ipv4 address
+
+=head2 port
+
+Proxy port
+
+=head2 checked
+
+Is proxy checked at least one time after inserting in the database
+
+=head2 success_total
+
+How many times proxy check successfully passed
+
+=head2 fails_total
+
+How many times proxy check failed
+
+=head2 insertdate
+
+Date and time when this proxy was inserted in the database
+
+=head2 checkdate
+
+Date and time when last check was performed
+
+=head2 speed_checkdate
+
+Date and time when last speed check was performed
+
+=head2 fails
+
+How much failed checks in a row was performed. Each successful check resets this counter
+
+=head2 type
+
+Type of the proxy. One of C<HTTPS_PROXY>, C<HTTP_PROXY>, C<CONNECT_PROXY>, C<SOCKS4_PROXY>, C<SOCKS5_PROXY>, C<DEAD_PROXY>.
+Not checked proxy has C<DEAD_PROXY> type. See L<Net::Proxy::Type> for proxy types description.
+
+=head2 in_progress
+
+Is proxy in the queue for check
+
+=head2 conn_time
+
+Connection time to this proxy host
+
+=head2 speed
+
+Proxy speed in bytes per second
+
+=head1 AUTHOR
+
+Oleg G, E<lt>oleg@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself
+
+=cut

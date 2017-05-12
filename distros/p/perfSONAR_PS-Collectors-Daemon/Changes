@@ -1,0 +1,13 @@
+0.04    2008-01-19
+- Fixes for the init script/Makefile
+
+0.03	2008-01-18
+- Put the init/config files in standard locations during a CPAN install
+- Improve PID Handling
+
+0.02	2008-01-16
+- Switch back from using the version module
+- Add a Base class that collectors use as their parent class
+
+0.01    2008-01-15
+- Initial version.

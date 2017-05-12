@@ -1,0 +1,66 @@
+<HTML>
+<HEAD><TITLE>2. What is the difference between perl/Tk and Tkperl?</TITLE></HEAD>
+<BODY><a name="A2">2. What is the difference between perl/Tk and Tkperl?</a>
+
+<hr>
+</p><p>
+TkPerl was originally the name of a (now unsupported) perl 4 package 
+that Malcolm Beattie 
+<a href="mailto:mbeattie@sable.ox.ac.uk">&lt;mbeattie@sable.ox.ac.uk&gt;</a> 
+at Oxford University called his code to wed the
+Tk X toolkit with Perl. (He has referred to this code as a different
+&quot;<i>kettle of fish</i>&quot; from perl/Tk.) 
+</p><p>
+Since that beginning Malcolm has also come up with a 
+<a href="http://sable.ox.ac.uk/~mbeattie/perl.html">Tcl</a> module for perl 5 
+that has a <a href="http://sable.ox.ac.uk/~mbeattie/perl.html">Tcl::Tk</a> 
+module extension.  That module allows the use of
+Tcl within a Perl script (<i>i.e.</i> you must know both languages
+to get your widgets to work.)  If you are interested in that package instead, 
+see the necessary kits for Malcolm Beattie's Tcl/Tk 
+extensions to Perl, which have been distrubuted as 
+<kbd>Tcl-b&#35;.tar.gz</kbd> and <kbd>TclTk-b&#35;.tar.gz</kbd> files in 
+the <kbd>authors/id/MICB/</kbd> directory at 
+<a href="qna4.html">CPAN sites (locations given in a separate question in this FAQ)</a>.
+</p><p>
+The name &quot;<i>tkperl</i>&quot; is sometimes applied 
+to the &quot;perl/Tk&quot; or &quot;ptk&quot; package that is the subject of 
+this FAQ. Nick Ing-Simmons prefers &quot;perl/Tk&quot; as the name of the package,
+with &quot;pTk&quot; or &quot;ptk&quot; as contractions of that name as well as
+referring to something technically distinct: 
+given the extensibility of the pTk code
+the &quot;p&quot; could also be taken to mean 'portable' or 'pure'
+(not to be confused with either the Helsinki University of Technology
+<a href="http://www.cs.hut.fi/~kjk/porttk.html">portTk</a>, nor with 
+Brian Warkentine's <a href="http://www.veritas.com/~brianw/rivet/index.html">
+Rivet</a>).
+In this document the code of interest is either referred to as
+&quot;perl/Tk&quot;, &quot;pTk&quot;, or &quot;ptk&quot; though the primary 
+focus is on perl/Tk.
+</p><p>
+<STRONG>Warning:</STRONG> do not attempt to install both perl/Tk and
+Tcl/Tkperl in the same perl installation. The names in the respective modules
+overlap. In particular the Tcl::Tk module is declared in a <KBD>Tk.pm</KBD> 
+file - so a statement like:
+<PRE>
+    use Tk;
+</PRE>
+will probably confuse your perl. If you cannot live without either module 
+then install make &amp; maintain separate perls for each and arrange your 
+script writing accordingly (this will not be easy).
+<p>
+A more extensive comparison of the differences between the Tkperl and the
+perl/Tk code is given in the 
+<a href="pod/Tcl-perl.html"><KBD>Tcl-perl.pod</KBD></a> file that is
+distributed with perl/Tk (see below for locations).
+<p>
+Lastly, it should be mentioned that if you build your Tk-b&#35; statically
+rather than dynamically it will make a new perl interpreter called
+<KBD>tkperl</KBD> (confusing isn't it? :-).
+
+
+<hr>
+	</p><p><a href="qna1.html">Previous</a> | Return to <a href="ptkTOC.html#TOC2">table of contents</a> | <a href="qna3.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

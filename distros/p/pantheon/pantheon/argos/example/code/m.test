@@ -1,0 +1,13 @@
+### perl: argos/code/m.test
+use strict;
+use warnings;
+use YAML::XS;
+
+return sub
+{
+    my ( %param, %mesg ) = @_;
+    my ( $batch, $param ) = @param{ qw( batch param ) };
+
+    $mesg{test}{ YAML::XS::Dump $param } = $batch;
+    return \%mesg;
+};

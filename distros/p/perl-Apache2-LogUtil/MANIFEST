@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+README
+lib/Apache2/LogUtil.pm
+lib/Apache2/LogUtil.pod
+lib/Apache2/Testing/LogUtil.pm
+lib/Apache2/Testing/LogUtil.pod
+lib/Misc/Stopwatch.pm
+lib/Misc/Stopwatch.pod
+t/full.t
+t/harness.hf
+t/harness.pl

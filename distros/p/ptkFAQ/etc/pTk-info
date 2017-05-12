@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+
+use Tk; 
+
+local(*Tk::m) = *Tk::Tk_module;
+  print "Your perl/Tk module is: $Tk::m\n";
+  print "Your Tk version is:     $Tk::tk_version\n";
+
+print "Your Perl version is:   $]\n";
+print "Your Perl library directories currently include:\n",join("\n",@INC),"\n";
+

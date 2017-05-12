@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+# Copyright © 2007 Alexis Sukrieh
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+# Perl Console is a small program that lets you evaluates Perl code
+# interactively.  It uses Readline for grabing input and provide completion
+# with all the namespaces loaded during your session.
+# This is the main script of the program.
+
+# strict mode 
+use strict;
+use warnings;
+
+# libs
+use PerlConsole;
+use PerlConsole::Console;
+
+# Init our console
+my $console = PerlConsole::Console->new($PerlConsole::VERSION);
+
+# look for option in the commandline
+$console->parse_options();
+
+# display the header message
+$console->header();
+
+# source the rcfile first
+$console->source_rcfile();
+
+# Main REPL, prompting and waiting for code to evaluate
+while (defined (my $code = $console->getInput())) {
+    $console->interpret($code);
+} 
+
+# End, quitting.
+$console->clean_exit(0);
+
+__END__
+=pod
+
+=head1 NAME
+
+perlconsole
+
+=head1 COPYRIGHT
+
+Perl Console is Copyright (C) 2007 by Alexis Sukrieh
+
+=head1 DESCRIPTION
+
+Perl Console is a small program that implements a Read-eval-print loop: it lets
+you evaluate Perl code interactively.  
+
+It uses Readline to grab input, and provides completion with all the namespaces
+loaded during your session. It allows you to load a module in your session and
+test a function exported by it.
+
+=head1 COMMANDS
+
+It's possible to interact with the console with internal commands. The
+following commands are supported in this version:
+
+=over 4
+
+=item B<:help> display the interactive help screen
+
+=item B<:quit> quit the console
+
+=item B<:set> set a preference (see PREFERENCES).
+
+=back
+
+=head1 RCFILE
+
+PerlConsole will look for a rcfile located in your home directory called:
+~/.perlconsolerc
+
+Every line in that file will be evaluated as if they were issued in the console.
+You can then load there your favorite modules, or even define your preferences.
+
+Example of a valid ~/.perlconsolerc
+
+    :set output = dumper
+    use Date::Calc;
+
+
+=head1 PREFERENCES
+
+Preferences can be set with the B<:set> command. The following preferences are
+supported in this version:
+
+=over 4 
+
+=item B<output> changes the output of evaluated code
+
+=back
+
+For details about commands, ype :help <command> within the console.
+
+=head1 AUTHOR
+
+Perl Console was writen by Alexis Sukrieh <sukria@sukria.net>.
+
+=cut

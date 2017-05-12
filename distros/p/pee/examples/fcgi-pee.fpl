@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+
+### Configurations
+
+# Change to 0 if you don't want to have any debug output to server log
+my $debug = 1;
+
+
+use FCGI;
+use Pee::FileRunner;
+
+print STDERR "fcgi-pee.pl: STARTING\n" if ($debug);
+
+# hash of PET files with their checksum
+my %pet;
+# hash of PET files with their code
+my %compiled_code;
+
+# main FastCGI loop
+while (FCGI::accept >= 0) {
+  my $template = $ENV{'PATH_TRANSLATED'};
+
+
+  print STDERR "fcgi-pee.pl: TEMPLATE='$template'\n" if ($debug);
+
+  # try and see if we can read the template
+  if (! -r $template) {
+    print STDERR "cannot read template: $!\n" if ($debug);
+	next;
+  }
+
+  # stat the file to compose the checksum of (size + mtime)
+  my @fstat = stat ($template);
+
+  # we either haven't seen this template before OR that it has changed
+  if (!(exists $pet{$template}) || ($pet{$template} ne "$fstat[7]|$fstat[9]")) {
+
+    print STDERR "fcgi-pee.pl: RE-compiling template\n" if ($debug);
+
+    my $runner = Pee::FileRunner->new("$template");
+
+    if (!$runner->compile()) {
+      print "Content-type: text/html\n\n";
+      print "Error compiling template: $template\n";
+      print "<br>$runner->{errmsg}\n";
+      next;
+    }
+
+    # remember the checksum and compiled code
+    $pet{$template} = "$fstat[7]|$fstat[9]";
+	$compiled_code{$template} = $runner;
+  }
+
+  my $runner = $compiled_code{$template};
+  my $rv = $runner->run();
+
+  if (!$rv) {
+    print "<br><br><p>Error running template: $template\n";
+    print "<br>$runner->{errmsg}\n";
+    next;
+  }
+
+}

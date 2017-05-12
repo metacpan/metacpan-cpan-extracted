@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+Pg.pm
+Pg.xs
+README
+eg/ApachePg.pl
+eg/example.pl
+test.pl
+typemap

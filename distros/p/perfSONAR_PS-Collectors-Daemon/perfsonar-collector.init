@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+# Init file for perfSONAR Collector Daemon
+#
+# chkconfig: 2345 60 20
+# description: perfSONAR Collector Daemon
+#
+
+PREFIX=../
+BINDIR=${PREFIX}/bin
+CONFDIR=${PREFIX}/etc
+VARDIR=${PREFIX}/var/run
+
+COLLECTORCONF=${CONFDIR}/perfsonar/collector.conf
+LOGGERCONF=${CONFDIR}/perfsonar/logger.conf
+PIDFILE=perfsonar-collector.pid
+
+PERFSONAR="${BINDIR}/perfsonar-collector --config=${COLLECTORCONF} --piddir=${VARDIR} --pidfile=${PIDFILE} --logger=${LOGGERCONF} --ignorepid"
+
+ERROR=0
+ARGV="$@"
+if [ "x$ARGV" = "x" ] ; then 
+    ARGS="help"
+fi
+
+for ARG in $@ $ARGS
+do
+    # check for pidfile
+    if [ -f $VARDIR/$PIDFILE ] ; then
+	PID=`cat $VARDIR/$PIDFILE`
+	if [ "x$PID" != "x" ] && kill -0 $PID 2>/dev/null ; then
+	    STATUS="perfsonar-collector (pid $PID) running"
+	    RUNNING=1
+	else
+	    STATUS="perfsonar-collector (pid $PID?) not running"
+	    RUNNING=0
+	fi
+    else
+	STATUS="perfsonar-collector (no pid file) not running"
+	RUNNING=0
+    fi
+
+    case $ARG in
+    start)
+	if [ $RUNNING -eq 1 ]; then
+	    echo "$0 $ARG: perfsonar-collector (pid $PID) already running"
+	    continue
+	fi
+
+	echo $PERFSONAR
+
+	if $PERFSONAR ; then
+	    echo "$0 $ARG: perfsonar-collector started"
+	else
+	    echo "$0 $ARG: perfsonar-collector could not be started"
+	    ERROR=3
+	fi
+	;;
+    stop)
+	if [ $RUNNING -eq 0 ]; then
+	    echo "$0 $ARG: $STATUS"
+	    continue
+	fi
+	if kill $PID ; then
+	    echo "$0 $ARG: perfsonar-collector stopped"
+	else
+	    echo "$0 $ARG: perfsonar-collector could not be stopped"
+	    ERROR=4
+	fi
+	;;
+    restart)
+    	$0 stop; echo "waiting..."; sleep 10; $0 start;
+	;;
+#	if [ $RUNNING -eq 0 ]; then
+#	    echo "$0 $ARG: perfsonar-collector not running, trying to start"
+#	    if $PERFSONAR ; then
+#		echo "$0 $ARG: perfsonar-collector started"
+#	    else
+#		echo "$0 $ARG: perfsonar-collector could not be started"
+#		ERROR=5
+#	    fi
+#	else
+#	    if kill -HUP $PID ; then
+#	       echo "$0 $ARG: perfsonar-collector restarted"
+#	    else
+#	       echo "$0 $ARG: perfsonar-collector could not be restarted"
+#	       ERROR=6
+#	    fi
+#	fi
+#	;;
+    *)
+	echo "usage: $0 (start|stop|restart|help)"
+	cat <<EOF
+
+start      - start perfsonar-collector
+stop       - stop perfsonar-collector
+restart    - restart perfsonar-collector if running by sending a SIGHUP or start if 
+             not running
+help       - this screen
+
+EOF
+	ERROR=2
+    ;;
+
+    esac
+
+done
+
+exit $ERROR

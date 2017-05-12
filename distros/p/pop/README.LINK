@@ -1,0 +1,108 @@
+POP Documentation  :  LINK CLASSES
+-----------------     ------------
+
+This example uses a 3-way link between 3 objects of the same type (Foo::Person).
+The example is a "marriage link" describing a marriage of two people, and it
+also maintains the officiater of the marriage (e.g. justice of peace). It also
+includes an attribute of wedding date.
+
+Here is the pox for the "link_marriage" class. Note the following:
+1. The class has a 'type' parameter which is set to 'link'
+2. The class includes attributes and participants. Participant is
+  just another attribute but it a) must be an object and b) it means the
+  object is part of the link.
+
+<class name='Marriage' abbr='lkmar' type='link'>
+   Sample link class; connects three people together in holy matrimony
+   <participant  name='husband' type='Foo::Person'>
+      Husband
+   </participant>
+   <participant  name='wife' type='Foo::Person'>
+      Wife
+   </participant>
+   <participant  name='official' type='Foo::Person'>
+      Who officiated the marriage
+   </participant>
+   <attribute name='wedding_dt' abbr='when' type='numeric(11,0)'>
+      When this marriage occured
+   </attribute>
+</class>
+
+# poxdb will generate the following things, more or less:
+
+create table lkmar
+   pid pid_type not null primary key, # The pid of the link object
+   husband pid_type,
+   wife pid_type,
+   official pid_type,
+   wed_dt char(11,0)
+)
+
+# Unlike normal classes, it will create indexes on all participant columns
+# to get at them fast.
+
+create index i_husband on lkmar(husband);
+create index i_wife on lkmar(wife);
+create index i_official on lkmar(official);
+
+# poxperl will generate the following class code for a link class
+
+Foo::Marriage
+...
+sub initialize {
+  my $this = shift;
+
+  $this->{'husband'} = \do{my $a};
+  $this->{'wife'} = \do{my $a};
+  $this->{'official'} = \do{my $a};
+  $this->{'wed_dt'} = '';
+}
+
+=head2 CLASS METHOD
+Title:  Foo::Marriage::all_with_husband
+Desc:   Returns list of Marriage objects that have the given
+        Foo::Person as a husband
+=cut
+
+sub all_with_husband {
+  my($type, $obj) = @_;
+  return map {$type->new($_)}
+         $type->all({'where' => [['husband', '=', $obj]]});
+}
+
+=head2 PARTICPANT
+Title:	Foo::Marriage::husband
+Desc:	Husband
+=cut
+
+sub husband {
+  my $this = shift;
+  if (@_) {
+    my $obj = shift;
+    unless (ref($obj) && $obj->isa('Foo::Person')) {
+      croak "[$obj] is not a Foo::Person";
+    }
+    $this->{'husband'} = \$obj;
+  }
+  ${$this->{'husband'}};
+}
+
+... # same for wife and official, regular stuff for wedding_dt
+
+# here are some handmade methods in the marriage object.  Note that
+# one _could_ put these methods in the Person class, but really, the
+# semantics of the marriage link should be maintained in the marriage
+# class itself.  These, then, are class methods.
+
+sub is_married {
+  my($type, $person) = @_;
+  $type = ref $type || $type;
+  return $type->all_with_wife($person) ||
+	 $type->all_with_husband($person);
+}
+
+sub is_bigomist {
+  my($type, $person) = @_;
+  $type = ref $type || $type;
+  return $type->all_with_husband($person) > 1;
+}

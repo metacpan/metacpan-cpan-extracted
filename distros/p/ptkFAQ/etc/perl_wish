@@ -1,0 +1,58 @@
+#!/usr/local/bin/perl
+#####################################################################
+#  An example of calling wish as a subshell under Perl and
+#  interactively communicating with it through sockets.
+#
+#  The script is directly based on Gustaf Neumann's perlwafe script.
+#
+#  Dov Grobgeld <A HREF="mailto:dov@menora.weizmann.ac.il">dov@menora.weizmann.ac.il</A>
+#  1993-05-17
+#####################################################################
+
+    $wishbin = "/usr/local/bin/wish";
+#    $wishbin = "/usr/local/X11/wish";
+
+    die "socketpair unsuccessful: $!!\n" unless socketpair(W0,WISH,1,1,0);
+    if ($pid=fork) {
+	    select(WISH); $| = 1;
+	    select(STDOUT);
+
+
+	# Create some TCL procedures
+	    print WISH 'proc echo {s} {puts stdout $s; flush stdout}',"\n";
+
+	# Create the widgets
+	print WISH <<TCL;
+	# This is a comment "inside" wish
+
+	frame .f -relief raised -border 1 -bg green
+	pack append . .f {top fill expand}
+
+	button .f.button-pressme -text "Press me" -command {
+	    echo "That's nice."
+	}
+	button .f.button-quit -text quit -command {
+	    echo "quit"
+	}
+	pack append .f .f.button-pressme {top fill expand} \\
+		       .f.button-quit {top expand}
+
+TCL
+	# Here is the main loop which receives and sends commands
+	# to wish.
+	while (<WISH>) {
+	    chop;
+	    print "Wish sais: <$_>\n";
+	    if (/^quit/) { print WISH "destroy .\n"; last; }
+	}
+	    wait;
+    } elsif (defined $pid) {
+	open(STDOUT, ">&W0");
+	open(STDIN, ">&W0");
+	close(W0);
+	select(STDOUT); $| = 1;
+	exec "$wishbin --";
+    } else {
+	die "fork error: $!\n";
+    }
+

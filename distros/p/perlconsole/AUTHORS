@@ -1,0 +1,14 @@
+AUTHORS
+
+Perl Console is written by Alexis Sukrieh.
+It is released under the terms of the GNU GPL Licence (see COPYING for details).
+
+CONTRIBUTORS
+
+The following people contributed to Perl Console:
+
+    - Antonio Terceiro (Perl Packaging).
+    - Daniel Novotny (patch for supporting if/while/for structure in evaluated
+      code).
+    - S. Zachariah Sprackett (Readline history support, rc file support)
+        

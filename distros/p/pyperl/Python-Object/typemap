@@ -1,0 +1,32 @@
+# Copyright 2000 ActiveState
+
+TYPEMAP
+PyObject *	PyO_Ref
+NewPyObject *	New_PyO_Ref
+NewPyObjectX *  New_PyO_Ref_X
+PerlPyErr *     PyErr_Ref
+
+OUTPUT
+
+New_PyO_Ref
+        $arg = 0; /* because xsubpp need '$arg =' first */
+	ASSERT_LOCK_PERL;
+	$arg = newPerlPyObject_noinc($var);
+
+New_PyO_Ref_X
+        $arg = 0; /* because xsubpp need '$arg =' first  */
+        ASSERT_LOCK_PYTHON;
+	PERL_LOCK;
+	$arg = pyo2sv($var);
+	PERL_UNLOCK;
+	Py_DECREF($var);
+	ENTER_PERL;
+
+INPUT
+
+PyO_Ref
+	$var = PerlPyObject_pyo($arg)
+
+PyErr_Ref
+	$var = PerlPyErr_err($arg)
+

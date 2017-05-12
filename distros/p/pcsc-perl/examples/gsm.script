@@ -1,0 +1,27 @@
+# Select MF (3F00)
+# expect 9Fxx
+A0 A4 00 00 02 3F 00
+
+# Select DF Telecom (7F10)
+# expect 9Fxx
+A0 A4 00 00 02 7F 10
+
+# EF_ADN (6F3A) (Abbreviated Dialing Numbers)
+# expect 9F0F
+A0 A4 00 00 02 6F 3A
+
+# Get Reponse
+# expect 15 bytes of infos + 9000
+# last info byte gives the record length
+A0 C0 00 00 0F
+
+# PIN auth (pin is 1234)
+# ASCII 31 32 33 34
+# + FF up to 8 bytes)
+# expect 9000
+A0 20 00 01 08 31 32 33 34 FF FF FF FF
+
+# Read record 01
+# length 1A is given by the last byte from
+# get response (excluding the SW)
+A0 B2 01 04 1A

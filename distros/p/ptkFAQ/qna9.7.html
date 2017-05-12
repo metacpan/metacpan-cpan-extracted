@@ -1,0 +1,107 @@
+<HTML>
+<HEAD><TITLE> 9.7. How do I configure a Scrollbar to scroll multiple widgets?</TITLE></HEAD>
+<BODY><a name="A9.7"> 9.7. How do I <KBD>configure</KBD> a <KBD>Scrollbar</KBD> to scroll multiple widgets?</a>
+
+<hr>
+</p><p>
+Note that the widget type that you wish to scroll can be important as a scroll
+&quot;unit&quot; on a <KBD>Text</KBD> or <KBD>Listbox</KBD> may be a character
+(several pixels - depending on font) whereas it would be an X &quot;units&quot; 
+on a <KBD>Canvas</KBD> (could be pixel - but you may also specify other units).
+<p>
+A concrete answer for scrolling 3 <KBD>Listbox</KBD>es 
+comes courtesy of Frederick L. Wagner &lt;derf@ti.com&gt;:
+<BLOCKQUOTE>
+From a working example of multi-xscrolling:
+</BLOCKQUOTE><PRE>
+    sub multiscrollx
+    {  # multiscrollx
+     my ($sb,$wigs,@args) = @ARG;
+     my $w;
+     foreach $w (@$wigs)
+     {
+       $w-&gt;xview(@args);
+     }
+    }  # multiscrollx
+ 
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+      $sh-&gt;configure( -command =&gt; [ \&amp;multiscrollx, $sh,
+                         [$scratchrule,$ruleheader,$ruletable]]);
+      $ruletable-&gt;configure(  -xscrollcommand =&gt; [ 'set', $sh]);
+      $ruleheader-&gt;configure( -xscrollcommand =&gt; [ 'set', $sh]);
+      $scratchrule-&gt;configure(-xscrollcommand =&gt; [ 'set', $sh]);
+</PRE><BLOCKQUOTE>
+In this case,<BR>
+  <KBD>$sh</KBD> is a horizontal <KBD>Scrollbar</KBD>,<BR>
+  <KBD>$ruletable</KBD> and <KBD>$scratchrule</KBD> are <KBD>Table</KBD>s<BR>
+  <KBD>$ruleheader</KBD> is an <KBD>Entry</KBD><BR>
+<P>
+However, this approach is good for any widget with 
+X-scrolling capability, I think.  
+So the Y counterpart should be:
+</BLOCKQUOTE><PRE>
+    sub multiscrolly
+    {  # multiscrolly
+     my ($sb,$wigs,@args) = @ARG;
+     my $w;
+     foreach $w (@$wigs)
+     {
+       $w-&gt;yview(@args);
+     }
+    }  # multiscrolly
+ 
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+      $sv-&gt;configure( -command =&gt; [ \&amp;multiscrolly, $sv,
+                                    [$l1,$l2,$l3]]);
+      $l1-&gt;configure( -yscrollcommand =&gt; [ 'set', $sv]);
+      $l2-&gt;configure( -yscrollcommand =&gt; [ 'set', $sv]);
+      $l3-&gt;configure( -yscrollcommand =&gt; [ 'set', $sv]);
+</PRE><BLOCKQUOTE>
+Hope that helps.
+</BLOCKQUOTE>
+<p>
+Greg VanSickle <a href="mailto:vansickl@bnr.ca">&lt;vansickl@bnr.ca&gt;</a> points out 
+that this little script snippet does not provide for the binding of 
+<KBD>'&lt;Button-2&lt;'</KBD> that he is accustomed to. He wrote
+a package called <a href="etc/DSListbox.tar.gz">DSListbox</a> to address this 
+binding issue.
+</p><p>
+Conversely, Jong Park asked how to setup multiple <KBD>Scrollbar</KBD>s to 
+scroll the same widget. Nick Ing-Simmon's reply makes use of an anonymous <KBD>sub</KBD> 
+and can be summed up in a little script that scrolls a <KBD>Text</KBD> widget
+(to see the scrolling in action type more than 20 lines of text into the widget):</p>
+<PRE>
+    #!/usr/local/bin/perl -w
+    
+    use Tk;
+    my $mw = MainWindow-&gt;new();
+    
+    my $s1 = $mw-&gt;Scrollbar(-orient =&gt; 'vertical');
+    my $s2 = $mw-&gt;Scrollbar(-orient =&gt; 'vertical');
+    
+    $s1-&gt;pack(-side =&gt; 'left', -fill =&gt; 'y');
+    my $t = $mw-&gt;Text(
+        -yscrollcommand =&gt;  sub{$s1-&gt;set(@_), $s2-&gt;set(@_)},
+        -wrap           =&gt; 'word',
+        -width          =&gt; 70,
+        -height         =&gt; 20, 
+        -font           =&gt; $font,
+        -setgrid        =&gt; 1,
+    )-&gt;pack(-side =&gt; 'left');
+    $s2-&gt;pack(-side =&gt; 'right', -fill =&gt; 'y');
+    $s1-&gt;configure(-command =&gt; [$t =&gt; 'yview']);
+    $s2-&gt;configure(-command =&gt; [$t =&gt; 'yview']);
+    
+    MainLoop;
+    
+    __END__
+</PRE>
+
+
+<hr>
+	<p><a href="qna9.6.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.7">table of contents</a> | <a href="qna9.8.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

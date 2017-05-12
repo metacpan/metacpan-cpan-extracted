@@ -1,0 +1,13 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Bundle/pRPC-modules.pm
+lib/RPC/pClient.pm
+lib/RPC/pServer.pm
+t/base.t
+t/client.t
+t/encrypt.t
+t/lib.pl
+t/noStorableOo.t
+t/noStorableOoEnc.t

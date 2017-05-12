@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use MIO::TCP;
+use Poros::Query;
+use Vulcan::OptConf;
+use Vulcan::Symlink::Conf;
+
+our $PORT = 12345;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 --range range --prod product path/link [--undo] \
+ [--timeout seconds] [--max number]
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->get( qw( range=s prod=s timeout=i max=i undo ) )->dump();
+
+$option->assert( qw( range prod ) );
+$o{name} = delete $o{prod};
+
+my %conf = Vulcan::Symlink::Conf->new( %o )->dump( @ARGV );
+while ( my ( $link, $conf ) = each %conf )
+{
+    if ( $o{undo} )
+    {
+        last unless @ARGV;
+        delete $conf->{path};
+    }
+    elsif ( ! $conf->{path} || $link eq $conf->{path} )
+    {
+        $conf->{check} = 1;
+        delete $conf->{path};
+    }
+
+    delete $conf->{regex};
+    $conf->{link} = $link;
+}
+
+exit 0 unless my @conf = values %conf;
+
+my %query = ( code => 'symlink', argv => \@conf );
+my $range = Hermes->new( $option->dump( 'range' ) );
+my ( %result, %mesg ) = MIO::TCP
+    ->new( map { join ':', $_, $PORT } $range->load( delete $o{range} )->list )
+    ->run( %o, input => Poros::Query->dump( \%query ) );
+
+while ( my ( $type, $mesg ) = each %result )
+{
+    while ( my ( $mesg, $node ) = each %$mesg )
+    {
+        map { $_ =~ s/:$PORT$// } @$node;
+        $mesg =~ s/--- \d+\n$//;
+        $node = $range->load( $node )->dump();
+        $mesg{$type}{$node} = YAML::XS::Load( $mesg ) if $mesg;
+    }
+}
+
+YAML::XS::DumpFile \*STDOUT, \%mesg if %mesg;
+exit 0;

@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+use DBI;
+use Carp;
+use POP::Environment;
+use POP::Schema_parser;
+my $dsn = "dbi:Sybase:server=$POP_DB_SERVER;database=$POP_DB_DB";
+my $dbh = DBI->connect($dsn, $POP_DB_USER, $POP_DB_PASSWD,
+		{ RaiseError => 1 }) or
+  croak "Couldn't connect to [$dsn]: $DBI::errstr";
+
+my $parse = new POP::Schema_parser;
+$parse->parse(\*STDIN);
+unless (@ARGV) { @ARGV = keys %$parse }
+foreach my $schema (@ARGV) {
+  push(@tables, map {$_->{'sql'}} grep {$_->{'type'} eq 'TABLE'} @{$parse->{$schema}});
+  push(@procs, map {$_->{'sql'}} grep {$_->{'type'} eq 'PROC'} @{$parse->{$schema}});
+}
+
+for (reverse @procs) {
+  /^create proc (.*)/ or croak "Syntax Error [$_]";
+  eval {
+    $dbh->do("drop proc $1");
+  };
+  if ($@) { print STDERR $@ }
+}
+
+for (reverse @tables) {
+  /^create table (.*)/ or croak "Syntax Error [$_]";
+  eval {
+    $dbh->do("drop table $1");
+  };
+  if ($@) { print STDERR $@ }
+}
+$dbh->disconnect;

@@ -1,0 +1,37 @@
+### perl: poros/code/access
+
+use strict;
+use warnings;
+
+use Vulcan::File;
+
+return sub
+{
+    local $/ = "\n";
+
+    my %param = @_;
+    my %file = map { $_ => Vulcan::File->new( "/etc/$_" ) }
+        qw( passwd shadow sudoers );
+
+    for my $conf ( @{ $param{argv} } )
+    {
+        next unless my $user = $conf->{user};
+        my $regex = qr/^$user\b/;
+        map { $file{$_}->munge( seek => 'set', regex => $regex, length => 1, 
+            line => $conf->{$_}, lazy => 1 ) } keys %file;
+    }
+
+    map { $_->commit() } values %file;
+
+    for my $conf ( @{ $param{argv} } )
+    {
+        next unless my $user = $conf->{user};
+        my $home = "/home/$user";
+        my $ssh = "$home/.ssh";
+        system( "mkdir -m 0700 -p $ssh && chown $user $ssh $home" )
+            if $conf->{passwd};
+    }
+
+    print "ok\n";
+    return 0;
+};

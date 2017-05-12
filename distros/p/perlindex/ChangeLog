@@ -1,0 +1,146 @@
+2013-01-06  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Do not decrement IDF in GC code.  I am not sure why the previous
+	code could produce negative document frequencies.
+
+2011-01-30  Damyan Ivanov <dmn@debian.org>
+
+	* Description: Replace usage of 'find.pl' by File::Find
+	 find.pl is scheduled for removal from the perl core
+
+2008-11-17  Ulrich Pfeifer  <Ulrich.Pfeifer@VerizonBusiness.com>
+
+	* perlindex.PL: applied typo patch from Slaven Rezic
+	(http://rt.cpan.org/Ticket/Display.html?id=40890)
+
+2008-10-19  Ulrich Pfeifer  <Ulrich.Pfeifer@VerizonBusiness.com>
+
+	* perlindex.PL: Garbage collect can not change the index while
+	scanning it.  Doing a copy now.
+
+	* perlindex.PL: Fixed $gc_required scoping error.  Removed code
+	duplication. Added progress indication for GC collect. 
+
+	* perlindex.PL: Fixed the indexing of the default directories
+	(code duplication needs to be removed) and added checking for
+	removed files (http://rt.cpan.org/Ticket/Display.html?id=39863).
+
+2008-10-19  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* perlindex.PL: Added support for updating documents as requested
+	by SREZIC in http://rt.cpan.org/Ticket/Display.html?id=39862.
+	Update is transparent - except for the time used in the garbage
+	collect phase.
+
+2006-07-02  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* perlindex.PL (index): moving the check for Pod::Text in the
+	index function.  The result went out of scope before (thanks
+	Florian for the bug report).  Fixing the loop variable in the main
+	loop (thanks Florian for the bug report).  Adding support for
+	IO::Scalar.
+	
+2006-03-19  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Fixed a bug reported by Florian Ragwitz:  Absolute filenames
+	were access incorrectly from hit list.
+
+2005-09-18  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Integrated a patch from Marek Rouchal to use Pod::Text for
+	parsing if available.  I did rework the patch a little to remove
+	the need for IO::Scalar which does no seem to be part of debian
+	sarge.  Now underscore is also a valid letter.
+
+2005-04-10  Ulrich Pfeifer  <upf@wait.de>
+
+	* Re-Added Text::English as it does not seem to be available
+	separately.  I'd rather not package a "foreign" separately.
+
+2005-04-03  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Removed Text::English from Distribution
+	* Determine pager and search path at run time (Patch from Marek, Ticket #4506)
+
+2004-05-02  Florian Ragwitz
+
+	* please parameterize the $IDIR in the make process
+	* clarified license
+	* clarified authorship of Text::English
+	
+2003-06-19  Slaven Rezic 
+
+	* t/basic.t: made test more safe and portable
+
+2003-06-18  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	Added some regression tests before the CPAN testers beat me up.
+
+2003-06-18  Slaven Rezic 
+
+        [cpan #2820] Fix indexed directories
+
+        In some perl installations, installsitelib is not part of the
+	privlib directory. That is, privlib is something like
+	/usr/local/lib/perl5/5.8.0 and installsitelib something like
+	/usr/local/lib/perl5/site_perl/5.8.0.  This causes the perlindex
+	indexer not to dive into installsitelib.
+
+
+Sun Mar 10 13:05:46 MET 1996   "Chuck D. Phillips (NON-HP Employee)" <cdp@hpescdp.fc.hp.com>
+
+By default, the program perlindex isn't deleted when you do a "make
+clean" the result is that the Config.pm constants don't get updated
+next time you do a "make all".  To fix this, you can add the following
+line to the WriteMakefile() parameters in Makefile.PL:
+
+	      'clean' =>	{ 'FILES' => 'perlindex' },
+
+
+Nit: Term::ReadKey is more reliable for cbreak than using $d_bsd.  On
+HPUX, setting BSD_Style to either 0 or 1 doesn't quite work right.
+I've hacked my own copy of perlindex.PL to prefer Term::ReadKey if
+available.  Otherwise, it defaults to old behavior execept that it
+resolves during "make all" instead of at run time.  (I also insert
+"col" between the nroff and the pager to avoid some garbage on HPUX.)
+I've included the diffs at the bottom.
+
+patch7 Description:
+
+	Fixed test for compressed int patch.
+
+Fri Mar  8 20:26:27 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+patch6 Description:
+
+	man3direxp will not be indexed any more. Even if inside of
+	privlibexp. Fixed bug with -nomenu. Did eat characters ;-)
+	cbreak for non bsd systems (hopefully).
+
+Wed Feb 28 13:45:28 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+patch5 Description:
+
+	Nroff, man1direxp, privlibexp, prefix and pager are now
+	determined at extraction time. Nroff and pager were hardcoded
+	before.
+
+Fri Feb 23 11:22:12 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	Fixed version computation.
+	Fixed menu numbering. First hit could not be selected before.
+        Added chmod 0755 to perlindex.PL
+Thu Feb 22 19:17:54 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	New version numbering.
+	Added cbreak mode.
+
+Thu Feb 22 16:43:57 MET 1996   Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+
+. Description:
+
+	

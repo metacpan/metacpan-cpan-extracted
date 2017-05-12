@@ -1,0 +1,17 @@
+^.hg
+^cover_db
+~$
+-$
+.old$
+.bak$
+^\.\#
+Makefile$
+blib/
+pm_to_blib
+blibdirs
+^MYMETA
+pkg.html
+readme.md
+^inotify
+^tst
+\#

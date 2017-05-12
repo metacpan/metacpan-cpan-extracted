@@ -1,0 +1,75 @@
+From:	IN%"okamoto@hpcc123.corp.hp.com"  "Jeff Okamoto" 16-APR-1996 18:13:03.20
+To:	IN%"perl5-porters@africa.nicoh.com"
+CC:	
+Subj:	Patches to Tk-b11
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I3MA6YHJNK8X6COK@LNS62.LNS.CORNELL.EDU>; Tue,
+ 16 Apr 1996 18:12:51 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA272742732; Tue, 16 Apr 1996 18:12:12 -0400
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA272172713; Tue,
+ 16 Apr 1996 18:11:53 -0400
+Received: from paloalto.access.hp.com by africa.nicoh.com with ESMTP
+ (1.37.109.15/16.2) id AA271952699; Tue, 16 Apr 1996 16:11:41 -0600
+Received: from hpcc123.corp.hp.com (okamoto.corp.hp.com)
+ by paloalto.access.hp.com with ESMTP (1.37.109.16/15.5+ECS 3.3)
+ id AA182972637; Tue, 16 Apr 1996 15:10:38 -0700
+Received: by hpcc123.corp.hp.com (1.37.109.16/15.5+ECS 3.3)
+ id AA101552635; Tue, 16 Apr 1996 15:10:36 -0700
+Date: Tue, 16 Apr 1996 15:10:36 -0700
+From: Jeff Okamoto <okamoto@hpcc123.corp.hp.com>
+Subject: Patches to Tk-b11
+Sender: owner-perl5-porters@nicoh.com
+To: perl5-porters@africa.nicoh.com
+Message-id: <199604162210.AA101552635@hpcc123.corp.hp.com>
+Content-transfer-encoding: 7BIT
+List-Name: perl5-porters
+Precedence: bulk
+
+Here are two patches for Tk-b11 that caused problems when compiling.  The
+first one is more egregious, because it caused myConfig to not compile its
+test programs in ANSI mode.
+
+Jeff
+-----
+*** Tk/MMtry.pm.original	Tue Apr 16 15:04:45 1996
+--- Tk/MMtry.pm	Tue Apr 16 15:03:09 1996
+***************
+*** 8,14 ****
+  sub try_compile
+  {
+   my $file  = shift;
+!  my $msgs  = `$Config{'cc'} $file 2>&1`;
+   my $ok = ($? == 0);
+   unlink('a.out') if (-f 'a.out');
+   return $ok;
+--- 8,14 ----
+  sub try_compile
+  {
+   my $file  = shift;
+!  my $msgs  = `$Config{'cc'} $Config{'ccflags'} $file 2>&1`;
+   my $ok = ($? == 0);
+   unlink('a.out') if (-f 'a.out');
+   return $ok;
+
+*** myConfig.original	Tue Apr 16 15:08:06 1996
+--- myConfig	Tue Apr 16 15:04:28 1996
+***************
+*** 86,92 ****
+    my $def;
+    foreach $d (qw(TZ NO_TZ DOTS))
+     {
+!     if (Tk::MMutil::try_compile("-DTIMEOFDAY_$d config/tod.c"))
+       {
+        $def = "TIMEOFDAY_$d";
+        print STDERR "$d gettimeofday()\n";
+--- 86,92 ----
+    my $def;
+    foreach $d (qw(TZ NO_TZ DOTS))
+     {
+!     if (try_compile("-DTIMEOFDAY_$d config/tod.c"))
+       {
+        $def = "TIMEOFDAY_$d";
+        print STDERR "$d gettimeofday()\n";

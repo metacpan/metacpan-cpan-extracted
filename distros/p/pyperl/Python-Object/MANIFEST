@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+Object.pm
+Object.xs
+lib/Python.pm
+lib/Python/Err.pm
+typemap
+pyinc.py

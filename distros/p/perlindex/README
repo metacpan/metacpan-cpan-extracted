@@ -1,0 +1,22 @@
+This is the perlindex distribution 
+
+Perlindex is a program to index and search the perl documentation.
+
+The newest version is always available from CPAN/authors/id/ULPFR.
+
+Perlindex should work with any Perl >= 5.002 at least. With Perl >=
+5.003_07 it will use compress integers which results in smaller
+indices.
+
+To  install do:
+
+        perl Makefile.PL
+        make install
+        perlindex -index
+
+You may give additional files to index on the command line. I'd
+recommend to specify the perl utils (perldoc, h2xs, ...):
+
+        perlindex -index /usr/local/ls6/perl-5.002/bin/*
+
+Ulrich Pfeifer

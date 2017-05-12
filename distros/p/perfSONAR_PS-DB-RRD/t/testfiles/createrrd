@@ -1,0 +1,22 @@
+rm ./t/testfiles/testrrd1.rrd
+rm ./t/testfiles/testrrd2.rrd
+rm ./t/testfiles/testrrd3.rrd
+rrdtool create ./t/testfiles/testrrd1.rrd --start 1000000000 --step 1 DS:ds:GAUGE:1:U:U RRA:AVERAGE:0.5:1:1000
+rrdtool create ./t/testfiles/testrrd2.rrd --start 1000000000 --step 1 DS:ds:GAUGE:1:U:U RRA:AVERAGE:0.5:2:1000
+rrdtool create ./t/testfiles/testrrd3.rrd --start 2000000000 --step 1 DS:ds:GAUGE:1:0:2000 RRA:AVERAGE:0.99999:1:2000
+rrdtool update ./t/testfiles/testrrd1.rrd 1000000001:1337
+rrdtool update ./t/testfiles/testrrd2.rrd 1000000001:1337
+rrdtool update ./t/testfiles/testrrd3.rrd 2000000201:1337
+rrdtool update ./t/testfiles/testrrd1.rrd 1000000002:3.14
+rrdtool update ./t/testfiles/testrrd2.rrd 1000000002:3.14
+rrdtool update ./t/testfiles/testrrd3.rrd 2000000202:3.14
+rrdtool update ./t/testfiles/testrrd1.rrd 1000000003:2.71
+rrdtool update ./t/testfiles/testrrd2.rrd 1000000003:2.71
+rrdtool update ./t/testfiles/testrrd3.rrd 2000000203:2.71
+rrdtool update ./t/testfiles/testrrd1.rrd 1000000004:42
+rrdtool update ./t/testfiles/testrrd2.rrd 1000000004:42
+rrdtool update ./t/testfiles/testrrd3.rrd 2000000204:42
+rrdtool update ./t/testfiles/testrrd1.rrd 1000000005:0.89
+rrdtool update ./t/testfiles/testrrd2.rrd 1000000005:0.89
+rrdtool update ./t/testfiles/testrrd3.rrd 2000000205:0.89
+

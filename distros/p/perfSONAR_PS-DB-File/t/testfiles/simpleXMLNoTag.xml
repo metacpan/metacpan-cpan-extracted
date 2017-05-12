@@ -1,0 +1,18 @@
+<alpha>
+	<beta>
+		<charley europe="fun"/>
+	</beta>
+	<charley>
+		<dog europe="good"/>
+	</charley>
+	<beta/>
+	<beta>
+		<charley>
+			<done>
+				<england super="man">
+					Freaky
+				</england>
+			</done>
+		</charley>
+	</beta>
+</alpha>

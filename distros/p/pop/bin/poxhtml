@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+use strict;
+use POP::POX_parser;
+use Fcntl;
+use Carp;
+use vars qw/@colors %colors @imgs %imgs $OUT_EXT @IN @OUT/;
+
+$OUT_EXT = 'html';
+
+require 'poxargs.pl';
+
+@colors = (qw(#dd4444 #4444dd #44dd44 #dddd44 #44dddd #dd44dd #dddddd));
+@imgs = (qw(dd4444.gif 4444dd.gif 44dd44.gif dddd44.gif 44dddd.gif dd44dd.gif dddddd.gif));
+
+my $p = new POP::POX_parser;
+
+for (my $i; $i < @IN; $i++) {
+  %colors = %imgs = ();
+  unless (sysopen(OUT, $OUT[$i], O_WRONLY|O_CREAT|O_TRUNC, 0660)) {
+    croak "Couldn't open [$OUT[$i]] for writing: $!";
+  }
+  print STDERR "Converting $IN[$i] to $OUT[$i]\n";
+  my $c;
+  eval {
+   $c = $p->parse($IN[$i]);
+  };
+  if ($@) {
+    print STDERR "$@";
+    next;
+  }
+  print OUT 
+  "<html>",
+    "<head>",
+      "<title>",
+	"Class definition: $c->{'name'}",
+      "</title>\n",
+    "<body>",
+     "<H1><font color='#6666ff'>$c->{'name'}</font></H1>\n",
+      &conv_isa($c->{'isa'}),
+      "<H2>Attributes</H2>\n",
+      "<ul>",
+      (map {"<font $colors{$_->{'inherited'}}>".
+	      "<li>".
+	        "<b>".
+		  "$_->{'name'}".
+		  ($_->{'hash'} ?
+		    ' { } : '.&conv_type($_->{'key_type'}).' => '.
+			      &conv_type($_->{'val_type'}) :
+		    ($_->{'list'} ? ' [ ] : ' : ' : ').
+	            &conv_type($_->{'type'})).
+	        "</b>".
+		"<br>\n".
+	        $_->{'comments'}.
+	      "</li>".
+	    "</font>\n"}
+	   values %{$c->{'attributes'}},
+	   values %{$c->{'participants'}}),
+      "</ul>",
+      "<H2>Constructors</H2>\n",
+      "<ul>",
+      (map {"<font $colors{$_->{'inherited'}}>".
+	      "<li>".	
+		"<b>".
+		  "$_->{'name'} (".
+		  (join ", ", map {"$_->{'name'} : ".
+				   &conv_type($_->{'type'})}
+				   values %{$_->{'params'}}).
+		  ")".
+		"</b>".
+		"<br>\n".
+		"<ul>".
+		  (join "<br>\n", map {"<li>".
+					 "<i>$_->{'name'}</i> : ".
+					 $_->{'comments'}.
+				       "</li>"}
+				      values %{$_->{'params'}}).
+		"</ul>".
+		$_->{'comments'}.
+	      "</li>".
+	    "</font>\n"}
+	   values %{$c->{'constructors'}}),
+      "</ul>\n",
+      "<H2>Methods</H2>\n",
+      "<ul>",
+      (map {"<font $colors{$_->{'inherited'}}>".
+	      "<li>".	
+		"<b>".
+		  "$_->{'name'} (".
+		  (join ", ", map {"$_->{'name'} : ".
+				   &conv_type($_->{'type'})}
+				  values %{$_->{'params'}}).
+		  ")".	
+		"</b>".
+		"<br>\n".
+		"<ul>".
+		  (join "<br>\n", map {"<li>".
+					 "<i>$_->{'name'}</i> : ".
+					 "$_->{'comments'}".
+				       "</li>"}
+				      values %{$_->{'params'}}).
+		"</ul>".
+		$_->{'comments'}.
+	      "</li>".
+	    "</font>\n"}
+	   values %{$c->{'methods'}}),
+      "</ul>\n",
+      "<H2>Class Methods</H2>\n",
+      "<ul>",
+      (map {"<font $colors{$_->{'inherited'}}>".
+	      "<li>".
+		"<b>$_->{'name'} (".
+		  (join ", ", map {"$_->{'name'} : ".
+				   &conv_type($_->{'type'})}
+				  values %{$_->{'params'}}).
+		  ")".
+		"</b>".
+		"<br>\n".
+		"<ul>".
+		  (join "<br>\n", map {"<li>".
+					 "<i>$_->{'name'}</i> : ".
+					 "$_->{'comments'}".
+				       "</li>"}
+				  values %{$_->{'params'}}).
+		"</ul>".
+		$_->{'comments'}.
+	      "</li>".
+	    "</font>\n"}
+	   values %{$c->{'class-methods'}}),
+      "</ul>\n",
+    "</body>",
+  "</html>\n";
+}
+
+sub conv_type {
+  my $type = shift;
+  if ($type =~ /Fez::(.*)/) {
+    $type = "<a href='$1'>$type</a>";
+  }
+  $type;
+}
+
+sub conv_isa {
+  my($isa) = shift;
+  return unless $isa;
+  my @isa = split /\s*,\s*/, $isa;
+  for (my $i=0; $i < @isa; $i++) {
+    $colors{$isa[$i]} = "color=$colors[$i]";
+    $imgs{$isa[$i]} = $imgs[$i];
+  }
+  return "Derived from: ".(join ', ',
+    map {"<a href='$_'>$_</a> (<img src=$imgs{$_} height=12 width=30>)"} @isa)."\n";
+}

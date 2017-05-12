@@ -1,0 +1,90 @@
+<HTML>
+<HEAD><TITLE> 11.1. What do the -&gt;, =&gt; and :: symbols mean?</TITLE></HEAD>
+<BODY><a name="A11.1"> 11.1. What do the <KBD>-&gt;</KBD>, <KBD>=&gt;</KBD> and <KBD>::</KBD> symbols mean?</a>
+
+<hr>
+</p><p>
+The <KBD>-&gt;</KBD> is the &quot;infix dereference operator&quot;. 
+In other words it is the means by which one calls a <KBD>sub</KBD> with a pass 
+by reference (among other things you can do with <KBD>-&gt;</KBD>). As stated 
+above most things in calls to perl/Tk routines are 
+passed by reference. The <KBD>-&gt;</KBD> is used in perl just as in C or C++. 
+(Most of the widget primitives are elements of the <KBD>Tk::</KBD> &quot;perl
+class&quot;.) A simple example of dereferencing would be:
+<pre>
+    $x = { def =&gt; bar };  # $x is a reference to an anon. hash
+    print $x-&gt;{def},"\n"; # prints ``bar''
+</pre>
+Note that in the case of calling perl/Tk <KBD>sub</KBD>s there
+may be more than one way to call by reference. Compare
+<pre>
+    my($top) = MainWindow-&gt;new;
+</pre>
+with
+<pre>
+    my($top) = new MainWindow;
+</pre>
+But in general you will be making extensive use of calls like:
+<pre>
+    $top -&gt; <i>Widge-type</i>;
+</pre>
+There is a clear and succint discussion of references, dereferences, and even
+closures in 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlref.html">
+<KBD>man perlref(1)</KBD></a> or see the perl 5 info page at:
+<pre>
+    <a href="http://www.metronet.com/perlinfo/perl5.html">http://www.metronet.com/perlinfo/perl5.html</a>
+</pre>
+The use of the <KBD>=&gt;</KBD> operator is quite common in perl/Tk scripts. 
+Quoting from 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlop.html">
+<KBD>man perlop(1)</KBD></a>:
+<BLOCKQUOTE>
+ The =&gt; digraph is simply a synonym for the comma operator. It's useful for
+ documenting arguments that come in pairs.
+</BLOCKQUOTE>
+You could say that <KBD>=&gt;</KBD> is used for aesthetic or organizational
+reasons. Note in the following how hard it is to keep track of whether or not
+every <KBD>-option</KBD> has an <KBD>argument</KBD>:
+<pre>
+    $query -&gt; Button(-in,\$reply,-side,'left',-padx,2m,-pady,
+     2m,-ipadx,2m,-ipady,1m)-&gt;pack(-side,'bottom');
+</pre>
+As opposed to:
+<pre>
+    $query -&gt;Button( -in =&gt; \$reply,
+                     -side =&gt; 'left',
+                     -padx =&gt; 2m,
+                     -pady =&gt; 2m,
+                     -ipadx =&gt; 2m,
+                     -ipady =&gt; 1m
+                    )-&gt;pack(-side =&gt; 'bottom');
+</pre>
+By the way if you wanted the numeric &quot;greater than or equal&quot; you
+would use <KBD>&gt;=</KBD> not <KBD>=&gt;</KBD>. 
+<p>
+While the <KBD>::</KBD> symbol can be thought of as similar to the period 
+in a C struct, it is much more akin to the <KBD>::</KBD> class scope operator
+in C++:
+<pre>
+    a.b.c;       /* something in C */
+    a::b::c();   // function in C++ 
+    $a::b::c;    # a scalar in Perl 5
+    @a::b::c;    # a list in Perl 5
+    %a::b::c;    # an associative array or "hash" in Perl 5
+    &amp;a::b::c;    # a function in Perl 5
+</pre>
+It is also analogous to the single forward quotation mark in perl 4:
+<pre>
+    $main'foo;   # a $foo scalar in perl 4
+    $main::foo;  # a $foo scalar in Perl 5
+</pre>
+For backward compatibility perl 5 allows you to refer to <KBD>$main'foo</KBD> 
+but <KBD>$main::foo</KBD> is recommended.
+
+
+<hr>
+	<p><a href="qna11.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.1">table of contents</a> | <a href="qna11.2.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

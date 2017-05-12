@@ -1,0 +1,38 @@
+perfSONAR_PS::Collectors::Daemon README File
+==========================================
+
+Description
+-----------
+
+The perfSONAR_PS::Collectors::Daemon is the main daemon that is used to start
+perfSONAR collectors. To use the daemon, install the modules for the collectors
+one is interested in and configure the services in collector.conf.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Collectors::Daemon'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Configuration
+-------------
+
+Once installed, run the program "psConfigureCollectors". This program will ask
+a series of questions allowing you to specify which collectors to enable and
+how each collector is configured.
+
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

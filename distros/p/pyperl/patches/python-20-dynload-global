@@ -1,0 +1,18 @@
+--- Python/dynload_shlib.c.dist	Tue May 23 19:06:13 2000
++++ Python/dynload_shlib.c	Tue May 23 19:07:18 2000
+@@ -103,12 +103,12 @@ dl_funcptr _PyImport_GetDynLoadFunc(cons
+ #ifdef RTLD_NOW
+ 	/* RTLD_NOW: resolve externals now
+ 	   (i.e. core dump now if some are missing) */
+-	handle = dlopen(pathname, RTLD_NOW);
++	handle = dlopen(pathname, RTLD_NOW | RTLD_GLOBAL);
+ #else
+ 	if (Py_VerboseFlag)
+ 		printf("dlopen(\"%s\", %d);\n", pathname,
+-		       RTLD_LAZY);
+-	handle = dlopen(pathname, RTLD_LAZY);
++		       RTLD_LAZY | RTLD_GLOBAL);
++	handle = dlopen(pathname, RTLD_LAZY | RTLD_GLOBAL);
+ #endif /* RTLD_NOW */
+ 	if (handle == NULL) {
+ 		PyErr_SetString(PyExc_ImportError, dlerror());

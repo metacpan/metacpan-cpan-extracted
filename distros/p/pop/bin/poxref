@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use strict;
+use POP::POX_parser;
+use POP::Environment qw/$POP_SYSTEM/;
+use Fcntl;
+use Carp;
+
+use vars qw/%CLASSES %references %missing/;
+
+my $p = new POP::POX_parser;
+
+for my $in (@ARGV) {
+  my $c;
+  eval {
+    $c = $p->parse($in);
+  };
+  if ($@) {
+    print STDERR $@;
+    next;
+  }
+  $CLASSES{$c->{'name'}} = $c;
+  foreach (values %{$c->{'scalar_attributes'}}) {
+    if ($_->{'type'} =~ /::/) {
+      push (@{$references{$_->{'type'}}}, {
+	'table' => $c->{'dbname'},
+	'column' => $_->{'dbname'} });
+    }
+  }
+  foreach (values %{$c->{'list_attributes'}}) {
+    if ($_->{'type'} =~ /::/) {
+      push (@{$references{$_->{'type'}}}, {
+	'table' => "$c->{'dbname'}\@$_->{'dbname'}",
+	'column' => "$_->{'dbname'}" });
+    }
+  }
+  foreach (values %{$c->{'hash_attributes'}}) {
+    if ($_->{'val_type'} =~ /::/) {
+      push (@{$references{$_->{'val_type'}}}, {
+	'table' => "$c->{'dbname'}\@$_->{'dbname'}",
+	'column' => 'value' });
+    }
+  }
+  $missing{$c->{'name'}} = 1;
+}
+
+while (my($class,$refs) = each %references) {
+  $class =~ /^$POP_SYSTEM\::(.*)/ or croak "[$class] not in $POP_SYSTEM";
+  my $c = $CLASSES{$1};
+  delete $missing{$1};
+  croak "POX for [$1] not specified.\n" unless $c;
+  print "create proc $c->{'dbname'}#CNT\n",
+	"  \@pid pid_type,\n",
+	"  \@count int output\n",
+	"as\n",
+	"  declare \@cnt int\n",
+	"  select \@count = 0\n",
+	join("", map {
+	  "  select \@cnt = count(*) from $_->{'table'} where $_->{'column'} = \@pid\n".
+	  "  select \@count = \@count + \@cnt\n"
+		     } @$refs),
+	"  select \@count\n\n";
+}
+
+for my $class (keys %missing) {
+  my $c = $CLASSES{$class};
+  print "create proc $c->{'dbname'}#CNT\n",
+	"  \@pid pid_type,\n",
+	"  \@count int output\n",
+	"as\n",
+	"  select \@count = 0\n\n";
+}

@@ -1,0 +1,31 @@
+                               pBLADE
+
+What is it?
+-----------
+   pBLADE is a Perl interface to the BLADE web development environment.
+   For more information on BLADE, see
+   http://www.thestuff.net/bob/projects/blade/
+
+Where can (did) I get it?
+-------------------------
+   http://www.perl.com/CPAN/authors/id/P/PR/PRATZLAFF
+
+What version of BLADE does this module need?
+----------------------------------------------
+  This version of pBLADE has been built with libblade-0.34. It is not known
+  whether other versions will work.
+
+Installation
+------------
+   The usual...
+
+     $ perl Makefile.PL
+     $ make
+     $ make test
+     $ make install
+
+Please feel free to contact me if you think you've found a bug, or if you
+have a patch, or for any other reason. Bugs cannot be fixed if you don't
+report them!
+
+-Pete Ratzlaff <pratzlaff@cfa.harvard.edu>

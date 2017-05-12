@@ -1,0 +1,312 @@
+2001-03-01   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0
+
+   Introduced dbi2.py: A Perl DBI adaptor module that conforms
+   to Python's own DB API   
+
+   Introduced perlmod.py: Simplified access to existing Perl
+   library modules from Python.
+
+   Added some docstrings.
+
+
+
+2001-02-23   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta8
+
+   Escape potential safe compartment for perl.defined()
+   and perl.get_ref() calls.
+
+
+
+2001-02-01   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta7
+
+   Introduced RTDL_GLOBAL hack for platforms that use dlopen(3).  After
+   this there should not be any need for patching neither perl nor
+   python.
+
+   Override pysvrv_nonzero so that len() does not have to lie any more.
+
+   Some prototype changes.
+
+
+
+2001-01-11   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta6
+
+   Win32 portability tweaks:
+      - make sure svrv_object.c is compiled as C++ (by renaming)
+      - disable JMPENV code (required internal API not exported on windows)
+      - deal with space in the path to python.exe
+
+   Documentation updates (mostly regading MULTI_PERL)
+
+   The dbi.py module does not insist on not working just because
+   MULTI_PERL is enabled.
+
+
+
+2001-01-03   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta5
+
+   Make it possible to pass 'perl ref' objects to python even
+   for MULTI_PERL builds.  For this to be safe these objects now
+   contain a pointer to perl interpreter that owns them, and the
+   objects are only unwrapped when passed to the right interpreter.
+
+   Python::Import() did not release the python lock as it should.
+
+   Fix refcount error for perl.get_ref("@")
+
+   Renamed patches/python-16-dynload-global to python-20-...
+
+
+
+2000-12-22   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta4
+
+   Implemented Python::Import()
+
+   Implemented Python::exec() and Python::eval()
+
+   Make it possible to boot the symbiosis from perl, i.e. use this
+   code base to embed Python in Perl.  This support is still very
+   rough.  It is enabled by touching the file 'BOOT_FROM_PERL'
+   before building.
+
+   Some Win32 tweaks for Python 2.0
+
+
+
+2000-11-14   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta3
+
+   Python lists wrapped up in Python::Object now support builtin
+   push/pop/shift/unshift/splice and exists.
+
+   Fixed non MULTI_PERL builds.  Did not compile because of missing dTHX
+   declarations and a dCTX that expanded to nothing.
+
+   perlsh.py will now use Term::ReadLine.  This allow command line editing.
+
+
+
+2000-10-02   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta2
+
+   Win32 builds should work now.
+
+
+
+2000-09-20   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0-beta1
+
+   The alpha zope-perl distribution has now been splitted into two
+   different distributions: 'pyperl' and 'zoperl'.  The 'pyperl'
+   distribution contains the general stuff for embedding perl in
+   python.  There is nothing Zope specific in it.  The 'zoperl'
+   distribution depends on 'pyperl' and contains 3 Zope products
+   (written in Python) that enable perl for Zope.
+
+   This is the 'pyperl' package.  Techinically this release is
+   identical to the 'perl for python' part of zope-perl-0.2.a7.
+
+
+
+2000-09-17   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.2.a7
+
+   Introduced my own thread specific struct; thrd_ctx.[hc]
+   It surely needs porting to non-pthread platforms.
+
+   Implemented perl.safecall() and made the other entry points
+   able to escape the last compartment and opmask.
+
+   Zope PerlMethods are now compiled and executed inside
+   a safe compartment.  PerlMethod icon reverted to old look.
+
+   Added some concurrency tests and others to the test suite.
+
+
+
+2000-09-11   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.2.a6
+
+   The default build flavour of "Perl for Python" is now MULTI_PERL.
+   It means that each python thread get its own perl interpreter.
+   This avoids the need for a perl lock and allow each the threads to run
+   with full concurrency when inside perl.  The downside is that perl data
+   can not be passed back to python in this mode.
+
+   Adjusted Zope products to be compatible with MULTI_PERL.
+
+   Added a README file for ZDBI_DA, mostly to explain the connection
+   string format.
+
+   Build patch (less hardcoding of perl/python paths)
+   by Joseph Wayne Norton <norton@arseed.co.jp>
+
+   Implemented perl.defined() function.
+
+   Implemented Python::id() function.
+
+   Made the PerlMethod icon look more dangerous :-)
+
+
+
+2000-08-31   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.1.a5
+
+   ZDBI_DA can now except multiple statements per query.
+   Also implements close() method.  Based on patch from
+   Joseph Wayne Norton <norton@alum.mit.edu>.
+
+   The dbi.py file is now installed
+
+   Invoke SETMAGIC after hash updates.  Makes updates to
+   tied hashes work.
+
+   Completed ithread-perl support.
+
+   PerlMethod tries to be smart about the size of the editing
+   textarea.
+
+
+
+2000-08-21   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.1.a4
+
+   Support builds with perl-5.6 compiled with ithread support.
+   But an ithread enabled perl can currently only be invoked from
+   the main python thread so it is not usable for Zope yet.
+
+   Disabled dysfunctional 'define_macros' in setup.py
+
+   Introduced two ways of calling python methods with keyword
+   arguments from perl $o->foo($pos1, *key => $val) and
+   $o->foo($pos1, KW(key => $val))
+
+   Implemented Python::apply($func, \@arg, \%kw)
+
+   Implemented Python::complex($real, $imag)
+
+   Fixed refcount error with Python::Err objects (type object where
+   decremented twice in the destructor)
+
+   Reindentation of some C source files.
+
+   Zope PerlMethod now use "Change Perl Method" permissions.
+   This also covers PUT method.
+
+   Zope PerlMethods can now be edited through ftp (and possibly WebDAV).
+   This is cool as it allow them to be edited in emacs directly.
+
+   Zope PerlMethods now support the document_src method.  It means
+   that if you have a perl method that you can access as:
+
+       http://myzope:8080/d/foo
+
+   then you can get back the source of the method as plain (readable)
+   perl function with:
+
+      http://myzope:8080/d/foo/document_src
+
+
+
+2000-08-14   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.1.a3
+
+   Moved API methods out of the Python::Object namespace
+   and made them plain functions in the Python:: namespace.
+   This remove stupid limitation of what real attributes names
+   can be used safely with the AUTOLOAD mapping.
+
+   Python::Object constructors are now plain functions like
+   long(), list(), dict() in the Python:: namespace.
+
+   Overloading of hash/array/call deref for Python::Object.
+   It means $list->[0], @$list, $dict->{foo}, %$dict, and
+   $callable->($arg1, $arg2) now all work.
+
+   Python::Err->Raise() is now Python::raise()
+
+   Python::len() and Python::hash() did not croak when an
+   exception was raised.
+
+   Force keys of lists and tuples to be interpreted as integers
+   for PyObject_{Get,Set,Del}Item
+
+   Python::Object sequence/mapping attributes now unwrap
+   in list context.
+
+   PyXXX_Check() functions can now be passed non-Python::Object
+   arguments.
+
+   Python::Err::Exception() and sister functions now take an
+   optional single argument which is tested against the
+   corresponding exception type.  Still not a subclass test as
+   it probably ought to be.
+
+   Arguments to Zope PerlMethods are now automatically
+   extracted from @_.
+
+   Introduced zope-method.pod
+
+   Various documentation updates.
+
+
+
+
+2000-08-08   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.1.a2
+
+   Force integer key for {Get,Set,Del}Item on
+   sequences.
+
+   Fix building of perlmodule when python is compiled
+   without thread support.
+
+   Perl data can now be picked with Storable 0.7.
+   Pickling of perl data enabled by loading the
+   perlpickle module.
+
+   The setup.py script now requires Distutils-0.9
+
+   Provide python-dynload-global patch for py152
+
+   Introduced try_perlapi.pl
+
+   More ZPublisher provided names in methodTry.dtml.
+   Patch by Joseph Wayne Norton <norton@alum.mit.edu>.
+
+   Improved documentation.
+
+   Fix comments on last line of a perl method.
+   Patch by Monty Taylor <mtaylor@goldridge.net>.
+
+   Implemented hash.update()
+
+
+
+2000-07-27   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.1.a1
+
+   First public alpha release.
+

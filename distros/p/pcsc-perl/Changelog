@@ -1,0 +1,163 @@
+2001-10-18  Ludovic Rousseau  <rousseau@trinity>
+
+	* MANIFEST: added LICENCE
+
+	* LICENCE: Added GPL LICENCE
+
+	* README.Unix: Release 1.0.8
+
+	* create_distrib.sh: format is foo-bar-x.y.z not foo-bar.x.y.z
+
+	* create_distrib.sh: removed debian/ from the official archive
+
+	* MANIFEST, README.Windows, remarks.txt:
+	remarks.txt renamed README.Windows
+
+	* create_distrib.sh, MANIFEST:
+	added some comments, remove exit used for debug
+
+	* create_distrib.sh, MANIFEST:
+	compare the files in the directory with MANIFEST to check all the files
+	will be included in the archive
+
+2001-10-17  Ludovic Rousseau  <rousseau@trinity>
+
+	* create_distrib.sh:
+	Added checks: directory name format, directory existance
+
+2001-10-16  Ludovic Rousseau  <rousseau@trinity>
+
+	* MANIFEST:
+	removed scriptor and gscriptor scripts (moved to pcsc-tools)
+
+	* examples/readfile.script: removed
+
+	* MANIFEST: removed create_distrib.sh from exported files
+
+	* create_distrib.sh:
+	added automatic creation of Changelog using rcs2log
+
+	* README.Unix: quick install notes
+
+	* create_distrib.sh, MANIFEST: *** empty log message ***
+
+	* create_distrib.sh:
+	create a nice package without Debian specific stuff and CVS directories
+
+2001-10-10  Lionel Victor  <lvictor@trinity>
+
+	* t/test.t: Initial check in
+
+	* PCSC.pm:
+	Added fake variable declarations/initialization to work with make test
+
+2001-09-07  Lionel Victor  <lvictor@trinity>
+
+	* examples/gsm_directory.pl: cosmetic chage in the header comment
+
+2001-09-06  Ludovic Rousseau  <rousseau@trinity>
+
+	* examples/gsm_directory.pl: added CVS Id and Log fields
+
+	* examples/gsm_directory.pl: typos in comments
+
+2001-09-06  Lionel Victor  <lvictor@trinity>
+
+	* examples/gsm_directory.pl: Added a license
+
+2001-09-05  Lionel Victor  <lvictor@trinity>
+
+	* examples/gsm_directory.pl, examples/gsm.script:
+	Added some GSM11.11 demo scripts to gscriptor/scriptor as well as a
+	small example of how to use PCSC-perl to read the directory from your
+	GSM card...
+
+	* PCSC/Card.pm:
+	Do not warn anymore when P3(len) is not related to the number of bytes
+	to be transmitted after the APDU
+
+2001-09-05  Ludovic Rousseau  <rousseau@trinity>
+
+	* test/single_reader.pl:
+	Added -w flag to #!/usr/bin/perl and corrected some warnings
+
+	* test/multiple_readers.pl:
+	Added title and author name in the GPL licence
+
+	* test/single_reader.pl: Added CVS Id and Log fields
+	Added GPL licence
+
+	* test/multiple_readers.pl:
+	Added -w flag to /usr/bin/perl and corrected some warnings
+
+	* test/multiple_readers.pl: Added CVS Id and Log fields
+	Added GPL licence
+
+	* test.pl: Added CVS Log and Id fields
+	Added GPL licence
+
+2001-09-04  Lionel Victor  <lvictor@trinity>
+
+	* test/multiple_readers.pl, test/single_reader.pl:
+	Now using the real double typed magical scalar $PCSC::errno to report
+	errors instead of the old $! which was buggy.
+
+	* test/multiple_readers.pl, test/single_reader.pl:
+	updated the files so that they now use the 'new' package architecture
+	i.e.: PCSC + PCSC::Card insteead of PCSC + PCSCCard...
+
+	* PCSC.pm:
+	tried to make the @EXPORT @ISA $VERSION variable use more standard (At
+	least I hope so)
+
+	* PCSC.pm:
+	Fixed a bug in PCSC::ascii_to_array(). The returned array was global
+	therefore, each call to the function was returning all the arrays since
+	the object initialization.
+	I now use 'use strict' to avoid such problems in the future but I do not
+	know if I do it the proper way... I had to modify EXPORT and such to make
+	it run
+
+	* test/multiple_readers.pl, test/single_reader.pl:
+	More cosmetic changes
+
+	* PCSC/Card.pm, PCSC/Card.pod, PCSC.pm, PCSC.pod, PCSC.xs, test.pl:
+	Applied a patch from somebody who apparently wants to stay anonymous.
+	This patch includes mostly cosmetic changes and extra documentation about
+	array_to_ascii() and ascii_to_array(). Thanks to this contributor for his
+	help and time
+
+2001-07-02  Lionel Victor  <lvictor@trinity>
+
+	* PCSC.pod, test.pl:
+	Made minor modifications (corrected some misspelled words in the doc and
+	removed unnecessary commented code)
+
+	* examples/readfile.script: Initial checkin
+
+2001-06-12  Jean-Luc GIRAUD  <giraud@trinity>
+
+	* README.OSX: Small README about the OS X install.
+
+	* Makefile_OSX.pl, Makefile_OSX.PL:
+	Changed name tp .pl instead of .PL otherwise MakeMaker tries to run Makefile_OSX.PL
+
+	* Makefile_OSX.PL: Makefile dedicated to Mac OS X
+
+	* PCSC.pod, PCSC.xs:
+	Modification for Mac OS X support (LOAD_LIB replaced by LOAD_LIB())
+
+	* PCSCperl.h: Added support for MacOS X
+
+2001-05-31  Ludovic Rousseau  <rousseau@trinity>
+
+	* PCSC/Card.pm, PCSC.pm: added hash-bang
+
+2001-05-31  Lionel Victor  <lvictor@trinity>
+
+	* Makefile.PL, PCSC/Card.pm, PCSC/Card.pod, PCSCperl.h, PCSC.pm, PCSC.pod, PCSC.xs, remarks.txt, test/multiple_readers.pl, test.pl, test/single_reader.pl, typemap:
+	Initial import
+
+	* Makefile.PL, PCSC/Card.pm, PCSC/Card.pod, PCSCperl.h, PCSC.pm, PCSC.pod, PCSC.xs, remarks.txt, test/multiple_readers.pl, test.pl, test/single_reader.pl, typemap:
+	New file.
+

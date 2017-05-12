@@ -1,0 +1,30 @@
+### perl hermes/callback/seco
+
+use strict;
+use warnings;
+
+use File::Spec;
+use File::Basename;
+
+use Vulcan::OptConf;
+
+my %seco;
+
+BEGIN { %seco = Vulcan::OptConf->load()->dump( 'seco' ); }
+
+use lib $seco{lib};
+use SECO::Conf;
+
+return sub
+{
+    my %cluster;
+
+    for ( glob File::Spec->join( $seco{conf}, '*' ) )
+    {
+        next unless my $conf = eval { SECO::Conf->load( $_ ) };
+        my ( $name, $dc ) = $conf->name();
+        map { $cluster{ "$name$_\@$dc" } = $conf->list( host => $_ ) }
+            1 .. $conf->replica();
+    }
+    return \%cluster;
+};

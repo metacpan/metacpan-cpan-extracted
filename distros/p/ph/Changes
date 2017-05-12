@@ -1,0 +1,46 @@
+Revision history for Perl module App::ph
+
+0.09 2013-12-29T08:53:47Z
+
+    - Support 2-factor authentication.
+      (tokuhirom)
+
+0.08 2013-05-29T08:39:16Z
+
+    - depended on perl 5.10.0;
+      (tokuhirom)
+
+0.07 2013-04-03T06:40:22Z
+
+    - no Module::Build::Tiny
+
+0.06 2013-03-28T02:50:25Z
+
+    - packaging, again
+
+0.05 2013-03-26T22:36:03Z
+
+    - [Bug fix] Prompt says [Y/n] but 'n' is default.
+      (reported by miyagawa++)
+
+0.04 2013-03-25T22:25:51Z
+
+    - Automatic username/repository name aggregation for ssh repository URI
+      (tokuhirom)
+    - Added `ph issues` sub command
+      (tokuhirom)
+
+0.03 2013-03-25T22:18:29Z
+
+    - Added documents
+      (tokuhirom)
+
+0.02 2013-03-07T08:16:56
+
+    - Name our token, so we can tell what/where it is from the Applications page
+      (RsrchBoy)
+
+0.01 2012-09-01
+
+    - original version
+

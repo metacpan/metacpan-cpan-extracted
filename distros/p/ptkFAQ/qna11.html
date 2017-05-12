@@ -1,0 +1,58 @@
+<HTML>
+<HEAD><TITLE>11. Common Problems.</TITLE></HEAD>
+<BODY><a name="A11">11. Common Problems.</a>
+
+<hr>
+</p><p>
+
+Everything in Tk-land is a reference.  When defining callbacks take
+care to pass variables by reference.  Callbacks are closures and to
+ensure a variable gets its current value, as opposed to its value
+when the callback is defined, pass by reference, <i>e.g.</i>:
+<pre>
+    $frog = 123;
+    $b = $mw-&gt;Button(
+        -text    =&gt; 'Push Me',
+        -command =&gt; [
+            sub {
+               my($widget, $frog) = @ARG;
+               print STDERR "widget=$widget!\n";
+               print STDERR "frog=$$frog!\n";
+            }, $mw, \$frog,
+         ],
+    ); # end Button definition
+</pre><p>
+If <kbd>$frog</kbd> is not passed by reference the <kbd>print</kbd> statement 
+will always output "<kbd>123</kbd>" (actually, the <kbd>print</kbd> as it 
+exists will print nothing since it's trying to dereference <kbd>$frog</kbd>, 
+which presumably is now not a reference).  Note that by definition all 
+perl/Tk widgets are already references, since they're simply Perl objects, 
+and that's why you do not have to print <kbd>$$widget</kbd>!
+</p><p>
+A good &quot;reference&quot; for handling references and dereferencing 
+are the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlref.html">
+<KBD>perlref(1)</KBD></a> and 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlobj.html">
+<KBD>perlobj(1)</KBD></a> man pages.
+A good &quot;reference&quot; for the various data types you will encounter
+in this kind of perl programming is <A HREF="mailto:tchrist@perl.com">Tom Christiansen's</A> 
+<A HREF="http://www.perl.com/perl/pdsc/index.html">Perl Data Structures 
+Cookbook</A> which is now available as the 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perldsc.html">perldsc(1)</a> man page.
+</p>
+<p>Also beware the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perltrap.html">traps</a>
+that befall perl4 programmers in making the move to perl 5. References for this
+include the new <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perltrap.html">perltrap(1)</a> 
+man page as well as William Middleton's perl425 trap document at:
+<pre>
+    <a href="http://www.perl.com/perl/all_about/perl425.html">http://www.perl.com/perl/all_about/perl425.html</a>
+<i>or</i>
+    <a href="misc/perl425.html">http://w4.lns.cornell.edu/~pvhp/ptk/misc/perl425.html</a>
+</pre>
+
+
+<hr>
+	<p><a href="qna10.9.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11">table of contents</a> | <a href="qna11.1.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

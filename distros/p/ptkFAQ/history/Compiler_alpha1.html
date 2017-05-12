@@ -1,0 +1,60 @@
+<H2>[PREV]  [NEXT]  <A HREF="4mqof8$5th@pcnet4.pcnet.com">[PREV Thread]</A>  <A HREF="31977E1C.119F@tethys.net">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2><HR><ADDRESS> mbeattie@sable.ox.ac.uk (Malcolm Beattie)
+</ADDRESS>
+<TITLE> ANNOUNCE: Perl Compiler Kit, alpha1</TITLE>
+<ADDRESS><H1> ANNOUNCE: Perl Compiler Kit, alpha1</H1>
+</ADDRESS>
+<ADDRESS> 13 May 1996 15:37:30 GMT
+ Oxford University, England
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.announce">comp.lang.perl.announce,</A><A HREF="news:comp.lang.perl.misc">comp.lang.perl.misc</A>
+</DL>
+<HR>
+<PRE>	   Announcing the Perl Compiler Kit, Version alpha1
+
+This is alpha-test version 1 of the compiler kit for Perl.
+It provides extension modules for Perl 5.002 which let you compile
+Perl programs. 
+
+At the moment, plain standalone Perl progams are handled best:
+programs which use XSUB extension modules or new-fangled things like
+the AutoLoader will not work. Two functional compiler backends are
+provided at the moment: one generates C source code; one generates a
+platform-independent bytecode via a new "assembler" language. In both
+cases, the code produced bypasses the "parse and compile" steps that
+perl usually has to perform to run any Perl program. In neither case
+is the "pure" run-time of the program appreciably reduced. These
+compiler backends are more suitable for large Perl programs or for
+small but frequently-run Perl programs since start-up costs are then
+important.
+
+Another planned backend (called "CC") is to write out C source code
+for a Perl program's runtime in the form of optimised PP code or inline
+C source. [PP code is perl's internal run-time engine]. A version of
+this backend is still in the current compiler kit distribution but has
+not worked (or been worked on) since early kit snapshots made available
+to perl5-porters. A working version isn't too far away.
+
+The compiler kit is available for anonymous ftp from ftp.ox.ac.uk
+in /pub/perl/Compiler-a1.tar.gz and is licensed under both the GNU
+Public Licence and the Artistic Licence, just as perl itself is.
+Prerequisites are perl 5.002, the ability to type "perl Makefile.PL; make"
+and the ability to stay calm when your favourite 1000-line (or 100-line
+or 10-line) Perl program doesn't compile properly with this release.
+
+I am well aware of the majority of "obvious" problems with this release
+but I don't mind being mailed comments, bug reports (or even fixes)
+provided that I'm treated as a write-only medium.
+
+--Malcolm
+
+-- 
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>
+Oxford University Computing Services
+"Widget. It's got a widget. A lovely widget. A widget it has got." --Jack Dee
+
+</PRE>
+<HR><H2>[PREV]  [NEXT]  <A HREF="4mqof8$5th@pcnet4.pcnet.com">[PREV Thread]</A>  <A HREF="31977E1C.119F@tethys.net">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2>

@@ -1,0 +1,25 @@
+<HTML>
+<HEAD><TITLE> 17.2. Is there a send and do I need xauth?</TITLE></HEAD>
+<BODY><a name="A17.2"> 17.2. Is there a <KBD>send</KBD> and do I need <KBD>xauth</KBD>?</a>
+
+<hr>
+</p><p>
+There is a <KBD>Tk::send</KBD>, but to use it own must write one's own 
+version of <KBD>Tk::receive</KBD>. An example of this may be found in the
+<STRONG>rmt</STRONG> program distributed with Tk-b&#35;. 
+<P>
+The <KBD>Tk::send &lt;-&gt; Tk::receive</KBD> process will work under 
+<KBD>xhost +</KBD> authority. The security this affords comes from the fact
+that anyone who would want to exploit it would have to know how to write a 
+<KBD>Tk::receive</KBD> custom tailored to your application (in addition to all
+the other protocol hacking). 
+<P>
+Please note that while you may not <em>need</em> <KBD>xauth</KBD>
+authorization it is nevertheless <em>always</em> a good idea.
+
+
+<hr>
+	<p><a href="qna17.1.html">Previous</a> | Return to <a href="ptkTOC.html#TOC17.2">table of contents</a> | <a href="qna17.3.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

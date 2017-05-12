@@ -1,0 +1,12298 @@
+=head2 Thu Dec  4 00:30:38 2003: C<Module> L<GD|GD>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 01:47:51 2003: C<Module> L<DBD::CSV|DBD::CSV>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.1030>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 01:48:14 2003: C<Module> L<libxml-perl|libxml-perl>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 01:48:35 2003: C<Module> L<XML::Grove|XML::Grove>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.46alpha>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 02:15:08 2003: C<Module> L<CPANPLUS|CPANPLUS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.047>
+
+=item *
+
+C<EXE_FILES: bin/cpanp bin/cpansmoke>
+
+=back
+
+=head2 Thu Dec  4 04:13:44 2003: C<Module> L<libwww-perl|libwww-perl>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.76>
+
+=item *
+
+C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GET bin/HEAD bin/POST>
+
+=back
+
+=head2 Thu Dec  4 04:14:14 2003: C<Module> L<Net::SSLeay|Net::SSLeay>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.25>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:04:39 2003: C<Module> L<Term::ReadKey|Term::ReadKey>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:04:43 2003: C<Module> L<Curses|Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:04:46 2003: C<Module> L<MD5|MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:04:49 2003: C<Module> L<FreezeThaw|FreezeThaw>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:04:53 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:04:57 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:01 2003: C<Module> L<Archive::Tar|Archive::Tar>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:04 2003: C<Module> L<Net::Telnet|Net::Telnet>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:08 2003: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:12 2003: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:15 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:18 2003: C<Module> L<Time-modules|Time-modules>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2003.1126>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:21 2003: C<Module> L<TimeDate|TimeDate>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:24 2003: C<Module> L<OS2::Focus|OS2::Focus>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:26 2003: C<Module> L<OS2::Attrib|OS2::Attrib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:29 2003: C<Module> L<OS2::WinObject|OS2::WinObject>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:31 2003: C<Module> L<OS2::Proc|OS2::Proc>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:34 2003: C<Module> L<SOM|SOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.0601>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:37 2003: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.39>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Thu Dec  4 14:05:42 2003: C<Module> L<Text::CSV_XS|Text::CSV_XS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:44 2003: C<Module> L<SQL::Statement|SQL::Statement>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:47 2003: C<Module> L<DBD::File|DBD::File>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:50 2003: C<Module> L<DBD::RAM|DBD::RAM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:53 2003: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:05:59 2003: C<Module> L<File::CounterFile|File::CounterFile>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:02 2003: C<Module> L<Font::AFM|Font::AFM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:05 2003: C<Module> L<HTML-Tree|HTML-Tree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:08 2003: C<Module> L<Image::Size|Image::Size>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.992>
+
+=item *
+
+C<EXE_FILES: imgsize>
+
+=back
+
+=head2 Thu Dec  4 14:06:11 2003: C<Module> L<IO::String|IO::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:14 2003: C<Module> L<IO-stringy|IO-stringy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.108>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:16 2003: C<Module> L<Image::Info|Image::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.15>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:19 2003: C<Module> L<MIME::Lite|MIME::Lite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:22 2003: C<Module> L<MIME::Lite::HTML|MIME::Lite::HTML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:25 2003: C<Module> L<Mail|Mail>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.60>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:28 2003: C<Module> L<MIME-tools|MIME-tools>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.411>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:31 2003: C<Module> L<MIME::Types|MIME::Types>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:35 2003: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:39 2003: C<Module> L<XML::LibXML::Common|XML::LibXML::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.13>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:42 2003: C<Module> L<XML::NamespaceSupport|XML::NamespaceSupport>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:45 2003: C<Module> L<XML::SAX|XML::SAX>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:48 2003: C<Module> L<Unicode::String|Unicode::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:51 2003: C<Module> L<XML::RegExp|XML::RegExp>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:54 2003: C<Module> L<XML::LibXML|XML::LibXML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.56>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:06:57 2003: C<Module> L<XML::Parser::EasyTree|XML::Parser::EasyTree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:00 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:04 2003: C<Module> L<XML::Sablotron|XML::Sablotron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:12 2003: C<Module> L<XML::Encoding|XML::Encoding>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: bin/compile_encoding bin/make_encmap>
+
+=back
+
+=head2 Thu Dec  4 14:07:16 2003: C<Module> L<XML-DOM|XML-DOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:19 2003: C<Module> L<XML::DT|XML::DT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: mkdtskel mkdtdskel>
+
+=back
+
+=head2 Thu Dec  4 14:07:22 2003: C<Module> L<XML::Dumper|XML::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.67>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:25 2003: C<Module> L<XML::Registry|XML::Registry>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:28 2003: C<Module> L<XML::Generator|XML::Generator>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.93>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:31 2003: C<Module> L<XML::Node|XML::Node>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:34 2003: C<Module> L<XML::QL|XML::QL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:37 2003: C<Module> L<XML::Schematron|XML::Schematron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:39 2003: C<Module> L<XML::SemanticDiff|XML::SemanticDiff>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: eg/xmlsemdiff>
+
+=back
+
+=head2 Thu Dec  4 14:07:43 2003: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:46 2003: C<Module> L<XML::Stream|XML::Stream>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:50 2003: C<Module> L<XML::Twig|XML::Twig>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.11>
+
+=item *
+
+C<EXE_FILES: tools/xml_pp/xml_pp tools/xml_grep/xml_grep tools/xml_spellcheck/xml_spellcheck>
+
+=back
+
+=head2 Thu Dec  4 14:07:55 2003: C<Module> L<XML::Writer|XML::Writer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.4>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:07:58 2003: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
+=head2 Thu Dec  4 14:08:02 2003: C<Module> L<XML::miniXQL|XML::miniXQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:06 2003: C<Module> L<XML::XSLT|XML::XSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.45>
+
+=item *
+
+C<EXE_FILES: xslt-parser>
+
+=back
+
+=head2 Thu Dec  4 14:08:10 2003: C<Module> L<XML::Handler::YAWriter|XML::Handler::YAWriter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: xmlpretty>
+
+=back
+
+=head2 Thu Dec  4 14:08:13 2003: C<Module> L<XML::XQL|XML::XQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.68>
+
+=item *
+
+C<EXE_FILES: bin/xql.pl>
+
+=back
+
+=head2 Thu Dec  4 14:08:18 2003: C<Module> L<XML::XSLT::Wrapper|XML::XSLT::Wrapper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:21 2003: C<Module> L<IO::Zlib|IO::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:24 2003: C<Module> L<PadWalker|PadWalker>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:27 2003: C<Module> L<Compress::Bzip2|Compress::Bzip2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:31 2003: C<Module> L<GD::Graph|GD::Graph>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:34 2003: C<Module> L<File::NCopy|File::NCopy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:37 2003: C<Module> L<Parse::RecDescent|Parse::RecDescent>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.94>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:40 2003: C<Module> L<ExtUtils::ParseXS|ExtUtils::ParseXS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:08:44 2003: C<Module> L<File::RsyncP|File::RsyncP>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:09:36 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:09:39 2003: C<Module> L<Regexp::Common|Regexp::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.113>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:09:42 2003: C<Module> L<Test::Reporter|Test::Reporter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.20>
+
+=item *
+
+C<EXE_FILES: bin/cpantest>
+
+=back
+
+=head2 Thu Dec  4 14:09:46 2003: C<Module> L<YAML|YAML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.35>
+
+=item *
+
+C<EXE_FILES: bin/ysh bin/xyx bin/yaml2outline bin/phone2yaml>
+
+=back
+
+=head2 Thu Dec  4 14:09:49 2003: C<Module> L<Locale::Maketext::Lexicon|Locale::Maketext::Lexicon>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/xgettext.pl>
+
+=back
+
+=head2 Thu Dec  4 14:10:08 2003: C<Module> L<Curses::UI|Curses::UI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.85>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:10:12 2003: C<Module> L<File::chdir|File::chdir>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:10:15 2003: C<Module> L<Module::ScanDeps|Module::ScanDeps>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/scandeps.pl>
+
+=back
+
+=head2 Thu Dec  4 14:10:18 2003: C<Module> L<Archive::Zip|Archive::Zip>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: crc32>
+
+=back
+
+=head2 Thu Dec  4 14:10:21 2003: C<Module> L<Crypt::SSLeay|Crypt::SSLeay>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.51>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:10:24 2003: C<Module> L<IO::Socket::SSL|IO::Socket::SSL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 14:10:26 2003: C<Module> L<CPANPLUS::Shell::Curses|CPANPLUS::Shell::Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 15:08:44 2003: C<Module> L<Module::Signature|Module::Signature>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: inc/SCRIPTS/cpansign>
+
+=back
+
+=head2 Thu Dec  4 15:09:59 2003: C<Module> L<IPC::Run|IPC::Run>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.77>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 15:11:32 2003: C<Module> L<MP3::Info|MP3::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 15:15:48 2003: C<Module> L<Term::ReadKey|Term::ReadKey>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Thu Dec  4 18:04:33 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Fri Dec  5 22:41:11 2003: C<Module> L<Inline|Inline>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sat Dec  6 11:58:10 2003: C<Module> L<Module::Signature|Module::Signature>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: inc/SCRIPTS/cpansign>
+
+=back
+
+=head2 Sat Dec  6 12:00:37 2003: C<Module> L<Pod::Escapes|Pod::Escapes>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sat Dec  6 12:01:09 2003: C<Module> L<Pod::Simple|Pod::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sat Dec  6 12:01:23 2003: C<Module> L<Test::Builder::Tester|Test::Builder::Tester>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sat Dec  6 12:01:40 2003: C<Module> L<Test::Pod|Test::Pod>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sat Dec  6 12:02:01 2003: C<Module> L<CPANPLUS::Shell::Curses|CPANPLUS::Shell::Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec  8 15:44:49 2003: C<Module> L<PAR-Dist|PAR-Dist>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec  8 16:57:35 2003: C<Module> L<Data::Buffer|Data::Buffer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:22:55 2003: C<Module> L<Term::ReadKey|Term::ReadKey>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:22:58 2003: C<Module> L<Term::ReadLine|Term::ReadLine>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.0203>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:01 2003: C<Module> L<Data::Flow|Data::Flow>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:03 2003: C<Module> L<Curses|Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:06 2003: C<Module> L<MD5|MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:32 2003: C<Module> L<FreezeThaw|FreezeThaw>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:34 2003: C<Module> L<C::Scan|C::Scan>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.74>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:45 2003: C<Module> L<File::Spec|File::Spec>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.86>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:47 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:49 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:52 2003: C<Module> L<Archive::Tar|Archive::Tar>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:54 2003: C<Module> L<Data::Dumper|Data::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.121>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:56 2003: C<Module> L<Net::Telnet|Net::Telnet>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:23:59 2003: C<Module> L<Net|Net>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:24:02 2003: C<Module> L<CPAN|CPAN>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.76>
+
+=item *
+
+C<EXE_FILES: scripts/cpan>
+
+=back
+
+=head2 Sun Dec 14 21:24:05 2003: C<Module> L<MIME::Base64|MIME::Base64>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: encode-base64 decode-base64 encode-qp decode-qp>
+
+=back
+
+=head2 Sun Dec 14 21:24:08 2003: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:24:11 2003: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:24:14 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:25:21 2003: C<Module> L<libwww-perl|libwww-perl>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.76>
+
+=item *
+
+C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GET bin/HEAD bin/POST>
+
+=back
+
+=head2 Sun Dec 14 21:26:05 2003: C<Module> L<Time-modules|Time-modules>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2003.1126>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:08 2003: C<Module> L<Time::HiRes|Time::HiRes>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.52>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:10 2003: C<Module> L<TimeDate|TimeDate>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:13 2003: C<Module> L<OS2::Focus|OS2::Focus>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:15 2003: C<Module> L<OS2::Attrib|OS2::Attrib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:17 2003: C<Module> L<OS2::WinObject|OS2::WinObject>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:20 2003: C<Module> L<OS2::Proc|OS2::Proc>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:22 2003: C<Module> L<SOM|SOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.0601>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:25 2003: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.39>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Sun Dec 14 21:26:29 2003: C<Module> L<Text::CSV_XS|Text::CSV_XS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:31 2003: C<Module> L<SQL::Statement|SQL::Statement>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:34 2003: C<Module> L<DBD::File|DBD::File>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:36 2003: C<Module> L<DBD::RAM|DBD::RAM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:39 2003: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:43 2003: C<Module> L<File::CounterFile|File::CounterFile>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:45 2003: C<Module> L<Font::AFM|Font::AFM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:48 2003: C<Module> L<HTML-Tree|HTML-Tree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:51 2003: C<Module> L<Image::Size|Image::Size>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.992>
+
+=item *
+
+C<EXE_FILES: imgsize>
+
+=back
+
+=head2 Sun Dec 14 21:26:54 2003: C<Module> L<IO::String|IO::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:56 2003: C<Module> L<IO-stringy|IO-stringy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.108>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:26:59 2003: C<Module> L<Image::Info|Image::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.15>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:02 2003: C<Module> L<MIME::Lite|MIME::Lite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:04 2003: C<Module> L<MIME::Lite::HTML|MIME::Lite::HTML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:07 2003: C<Module> L<Mail|Mail>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.60>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:10 2003: C<Module> L<MIME-tools|MIME-tools>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.411>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:13 2003: C<Module> L<MIME::Types|MIME::Types>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:16 2003: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:20 2003: C<Module> L<XML::LibXML::Common|XML::LibXML::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.13>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:23 2003: C<Module> L<XML::NamespaceSupport|XML::NamespaceSupport>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:26 2003: C<Module> L<XML::SAX|XML::SAX>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:30 2003: C<Module> L<Unicode::String|Unicode::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:33 2003: C<Module> L<XML::RegExp|XML::RegExp>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:36 2003: C<Module> L<XML::LibXML|XML::LibXML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.56>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:42 2003: C<Module> L<XML::Parser::EasyTree|XML::Parser::EasyTree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:45 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:48 2003: C<Module> L<XML::Sablotron|XML::Sablotron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:27:55 2003: C<Module> L<XML::Encoding|XML::Encoding>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: bin/compile_encoding bin/make_encmap>
+
+=back
+
+=head2 Sun Dec 14 21:27:58 2003: C<Module> L<XML-DOM|XML-DOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:28:38 2003: C<Module> L<XML::DT|XML::DT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: mkdtskel mkdtdskel>
+
+=back
+
+=head2 Sun Dec 14 21:28:41 2003: C<Module> L<XML::Dumper|XML::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.67>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:28:43 2003: C<Module> L<XML::Registry|XML::Registry>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:28:52 2003: C<Module> L<XML::Generator|XML::Generator>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.93>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:28:55 2003: C<Module> L<XML::Node|XML::Node>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:28:57 2003: C<Module> L<XML::QL|XML::QL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:29:00 2003: C<Module> L<XML::Schematron|XML::Schematron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:29:03 2003: C<Module> L<XML::SemanticDiff|XML::SemanticDiff>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: eg/xmlsemdiff>
+
+=back
+
+=head2 Sun Dec 14 21:29:50 2003: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:29:53 2003: C<Module> L<XML::Stream|XML::Stream>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:29:56 2003: C<Module> L<XML::Twig|XML::Twig>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.11>
+
+=item *
+
+C<EXE_FILES: tools/xml_pp/xml_pp tools/xml_grep/xml_grep tools/xml_spellcheck/xml_spellcheck>
+
+=back
+
+=head2 Sun Dec 14 21:30:02 2003: C<Module> L<XML::Writer|XML::Writer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.4>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:30:06 2003: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
+=head2 Sun Dec 14 21:30:09 2003: C<Module> L<XML::miniXQL|XML::miniXQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:30:13 2003: C<Module> L<XML::XSLT|XML::XSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.45>
+
+=item *
+
+C<EXE_FILES: xslt-parser>
+
+=back
+
+=head2 Sun Dec 14 21:30:16 2003: C<Module> L<XML::Handler::YAWriter|XML::Handler::YAWriter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: xmlpretty>
+
+=back
+
+=head2 Sun Dec 14 21:30:19 2003: C<Module> L<XML::XQL|XML::XQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.68>
+
+=item *
+
+C<EXE_FILES: bin/xql.pl>
+
+=back
+
+=head2 Sun Dec 14 21:30:52 2003: C<Module> L<IO::Zlib|IO::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:30:54 2003: C<Module> L<PadWalker|PadWalker>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:30:57 2003: C<Module> L<Compress::Bzip2|Compress::Bzip2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:31:01 2003: C<Module> L<GD::Graph|GD::Graph>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:31:03 2003: C<Module> L<File::NCopy|File::NCopy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:32:13 2003: C<Module> L<Parse::RecDescent|Parse::RecDescent>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.94>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:32:16 2003: C<Module> L<Parse::RecDescent::Deparse|Parse::RecDescent::Deparse>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:32:19 2003: C<Module> L<Parse::RecDescent::Consumer|Parse::RecDescent::Consumer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:32:22 2003: C<Module> L<ExtUtils::ParseXS|ExtUtils::ParseXS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:32:25 2003: C<Module> L<File::RsyncP|File::RsyncP>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:09 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:13 2003: C<Module> L<Regexp::Common|Regexp::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.113>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:16 2003: C<Module> L<Test::Reporter|Test::Reporter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.20>
+
+=item *
+
+C<EXE_FILES: bin/cpantest>
+
+=back
+
+=head2 Sun Dec 14 21:33:20 2003: C<Module> L<YAML|YAML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.35>
+
+=item *
+
+C<EXE_FILES: bin/ysh bin/xyx bin/yaml2outline bin/phone2yaml>
+
+=back
+
+=head2 Sun Dec 14 21:33:24 2003: C<Module> L<Locale::Maketext::Lexicon|Locale::Maketext::Lexicon>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/xgettext.pl>
+
+=back
+
+=head2 Sun Dec 14 21:33:27 2003: C<Module> L<PAR-Dist|PAR-Dist>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:30 2003: C<Module> L<Module::Signature|Module::Signature>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: inc/SCRIPTS/cpansign>
+
+=back
+
+=head2 Sun Dec 14 21:33:35 2003: C<Module> L<Curses::UI|Curses::UI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.85>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:38 2003: C<Module> L<File::chdir|File::chdir>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:41 2003: C<Module> L<Module::ScanDeps|Module::ScanDeps>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/scandeps.pl>
+
+=back
+
+=head2 Sun Dec 14 21:33:44 2003: C<Module> L<Archive::Zip|Archive::Zip>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: crc32>
+
+=back
+
+=head2 Sun Dec 14 21:33:48 2003: C<Module> L<Crypt::SSLeay|Crypt::SSLeay>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.51>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:51 2003: C<Module> L<IO::Socket::SSL|IO::Socket::SSL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:54 2003: C<Module> L<CPANPLUS::Shell::Curses|CPANPLUS::Shell::Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:33:57 2003: C<Module> L<MP3::Info|MP3::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:34:00 2003: C<Module> L<MP3::Tag|MP3::Tag>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:34:04 2003: C<Module> L<Inline|Inline>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:34:09 2003: C<Module> L<Data::Buffer|Data::Buffer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:34:12 2003: C<Module> L<Convert::ASN1|Convert::ASN1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 21:34:15 2003: C<Module> L<PAR|PAR>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.76>
+
+=item *
+
+C<EXE_FILES: script/par.pl script/pp script/tkpp script/parl.exe script/parldyn.exe>
+
+=back
+
+=head2 Sun Dec 14 23:41:26 2003: C<Module> L<WebService::FreeDB|WebService::FreeDB>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.7>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Dec 14 23:41:52 2003: C<Module> L<AudioFile-Identify-MusicBrainz|AudioFile-Identify-MusicBrainz>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 00:53:38 2003: C<Module> L<Date::Manip|Date::Manip>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.42>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 00:53:40 2003: C<Module> L<Parse::Yapp|Parse::Yapp>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.05>
+
+=item *
+
+C<EXE_FILES: yapp>
+
+=back
+
+=head2 Mon Dec 15 00:53:43 2003: C<Module> L<XML::XQL|XML::XQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.68>
+
+=item *
+
+C<EXE_FILES: bin/xql.pl>
+
+=back
+
+=head2 Mon Dec 15 03:23:24 2003: C<Module> L<Term::ReadKey|Term::ReadKey>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:23:27 2003: C<Module> L<Term::ReadLine|Term::ReadLine>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.0203>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:23:30 2003: C<Module> L<Data::Flow|Data::Flow>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:23:33 2003: C<Module> L<Curses|Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:23:36 2003: C<Module> L<MD5|MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:16 2003: C<Module> L<FreezeThaw|FreezeThaw>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:18 2003: C<Module> L<C::Scan|C::Scan>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.74>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:21 2003: C<Module> L<File::Spec|File::Spec>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.86>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:24 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:27 2003: C<Module> L<Archive::Tar|Archive::Tar>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:30 2003: C<Module> L<Data::Dumper|Data::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.121>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:32 2003: C<Module> L<Net::Telnet|Net::Telnet>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:35 2003: C<Module> L<Net|Net>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:38 2003: C<Module> L<CPAN|CPAN>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.76>
+
+=item *
+
+C<EXE_FILES: scripts/cpan>
+
+=back
+
+=head2 Mon Dec 15 03:24:42 2003: C<Module> L<MIME::Base64|MIME::Base64>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: encode-base64 decode-base64 encode-qp decode-qp>
+
+=back
+
+=head2 Mon Dec 15 03:24:45 2003: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:48 2003: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:24:52 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:26:04 2003: C<Module> L<libwww-perl|libwww-perl>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.76>
+
+=item *
+
+C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GET bin/HEAD bin/POST>
+
+=back
+
+=head2 Mon Dec 15 03:26:52 2003: C<Module> L<Time-modules|Time-modules>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2003.1126>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:26:55 2003: C<Module> L<Time::HiRes|Time::HiRes>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.52>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:26:58 2003: C<Module> L<TimeDate|TimeDate>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:01 2003: C<Module> L<OS2::Focus|OS2::Focus>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:03 2003: C<Module> L<OS2::Attrib|OS2::Attrib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:06 2003: C<Module> L<OS2::WinObject|OS2::WinObject>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:09 2003: C<Module> L<OS2::Proc|OS2::Proc>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:11 2003: C<Module> L<SOM|SOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.0601>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:16 2003: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.39>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Mon Dec 15 03:27:20 2003: C<Module> L<Text::CSV_XS|Text::CSV_XS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:22 2003: C<Module> L<SQL::Statement|SQL::Statement>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:25 2003: C<Module> L<DBD::File|DBD::File>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:28 2003: C<Module> L<DBD::RAM|DBD::RAM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:31 2003: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:35 2003: C<Module> L<File::CounterFile|File::CounterFile>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:38 2003: C<Module> L<Font::AFM|Font::AFM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:41 2003: C<Module> L<HTML-Tree|HTML-Tree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:44 2003: C<Module> L<Image::Size|Image::Size>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.992>
+
+=item *
+
+C<EXE_FILES: imgsize>
+
+=back
+
+=head2 Mon Dec 15 03:27:47 2003: C<Module> L<IO::String|IO::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:50 2003: C<Module> L<IO-stringy|IO-stringy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.108>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:52 2003: C<Module> L<Image::Info|Image::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.15>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:55 2003: C<Module> L<MIME::Lite|MIME::Lite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:27:58 2003: C<Module> L<MIME::Lite::HTML|MIME::Lite::HTML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:02 2003: C<Module> L<Mail|Mail>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.60>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:06 2003: C<Module> L<MIME-tools|MIME-tools>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.411>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:09 2003: C<Module> L<MIME::Types|MIME::Types>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:13 2003: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:17 2003: C<Module> L<XML::LibXML::Common|XML::LibXML::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.13>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:19 2003: C<Module> L<XML::NamespaceSupport|XML::NamespaceSupport>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:23 2003: C<Module> L<XML::SAX|XML::SAX>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:28 2003: C<Module> L<Unicode::String|Unicode::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:31 2003: C<Module> L<XML::RegExp|XML::RegExp>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:35 2003: C<Module> L<XML::LibXML|XML::LibXML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.56>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:40 2003: C<Module> L<XML::Parser::EasyTree|XML::Parser::EasyTree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:43 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:46 2003: C<Module> L<XML::Sablotron|XML::Sablotron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:28:54 2003: C<Module> L<XML::Encoding|XML::Encoding>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: bin/compile_encoding bin/make_encmap>
+
+=back
+
+=head2 Mon Dec 15 03:28:57 2003: C<Module> L<XML-DOM|XML-DOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:29:42 2003: C<Module> L<XML::DT|XML::DT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: mkdtskel mkdtdskel>
+
+=back
+
+=head2 Mon Dec 15 03:29:45 2003: C<Module> L<XML::Dumper|XML::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.67>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:29:48 2003: C<Module> L<XML::Registry|XML::Registry>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:29:50 2003: C<Module> L<XML::Generator|XML::Generator>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.93>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:29:53 2003: C<Module> L<XML::Node|XML::Node>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:29:56 2003: C<Module> L<XML::QL|XML::QL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:29:59 2003: C<Module> L<XML::Schematron|XML::Schematron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:30:02 2003: C<Module> L<XML::SemanticDiff|XML::SemanticDiff>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: eg/xmlsemdiff>
+
+=back
+
+=head2 Mon Dec 15 03:30:05 2003: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:30:08 2003: C<Module> L<XML::Stream|XML::Stream>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:30:12 2003: C<Module> L<XML::Twig|XML::Twig>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.11>
+
+=item *
+
+C<EXE_FILES: tools/xml_pp/xml_pp tools/xml_grep/xml_grep tools/xml_spellcheck/xml_spellcheck>
+
+=back
+
+=head2 Mon Dec 15 03:30:17 2003: C<Module> L<XML::Writer|XML::Writer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.4>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:30:21 2003: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
+=head2 Mon Dec 15 03:30:25 2003: C<Module> L<XML::miniXQL|XML::miniXQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:30:29 2003: C<Module> L<XML::XSLT|XML::XSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.45>
+
+=item *
+
+C<EXE_FILES: xslt-parser>
+
+=back
+
+=head2 Mon Dec 15 03:30:32 2003: C<Module> L<XML::Handler::YAWriter|XML::Handler::YAWriter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: xmlpretty>
+
+=back
+
+=head2 Mon Dec 15 03:30:36 2003: C<Module> L<XML::XQL|XML::XQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.68>
+
+=item *
+
+C<EXE_FILES: bin/xql.pl>
+
+=back
+
+=head2 Mon Dec 15 03:31:12 2003: C<Module> L<IO::Zlib|IO::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:31:15 2003: C<Module> L<PadWalker|PadWalker>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:31:18 2003: C<Module> L<Compress::Bzip2|Compress::Bzip2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:31:22 2003: C<Module> L<File::NCopy|File::NCopy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:32:39 2003: C<Module> L<Parse::RecDescent|Parse::RecDescent>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.94>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:32:42 2003: C<Module> L<Parse::RecDescent::Deparse|Parse::RecDescent::Deparse>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:32:45 2003: C<Module> L<Parse::RecDescent::Consumer|Parse::RecDescent::Consumer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:32:48 2003: C<Module> L<ExtUtils::ParseXS|ExtUtils::ParseXS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:35:42 2003: C<Module> L<File::RsyncP|File::RsyncP>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:36:33 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:36:37 2003: C<Module> L<Regexp::Common|Regexp::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.113>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:36:40 2003: C<Module> L<Test::Reporter|Test::Reporter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.20>
+
+=item *
+
+C<EXE_FILES: bin/cpantest>
+
+=back
+
+=head2 Mon Dec 15 03:36:44 2003: C<Module> L<YAML|YAML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.35>
+
+=item *
+
+C<EXE_FILES: bin/ysh bin/xyx bin/yaml2outline bin/phone2yaml>
+
+=back
+
+=head2 Mon Dec 15 03:36:49 2003: C<Module> L<Locale::Maketext::Lexicon|Locale::Maketext::Lexicon>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/xgettext.pl>
+
+=back
+
+=head2 Mon Dec 15 03:36:52 2003: C<Module> L<PAR-Dist|PAR-Dist>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:36:56 2003: C<Module> L<Module::Signature|Module::Signature>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: inc/SCRIPTS/cpansign>
+
+=back
+
+=head2 Mon Dec 15 03:37:01 2003: C<Module> L<Curses::UI|Curses::UI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.85>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:05 2003: C<Module> L<File::chdir|File::chdir>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:08 2003: C<Module> L<Module::ScanDeps|Module::ScanDeps>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/scandeps.pl>
+
+=back
+
+=head2 Mon Dec 15 03:37:12 2003: C<Module> L<Archive::Zip|Archive::Zip>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: crc32>
+
+=back
+
+=head2 Mon Dec 15 03:37:15 2003: C<Module> L<Crypt::SSLeay|Crypt::SSLeay>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.51>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:18 2003: C<Module> L<IO::Socket::SSL|IO::Socket::SSL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:22 2003: C<Module> L<CPANPLUS::Shell::Curses|CPANPLUS::Shell::Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:25 2003: C<Module> L<MP3::Info|MP3::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:28 2003: C<Module> L<MP3::Tag|MP3::Tag>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:34 2003: C<Module> L<Inline|Inline>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:37 2003: C<Module> L<Data::Buffer|Data::Buffer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:37:41 2003: C<Module> L<Convert::ASN1|Convert::ASN1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:38:31 2003: C<Module> L<PAR|PAR>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.76>
+
+=item *
+
+C<EXE_FILES: script/par.pl script/pp script/tkpp script/parl.exe script/parldyn.exe>
+
+=back
+
+=head2 Mon Dec 15 03:38:38 2003: C<Module> L<GD::Text|GD::Text>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.86>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:38:41 2003: C<Module> L<GD::Graph|GD::Graph>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:38:44 2003: C<Module> L<Digest|Digest>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:38:46 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 03:41:14 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 14:52:47 2003: C<Module> L<dummy|dummy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: >
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 14:59:05 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 16:02:45 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 16:21:56 2003: C<Module> L<Curses|Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 16:42:45 2003: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 23:03:53 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Dec 15 23:07:43 2003: C<Module> L<SOM|SOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 0.0601>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:44:35 2003: C<Module> L<Digest|Digest>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:45:28 2003: C<Module> L<Term::ReadKey|Term::ReadKey>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:45:33 2003: C<Module> L<Term::ReadLine|Term::ReadLine>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.0203>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:45:37 2003: C<Module> L<Data::Flow|Data::Flow>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:45:43 2003: C<Module> L<Curses|Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:45:48 2003: C<Module> L<MD5|MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:46:39 2003: C<Module> L<FreezeThaw|FreezeThaw>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:46:58 2003: C<Module> L<C::Scan|C::Scan>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.74>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:47:02 2003: C<Module> L<File::Spec|File::Spec>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.86>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:47:26 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:47:58 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:01 2003: C<Module> L<Archive::Tar|Archive::Tar>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:07 2003: C<Module> L<Data::Dumper|Data::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.121>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:11 2003: C<Module> L<Net::Telnet|Net::Telnet>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:17 2003: C<Module> L<Net|Net>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:24 2003: C<Module> L<CPAN|CPAN>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.76>
+
+=item *
+
+C<EXE_FILES: scripts/cpan>
+
+=back
+
+=head2 Tue Dec 16 00:48:33 2003: C<Module> L<MIME::Base64|MIME::Base64>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: encode-base64 decode-base64 encode-qp decode-qp>
+
+=back
+
+=head2 Tue Dec 16 00:48:39 2003: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:47 2003: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:48:54 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:50:18 2003: C<Module> L<libwww-perl|libwww-perl>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.76>
+
+=item *
+
+C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GET bin/HEAD bin/POST>
+
+=back
+
+=head2 Tue Dec 16 00:51:14 2003: C<Module> L<Time-modules|Time-modules>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2003.1126>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:51:21 2003: C<Module> L<Time::HiRes|Time::HiRes>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.52>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:51:27 2003: C<Module> L<TimeDate|TimeDate>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:51:33 2003: C<Module> L<OS2::Focus|OS2::Focus>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:51:38 2003: C<Module> L<OS2::Attrib|OS2::Attrib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:51:44 2003: C<Module> L<OS2::WinObject|OS2::WinObject>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:51:50 2003: C<Module> L<OS2::Proc|OS2::Proc>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:52:30 2003: C<Module> L<SOM|SOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.0601>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:53:55 2003: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.39>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Tue Dec 16 00:54:00 2003: C<Module> L<Text::CSV_XS|Text::CSV_XS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:54:06 2003: C<Module> L<SQL::Statement|SQL::Statement>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:54:12 2003: C<Module> L<DBD::File|DBD::File>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:54:18 2003: C<Module> L<DBD::RAM|DBD::RAM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:55:30 2003: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:56:46 2003: C<Module> L<File::CounterFile|File::CounterFile>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:56:50 2003: C<Module> L<Font::AFM|Font::AFM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:56:56 2003: C<Module> L<HTML-Tree|HTML-Tree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:57:03 2003: C<Module> L<Image::Size|Image::Size>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.992>
+
+=item *
+
+C<EXE_FILES: imgsize>
+
+=back
+
+=head2 Tue Dec 16 00:57:12 2003: C<Module> L<IO::String|IO::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:57:41 2003: C<Module> L<IO-stringy|IO-stringy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.108>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:57:45 2003: C<Module> L<Image::Info|Image::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.15>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:58:15 2003: C<Module> L<MIME::Lite|MIME::Lite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:58:19 2003: C<Module> L<MIME::Lite::HTML|MIME::Lite::HTML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:58:25 2003: C<Module> L<Mail|Mail>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.60>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:59:21 2003: C<Module> L<MIME-tools|MIME-tools>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.411>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:59:25 2003: C<Module> L<MIME::Types|MIME::Types>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:59:32 2003: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:59:42 2003: C<Module> L<XML::LibXML::Common|XML::LibXML::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.13>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 00:59:48 2003: C<Module> L<XML::NamespaceSupport|XML::NamespaceSupport>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:02 2003: C<Module> L<XML::SAX|XML::SAX>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:07 2003: C<Module> L<Unicode::String|Unicode::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:14 2003: C<Module> L<XML::RegExp|XML::RegExp>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:21 2003: C<Module> L<XML::LibXML|XML::LibXML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.56>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:30 2003: C<Module> L<XML::Parser::EasyTree|XML::Parser::EasyTree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:37 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:01:44 2003: C<Module> L<XML::Sablotron|XML::Sablotron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:02:01 2003: C<Module> L<XML::Encoding|XML::Encoding>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: bin/compile_encoding bin/make_encmap>
+
+=back
+
+=head2 Tue Dec 16 01:02:08 2003: C<Module> L<XML-DOM|XML-DOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:01 2003: C<Module> L<XML::DT|XML::DT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: mkdtskel mkdtdskel>
+
+=back
+
+=head2 Tue Dec 16 01:03:09 2003: C<Module> L<XML::Dumper|XML::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.67>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:15 2003: C<Module> L<XML::Registry|XML::Registry>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:21 2003: C<Module> L<XML::Generator|XML::Generator>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.93>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:28 2003: C<Module> L<XML::Node|XML::Node>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:35 2003: C<Module> L<XML::QL|XML::QL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:41 2003: C<Module> L<XML::Schematron|XML::Schematron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:03:47 2003: C<Module> L<XML::SemanticDiff|XML::SemanticDiff>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: eg/xmlsemdiff>
+
+=back
+
+=head2 Tue Dec 16 01:03:55 2003: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:04:01 2003: C<Module> L<XML::Stream|XML::Stream>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:05:19 2003: C<Module> L<XML::Twig|XML::Twig>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.11>
+
+=item *
+
+C<EXE_FILES: tools/xml_pp/xml_pp tools/xml_grep/xml_grep tools/xml_spellcheck/xml_spellcheck>
+
+=back
+
+=head2 Tue Dec 16 01:05:26 2003: C<Module> L<XML::Writer|XML::Writer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.4>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:05:33 2003: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
+=head2 Tue Dec 16 01:05:41 2003: C<Module> L<XML::miniXQL|XML::miniXQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:05:50 2003: C<Module> L<XML::XSLT|XML::XSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.45>
+
+=item *
+
+C<EXE_FILES: xslt-parser>
+
+=back
+
+=head2 Tue Dec 16 01:06:26 2003: C<Module> L<XML::Handler::YAWriter|XML::Handler::YAWriter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: xmlpretty>
+
+=back
+
+=head2 Tue Dec 16 01:06:31 2003: C<Module> L<XML::XQL|XML::XQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.68>
+
+=item *
+
+C<EXE_FILES: bin/xql.pl>
+
+=back
+
+=head2 Tue Dec 16 01:07:50 2003: C<Module> L<IO::Zlib|IO::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:08:01 2003: C<Module> L<PadWalker|PadWalker>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:09:06 2003: C<Module> L<Compress::Bzip2|Compress::Bzip2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:09:10 2003: C<Module> L<GD::Graph|GD::Graph>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:09:23 2003: C<Module> L<File::NCopy|File::NCopy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:12:27 2003: C<Module> L<Parse::RecDescent|Parse::RecDescent>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.94>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:12:32 2003: C<Module> L<Parse::RecDescent::Deparse|Parse::RecDescent::Deparse>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:12:37 2003: C<Module> L<Parse::RecDescent::Consumer|Parse::RecDescent::Consumer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:12:53 2003: C<Module> L<ExtUtils::ParseXS|ExtUtils::ParseXS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:14:28 2003: C<Module> L<File::RsyncP|File::RsyncP>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:15:07 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:15:12 2003: C<Module> L<Regexp::Common|Regexp::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.113>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:15:38 2003: C<Module> L<Test::Reporter|Test::Reporter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.20>
+
+=item *
+
+C<EXE_FILES: bin/cpantest>
+
+=back
+
+=head2 Tue Dec 16 01:15:42 2003: C<Module> L<YAML|YAML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.35>
+
+=item *
+
+C<EXE_FILES: bin/ysh bin/xyx bin/yaml2outline bin/phone2yaml>
+
+=back
+
+=head2 Tue Dec 16 01:15:49 2003: C<Module> L<Locale::Maketext::Lexicon|Locale::Maketext::Lexicon>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/xgettext.pl>
+
+=back
+
+=head2 Tue Dec 16 01:15:56 2003: C<Module> L<PAR-Dist|PAR-Dist>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:16:01 2003: C<Module> L<Module::Signature|Module::Signature>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: inc/SCRIPTS/cpansign>
+
+=back
+
+=head2 Tue Dec 16 01:16:09 2003: C<Module> L<Curses::UI|Curses::UI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.85>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:16:16 2003: C<Module> L<File::chdir|File::chdir>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:16:21 2003: C<Module> L<Module::ScanDeps|Module::ScanDeps>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/scandeps.pl>
+
+=back
+
+=head2 Tue Dec 16 01:17:12 2003: C<Module> L<Archive::Zip|Archive::Zip>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: crc32>
+
+=back
+
+=head2 Tue Dec 16 01:17:15 2003: C<Module> L<Crypt::SSLeay|Crypt::SSLeay>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.51>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:17:21 2003: C<Module> L<IO::Socket::SSL|IO::Socket::SSL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:17:26 2003: C<Module> L<CPANPLUS::Shell::Curses|CPANPLUS::Shell::Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:17:32 2003: C<Module> L<MP3::Info|MP3::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:17:54 2003: C<Module> L<MP3::Tag|MP3::Tag>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:19:09 2003: C<Module> L<Inline|Inline>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:19:25 2003: C<Module> L<Data::Buffer|Data::Buffer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:19:40 2003: C<Module> L<Convert::ASN1|Convert::ASN1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:22:20 2003: C<Module> L<PAR|PAR>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.76>
+
+=item *
+
+C<EXE_FILES: script/par.pl script/pp script/tkpp script/parl.exe script/parldyn.exe>
+
+=back
+
+=head2 Tue Dec 16 01:31:52 2003: C<Module> L<Term::ReadKey|Term::ReadKey>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:31:55 2003: C<Module> L<Term::ReadLine|Term::ReadLine>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.0203>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:31:57 2003: C<Module> L<Data::Flow|Data::Flow>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:32:01 2003: C<Module> L<Curses|Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:32:03 2003: C<Module> L<MD5|MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:32:55 2003: C<Module> L<FreezeThaw|FreezeThaw>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:32:59 2003: C<Module> L<C::Scan|C::Scan>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.74>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:02 2003: C<Module> L<File::Spec|File::Spec>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.86>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:06 2003: C<Module> L<Digest::MD5|Digest::MD5>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.31>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:10 2003: C<Module> L<Compress::Zlib|Compress::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:13 2003: C<Module> L<Archive::Tar|Archive::Tar>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:17 2003: C<Module> L<Data::Dumper|Data::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.121>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:19 2003: C<Module> L<Net::Telnet|Net::Telnet>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:23 2003: C<Module> L<Net|Net>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:27 2003: C<Module> L<CPAN|CPAN>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.76>
+
+=item *
+
+C<EXE_FILES: scripts/cpan>
+
+=back
+
+=head2 Tue Dec 16 01:33:32 2003: C<Module> L<MIME::Base64|MIME::Base64>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: encode-base64 decode-base64 encode-qp decode-qp>
+
+=back
+
+=head2 Tue Dec 16 01:33:35 2003: C<Module> L<HTML::Parser|HTML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:42 2003: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:33:47 2003: C<Module> L<HTML::Tagset|HTML::Tagset>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:35:19 2003: C<Module> L<libwww-perl|libwww-perl>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.76>
+
+=item *
+
+C<EXE_FILES: bin/lwp-request bin/lwp-mirror bin/lwp-rget bin/lwp-download bin/GET bin/HEAD bin/POST>
+
+=back
+
+=head2 Tue Dec 16 01:36:21 2003: C<Module> L<Time-modules|Time-modules>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2003.1126>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:24 2003: C<Module> L<Time::HiRes|Time::HiRes>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.52>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:28 2003: C<Module> L<TimeDate|TimeDate>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:32 2003: C<Module> L<OS2::Focus|OS2::Focus>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:35 2003: C<Module> L<OS2::Attrib|OS2::Attrib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:38 2003: C<Module> L<OS2::WinObject|OS2::WinObject>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:41 2003: C<Module> L<OS2::Proc|OS2::Proc>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:44 2003: C<Module> L<SOM|SOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.0601>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:49 2003: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.39>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof>
+
+=back
+
+=head2 Tue Dec 16 01:36:53 2003: C<Module> L<Text::CSV_XS|Text::CSV_XS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:36:56 2003: C<Module> L<SQL::Statement|SQL::Statement>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:00 2003: C<Module> L<DBD::File|DBD::File>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:03 2003: C<Module> L<DBD::RAM|DBD::RAM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:06 2003: C<Module> L<DBD::SQLite|DBD::SQLite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.28>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:11 2003: C<Module> L<File::CounterFile|File::CounterFile>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:15 2003: C<Module> L<Font::AFM|Font::AFM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:19 2003: C<Module> L<HTML-Tree|HTML-Tree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:22 2003: C<Module> L<Image::Size|Image::Size>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.992>
+
+=item *
+
+C<EXE_FILES: imgsize>
+
+=back
+
+=head2 Tue Dec 16 01:37:26 2003: C<Module> L<IO::String|IO::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:30 2003: C<Module> L<IO-stringy|IO-stringy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.108>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:33 2003: C<Module> L<Image::Info|Image::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.15>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:37 2003: C<Module> L<MIME::Lite|MIME::Lite>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:40 2003: C<Module> L<MIME::Lite::HTML|MIME::Lite::HTML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:45 2003: C<Module> L<Mail|Mail>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.60>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:49 2003: C<Module> L<MIME-tools|MIME-tools>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 5.411>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:52 2003: C<Module> L<MIME::Types|MIME::Types>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:37:57 2003: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.34>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:01 2003: C<Module> L<XML::LibXML::Common|XML::LibXML::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.13>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:04 2003: C<Module> L<XML::NamespaceSupport|XML::NamespaceSupport>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.08>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:09 2003: C<Module> L<XML::SAX|XML::SAX>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:14 2003: C<Module> L<Unicode::String|Unicode::String>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:17 2003: C<Module> L<XML::RegExp|XML::RegExp>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:22 2003: C<Module> L<XML::LibXML|XML::LibXML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.56>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:28 2003: C<Module> L<XML::Parser::EasyTree|XML::Parser::EasyTree>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:32 2003: C<Module> L<XML::LibXSLT|XML::LibXSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.53>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:36 2003: C<Module> L<XML::Sablotron|XML::Sablotron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:38:44 2003: C<Module> L<XML::Encoding|XML::Encoding>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: bin/compile_encoding bin/make_encmap>
+
+=back
+
+=head2 Tue Dec 16 01:38:48 2003: C<Module> L<XML-DOM|XML-DOM>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:39:43 2003: C<Module> L<XML::DT|XML::DT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: mkdtskel mkdtdskel>
+
+=back
+
+=head2 Tue Dec 16 01:39:47 2003: C<Module> L<XML::Dumper|XML::Dumper>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.67>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:39:50 2003: C<Module> L<XML::Registry|XML::Registry>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:39:53 2003: C<Module> L<XML::Generator|XML::Generator>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.93>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:39:56 2003: C<Module> L<XML::Node|XML::Node>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.11>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:39:59 2003: C<Module> L<XML::QL|XML::QL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.07>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:40:02 2003: C<Module> L<XML::Schematron|XML::Schematron>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.98>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:40:06 2003: C<Module> L<XML::SemanticDiff|XML::SemanticDiff>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: eg/xmlsemdiff>
+
+=back
+
+=head2 Tue Dec 16 01:40:09 2003: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.09>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:40:12 2003: C<Module> L<XML::Stream|XML::Stream>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.17>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:41:22 2003: C<Module> L<XML::Twig|XML::Twig>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 3.11>
+
+=item *
+
+C<EXE_FILES: tools/xml_pp/xml_pp tools/xml_grep/xml_grep tools/xml_spellcheck/xml_spellcheck>
+
+=back
+
+=head2 Tue Dec 16 01:41:28 2003: C<Module> L<XML::Writer|XML::Writer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.4>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:41:33 2003: C<Module> L<XML::XPath|XML::XPath>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.13>
+
+=item *
+
+C<EXE_FILES: examples/xpath>
+
+=back
+
+=head2 Tue Dec 16 01:41:36 2003: C<Module> L<XML::miniXQL|XML::miniXQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:41:41 2003: C<Module> L<XML::XSLT|XML::XSLT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.45>
+
+=item *
+
+C<EXE_FILES: xslt-parser>
+
+=back
+
+=head2 Tue Dec 16 01:41:44 2003: C<Module> L<XML::Handler::YAWriter|XML::Handler::YAWriter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.23>
+
+=item *
+
+C<EXE_FILES: xmlpretty>
+
+=back
+
+=head2 Tue Dec 16 01:41:48 2003: C<Module> L<XML::XQL|XML::XQL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.68>
+
+=item *
+
+C<EXE_FILES: bin/xql.pl>
+
+=back
+
+=head2 Tue Dec 16 01:42:30 2003: C<Module> L<IO::Zlib|IO::Zlib>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:42:33 2003: C<Module> L<PadWalker|PadWalker>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:42:36 2003: C<Module> L<Compress::Bzip2|Compress::Bzip2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:42:40 2003: C<Module> L<GD::Graph|GD::Graph>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.43>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:42:43 2003: C<Module> L<File::NCopy|File::NCopy>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:44:01 2003: C<Module> L<Parse::RecDescent|Parse::RecDescent>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.94>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:44:05 2003: C<Module> L<Parse::RecDescent::Deparse|Parse::RecDescent::Deparse>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:44:08 2003: C<Module> L<Parse::RecDescent::Consumer|Parse::RecDescent::Consumer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:44:11 2003: C<Module> L<ExtUtils::ParseXS|ExtUtils::ParseXS>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:46:49 2003: C<Module> L<File::RsyncP|File::RsyncP>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:47:35 2003: C<Module> L<Digest::SHA1|Digest::SHA1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:47:40 2003: C<Module> L<Regexp::Common|Regexp::Common>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.113>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:47:43 2003: C<Module> L<Test::Reporter|Test::Reporter>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.20>
+
+=item *
+
+C<EXE_FILES: bin/cpantest>
+
+=back
+
+=head2 Tue Dec 16 01:47:46 2003: C<Module> L<YAML|YAML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.35>
+
+=item *
+
+C<EXE_FILES: bin/ysh bin/xyx bin/yaml2outline bin/phone2yaml>
+
+=back
+
+=head2 Tue Dec 16 01:47:51 2003: C<Module> L<Locale::Maketext::Lexicon|Locale::Maketext::Lexicon>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/xgettext.pl>
+
+=back
+
+=head2 Tue Dec 16 01:47:54 2003: C<Module> L<PAR-Dist|PAR-Dist>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:47:58 2003: C<Module> L<Module::Signature|Module::Signature>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.37>
+
+=item *
+
+C<EXE_FILES: inc/SCRIPTS/cpansign>
+
+=back
+
+=head2 Tue Dec 16 01:48:03 2003: C<Module> L<Curses::UI|Curses::UI>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.85>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:07 2003: C<Module> L<File::chdir|File::chdir>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.06>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:10 2003: C<Module> L<Module::ScanDeps|Module::ScanDeps>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.32>
+
+=item *
+
+C<EXE_FILES: script/scandeps.pl>
+
+=back
+
+=head2 Tue Dec 16 01:48:14 2003: C<Module> L<Archive::Zip|Archive::Zip>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.09>
+
+=item *
+
+C<EXE_FILES: crc32>
+
+=back
+
+=head2 Tue Dec 16 01:48:18 2003: C<Module> L<Crypt::SSLeay|Crypt::SSLeay>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.51>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:21 2003: C<Module> L<IO::Socket::SSL|IO::Socket::SSL>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.95>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:25 2003: C<Module> L<CPANPLUS::Shell::Curses|CPANPLUS::Shell::Curses>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:29 2003: C<Module> L<MP3::Info|MP3::Info>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:32 2003: C<Module> L<MP3::Tag|MP3::Tag>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:37 2003: C<Module> L<Inline|Inline>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.44>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:42 2003: C<Module> L<Data::Buffer|Data::Buffer>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:48:45 2003: C<Module> L<Convert::ASN1|Convert::ASN1>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 01:49:42 2003: C<Module> L<PAR|PAR>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.76>
+
+=item *
+
+C<EXE_FILES: script/par.pl script/pp script/tkpp script/parl.exe script/parldyn.exe>
+
+=back
+
+=head2 Tue Dec 16 20:11:44 2003: C<Module> L<CPAN::WAIT|CPAN::WAIT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:13:43 2003: C<Module> L<CPAN::WAIT|CPAN::WAIT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:13:55 2003: C<Module> L<HTML-Format|HTML-Format>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:14:04 2003: C<Module> L<LWP-attic|LWP-attic>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:14:14 2003: C<Module> L<Net::PH|Net::PH>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:17:39 2003: C<Module> L<Net::SNPP|Net::SNPP>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:35:05 2003: C<Module> L<CPAN::WAIT|CPAN::WAIT>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.27>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:35:08 2003: C<Module> L<HTML-Format|HTML-Format>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:35:11 2003: C<Module> L<LWP-attic|LWP-attic>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.00>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:35:14 2003: C<Module> L<Net::PH|Net::PH>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.21>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:36:14 2003: C<Module> L<Digest::HMAC|Digest::HMAC>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.01>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:36:43 2003: C<Module> L<Digest::MD2|Digest::MD2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:39:21 2003: C<Module> L<Digest::MD2|Digest::MD2>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 2.03>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:46:15 2003: C<Module> L<Array::RefElem|Array::RefElem>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:46:26 2003: C<Module> L<Data::DumpXML|Data::DumpXML>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Tue Dec 16 20:48:13 2003: C<Module> L<Array::RefElem|Array::RefElem>
+
+=over 4
+
+=item *
+
+C<installed into: i:/perllib/lib/site_perl/5.8.2>
+
+=item *
+
+C<LINKTYPE: static>
+
+=item *
+
+C<VERSION: 0.02>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

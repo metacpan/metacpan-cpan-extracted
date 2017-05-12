@@ -1,0 +1,546 @@
+Ponfish - A Binary-only Newsreader For Unix
+
+See manual.txt for more information.
+
+
+
+Keywords:
+
+Usenet Newsreader Linux Free Binaries Decode Unix Newsgroups
+
+
+
+
+manual.txt duplicated below:
+----------------------------
+
+Ponfish:  Binary Newsreader for Unix and Windows.*
+
+* Actually, it's more of a newsleecher.
+
+
+Disclaimer
+----------------------------------------------------------------------
+Please use and enjoy this newsreader, but I can't take any
+responsibility for anything bad that might happen as a result of
+using this.  (It's possible, though highly unlikely, that the use of
+this program could recursively delete the root directory)
+
+
+Purpose / Goals
+----------------------------------------------------------------------
+To write a decent newsreader that I can use in Linux.
+
+My main requirements at the start of this project were:
+
+- Must handle reading 30 million headers worth of news at a time (and
+  still be responsive with acceptable memory usage).
+- Must work in Windows as well as Linux.
+- Must be able to work offline.
+- Must be able to transfer the download queue to different machines.
+- Must not require any non-core Perl modules.
+- Must decode Yenc.
+
+
+Implementation
+----------------------------------------------------------------------
+I wanted something useable ASAP.  In under two weeks of part time
+programming, I had a stable and useable skeleton.  Functionality
+was added as I needed it.
+
+I opted for a road-warrior style of programming, I wanted to get the
+job quickly after all.  The code isn't the nicest I've ever written,
+but it's very straight forward.  (Actually, I'm almost embarrassed to
+release it)
+
+I chose to use a terminal interface which uses a few ugly hacks for
+functionality.  This allowed me to keep the design exceedingly simple.
+It also meant that it has more or less a command-line interface.
+
+After getting thoughts of releasing this monstrosity onto the general
+public, I added help features and fixed as many of the glaring bugs
+as possible.
+
+(I actually have a history of writing newsreaders... my first one
+written in Perl/Tk worked quite well, but consumed about 100MB of ram
+for each 100K articles)
+
+
+Features:
+----------------------------------------------------------------------
+* It's free, which always helps.
+* Runs in both Linux and Windows.
+* Highly memory efficient - reading a newsgroup with over 15 million
+  headers on a machine with only 512K of RAM will not force the system
+  to it's knees.
+* Uses Perl's built in (and very powerful) regular expressions to
+  offer never before seen search and destroy functionality.
+* Multiple download threads to max out your bandwidth.
+* Intelligently managed download queue that downloads the oldest posts
+  first, and which persists through crashes. (Why don't other
+  newsreaders do this?  It's the most important part of a newsreader!)
+* It is very fast.
+* It is very powerful.
+* It's a terminal program, so you can access it remotely.
+* If you're running it in Linux, you will have access to funky colors
+  and eventually, perhaps a better (curses based) interface.
+* Full non-interactive help.
+
+
+Tested Environments:
+----------------------------------------------------------------------
+- Linux (various) / Perl 5.8.8
+- Windows 2000 & XP Media Ed / AS Perl 5.8.8
+
+
+Installation Instructions:
+----------------------------------------------------------------------
+Unix & Windows:
+
+Unpack into any directory.  Run the programs from this directory.*
+
+* It's extremely beta - do not run a "make install" please.
+
+Requirements:
+----------------------------------------------------------------------
+You will need to have uudeview installed in the path.  This is
+available for both Linux and Windows.  If not, downloaded articles
+will not decode for you.  For Windows, make sure you install the
+command-line version of uudeview.
+
+You will also need par2repair and rar, as standard tools for repairing
+and extracting most usenet binaries.
+
+Bugs/To Do:
+----------------------------------------------------------------------
+- The save functionality is only partially implemented.  It works, but
+the command files are currently not being deleted, and you can't
+specify how or where these files are saved.  Try to avoid using
+this if you can, clean the command files manually if you do.
+- The junk folder (where all the complete command files go) is not
+cleaned out.  It will eventually grow huge and will need manual
+deletion.
+- The manner in which the downloads / decodes happen increase drive
+fragmentation.  While not a huge problem, eventually I want to address
+this issue.
+- The help system is slightly inaccurate.
+
+
+Quickstart Guide:
+----------------------------------------------------------------------
+
+-------------------------- WARNING -----------------------------------
+
+This program was written by a programmer for use by a programmer.
+It has no GUI, a scant manual, and minimal help.  Good luck.
+
+----------------------- END OF WARNING -------------------------------
+
+
+######################################################################
+Below is a 'manual' of sorts, but it's getting out of date.  Instead
+of maintaining it, I will re-write it when/if the next release comes
+out
+######################################################################
+
+
+There are two programs you will need to run: ponfishr (the READER),
+and ponfishd (the DOWNLOADER).
+
+Ponfishr is the newsreader client, and ponfishd is the
+downloading service.  Ponfishr does not connect to Usenet, it only
+issues commands that ponfishd queues up and services.
+
+For the rest of this document, I'll call ponfishr the READER, and
+ponfishd the DAEMON.
+
+Run the daemon in one terminal.  Make sure you do not run two
+instances of this program or your downloads will likely fail.*
+
+* I will eventually write some code that prevents two instances of
+  the daemon running
+
+Run the reader in another terminal.  Make sure the terminal is nice
+and large, you'll need all the visible space you can get.  I will
+normally maximize the terminal and use a small fixed font to get
+around 300 characters width.
+
+The following sections now describe usage within the reader:
+
+
+--- GETTING HELP:
+
+At any time, you can type "?" or "help" to get a (hopefully)
+context-sensitive list of help topics.  You can drill deeper by
+issuing a "help TOPIC" to access the help on any particular topic.
+
+
+--- ADDING NEWS SERVERS:
+
+It's been a while since I've had to add a new server, and I've
+actually forgotten how.  I type at the prompt "help", which
+brings up a list of topics.  I see the "add_server" command,
+which has the alias "add" (it's in brackets).
+
+I decide to see how to use it by typing "help add" and get the
+usage:
+
+Usage:
+
+  add_server NAME,SERVER[,USERNAME,PASSWORD,TIMEOUT,CONNECTIONS
+
+At the prompt, I type
+
+> add bogus, news.bogus.com, chowda222, imagoat, 60, 5
+
+Now I can see that the news server "bogus" appears in my list of
+servers.
+
+It's time to explain that your username and password are going to
+be stored in a plain text file.  If you don't feel this meets your
+stringent security standards, please submit a patch to the source
+code and I'll be happy to integrate the changes.
+
+I really don't want "bogus", since this was just to illustrage,
+so I go to help and figure out that I can remove it like so:
+
+> remove bogus
+
+
+--- SERVERS LIST: Downloading the newsgroup list:
+
+The first screen you'll see is the SERVERS LIST.  To download header
+data for the server(s), you'll need to run the "sync_groups" command:
+
+------------------------------------------------------------------
+01. Shaw                (Wed Sep  6 12:46:32 2006)
+02. Giganews            (Wed Sep  6 12:31:41 2006)
+------------------------------------------------------------------
+Comamnd: > sy 1-2
+
+This will queue sync commands for both these servers, which will take
+a minute or so to be processed.  To check that what you expect is
+working, switch to the terminal you ran the daemon in.  You should
+see some activity - or an error message!  Otherwise probably something
+is very wrong.
+
+
+--- COMMANDS: How they work:
+
+The interface this program implements is a list of choices to choose
+from, numbered 01, 02, 03, etc, all the way down to the end of the
+page.  In general, all commands that work on a selection, such as the
+selection of articles to decode, can be given numbers separated by
+spaces, or a range.  For example:
+
+Command: > de 1-8 20-30
+
+This will issue decode commands for articles 1 to 8 and 20 to 30.
+
+Command: > de 1 2 3 8 18
+
+This does as expected.
+
+
+--- SERVERS MENU: Selecting a server to read:
+
+You can read a newsgroup by simply typing the number at the prompt:
+
+------------------------------------------------------------------
+01. Shaw                (Wed Sep  6 12:46:32 2006)
+02. Giganews            (Wed Sep  6 12:31:41 2006)
+------------------------------------------------------------------
+Comamnd: > 2
+
+
+Note that at each menu, depending on where you are (ie: server list,
+newsgroup list, articles list), there is a default command that is
+invoked by typing a number, numbers, or range.  You can see what that
+default command is in the HELP - it is the command with the "*"
+as the abbreviation.
+
+
+--- NEWSGROUPS MENU: Displaying ALL newsgroups:
+
+The next screen will be the NEWSGROUPS MENU.
+
+It defaults to displaying SUBSCRIBED newsgroups, which will be empty
+on your first run.  Type the "all" command to view the entire
+newsgroup list.
+
+Command: > all
+
+
+--- NEWSGROUPS MENU: Resizing the text area:
+
+Displayed will probably get the first 20-70 newsgroups.  If you're
+running in Linux, the program will use the entire size of the terminal
+and will resize automatically when the terminal is resized.  If you're
+running in Windows, you have to manually resize the screen using the
+"resize" command:
+
+Command: > resize WIDTH HEIGHT
+
+
+Just substitute the appropriate WIDTH and HEIGHT for your terminal
+here.
+
+* NOTE: If your terminal supports it, you will see some lines
+  highlighted.  This is to make it easier to select the correct menu
+  number, as well as to highlight particular headers when reading a
+  newsgroup.  Sorry Windows users - I've tried but can't find a way
+  to change the colors.
+
+When you're happy with the state of your terminal, continue on...
+
+
+--- NEWSGROUPS MENU: Searching
+
+The newsgroup list isn't too useful in itself - we need to be able to
+narrow down the list, which consists of between 60-120 THOUSAND
+newsgroups.  To do this use the filter command by typing a slash "/",
+followed by a REGEXP.  If you don't know what a REGEXP is, I refer you
+to either the perlre man page or a Regular Expression tutorial on the
+internet.  Barring that, just type in part of the name of a newsgroup
+you want to search on:
+
+Command: > /multimedia.cartoon
+
+
+Filtered: 8 groups!
+01.  1434915 - alt.binaries.multimedia.cartoons
+02.        4 - alt.binaries.multimedia.cartoons.french
+03.        1 - alt.binaries.multimedia.cartoons.looneytoons
+04.   439860 - alt.binaries.multimedia.cartoons.looneytunes
+05.    41259 - alt.binaries.multimedia.cartoons.repost
+06.        0 - alt.binaries.multimedia.cartoons.scoobydoo
+07.        4 - alt.binaries.multimedia.cartoons.video-games
+08.   101179 - alt.binaries.multimedia.cartoons.vintage
+Comamnd: >
+
+The filter command will probably be the most used in your arsenal,
+which you will use here and in the ARTICLES MENU to search posts.
+
+
+--- NEWSGROUPS MENU: Downloading headers
+
+Use the sync (sy) command to download headers, for example, to
+download the headers for alt.binaries.multimedia.cartoons and
+alt.binaries.multimedia.cartoons.repost, do the following:
+
+alt.binaries.multimedia.cartoons
+Filtered: 8 groups!
+01.  1434915 - alt.binaries.multimedia.cartoons
+02.        4 - alt.binaries.multimedia.cartoons.french
+03.        1 - alt.binaries.multimedia.cartoons.looneytoons
+04.   439860 - alt.binaries.multimedia.cartoons.looneytunes
+05.    41259 - alt.binaries.multimedia.cartoons.repost
+06.        0 - alt.binaries.multimedia.cartoons.scoobydoo
+07.        4 - alt.binaries.multimedia.cartoons.video-games
+08.   101179 - alt.binaries.multimedia.cartoons.vintage
+Comamnd: > sy 1 4
+
+Note that there is a sync command for servers as well.  They
+are named the same and logically do a similar job, but of course
+are quite different.  The program knows which menu you are on and
+does what you expect.
+
+Remember that the daemon will be doing the networking tasks in the
+other terminal.  It may take a while before all headers for a
+newsgroup are downloaded.
+
+
+-- NEWSGROUPS MENU:  Reading a newsgroup:
+
+In the above example, type in the number of a newsgroup you have
+downloaded headers for.  Remember there may be a delay between issuing
+the command to download headers, and having the headers be
+downloaded.  You may, however, read a newsgroup WHILE the articles are
+being downloaded - you will only be able to see the ones that have
+been downloaded at the time you began reading the newsgroup.
+
+Command: > 1
+
+
+--- ARTICLES MENU: Functionality:
+
+By now you kind of have an idea of how the newsreader works.  The
+in-program help is more up to date than this text file, but here
+are a list of commands for you to peruse:
+
+* de RANGE  (ie: de 1-8 12, 19):  Queues the specified articles for
+  decode.  You can do fancy things like this:
+
+  de RANGE > DIR
+
+  To have the decoded binaries stored in DIR.
+
+* sa RANGE: Saves a range of articles.
+
+* pr RANGE: Same as "de", only it jumps the decode queue.  It will
+  take highest precedence, and will be put to the front of the decode
+  queue.
+
+* scan REGEXP: Positions the first article on the page to the first
+  article matching REGEXP.
+
+* scan date MMM [DD]: Like scan above, but to a particular month (ie:
+  aug, sep), and optional day.
+
+* filter REGEXP: (same as /REGEXP)  Filters out only those articles
+  matching REGEXP.
+
+* so sub|date|poster:  Sorts the list by Subject, Date, or Poster.
+
+* fresher MMM [DD]: Keeps only articles newer than MMM-DD, where DD is
+  optional, and MMM is a 3 character month code.
+
+If you want to replace the original article list, use the ++ and --
+prefixes.  Here's an example:
+
+To remove (from memory) all articles that were posted prior to August:
+
+Command: > ++ fresher aug
+
+
+To remove any articles that do not match REGEXP from memory:
+
+Command: > ++/REGEXP
+
+
+To remove any articles from memory that DO MATCH REGEXP:
+
+Command: > --/REGEXP
+
+
+This functionality allows you to narrow down searches incrementally.
+
+
+--- PREFIXES:
+
+The following prefixes can be used in front of certain commands:
+
+  + - ++ --
+
+The plus means keep, the minus means remove.  As explained weakly
+above, there are two lists maintained for the menu at all times - the
+main list and the filtered list.  The main list never changes, unless
+you use the -- or ++ prefixes.  The rules I can imagine must be
+somewhat confusing.  (not for me of course, this is my own invention
+after all)
+
+Here's an example to illustrate:
+
+I will first display a list of newsgroups.  Now let's say I am
+interested in finding pictures of dogs.  I will do a simple filter,
+like so:
+
+> /pet
+
+The result is a list of 560 newsgroups!  Too many to go through
+manually, but I know I am interested in pictures, so a binary
+newsgroup.  I could filter on the text "binar" now:
+
+> /binar
+
+Now I have a list of 6938 newsgroups!  What is happening?  The main
+list contains all 100_000 plus newsgroups.  The display list contains
+the current search results.  When I do a filter: "/such-and-such", the
+filter works off the main list and populates the display list.
+
+I can use a prefix to force the filter to operate on the display list:
+
+> /pet
+> +/binar
+
+This first populates the display list with any newsgroups containing
+the text "pet", and then filters that list for any newsgroups
+containing the text "binar":
+
+>>>filter<<< (binar)
+FILTER: 'binar'
+Filtered: 6 groups!
+01.       14 - alt.binaries.games.petz
+02.  1006824 - alt.binaries.models.petite
+03.      126 - alt.binaries.multimedia.erotica.peternorth
+04.        0 - alt.binaries.pets.birds
+05.       96 - alt.binaries.pictures.erotica.jay-denebeim.and.his.pet.pig
+06.      155 - alt.binaries.pictures.petra-verkaik
+Comamnd: >
+
+
+Now let's say I want to do a bunch of searching, and I know I'm ONLY
+interested in binary newsgroups.  I can go ahead and remove any
+non-binary newsgroups from my main list like so:
+
+> ++/binar
+
+What is actually happening is that the display list is being populated
+with any newsgroups matching "binar", and the ++ then tells the
+display list to replace the main list.  Now the main list will contain
+only the 6938 newsgroups containing the string "binar".
+
+Subsequent searches will be limited to only those newsgroups.
+
+To re-load the main list, type the "all" command, which load all the
+newsgroups from the newsgroups file.  (Or the "sub" command, which
+will load all the 'subscribed' newsgroups)
+
+
+--- TECHNIQUES:
+
+I encourage experimenting with the features to find what works for
+you.  Here are some tips that might help you get started:
+
+
+--- TECHNIQUES: Use the "++ fresher DATE" sequence.
+
+Because currently this newsreader does not track what you have or have
+not read, you will need this to filter out the old headers.  For
+example, after syncing the articles for a newsgroup not read since
+February 15th, use the command:
+
+> ++fresher feb 15
+
+To limit the list to articles posted on or after Feb 15.
+
+
+--- TECHNIQUES: Use pr and ponfishd with the -p option.
+
+If you run the daemon with the -p option (preview), the only executed
+newsgroup commands that the daemon will execute are "preview", and
+"sync".  This allows you to preview posts / newsgroups quickly and
+queue downloads but not have those downloads begin until you restart
+the daemon without the -p option.
+
+
+--- TECHNIQUES: Use the "poster" command.
+
+Use the "poster" command to locate all articles posted by a particular
+persona.  When you find things of interest, this will allow you to
+find posts by the same person.
+
+
+--- FURTHER READING:
+
+The single best thing you can do is to read up on regular
+expressions.  The perl manpage is a good place to start: at a shell
+prompt, type "man perlre".
+
+
+--- AUTHOR:
+
+Des Lee:	desimus.prime / gmail.com
+
+All comments / suggestions welcome
+
+If you're interested in signing up for a good Usenet provider,
+please consider signing up with Giganews via this link:
+
+http://www.giganews.com/?c=gn289495
+
+Or using my referral id: gn289495
+
+(I get credited $15 or $20 for each referee who stays on
+for 90 days)
+

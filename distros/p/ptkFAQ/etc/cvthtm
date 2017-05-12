@@ -1,0 +1,189 @@
+#!/usr/bin/perl -w
+
+##########################################################################
+
+=head1 NAME 
+
+cvthtm    
+
+=head1 SUMMARY
+
+Run as:
+
+    cvthtm *.ht
+
+or:
+
+    cvthtm *.htm
+
+=head1 SYNOPSIS
+
+Program to convert [.ht|.htm] files to .html files and change all references
+from blah.[ht|htm] to blah.html.
+
+This scripts builds on and extends the "cvtht" script posted by 
+Mark Elston (elston@cave.arc.nasa.gov) to the ptk
+mailing list Thu, 21 Sep 1995 08:33:08 -0700. 
+It also hopefully meets the spirit of the criticism of cvtht posted by 
+James M. Stern (jstern@world.nad.northrop.com) 
+Thu, 21 Sep 1995 10:05:58 -0700 (PDT). (No, it does not do a substitution only
+on <a href>nchors</a>, nor does it clean up the <a name="name">anchors</a>).
+
+This should prove particularly useful with the documents that are distributed
+with various versions of Perl/Tk.
+
+You can avoid using this script with Tk-b10 if you apply the following patch to
+Tk-b10/doc/man2html before running 'make' in the Tk-b10 directory:
+
+ *** man2html.orig	Mon Mar 25 01:53:37 1996
+ --- man2html	Mon Mar 25 02:49:59 1996
+ ***************
+ *** 5,11 ****
+   use Carp;
+   use Getopt::Long;
+   
+ ! $opt_suffix = "htm";
+   $opt_tk     = "";
+   
+   GetOptions('suffix=s','tk','q');
+ --- 5,11 ----
+   use Carp;
+   use Getopt::Long;
+   
+ ! $opt_suffix = "html";
+   $opt_tk     = "";
+   
+   GetOptions('suffix=s','tk','q');
+ ***************
+ *** 19,25 ****
+   {
+    package HTML;
+    use Carp; 
+ !  use Tk::Pretty;
+    use strict qw(subs);
+   
+    $enabled = 0;
+ --- 19,25 ----
+   {
+    package HTML;
+    use Carp; 
+ ! # use Tk::Pretty;
+    use strict qw(subs);
+   
+    $enabled = 0;
+ ***************
+ *** 358,364 ****
+      if (exists $obj->{'SECTIONS'}{$sec})
+       {
+        my $name = $obj->{'SECTIONS'}{$sec};
+ !      $obj->tagged('H2',"<A NAME=$name>$arg</A>");
+       }
+      else
+       {
+ --- 358,364 ----
+      if (exists $obj->{'SECTIONS'}{$sec})
+       {
+        my $name = $obj->{'SECTIONS'}{$sec};
+ !      $obj->tagged('H2',"<A NAME=\"$name\">$arg</A>");
+       }
+      else
+       {
+
+
+=head1 AUTHOR
+
+Peter Prymmer pvhp@lns62.lns.cornell.edu
+
+=cut
+
+##########################################################################
+
+require 5.001; # gimme non-greedy regexps - now!
+
+for $FileName (@ARGV) {
+
+# yes we could have done 'use Tk;' and branched on $Tk::VERSION , but...
+
+    if (($NewFileName = $FileName) =~ s/\.htm$/\.html/) {
+        $b10_like = 1;
+    }
+    elsif (($NewFileName = $FileName) =~ s/\.ht$/\.html/) {
+        $b10_like = 0;
+    }
+    else { 
+        die "Are you sure you have the right filename?:\n $FileName\n"; 
+    }
+
+    print " $FileName -> $NewFileName\n";
+
+    open $FileName, "$FileName" or die "Can't open $FileName for input: $!\n";
+
+    open $NewFileName, ">$NewFileName" or die "Can't open $NewFileName for output: $!\n";
+
+
+#
+# all references we want to change (Tk-b9.01 and prior) are in lines like:
+# See the <A HREF="options.ht">
+#
+# Therefore look for all occurences of .ht\" and replace them 
+# with .html\"
+#
+# As of Tk-b10 (March 1996 the .htm era) however, there are many sectioned 
+# hyperlinks (particularly to href="options.htm#foo" ).
+#
+# Therefore look for all occurences of .htm\# and replace them 
+# with .html\# in addition to the s/\.htm\"/\.html\"/
+#
+# For speed the if ($b10_like) is evaluated outside the while <$FileName> {.
+# and no attempt at s/\.ht\#/\.html\#/ is made.
+#
+
+    if ($b10_like) {
+        while ($line = <$FileName>) {
+            $line =~ s/\.htm\"/\.html\"/ig;
+            $line =~ s/\.htm\#/\.html\#/ig;
+            $line =~ s/(NAME\=)([^"]*?)(\>)/$1\"$2$\"$3/g;
+            print $NewFileName $line or die "Unable to write to $NewFileName: $!\n";
+        }
+    }
+    else {
+        while ($line = <$FileName>) {
+            $line =~ s/\.ht\"/\.html\"/ig;
+            print $NewFileName $line or die "Unable to write to $NewFileName: $!\n";
+        }
+    }
+
+    close $FileName or die "Can't close $FileName: $!\n";
+    close $NewFileName or die "Can't close $NewFileName: $!\n";
+
+}
+
+if ($b10_like) {
+    $NewFileName = "index.html";
+    $FileName = "$$.html.$$";
+    if (!(-e $FileName)) {
+        system 'mv', $NewFileName, $FileName; 
+        print " $FileName -> $NewFileName\n";
+        open $FileName, "$FileName" or die "Can't open $FileName for input: $!\n";
+        open $NewFileName, ">$NewFileName" or die "Can't open $NewFileName for output: $!\n";
+        while ($line = <$FileName>) {
+            $line =~ s/\.htm\"/\.html\"/g;
+            print $NewFileName $line or die "Unable to write to $NewFileName: $!\n";
+        }
+        close $FileName or die "Can't close $FileName: $!\n";
+        close $NewFileName or die "Can't close $NewFileName: $!\n";
+    }
+    else {
+        print " If you are using this with the Tk-b10 doc set I recommend typing:\n";
+        print "perl -pe -i.bak 's/\\.htm\\\"/\\.html\\\"/g' index.html\n";
+        # unescaped that is: 
+        # perl -pe -i.bak 's/\.htm\"/\.html\"/g' index.html
+        print " at this time.\n";
+    }
+}
+
+__END__
+
+Peter Prymmer
+pvhp@lns62.lns.cornell.edu
+

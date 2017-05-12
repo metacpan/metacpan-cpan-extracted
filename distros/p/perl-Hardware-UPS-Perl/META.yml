@@ -1,0 +1,35 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         perl-Hardware-UPS-Perl
+version:      0.43
+version_from: 
+installdirs:  site
+requires:
+    Carp:                          0
+    constant:                      0
+    Date::Format:                  0
+    Env:                           0
+    Fcntl:                         0
+    File::Basename:                0
+    File::Find:                    0
+    File::Spec::Functions:         0
+    FileHandle:                    0
+    FindBin:                       0
+    Getopt::Long:                  0
+    IO::Select:                    0
+    IO::Socket:                    0
+    IO::Socket::INET:              0
+    IO::Stty:                      0
+    Mail::Send:                    0
+    Net::Domain:                   0
+    Net::hostent:                  0
+    POSIX:                         0
+    strict:                        0
+    Sys::Syslog:                   0
+    Test::Simple:                  0
+    Tie::RefHash:                  0
+    Time::HiRes:                   0
+    vars:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

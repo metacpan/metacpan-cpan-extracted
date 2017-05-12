@@ -1,0 +1,73 @@
+Index: util.c
+===================================================================
+RCS file: /local/perl/build/CVSROOT/perl/util.c,v
+retrieving revision 1.1.1.1
+diff -u -p -u -p -r1.1.1.1 util.c
+--- util.c	2000/05/22 14:58:14	1.1.1.1
++++ util.c	2000/05/25 12:33:00
+@@ -1580,14 +1580,20 @@ Perl_vcroak(pTHX_ const char* pat, va_li
+     SV *msv;
+     STRLEN msglen;
+ 
+-    msv = vmess(pat, args);
+-    if (PL_errors && SvCUR(PL_errors)) {
+-	sv_catsv(PL_errors, msv);
+-	message = SvPV(PL_errors, msglen);
+-	SvCUR_set(PL_errors, 0);
++    if (pat) {
++	msv = vmess(pat, args);
++	if (PL_errors && SvCUR(PL_errors)) {
++	    sv_catsv(PL_errors, msv);
++	    message = SvPV(PL_errors, msglen);
++	    SvCUR_set(PL_errors, 0);
++	}
++	else
++	    message = SvPV(msv,msglen);
++    }
++    else {
++	message = Nullch;
++	msglen = 0;
+     }
+-    else
+-	message = SvPV(msv,msglen);
+ 
+     DEBUG_S(PerlIO_printf(Perl_debug_log, "croak: 0x%"UVxf" %s",
+ 			  PTR2UV(thr), message));
+@@ -1606,9 +1612,14 @@ Perl_vcroak(pTHX_ const char* pat, va_li
+ 
+ 	    ENTER;
+ 	    save_re_context();
+-	    msg = newSVpvn(message, msglen);
+-	    SvREADONLY_on(msg);
+-	    SAVEFREESV(msg);
++	    if (message) {
++		msg = newSVpvn(message, msglen);
++		SvREADONLY_on(msg);
++		SAVEFREESV(msg);
++	    }
++	    else {
++		msg = ERRSV;
++	    }
+ 
+ 	    PUSHSTACKi(PERLSI_DIEHOOK);
+ 	    PUSHMARK(SP);
+@@ -1654,10 +1665,16 @@ Perl_croak_nocontext(const char *pat, ..
+ 
+ /*
+ =for apidoc croak
++
++This is the XSUB-writer's interface to Perl's C<die> function.
++Normally use this function the same way you use the C C<printf>
++function.  See C<warn>.
++
++If you want to throw object exceptions, assign the object reference to
++ERRSV and then pass C<Nullch> to croak():
+ 
+-This is the XSUB-writer's interface to Perl's C<die> function.  Use this
+-function the same way you use the C C<printf> function.  See
+-C<warn>.
++   sv_setsv(ERRSV, exception);
++   croak(Nullch);
+ 
+ =cut
+ */

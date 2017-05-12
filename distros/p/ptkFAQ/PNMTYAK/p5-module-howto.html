@@ -1,0 +1,675 @@
+<html><head>
+<title>p5-module-howto</title>
+</head><body>
+<h1>Pure Perl-5 (&amp; Perl/Tk) module how to</h1>
+This quasi-random collection of articles (primarily postings to the 
+<a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a> newsgroup) are meant to
+convey the spirit of trying to come up with either a perl/Tk module in
+particular or a Perl-5 module in general. This collection of information does
+not mention the use of xs code (h2xs, xsubpp, <i>et al.</i>). For more
+illustrative information on xs extensions please see 
+<a href="Howdy-widget.html">Howdy-widget.html</a>.
+
+<hr>
+<h2>From ptkFAQ</h2>
+OK, here from the <a href="../ptkTOC.html">FAQ</a> we have this advice:
+<p>
+<hr>
+<a name="A14">14. How do I write new modules?</a>
+
+<hr>
+<p>
+You might want to start by poking around your Tk-b&#35; distribution directory. 
+Is there something there that already does what you want? Is there something
+that is reasonably close - but only requires minor modification?
+<p>
+Next go through the various perl documents - including the 
+<a href="http://www.perl.com/perl/faq/">FAQ</a> as well as the various relevant
+<KBD>man</KBD> pages: 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlmod.html">
+<KBD>perlmod(1)</KBD></a>, 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlobj.html">
+<KBD>perlobj(1)</KBD></a>,  
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlbot.html">
+<KBD>perlbot(1)</KBD></a>,  
+(and please don't forget:
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlpod.html">
+<KBD>perlpod(1)</KBD></a>!)  
+<p>
+Post your idea to 
+<a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a> and discuss it with
+others - there might very well be someone working on an approach already.  
+A clear explanation of all the stuff that gets
+put into a module was posted to the mailing list and can be found in the 
+archive at:
+<pre>
+    <a href="http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.10/0012.html">http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.10/0012.html</a>
+</pre>
+Also, be sure to check out a recent version of the official Module List that 
+Tim Bunce
+<a href="mailto:Tim.Bunce@ig.co.uk">&lt;Tim.Bunce@ig.co.uk&gt;</a> maintains
+and posts to <a href="news:comp.lang.perl.announce">comp.lang.perl.announce</a>
+periodically. The list is also available at 
+<a href="qna4.html">any CPAN ftp site</a> as well as:
+<pre>
+    <a href="ftp://franz.ww.tu-berlin.de/pub/modules/00modlist.long.html">ftp://franz.ww.tu-berlin.de/pub/modules/00modlist.long.html</a> &lt;- html!
+    <a href="ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/module-list">ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/module-list</a>
+    <a href="ftp://ftp.demon.co.uk/pub/perl/db/mod/module-list.txt">ftp://ftp.demon.co.uk/pub/perl/db/mod/module-list.txt</a>
+    <a href="ftp://ftp.wpi.edu/perl5/Modules/module_list.txt">ftp://ftp.wpi.edu/perl5/Modules/module_list.txt</a>
+</pre>
+Finally ready to ship? Small (<em>perl/Tk</em>) modules have been posted 
+directly to <a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a>. Big 
+modules may require ftp distribution (see upload info at one of the 
+<a href="qna4.html">CPAN sites</a> or 
+<a href="http://franz.ww.tu-berlin.de/modulelist/">__PAUSE__</a>) 
+ then make your announcement to 
+<a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a> and possibly to 
+<a href="news:comp.lang.perl.announce">comp.lang.perl.announce</a>.
+
+<hr>
+
+<h2>General perl modules</h2>
+Here are some informative postings:
+<p>
+The following by Aaron Sherman was originally posted to 
+<a href="news:comp.lang.perl.misc">comp.lang.perl.misc</a> and is a good general
+discussion of things that typically go into <em>any</em> perl module. Of course
+the naming hierarchy for Tk modules is pretty straightforward (<i>e.g.</i>
+<kbd>Tk::MyPackage</kbd> in this case):
+
+<pre>
+Aaron Sherman 
+
+Re: is this how you write modules ?
+***********************************
+
+Tue, 05 Dec 1995 15:09:45 -0500 I-Kinetics, Inc. 
+
+Newsgroups: 
+   <a href="news:comp.lang.perl.misc">comp.lang.perl.misc</a>
+References: 
+
+
+The basic idea behind your basic module:
+
+        The module should be called something descriptive
+                (see the module list for more info)
+        You can make it heirarchical (eg Mail::MIME), but
+                make sure that it makes sense, and fits with
+                what's there already (again see the module list
+                for more info).
+        The file name itself can be arived at via the following
+                transforms on the module name:
+                        s/::/\//g;
+                        s/$/\.pm/;
+                Note that this means that the module name DOES
+                not contain the .pm extension, only the file name.
+                Please don't try to put this code anywhere in your
+                module, I'm just illustrating the process that you
+                should do mentally to come up with the filename....
+
+        Start with a package statement:
+                package MyPackage;
+
+        Now you need to do all of your use/requires (you don't NEED
+                to do them ALL here, but grouping is probably wise):
+
+                        require Exporter;
+                        use Carp;
+                        use Socket;
+
+                These are some examples. You will almost certainly
+                need Exporter, since that's the magic that makes
+                use work. Otherwise, you will have to write your
+                own import function.
+        Now you should set up inheiritance:
+                @ISA=qw(Exporter);
+        Now you need to export whatever will be exported by default.
+                This is kind of heavy handed, and you might want to
+                consider using EXPORT_OK for some of it:
+                        @EXPORT=qw(myfunc);
+        List the functions, etc that can be exported if the user
+                wants them:
+                        @EXPORT_OK(myotherfunc myotherotherfunc);
+                        # This allows for "use MyPackage 'myotherfunc'"
+        This is where you start your actual function defs.
+                sub myfunc {
+                        ...
+                }
+        Terminate the module with a true value for require:
+                1;
+                __END__
+        You can always put POD-based documentation after the __END__
+                which will be processed by perldoc.
+
+                        -AJS
+
+-- 
+Aaron Sherman   
+ "They're just jealous because they don't have three wise men
+ or a virgin in their whole organization"  - Mayor on ACLU suit
+ over city nativity scene.
+ By way of sherzer@dsg59.nad.ford.com (Allen Sherzer)
+
+I-Kinetics, Inc.                   Pager: (508)545-0584
+1 NE Executive Park                Fax:   (617)270-4979
+Burlington, MA 01803-5005          Desk:  (617)252-3489
+ajs@ajs.com or ajs@openmarket.com  WWW:   <a href="http://ajs.com/~ajs/">http://ajs.com/~ajs/</a>
+</pre>
+<hr>
+<hr>
+
+<h2>The Dial.pm example</h2>
+Here is an example of a working perl/Tk module, Roy Johnson's 
+&lt;rjohnson@shell.com&gt; <b>Dial.pm</b>. (Recent distributions of the Tk kit
+have this module in the <kbd>Tk*/Contrib/</kbd> directory.) Note that Roy 
+chose not to <kbd>require Exporter</kbd> in this version of Dial.pm, and he 
+chose to stick the plain old documentation near the top of the file beginning 
+with the <kbd>=head1 NAME</kbd> &quot;statement&quot;:
+
+<xmp>
+#!/usr/bin/perl
+
+# Dial widget
+# ***********
+# 
+# Roy Johnson (rjohnson@shell.com)
+# Tue, 22 Aug 95 16:07:59 CDT 
+# 
+# Here's a dial widget I wrote as an exercise in learning how to write
+# Composite widgets. If noone else has written a good dial widget, I'd
+# be happy to let this one be the start. If there is a dial widget
+# already out there, I'd like to know about it, but I'd still like my
+# code critiqued by any of you who has some time to do so.
+# 
+# I especially want comments regarding:
+# 
+# - features it should have (not so important if it's not going to be
+#   an "official" widget). See the documentation for features I already
+#   have in mind.
+# - poor use of Tk: working too hard to accomplish something
+# - poor use of Perl's object-oriented features
+# 
+# -------- Roy Johnson ---- rjohnson@shell.com ---- Speaking for myself --------
+# "When the only tool you have is Perl, the whole | "Hooray for snakes!"
+# world begins to look like your oyster." -- Me   | -- The Simpsons (29 Apr 93)
+# ============== And remember, you heard it first on Usenet News ===============
+
+use Tk;
+
+package Dial;
+@ISA = qw(Tk::Frame); 
+
+$pi = atan2(1, 1) * 4;
+
+Tk::Widget->Construct('Dial');
+
+=head1 NAME
+
+Dial - an alternative to the scale widget
+
+=head1 SYNOPSIS
+
+use Tk::Dial;
+
+$dial = $top->Dial(-margin => 20,
+-radius => 48,
+-min => 0,
+-max => 100,
+-value => 0,
+-format => '%d');
+
+margin - blank space to leave around dial
+radius - radius of dial
+min, max - range of possible values
+value - current value
+format - printf-style format for displaying format
+
+Values shown above are defaults.
+
+=head1 DESCRIPTION
+
+A dial looks like a speedometer: a 3/4 circle with a needle indicating
+the current value. Below the graphical dial is an entry that displays
+the current value, and which can be used to enter a value by hand.
+
+The needle is moved by pressing button 1 in the canvas and dragging. The
+needle will follow the mouse, even if the mouse leaves the canvas, which
+allows for high precision. Alternatively, the user can enter a value in
+the entry space and press Return to set the value; the needle will be
+set accordingly.
+
+=head1 TO DO
+
+Configure
+Tick marks
+Step size
+
+=head1 AUTHORS
+
+Roy Johnson, rjohnson@shell.com
+
+Based on a similar widget in XV, a program by John Bradley,
+bradley@cis.upenn.edu
+
+=head1 HISTORY 
+
+August 1995: Released for critique by pTk mailing list
+
+=cut 
+
+@flags = qw(-margin -radius -min -max -value -format);
+
+sub Populate
+{
+my ($w, $args) = @_;
+
+@$w{@flags} = (20, 48, (0, 100), 0, '%d');
+for $key (@flags) {
+my $val = delete $args->{$key};
+if (defined $val) {
+$$w{$key} = $val;
+}
+}
+
+# Pass other args on to Frame
+$w->InheritThis($args);
+
+# Convenience variables, based on flag settings
+my ($margin, $radius, $min, $max, $format) = @$w{@flags};
+my ($center_x, $center_y) = ($margin + $radius) x 2;
+
+# Create Widgets
+my $c = $w->Canvas(-width => 2 * ($radius + $margin),
+-height => 1.75 * $radius + $margin);
+
+$c->create('arc',
+($center_x - $radius, $center_y - $radius),
+($center_x + $radius, $center_y + $radius),
+-start => -45, -extent => 270, -style => 'chord',
+-width => 2);
+
+$c->pack(-expand => 1, -fill => 'both');
+
+$w->bind($c, '<1>' => \&drawPointer);
+$w->bind($c, '<B1-Motion>' => \&drawPointer);
+
+my $e = $w->Entry(-textvariable => \$w->{-value});
+$e->pack();
+
+$w->bind($e, '<Return>' => sub { &setvalue($c) });
+
+&setvalue($c);
+}
+#------------------------------
+sub drawPointer
+{
+my $c = shift;
+my $w = $c->parent;
+my $e = $c->XEvent;
+
+# Convenience variables, based on flag settings
+my ($margin, $radius, $min, $max, $value, $format) = @$w{@flags};
+my ($center_x, $center_y) = ($margin + $radius) x 2;
+
+my ($delta_x, $delta_y) = ($e->x - $center_x, $e->y - $center_y);
+my $distance = sqrt($delta_x**2 + $delta_y**2);
+return if ($distance < 1);
+
+# atan2/pi returns the angle in pi-radians, but out-of-phase;
+# here we correct it to be 0 at the start of the arc
+my $angle = atan2($delta_y, $delta_x) / $pi + 1.25;
+if ($angle > 2) { $angle -= 2 }
+
+if ($angle < 1.5) {
+my $factor = $radius/$distance;
+my $newx = $center_x + int($factor * $delta_x);
+my $newy = $center_y + int($factor * $delta_y);
+
+$c->delete('oldpointer');
+$c->create('line', ($newx, $newy, $center_x, $center_y),
+-arrow => 'first', -tags => 'oldpointer',
+-width => 2);
+
+$w->{-value} = sprintf($format,
+$angle / 1.5 * ($max - $min) + $min);
+} elsif ($angle < 1.75) {
+if ($w->{-value} < $max) {
+&setvalue($c);
+$w->{-value} = $max;
+}
+} else {
+if ($w->{-value} > $min) {
+&setvalue($c);
+$w->{-value} = $min;
+}
+}
+
+}
+
+#------------------------------
+
+sub setvalue {
+my $c = shift;
+my $w = $c->parent;
+
+my $value = $w->{-value};
+
+# Convenience variables, based on flag settings
+my ($margin, $radius, $min, $max, $dummy, $format) = @$w{@flags};
+my ($center_x, $center_y) = ($margin + $radius) x 2;
+
+if ($value > $max) {
+$value = $max;
+} elsif ($value < $min) {
+$value = $min;
+}
+
+$w->{-value} = sprintf($format, $value);
+
+# value = (angle / 1.5) * (max-min) + min
+# Solving backwards...
+# value - min = angle / 1.5 * (max-min)
+# (value - min) * 1.5 / (max-min) = angle
+
+my $angle = ($value - $min) * 1.5 / ($max - $min);
+$angle -= 1.25;
+$angle *= $pi;
+
+# Now just figure out X and Y where atan2 == $angle
+my($x, $y) = (cos($angle) * $radius, sin($angle) * $radius);
+$x += $center_x;
+$y += $center_y;
+$c->delete('oldpointer');
+$c->create('line', ($x, $y, $center_x, $center_y),
+-arrow => 'first', -tags => 'oldpointer',
+-width => 2);
+
+}
+</xmp>
+
+<hr>
+
+<h2>LabeledEntryLabeledRadiobutton</h2>
+In your Tk-*/demos directory (where you built Tk) there is a sample script 
+called <kbd>composite</kbd> that in turn makes use of (actually it
+<kbd>require</kbd>s Tk::demos::LabEnLabRad. In the Tk-*/demos/demos directory
+there is the LabEnLabRad.pm file that contains the 
+LabeledEntryLabeledRadiobutton package declaration. The <kbd>composite</kbd>
+script shows the advantage of object-oriented design of composites: the
+reconfiguration is done quickly and with quite simple code.
+
+<HR>
+
+<h2>Composite</h2>
+The principal ideas behind composite widgets are discussed in the 
+<a href="../doc/composite.htm">composite widget class</a> html page that comes 
+in your doc directory.
+<p>
+One uses a <kbd>Populate</kbd> method for <kbd>Frame</kbd> based constructs 
+and an <kbd>InitObject</kbd> method for <kbd>Widget</kbd> based constructs.
+
+<h2>ConfigSpecs</h2>
+How is the \%args hash handled by one's composite widgets? The answers are
+given in the <a href="../doc/configspec.htm">configspec.htm</a> html page that
+comes in your doc directory. Calling <kbd>-&gt;ConfigSpecs();</kbd> is useful
+for disentangling the configure options that you intend for your subwidgets to
+inherit properly. 
+
+<h2>more...</h2>
+Herein is a re-write (re-format actually) of the 
+<a href="http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.10/0012.html">
+discussion of composite constructs in Perl/Tk</a>
+that Marc Paquette (Marc.Paquette@softimage.com) posted:
+<p>
+
+<strong>Composite Widget How-To?</strong><BR>
+Marc Paquette (<i>Marc.Paquette@softimage.com</i>)<br>
+<i>Mon, 2 Oct 1995 10:40:50 -0400</i>
+
+<i>&gt;&gt;&gt;&gt;&gt; "Mark" == Mark Elston &lt;elston@cave.arc.nasa.gov&gt; writes:</i><br>
+<p>
+    Mark&gt; I have been trying to put together a composite widget (a<br>
+    Mark&gt; somewhat modified version of the FileSelect widget that came<br>
+    Mark&gt; with Tk-b8).  After looking at the code that exists I began<br>
+    Mark&gt; to wonder just where to start.  I found that the<br>
+    Mark&gt; documentation that we have so far really does not explain a<br>
+    Mark&gt; lot of the inner workings of Composites very well.  At least<br>
+    Mark&gt; not if you are just trying to come up to speed on them (like<br>
+    Mark&gt; me).<br>
+<p>
+    Mark&gt; I have read the Composite.pod and ConfigSpec.pod entries and<br>
+    Mark&gt; looked at Frame.pm and demo/LabEnLabRad.pm and I must admit<br>
+    Mark&gt; that I am still lost.<br>
+<p>
+Remember what Nick said about b9 when reading the patched<br>
+Composite.pod:<br>
+<p>
+Nick&gt; <br>
+Nick&gt; There will be a few minor changes in Tk-b9 - I think they are transparent,<br>
+Nick&gt; or auto-convertable. <br>
+Nick&gt; <br>
+Nick&gt; One change is that the ConfigSpecs stuff has been 'pushed down' a level,<br>
+Nick&gt; so that you can add them to things which are not Frames. <br>
+Nick&gt; I have used this to derive  HTMLText class directly from Text.<br>
+<p>
+    Mark&gt; For example, what does the 'Component' method do?  How about<br>
+    Mark&gt; 'Advertise'?  I still can't make out how 'Delegates' is used<br>
+    Mark&gt; even after reading the (cryptic) references to it in<br>
+    Mark&gt; Composite and looking at any examples I can find.  Where are<br>
+    Mark&gt; these methods documented?  Are they documented?<br>
+<p>
+For now, looking at the source is the way to go...  Hard, but 
+instructive :-)  But here are some answers (bear in mind that 
+these are the things I understood while looking at the source, they 
+might not be 100% accurate).
+<p>
+<DL>
+<DT>Component</DT>	<DD>It creates a widget instance of some kind to 
+			be used as a "part" of your composite widget.
+			You can provide "creation-time" options in the
+			'Component' call.
+			Creating a component with this function will
+			make it part of the published interface to
+			your composite widget.  This is what is called
+			"Advertizing" your components.  The latter is
+			done when you accept that client code accesses 
+			the component directly.</DD>
+<DT>Advertise</DT>	<DD>You call this when you decide that it makes 
+			sense to publish the existence of a certain 
+			sub-widget.  'Component' does this for you 
+			(among other things).</DD>
+<DT>Delegates</DT>	<DD>Used by higher-levels widgets in the 
+			composition hierarchy (a composite widget 
+			is "higher" that its components) to pass down 
+			the responsability to respond to a 
+			method invocation.  This is done when 
+			you want to provide part of the interface of 
+			your components to your composite.  For 
+			example, the LabEntry composite delegates 
+			everything by default to the Entry component. 
+			Therefore, calling the 'cget' method on a 
+			LabEntry widget instance, will in fact invoke 
+			the 'cget' method of the 'Entry' component. 
+			</DD>
+</DL>
+<p>
+    Mark&gt; ConfigSpecs is better documented but I am still having<br>
+    Mark&gt; trouble putting it into perspective.  Perhaps if I could<br>
+    Mark&gt; only understand the rest of the stuff that goes on in the<br>
+    Mark&gt; Populate method ...<br>
+<p>
+    Mark&gt; Can anyone help get me up over whatever hump(s) I am facing?<br>
+<p>
+Hope this helps.<br>
+<p>
+    Mark&gt; Thanks.<br>
+<p>
+    Mark&gt; Mark.<br>
+<p>
+Marc Paquette                         | Marc.Paquette@Softimage.COM<br>
+Administrateur de Systemes / Sysadmin | Softimage Inc<br>
+tel: (514) 845-1636 ext. 3426         | 3510 Boulevard St-Laurent<br>
+fax: (514) 845-5676                   | Montreal (Quebec) H2X 2V2<br>
+<p>
+Here is Marc Paquette's Composite.pod documentation patch:
+<XMP>
+*** Composite.pod.orig	Wed Aug 16 06:08:27 1995
+--- Composite.pod	Wed Aug 23 10:05:50 1995
+***************
+*** 1,10 ****
+--- 1,12 ----
+  
+  =head1 NAME 
+  
++ 
+  Defining a new composite widget class
+  
+  =head1 SYNOPSIS
+  
++ 
+    package Whatever;
+    @ISA = qw(Tk::Frame);  # or Tk::Toplevel
+           
+***************
+*** 47,69 ****
+  
+  =head1 DESCRIPTION
+  
+! A composite should normaly inherit C<new()> from C<Tk::Widget>. 
+! C<Tk::Widget::new()>; will call C<$cw->InitObject(\%args)> which
+! a compoiste will normally inherit from C<Tk::Frame>. 
+  
+! C<Tk::Frame::InitObject()> will call C<Populate()>, which should 
+! be defined to create the characteristic subwidgets of the class.
+  
+  C<Populate> may call C<Delegates> to direct calls to methods 
+! to subwidgets. Typically most of not all methods are directed to a single
+! subwidget - e.g. ScrolledListbox directs all methods to the core
+! Listbox so that $composite->get(...) calls $listbox->get(...). 
+! 
+! C<Populate> should also call C<ConfigSpecs()> 
+! once C<Populate> returns C<Tk::Frame::ConfigDefault>
+! walks through the ConfigSpecs entries and populates
+! %$args hash with defaults for options from .Xdefaults etc.
+  When  C<InitObject()> returns to C<Tk::Widget::new()>, 
+! a call to $cw->configure(%$args) and sets *all* the options.
+  
+  
+--- 49,147 ----
+  
+  =head1 DESCRIPTION
+  
+! 
+! The intention behind a composite is to create a higher-level widget, 
+! sometime called a "super-widget".  Most often, a composite will be
+! built upon other widgets by B<using> them, as opposed to specializing on them.  
+! For example, the supplied composite widget C<LabEntry> is B<made of> an
+! C<Entry> and a C<Label>; it is neither a B<kind-of> C<Label>
+! nor is it a B<kind-of> C<Entry>.
+! 
+! Most of the work of a composite widget consist in creating subwidgets, 
+! arrange to dispatch configure options to the proper subwidgets and manage
+! composite-specific configure options.
+! 
+! =head2 Composite widget creation
+! 
+! 
+! Since C<pTk> is heavilly using an object-oriented approach, it is no
+! suprise that creating a composite goes through a C<new()> method.
+! However, the composite does not normally define a C<new()> method
+! itself: it is usually sufficient to simply inherit it from
+! C<Tk::Widget>.  
+! 
+! This is what happens when the composite use
+! 
+! 
+! 	@ISA = qw(Tk::Frame);  # or Tk::Toplevel
+! 
+! to specify its inheritance chain.  To complete the initialisation of the
+! widget, it must call the C<Construct> method from class C<Widget>.  That
+! method accepts the name of the new class to create, i.e. the package name
+! of your composite widget:
+! 
+! 
+! 	Tk::Widget->Construct('Whatever'); 
+  
+! Here, C<Whatever> is the package name (aka the widget's B<class>).  This
+! will define a constructor method for C<Whatever>, named after the 
+! widget's class.  Instanciating that composite in client code would
+! the look like:
+  
++ 	$top = MainWindow->new();   # Creates a top-level main window
++ 	$cw = $top->Whatever();     # Creates an instance of composite widget
++                                     # 'Whatever'
++ 
++ Whenever a composite is instanciated in client code,
++ C<Tk::Widget::new()> will be invoked via the widget's class
++ constructor.  That C<new()> method will call 
++ 
++ 
++ 	$cw->InitObject(\%args);
++ 
++ where C<%args> is the arguments passed to the widget's constructor.  Note
++ that C<InitObject> receives a B<reference> to the hash array
++ containing all arguments.
++ 
++ For composite widgets that needs an underlying frame, C<InitObject>
++ will typically be inherited from C<Tk::Frame>, that is, no method of
++ this name will appear in the composite package.  For composites that
++ don't need a frame, C<InitObject> will typically be defined in the
++ composite class (package).  Compare the C<LabEntry> composite with 
++ C<Optionmenu>: the former is C<Frame> based while the latter is C<Widget> 
++ based.
++ 
++ In C<Frame> based composites, C<Tk::Frame::InitObject()> will call
++ C<Populate()>, which should be defined to create the characteristic
++ subwidgets of the class.
++ 
++ C<Widget> based composites don't need an extra C<Populate> layer; they
++ typically have their own C<InitObject> method that will create subwidgets.
++ 
++ =head2 Creating Subwidgets
++ 
++ 
++ Subwidget creation happens usually in C<Populate()> (C<Frame> based) 
++ or C<InitObject()> (C<Widget> based).  The composite usually calls the
++ subwidget's constructor method either directly, for "private" subwidgets, 
++ or indirectly through the C<Component> method for subwidgets that should
++ be advertised to clients.
++ 
+  C<Populate> may call C<Delegates> to direct calls to methods 
+! of chosen subwidgets. For simple composites, typically most if not all 
+! methods are directed
+! to a single subwidget - e.g. C<ScrolledListbox> directs all methods to the core
+! C<Listbox> so that $composite->get(...) calls $listbox->get(...). 
+! 
+! B<Further steps for >C<Frame> B<based composites>
+! 
+! C<Populate> should also call C<ConfigSpecs()> to specify the
+! way that configure-like options should be handled in the composite.
+! Once C<Populate> returns, method C<Tk::Frame::ConfigDefault>
+! walks through the C<ConfigSpecs> entries and populates
+! %$args hash with defaults for options from X resources (.Xdefaults, etc).
+! 
+  When  C<InitObject()> returns to C<Tk::Widget::new()>, 
+! a call to $cw->configure(%$args) is made which sets *all* the options.
+  
+  
+
+</XMP>
+_end of patch_
+
+<HR>
+<ADDRESS>
+I am: <BR>
+<A HREF="http://w4.lns.cornell.edu/~pvhp/">Peter Prymmer</A><BR>
+<A HREF="http://w4.lns.cornell.edu/">Wilson Synchrotron Laboratory</A><BR>
+<A HREF="http://www.cornell.edu/">Cornell University</A><BR>
+<A HREF="http://www.ithaca.ny.us/">Ithaca</A>, 
+ <A HREF="http://wings.buffalo.edu/world/nywww.html">NY</A> 
+ <A HREF="http://www.mit.edu:8001/geo?Ithaca">14853</A><BR><BR>
+<A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A><BR>
+</ADDRESS>
+
+</BODY></HTML>

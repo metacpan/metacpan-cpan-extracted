@@ -1,0 +1,39 @@
+
+My ToDo list:
+1) Write better documentation
+    Started - pod2lyx documentation is better but Pod::Lyx is not done.
+
+2) Fix pod2lyx so that error messages are reported to the user versas just exit.
+    done :)
+
+3) Have pod2lyx display a usage screen
+    Done. Added command line options for printing out the man page as well.
+
+4) Work on creating links correctly.
+    Started...
+
+5) Work on making those pod files that just don't look right look right.
+    Started on this one but some work remains.
+
+6) Work on the C<> bug. Actualy I'm not sure that I would classify this as a bug
+   What happens is that certin pods use C<> to mark code examples instead of
+   using verbatim. Detecting this is kinda hard as there are instances where
+   C<> is used correctly. For now I'm doing what perlpod indicates I should
+   do. But this just doesn't look good in some cases.
+
+7) Implement handling of escapes in the pod file.
+
+8) Look into putting a foot note on page one indicating the file name and
+   version of the file/module used to generate the LyX file. This would let us
+   know if we need to print a new copy when we update our software.
+
+    Done.
+
+9) Make lists work better. In particular those lists with attached paragraphs.
+    - Done. Also added support for multilevel lists while I was at it.
+
+10) Develop a test case for Make.
+
+11) Get E<> working. Actually if you know of a pod file that uses this drop me
+    line at richardj@1gig.net as I've yet to find one that does. But then again
+    I haven't looked at all the pods yet either.

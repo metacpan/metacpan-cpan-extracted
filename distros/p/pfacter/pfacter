@@ -1,0 +1,471 @@
+#!/usr/bin/perl
+
+package pfacter;
+
+BEGIN { unshift @INC, './lib'; }
+
+# pfacter, Collect and display facts about the system.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+
+our $VERSION = '1.13';
+
+
+
+use Getopt::Long;
+
+use strict;
+
+
+
+# Initialize the package
+my $self = pfacter->init();
+
+$self->debug( "Output module list: [ @ARGV ]" );
+
+foreach ( @ARGV ) {
+    $self->{'pfact'}->{$_} = $self->pfact( $_ ) || next;
+
+    if ( $self->{'var'}->{'xml'} ) {
+        print "<fact>\n" . "\t<name>"  . $_ . "</name>\n";
+        if (
+            ( $self->{'var'}->{'multi'} )
+         && ( $self->{'pfact'}->{$_} =~ /.+?\=.+?\s.+?\=.+?/ )
+        ) {
+            my @facts = split / /, $self->{'pfact'}->{$_};
+            foreach my $fact ( @facts ) {
+                print "\t<value>" . $fact . "</value>\n";
+            }
+        }
+        else {
+            print "\t<value>" . $self->pfact( $_ ) . "</value>\n";
+        }
+        print "</fact>\n";
+    }
+    else {
+        my $c = $self->{'var'}->{'yaml'} ? ': ' : ' => ';
+        if (
+            ( $self->{'var'}->{'multi'} )
+         && ( $self->{'pfact'}->{$_} =~ /.+?\=.+?\s.+?\=.+?/ )
+        ) {
+            my @facts = split / /, $self->{'pfact'}->{$_};
+            foreach my $fact ( @facts ) {
+                print $_ . $c . $fact . "\n";
+            }
+        }
+        else {
+            print $_ . $c . $self->{'pfact'}->{$_} . "\n";
+        }
+    }
+}
+
+# Fetch the LDAP entry to compare against if writing
+if ( $self->{'var'}->{'write'} ) {
+    $self->debug( "Searching for existing LDAP host" );
+    $self->{'ldata'} = $self->fetch(
+        source => "ou=Hosts,$self->{'var'}->{'base'}",
+        filter => 'cn=' . $self->pfact( 'hostname' )
+    );
+
+    if ( $self->{'ldata'} ) {
+        # Compare local and LDAP facts for changes
+        $self->debug( "Found host in LDAP; checking for changes" );
+
+        my ( $change );
+
+        foreach my $k ( keys %{$self->{'pfact'}} ) {
+            if ( $self->{'var'}->{'multi'} ) {
+                if (
+                    ( ref $self->{'ldata'}->{$k} )
+                 || ( $self->{'pfact'}->{$k} =~ /.+?\=.+?\s.+?\=.+?/ )
+                ) {
+                    if (
+                        ( ref $self->{'ldata'}->{$k} )
+                     && ( $self->{'pfact'}->{$k} =~ /.+?\=.+?\s.+?\=.+?/ )
+                    ) {
+                        my ( $facts );
+                        foreach ( split / /, $self->{'pfact'}->{$k} ) {
+                            $facts->{$k}->{$_} = 1;
+                        }
+                        foreach ( @{$self->{'ldata'}->{$k}} ) {
+                            if ( $facts->{$k}->{$_} ) {
+                                delete $facts->{$k}->{$_};
+                            }
+                            else {
+                                $change->{'delete'}->{$k} = $_;
+                            }
+                        }
+                        foreach ( keys %{$facts->{$k}} ) {
+                            $change->{'add'}->{$k} = $_;
+                        }
+                    }
+                    else {
+                        $change->{'replace'}->{$k} =
+                            [ split / /, $self->{'pfact'}->{$k} ];
+                    }
+                }
+            }
+            else {
+                if ( $self->{'ldata'}->{$k} ne $self->{'pfact'}->{$k} ) {
+                    if ( $self->{'ldata'}->{$k} ) {
+                        $change->{'replace'}->{$k} = $self->{'pfact'}->{$k};
+                    } else {
+                        $change->{'add'}->{$k} = $self->{'pfact'}->{$k};
+                    }
+                }
+            }
+        }
+
+        if ( $change ) {
+            foreach my $t ( keys %{$change} ) {
+                map {
+                    $self->debug( "\t$_ => $change->{$t}->{$_}");
+                } keys %{$change->{$t}};
+
+                $self->{'LDAP'}->{'error'} = $self->{'LDAP'}->modify(
+                    'cn='
+                  . $self->pfact( 'hostname' )
+                  . ",ou=Hosts,$self->{'var'}->{'base'}",
+                    $t => $change->{$t}
+                );
+
+                if ( $self->{'LDAP'}->{'error'}->{'errorMessage'} ) {
+                    print 'Error: (LDAP) ';
+                    print $self->{'LDAP'}->{'error'}->{'errorMessage'};
+                    exit( 1 );
+                }
+                else {
+                    $self->debug( "LDAP modification successful" );
+                }
+            }
+        }
+        else {
+            $self->debug( "No changes found" );
+        }
+    }
+    else {
+        # No LDAP entry found; add host to LDAP
+        $self->debug( "Host not found; adding" );
+
+        $self->{'LDAP'}->{'error'} = $self->{'LDAP'}->add(
+            'cn='
+          . $self->pfact( 'hostname' )
+          . ",ou=Hosts,$self->{'var'}->{'base'}",
+            attrs => [
+                objectClass  => [ 'top', 'ipHost', 'pfHost' ],
+                ipHostNumber => $self->{'pfact'}->{'ipaddress'},
+
+                %{$self->{'pfact'}}
+            ]
+        );
+
+        if ( $self->{'LDAP'}->{'error'}->{'errorMessage'} ) {
+            print 'Error: (LDAP) ';
+            print $self->{'LDAP'}->{'error'}->{'errorMessage'};
+            exit( 1 );
+        }
+        else {
+            $self->debug( "Host successfully added to LDAP" );
+        }
+    }
+}
+
+
+
+sub init {
+    my $self = bless {}, shift;
+
+    # Define params for Getopt::Long
+    $self->GetOptions(
+        'configfile=s' => \$self->{'var'}->{'configfile'},
+        'base=s'       => \$self->{'var'}->{'base'},
+        'debug'        => \$self->{'var'}->{'debug'},
+        'help'         => \$self->{'var'}->{'help'},
+        'moduledir=s'  => \$self->{'var'}->{'moduledir'},
+        'multi'        => \$self->{'var'}->{'multi'},
+        'password=s'   => \$self->{'var'}->{'password'},
+        'server=s'     => \$self->{'var'}->{'server'},
+        'ssl'          => \$self->{'var'}->{'ssl'},
+        'username=s'   => \$self->{'var'}->{'username'},
+        'version'      => \$self->{'var'}->{'version'},
+        'write'        => \$self->{'var'}->{'write'},
+        'xml'          => \$self->{'var'}->{'xml'},
+        'yaml'         => \$self->{'var'}->{'yaml'}
+    ) || { $self->{'var'}->{'help'} = 1 };
+
+    # Read configuration from a file if --configfile specified
+    if ( $self->{'var'}->{'configfile'} ) {
+        $self->{'var'}->{'config'} = $self->readConfig(
+            configFile => $self->{'var'}->{'configfile'}
+        )
+        || do {
+            print qq(Error reading configuration file $self->{'var'}->{'configfile'}\n);
+            exit( 1 );
+        };
+
+        for ( qw( username password server ) ) {
+            $self->{'var'}->{$_} ||= $self->{'var'}->{'config'}->{$_}
+                if $self->{'var'}->{'config'}->{$_};
+        }
+    }
+
+    # Make sure all necessary params are specified if writing
+    if (
+        ( $self->{'var'}->{'write'} ) &&
+        (
+            ( !$self->{'var'}->{'server'} ||
+              !$self->{'var'}->{'username'} ||
+              !$self->{'var'}->{'password'} )
+            &&
+            ( !$self->{'var'}->{'configfile'} )
+        )
+    ) {
+        print qq(Error: required argument(s) not found for --write option;\n);
+        print qq(please provide --{username, password, server} or --configfile\n\n);
+
+        $self->{'var'}->{'help'} = 1;
+    }
+
+    # Display help/usage
+    if ( $self->{'var'}->{'help'} ) {
+        print qq(Type 'perldoc pfacter' for more options and information.\n\n);
+        print qq(USAGE: $0 [option]... [fact] [fact]...\n);
+        exit( 1 );
+    }
+
+    # Display the version
+    if ( $self->{'var'}->{'version'} ) {
+        print qq($VERSION\n);
+        exit( 0 );
+    }
+
+    # Display a (debug) warning to not-root users
+    $self->debug( "Executing as unpriviledged user; some facts may not work!" )
+        unless getpwnam( $< ) eq 'root';
+
+    # Core modules; used to determine other things within other modules
+    foreach ( qw( kernel operatingsystem hostname domain ) ) {
+        $self->{'pfact'}->{$_} = $self->pfact( $_ );
+    }
+
+    # 3rd party modules
+    if ( $self->{'var'}->{'moduledir'} ) {
+        $self->debug( "Using moduledir $self->{'var'}->{'moduledir'}" );
+        
+        if ( -d $self->{'var'}->{'moduledir'} ) {
+            unshift @INC, $self->{'var'}->{'moduledir'};
+        }
+        else {
+            $self->debug( "Moduledir $self->{'var'}->{'moduledir'} not found" );
+        }
+    }
+
+    # Setup a (bound) LDAP object if writing
+    if ( $self->{'var'}->{'write'} ) {
+        require Net::LDAP;
+
+        # Guess the base DN if not specified
+        if ( !$self->{'var'}->{'base'} ) {
+            unless ( $self->{'pfact'}->{'domain'} =~ /.+?\..+?/ ) {
+                print qq(Error: domain not found; unable to guess LDAP base DN\n);
+                exit( 1 );
+            }
+
+            my @domain = split /\./, $self->{'pfact'}->{'domain'};
+            foreach ( @domain ) { $self->{'var'}->{'base'} .= "dc=$_," }
+            chop( $self->{'var'}->{'base'} );
+
+            $self->debug( "Base DN not specified; using $self->{'var'}->{'base'}" );
+        }
+
+        $self->{'var'}->{'server'} = [ $self->{'var'}->{'server'} ]
+            if not ref $self->{'var'}->{'server'};
+
+        foreach my $server ( @{$self->{'var'}->{'server'}} ) {
+            # Reformat the server name for Net::LDAP::SSL
+            if ( $self->{'var'}->{'ssl'} ) {
+                $server = 'ldaps://' . $server . ':636';
+            }
+
+            # Create a new Net::LDAP object
+            $self->debug( "Connecting to $server" );
+
+            eval {
+                local $SIG{ALRM} = sub { die "\n" };
+                alarm( 10 );
+                $self->{'LDAP'} = Net::LDAP->new( $server );
+                alarm( 0 );
+            };
+            if ( $@ ) {
+                $self->debug( "Timed out connecting to $server" );
+                next;
+            }
+            elsif ( $self->{'LDAP'} ) {
+                $self->debug( "Connection successful" );
+                $self->{'var'}->{'server'} = $server;
+                last;
+            }
+            else {
+                $self->debug( "Unknown connection error" );
+                next;
+            }
+        }
+
+        unless ( $self->{'LDAP'} ) {
+            print qq(Unable to connect to LDAP server\n);
+            exit( 1 );
+        }
+
+        # Attempt to bind
+        $self->debug(
+            "Attempting to bind as uid=$self->{'var'}->{'username'},"
+                . "ou=People,$self->{'var'}->{'base'}"
+        );
+
+        $self->{'LDAP'}->{'error'} = $self->{'LDAP'}->bind(
+            "uid=$self->{'var'}->{'username'},ou=People,$self->{'var'}->{'base'}",
+            password => $self->{'var'}->{'password'}
+        );
+
+        # Exit if credentials aren't valid
+        if ( $self->{'LDAP'}->{'error'}->code() ) {
+            print qq(Error: invalid LDAP credentials\n);
+            exit( 1 );
+        }
+
+        $self->debug( "Bind successful" );
+    }
+
+    # Use all facts in Pfacter's modulelist if none are specified
+    unless ( @ARGV ) {
+        $self->debug( "No modules specified; using defaults" );
+
+        use Pfacter;
+        @ARGV = Pfacter->modulelist( $self->{'pfact'}->{'kernel'} );
+
+        # Read in all facts in --moduledir if specified
+        if ( $self->{'var'}->{'moduledir'} ) {
+            my $moduledir = $self->{'var'}->{'moduledir'};
+
+            my @files = <$moduledir/*>;
+
+            foreach my $file ( @files ) {
+                if ( -d $file ) { push @files, <$file/*>; }
+
+                push @ARGV, $1 if $file =~ /\/(\w+)\.pm$/;
+            }
+        }
+    }
+
+    return $self;
+}
+
+sub debug {
+    my $self = shift;
+
+    return unless $self->{'var'}->{'debug'};
+
+    print STDERR 'dbg> ' . shift() . "\n";
+}
+
+sub fetch {
+    my $self = shift;
+
+    my ( $arg );
+    %{$arg} = @_;
+
+    my ( $r );
+
+    my $result = $self->{'LDAP'}->search(
+        base   => $arg->{'source'},
+        filter => $arg->{'filter'}
+    );
+
+    foreach my $e ( $result->all_entries() ) {
+        foreach ( $e->attributes() ) {
+            my $ra = [ $e->get_value( $_ ) ];
+            $r->{$e->dn()}->{lc($_)} = @{$ra} > 1 ? $ra : $ra->[0];
+        }
+    }
+
+    ( $r ) = values %{$r};
+
+    return $r;
+}
+
+sub pfact {
+    my $self   = shift;
+    my $module = shift;
+
+    return $self->{'pfact'}->{lc( $module )}
+        if $self->{'pfact'}->{lc( $module )};
+
+    $module = lc( $module );
+
+    $self->debug( "Querying system for $module" );
+
+    unless ( eval "require Pfacter::$module" ) {
+        $self->debug( "Pfacter::$module module not found" );
+        return 0;
+    }
+
+    chomp( my $pfact = "Pfacter::$module"->pfact( $self ) );
+    return( $pfact );
+}
+
+sub readConfig {
+    my $self = shift;
+
+    my ( $arg );
+    %{$arg} = @_;
+
+    my ( $config );
+
+    $arg->{'configFile'} || return( 0 );
+
+    if ( -e $arg->{'configFile'} ) {
+        open configFile, $arg->{'configFile'} || return( 0 );
+
+        $self->debug( "Reading configuration file $arg->{'configFile'}:" );
+
+        while( <configFile> ) {
+            $config->{$1} = $2 if /^\$(.+?):.+?"(.+?)"/;
+            ( @{$config->{$1}} ) = split / /, $2 if /^\@(.+?):.+?"(.+?)"/;
+        }
+
+        close configFile;
+    }
+    else {
+        return( 0 );
+    }
+
+    map {
+        $config->{$_} =~ s/\$(\w+)/$config->{$1}/g;
+        if ( ref $config->{$_} ) {
+            $self->debug( "\t$_ => [ @{$config->{$_}} ]" );
+        }
+        else { $self->debug( "\t$_ => $config->{$_}" ); }
+    } keys %{$config};
+
+    return $config;
+}
+
+
+
+sub DESTROY {
+    my $self = shift;
+
+    $self->{'LDAP'}->unbind() if $self->{'LDAP'};
+}
+
+
+
+1;

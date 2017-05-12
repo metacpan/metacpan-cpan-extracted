@@ -1,0 +1,99 @@
+<H2>[PREV]  <A HREF="news:199604020103.UAA21310@Turkey.CC.Lehigh.EDU">[NEXT]</A>  <A HREF="news:315FFEC2.2781E494@micro.ti.com">[PREV Thread]</A>  <A HREF="news:Pine.HPP.3.91.960401111549.28546D-100000@hera.candu.aecl.ca">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> nik@tiuk.ti.com (Nick Ing-Simmons)
+</ADDRESS>
+<TITLE> Re: Tk-b11</TITLE>
+<ADDRESS><H1> Re: Tk-b11</H1>
+</ADDRESS>
+<ADDRESS> 1 Apr 96 16:44:48 GMT
+ via, but not speaking for : Texas Instruments Ltd.
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<199604011627.LAA04679@Turkey.CC.Lehigh.EDU"><199604011627.LAA04679@Turkey.CC.Lehigh.EDU></A>
+</DL>
+<HR>
+<PRE>Please use nick@tiuk.ti.com - the other address is subscribed
+to ptk but all mail there goes via modem and costs _ME_ money.
+So I don't need two copies ;-)
+
+In <199604011627.LAA04679@Turkey.CC.Lehigh.EDU>
+On Mon, 1 Apr 1996 11:27:13 -0500 (EST)
+Stephen O Lidie <lusol@Turkey.CC.Lehigh.EDU> writes:
+&gt;&gt; Try Tk-b11 -
+&gt;
+&gt;B11?  I'm not known to miss new release announcements (:
+
+Yes, it is on ftp://ftp.wpi.edu/perl5/Incoming/Tk-b11.tar.gz
+
+_This_ is the announcement ;-)
+
+see also 
+
+        ftp://ftp.wpi.edu/perl5/Incoming/Tk-JPEG-b11.tar.gz
+
+Both will be on CPAN soon I hope.
+
+Main reason for b11 was to see if I had the gettimeofday() build
+issues resolved. It is also a 'snapshot' of all stuff I did at home
+during my holiday (aka 'vacation').
+
+(And I always try and release _something_ on 1st April ;-))
+
+The Drag&Drop stuff looks real good on Solaris, but seems a little
+sad on SunOS...
+
+I just re-discovered more snags in Tk-b11/HTML/* 
+more and more folks are using Netscape stuff ...
+
+
+Changes in b11
+
+* Corrected initialization/malloc/free bug in Text Tag -data option.
+
+* Down graded ConfigDefault not to propagate 'default' values if 
+  ConfigSpec has 'undef' as default value. Changed default -foreground
+  -background to supplied by Tk::Derived to follow this model.
+  These changes allow subwidgets to default their own colours.
+  
+* Made '-class' universal and used it to set class for all Tk::Widgets.
+  Will allows Tix-like options db priming to affect subwidget defaults
+  (e.g. colours).
+
+* Messed with 'Menubar' class - now only exported decendants of 'Frame' and
+  auto-packs itself at top. Its Menubutton method looks for existing
+  menubutton of the supplied name, does maps ~Name to -underline
+  and passes -menuitems to the menu.
+
+* Adopted xpm3.4h for Pixmap/xpm 
+
+* Moved pTk's gettimeofday() tests up to top level myConfig.
+  Changed way C #define's are passed to code; now builds tkConfig.h 
+  and #include's it rather than passing lots of -DXXXX to the compiler.
+
+* Fixed infinite recursion on configure of DEFAULT options on derived widgets.
+
+* Fixed bad case of 'bit rot' in Sun drag&drop - it was broken at time of 
+  Tix code merge. Cleaned up the interface to it and added generic 'Local' 
+  drag&drop independent of Sun's. Drop is always via a selection, as 
+  both Sun's and Motif use that mechanism.
+
+   - 'Local' drop should allow emulation of Tix-like Drag&Drop.
+
+   - Works fine with olvwm4.1 under Solaris2.4.
+   - Works after a fashion under olvwm4.1 on SunOS4 - incoming drops sometimes 
+     fail. (Suspect bugs on 'xview' side...)
+   - SunOS4 olvwm3.* is even worse.
+   
+   - Need to add Motif methods when I can  decipher the protocol.
+
+* Various point fixes suggested to pTk list.
+
+
+-- 
+This article was gatewayed from the <A HREF=mailto:ptk@guest.wpi.edu">ptk@guest.wpi.edu</A> mailing list.
+Problems? <A HREF="mailto:refay@carbon.cudenver.edu">refay@carbon.cudenver.edu</A>. Subscriptions: <A HREF="mailto:majordomo@guest.wpi.edu">majordomo@guest.wpi.edu</A>
+</PRE>
+<HR><H2>[PREV]  <A HREF="news:199604020103.UAA21310@Turkey.CC.Lehigh.EDU">[NEXT]</A>  <A HREF="news:315FFEC2.2781E494@micro.ti.com">[PREV Thread]</A>  <A HREF="news:Pine.HPP.3.91.960401111549.28546D-100000@hera.candu.aecl.ca">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

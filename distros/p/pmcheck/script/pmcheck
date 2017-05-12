@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+
+=encoding utf8
+
+=head1 NAME
+
+pmcheck - show all Perl packages provided or required
+
+=head1 SYNOPSIS
+
+pmcheck [ --missing | --provided ] [ <directory or file> ]
+
+=head1 DESCRIPTION
+
+Recursively extract package information from all readable non-empty regular
+text files in the source tree.  The current directory is used if no directory
+or file is specified.  All dot-files and directories are ignored.
+
+If the --provided option is given, shows all packages provided by .pm files
+in the source tree.  Otherwise shows all packages required by .cgi, .pl, .pm
+and .t files that are not provided anywhere in the source tree (and also
+nowhere in @INC if the --missing option is given).  Files with no dot in the
+name are also checked if they start with a perl shebang line.
+
+NOTE: Packages required by the 'use base' and 'use parent' pragmas and by the
+Moose 'extends' and 'with' functions will only be included if Module::Used is
+available.  Will display an activity indicator if run interactively and
+Term::Activity is available.
+
+=head1 OPTIONS
+
+    --missing   Show all required packages that are not available in @INC
+    --provided  Show all packages provided by .pm files
+
+=head1 EXAMPLES
+
+pmcheck
+
+pmcheck -m
+
+pmcheck -p
+
+=head1 COPYRIGHT AND LICENSE
+
+Created by Andrew Pam <andrew.pam@strategicdata.com.au>
+Copyright 2011-2012 Strategic Data
+
+This program is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+
+use 5.010;
+use strict;
+use utf8;
+use warnings;
+
+use Fatal qw( open close );
+use File::Find qw( find );
+use Getopt::Long 2.33 qw( GetOptions );
+use Module::CoreList;
+use Pod::Usage qw( pod2usage );
+use PPI::Document;
+
+use version; our $VERSION = version->new('v1.1.11');
+
+########################################
+# Constants
+
+my $CORELIST = $Module::CoreList::version{$]};
+my $MODULE_USED = eval { require Module::Used };
+my $SHOW_ACTIVITY
+    = -t *STDERR && eval { require Term::Activity };    ## no critic (ProhibitInteractiveTest)
+
+########################################
+# Global variables
+
+my $activity;
+
+our ( %opt, %provided, %required );                     ## no critic (ProhibitPackageVars)
+
+########################################
+# Subroutines
+
+sub first_line {
+    open( my $fh, '<', shift );
+    my $line = <$fh>;
+    close $fh;
+
+    return $line;
+} ## end sub first_line
+
+sub modules_used {
+    my $doc = PPI::Document->new( shift, readonly => 1 );
+
+    ## no critic (Modules::RequireExplicitInclusion)
+    return Module::Used::modules_used_in_document($doc) if $MODULE_USED;
+
+    # Doesn't handle 'base' and 'parent' pragmas or Moose 'extends' and 'with'
+    my $includes = $doc->find('PPI::Statement::Include') or return;
+    return map { $_->module } grep { $_->module } @$includes;
+} ## end sub modules_used
+
+sub provided {
+    return if $File::Find::name =~ m{ / \. [^.] }x;    # Ignore hidden
+    return if !m/ \.pm \z /x;                          # Only check .pm files
+    return if !( -f -r ) || -z _ || -B _;              ## no critic (ProhibitFiletest_f)
+
+    $activity->tick if $SHOW_ACTIVITY;
+    my $doc = PPI::Document->new( $_, readonly => 1 );
+    my $packages = eval { $doc->find('PPI::Statement::Package') } or return;
+    $provided{ $_->schild(1)->content }++ foreach @$packages;
+
+    return;
+} ## end sub provided
+
+sub required {
+    return if $File::Find::name =~ m{ / \. [^.] }x;    # Ignore hidden
+
+    if (m/ \. /x) {
+        return if !m/ \. (?: cgi | p[lm] | t ) \z /x;    # Check file extension
+    }
+    else {
+        return if !( -f -r ) || -z _ || -B _;            ## no critic (ProhibitFiletest_f)
+        ## Ignore files with no dot that don't start with a perl shebang line
+        return if !eval { first_line($_) =~ m{ \A \#! .* /perl }x };
+    }
+
+    $activity->tick if $SHOW_ACTIVITY;
+    my @packages = eval { modules_used($_) } or return;
+    $required{$_}++ foreach grep { !exists $CORELIST->{$_} } @packages;
+
+    return;
+} ## end sub required
+
+########################################
+# Mainline code
+
+return 1 if caller;    # For testing
+
+GetOptions( \%opt, qw( missing provided ) ) or pod2usage(1);
+
+$activity = Term::Activity->new('Finding provided') if $SHOW_ACTIVITY;
+my $root = $ARGV[0] // '.';
+find( \&provided, $root );
+if ( $opt{'provided'} ) { undef $activity; say foreach sort keys %provided; exit }
+
+$activity->relabel('Finding required') if $SHOW_ACTIVITY;
+find( \&required, $root );
+$activity->relabel('Done.') if $SHOW_ACTIVITY;
+undef $activity;
+my @packages = sort grep { !exists $provided{$_} } keys %required;
+if ( !$opt{'missing'} ) { say foreach @packages; exit }
+
+say foreach grep { !eval "require $_" } @packages;    ## no critic (ProhibitStringyEval)
+
+exit;

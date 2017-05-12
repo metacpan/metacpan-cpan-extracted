@@ -1,0 +1,401 @@
+NAME
+    pkg - transparently use packages and inner packages
+
+SYNOPSIS
+      # standard operations
+      # works on either inner or normal packages
+      # -------------------------------       ----------------
+      use pkg 'A';                       #=>  use A;
+      use pkg 'A', 'a', 'b';             #=>  use A 'a', 'b';
+      use pkg 'A', [];                   #=>  use A ();
+
+      # extra operations
+
+      # default alias for a class package
+      use pkg -alias => 'A::B::C';
+      C->new(...); #equivalent to A::B::C->new();
+
+      # specific alias for a class package
+      use pkg 'A::B::C' => -as => 'ABC';
+      ABC->new( ); # equivalent to A:B::C->new;
+
+      # multiple packages
+      use pkg [ 'A::B::C' => -as => 'ABC'],
+              [ 'A::B'    => -as => 'AB' ];
+
+      # operate on A and its inner packages
+      use pkg 'A', '-inner';
+
+      # operate only on the inner packages of A
+      use pkg 'A', '-only_inner';
+
+      # operate on A and its inner packages, excluding anything below A::B
+      use pkg 'A', -inner, -exclude => qr/^A::B::/;
+
+DESCRIPTION
+    pkg extends the standard "use" statement to more transparently handle
+    inner packages, additionally incorporating some of the functionality of
+    the aliased and use pragmata with a few extra twists.
+
+    An inner package is one which does not have the same name as the (fully
+    qualified) module in which it is defined. For example, if A.pm contains
+
+      package A;
+
+      sub a { ... }
+
+      package A::B;
+
+      sub ab { ... }
+
+      package A::C;
+
+      sub ac { ... }
+
+      1;
+
+    packages "A::B" and "A::C" are inner packages. The use statement (as
+    well as most pragmata dealing with modules) does not handle inner
+    packages. Some, such as parent, do, but require the user (via the
+    "-norequire" option) to know if the package is inner or not.
+
+    For example, after loading the above module:
+
+      use A;
+
+    You could simply call
+
+      A::a();
+      A::B::ab();
+      A::C::ac();
+
+    But, what if package A::B exported ab? Its import routine is not
+    automatically called when A is loaded. If you try to do this
+
+      use A::B 'ab';
+
+    you'll get an error from Perl as it tries to search for a file named
+    e.g., A/B.pm. It doesn't check to see if the "A::B" package has been
+    loaded.
+
+    Instead, you'd need to do this:
+
+      A::B->import( 'ab' );
+      ab();
+
+    Or, using pkg:
+
+      use pkg [ 'A' ], [ 'A::B' => qw[ ab ] ];
+
+  Simple Usage
+    In its simplest form, pkg accepts a *list* of a package name (*as a
+    string*) and its imports.
+
+      use pkg 'A::B', qw( funca funcb );
+
+    This loads the package "A::B" (if necessary) and imports the functions
+    funca and funcb. Note that if "A::B" is an inner package, the module
+    (file) which contains it must be loaded prior to this e.g.
+
+      # either of these is sufficient
+      use A;
+      use pkg 'A';
+
+    This needs to be done only *once* (not every time an inner package is
+    used). Of course it can be combined with loading "A::B":
+
+      use pkg [ 'A' ], [ 'A::B' => qw( funca funcb ) ];
+
+  Controlling imports
+    There is a subtlety in how the standard use statement handles empty or
+    non-existent import lists:
+
+       use A;           # call A->import();
+       use A 'a', 'b'   # call A->import( 'a', 'b' );
+       use A ();        # do *not* call A->import;
+
+    This mechanism isn't available to pkg as it cannot tell the difference
+    between:
+
+       use pkg 'A';
+       use pkg 'A', ();
+
+    Instead, use "[]" instead of "()":
+
+       use pkg 'A', [];
+
+    What if you need to pass a "[]" to "A->import()"? Use the "-import"
+    package option:
+
+      use pkg 'A', -import => [];        #=> use A [];
+      use pkg 'A', -import => '-import'; #=> use A '-import';
+
+    "-import" instructs pkg that all remaining arguments should be passed to
+    the package's import routine.
+
+    Note that the following are equivalent
+
+      use A (), 'a';
+      use pkg 'A', [], 'a';
+
+    and result in
+
+      A->import( 'a' );
+
+  Multiple packages
+    Multiple packages may be operated on by passing each package's
+    specifications as separate array references:
+
+      use pkg ['A'], ['A::B', qw( funca funcb ) ];
+
+OPTIONS
+    pkg accepts options to modify its behavior. "Global" options (which
+    affect more than one package) can appear in multiple places if more than
+    one package is manipulated. Package specific options always appear
+    directly after the package name and apply only to that package.
+
+    If there's only one package, the syntax is simple. Global options occur
+    before the package name.
+
+      use pkg -norequire => 'My::Package' -as => 'MyP';
+
+    "-norequire" is a global option, and "-as" is a package option.
+
+    If more than one package is specified, global options may occur both
+    outside of the package specifications as well as inside of them. For
+    example,
+
+      use pkg
+        -alias =>
+        [ 'My::FirstClass' ],
+        [ -noalias => 'My::SecondClass' ]
+        [ 'My::ThirdClass' => -as => 'ThirdClassIsBetterThanFirst' ]
+        -noalias =>
+        [ 'My::Library1' ],
+        [ 'My::Library2' ],
+        [ 'My::Library3' ],
+        ;
+
+    The options appearing outside of the package specifications affect all
+    packages which follow. The options inside a specification affect that
+    package only. As shown, some options may be negated, and package options
+    may override global ones.
+
+  Global Options
+    "-alias"
+    "-noalias"
+        Provide (or don't provide) shortened names for class names. These
+        are simply the last component of the original name.
+
+        The idea is borrowed from the "aliased" pragma; pkg constructs and
+        exports a subroutine with the shortened name which returns the fully
+        qualified name.
+
+        For example,
+
+          use pkg -alias => 'A::Long:Class';
+
+          # these are equivalent
+          A::Long::Class->new();
+          Class->new();
+
+        If multiple classes are loaded, no checks are performed to ensure
+        that the shortened names are unique. Use the "-as" package option to
+        specify specific names.
+
+    "-strip"
+        Created aliases by removing a prefix from the succeeding class
+        names. The prefix may be specified in one of two ways:
+
+        "-strip" *string*
+            Remove a leading *string* from the class names. All component
+            separators ("::") are also removed. For example,
+
+              -strip => 'A::C', 'A::C::E::F::G'
+
+            results in an alias of "EFG".
+
+        "-strip { pfx => *string*, sep => *string* }"
+            Remove *prefix* from class names, and replace the class
+            component separators ("::") with the specified string. After
+            prefix removal, a leading "::" sequence is removed.
+
+    "-require"
+    "-norequire"
+        Try to load (or don't try to load) the packages with
+        Class::Load::load_class. If you know that the package is an inner
+        package and the file containing it has already been loaded,
+        specifying "-norequire" can speed things up by not loading
+        Class::Load.
+
+        By default packages are loaded (i.e. "-require").
+
+  Package Options
+    "-as" => *string*
+        Create an alias named *string* for the package. The aliased name
+        must be a legal subroutine name.
+
+        For example,
+
+          use pkg 'A::Long:Class' => -as => 'ALC';
+
+          # these are equivalent
+          A::Long::Class->new();
+          ALC->new();
+
+    "-import"
+        There's always a chance that a package's import list may be confused
+        with pkg package options (perhaps it also has a "-as" option). To
+        avoid this, a package's import list may be preceded with the
+        "-import" option, which indicates to pkg that all of the following
+        arguments are to be passed as is to the package's import routine.
+
+          # these are equivalent
+          use A ( '-as', 'func1', 'func2' );
+          use pkg 'A' => -import => ( '-as', 'func1', 'func2' );
+
+    "-require"
+    "-norequire"
+        This has the same functionality as the similarly named global
+        options, but as a package option may be placed after the package
+        name for aesthetics.
+
+    "-inner"
+        In addition to the package, process any of its currently loaded
+        inner packages. Inner packages are discovered via
+        Devel::InnerPackage, and must fall within the "hierarchy" of the
+        package. For example, given a module with the following contents:
+
+          package A;
+          sub a {}
+
+          package A::B;
+          sub ab {}
+
+          package B;
+          sub b {}
+
+        "A::B" is an inner package of "A", but "B" is not. Inner packages
+        must have defined symbols, otherwise they will not be identified.
+
+    "-only_inner"
+        Similar to "-inner", but *only* the inner packages are processed,
+        not the package itself.
+
+        This *does not* affect whether the package is loaded; this is
+        controlled by the "-require" option.
+
+    "-include" *specification*
+        Check the package name against the *specification* using the smart
+        match operator ("~~") and ignore it if it does not match. If
+        "-inner" or "-only_inner" are specified, inner packages are also
+        checked.
+
+        This *does not* affect whether the package is loaded; this is
+        controlled by the "-require" option.
+
+        This is most useful when either "-inner" or "-only_inner" is
+        specified.
+
+    "-exclude" *specification*
+        Check the package name against the *specification* using the smart
+        match operator ("~~") and ignore it if it matches. The "-exclude"
+        match is processed after "-include" if both are specified. If
+        "-inner" or "-only_inner" are specified, inner packages are also
+        checked.
+
+        This *does not* affect whether the package is loaded; this is
+        controlled by the "-require" option.
+
+        This is most useful when either "-inner" or "-only_inner" is
+        specified.
+
+    "-version" => *version*
+        Specify the minimum acceptable version of the package.
+
+DIAGNOSTICS
+    "global option '%s': unknown option"
+        The specified option wasn't recognized as a global option.
+
+    "package option '%s': unknown option"
+        The specified option wasn't recognized as a package option.
+
+    "option '%s': cannot be negated"
+        An illegal negation of the specified option was specified.
+
+    "option '%s': not enough values"
+        The specified option required more values than was specified.
+
+    "can't use option "%s" when looping over inner packages"
+        The specifed option cannot be used in conjunction with "-inner" or
+        "-only_inner".
+
+    "-strip: no prefix specified"
+        The "-strip" option requires an argument specifying the prefix to
+        remove.
+
+    "internal error"
+        Something really bad happened.
+
+IMPLEMENTATION
+    pkg does very little on its own. It uses the following modules:
+
+    Class::Load
+        Class::Load::load_class is used to load the package. It also takes
+        care of checking package versions.
+
+    Import::Into
+        This is used to call a package's import routine
+
+    aliased
+        This provided the inspiration for the aliasing implementation.
+
+    Devel::InnerPackages
+        Discover a package's inner self.
+
+DEPENDENCIES
+    Class::Load, Import::Into, Devel::InnerPackages, Perl 5.10.1.
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    pkg is focussed specifically on dealing with packages and is not
+    intended as a general purpose replacement for the standard use
+    statement. In particular it does not know how to deal with other
+    pragmata, e.g.,
+
+      use pkg strict;
+
+    will probably not do anything useful and will most probably advance the
+    heat death of the universe.
+
+    Please report any bugs or feature requests to "bug-pkg@rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=pkg>.
+
+SEE ALSO
+    aliased, namespace, as, use.
+
+VERSION
+    Version 0.01
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2013 Diab Jerius
+
+    pkg is free software: you can redistribute it and/or modify it under the
+    terms of the GNU General Public License as published by the Free
+    Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+
+AUTHOR
+    Diab Jerius <djerius@cpan.org>
+

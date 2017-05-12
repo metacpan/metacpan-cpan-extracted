@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/promessaging-MRS.t
+lib/promessaging/MRS.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+demo.pl

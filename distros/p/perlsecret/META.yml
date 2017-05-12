@@ -1,0 +1,34 @@
+---
+abstract: 'Perl secret operators and constants'
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  integer: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: perlsecret
+requires:
+  strict: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=perlsecret
+  repository: http://github.com/book/perlsecret.git
+version: '1.013'
+x_contributors:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+  - 'Rafael Garcia-Suarez <rgs@consttype.org>'
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Keith C. Ivey <keith@iveys.org>'
+  - 'Pau Amma <pauamma@gundo.com>'
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+  - 'Andy Armstrong <andy@hexten.net>'
+  - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'
+  - 'Abigail <abigail@abigail.be>'

@@ -1,0 +1,30 @@
+Changes			History of this package
+MANIFEST		This file
+Makefile.PL		Makes the Makefile
+README			Please do
+dump-lisp		Script that reads and print Lisp
+eg.lisp			Sample Lisp code
+eval-lisp		Script that reads and evaluate Lisp
+lib/Gnus/Newsrc.pm	Parse ~/.newsrc.eld files
+lib/Lisp/Cons.pm	Class representing cons cells
+lib/Lisp/Interpreter.pm	The interpreter (eval_lisp)
+lib/Lisp/List.pm	Class representing a list of cons cells (not used)
+lib/Lisp/Localize.pm	Save&restore symbol values
+lib/Lisp/Printer.pm	Turn Lisp objects into text
+lib/Lisp/Reader.pm	Turn text into Lisp objects
+lib/Lisp/Special.pm	Special forms
+lib/Lisp/String.pm	String objects (not used)
+lib/Lisp/Subr/All.pm	Load all subrs
+lib/Lisp/Subr/Core.pm	Core lisp subrs
+lib/Lisp/Subr/Perl.pm	Make perl builtins available as subrs
+lib/Lisp/Symbol.pm	Symbols hold functions and variables
+lib/Lisp/Vector.pm	Lisp version of arrays
+newsrc.eld		Sample ~/.newsrc.eld file
+t/arith.t		Calculate some
+t/bool.t		Evaluate some boolean expressions
+t/defun.t		Defining functions
+t/gnus-newsrc.t		Test Gnus::Newsrc
+t/loop.t		Test loop constructs
+t/printer.t		Test Lisp::Printer
+t/reader.t		Test Lisp::Reader
+todo			Stuff for the future

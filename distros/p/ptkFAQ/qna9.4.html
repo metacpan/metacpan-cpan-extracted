@@ -1,0 +1,125 @@
+<HTML>
+<HEAD><TITLE> 9.4. How do I bind keyboard keys?</TITLE></HEAD>
+<BODY><a name="A9.4"> 9.4. How do I <KBD>bind</KBD> keyboard keys?</a>
+
+<hr>
+</p><p>
+There are many default key bindings built in to the widgets of perl/Tk. Making
+proper use of them often involves setting up the right callback. 
+(You may wish to consult the examples in 
+<a href="pod/BindTable.html"><KBD>BindTable.pod</KBD></a>
+for help with this subject.)
+<p>
+The basic idea is:
+<pre>
+    $<i>widget</i> -&gt; bind('&lt;<i>keyname</i>&gt;' =&gt; <i>action</i>);
+</pre>
+Where <KBD>$<i>widget</i></KBD> is the tag or ID of the widget for which the
+bindings are to hold (note for global bindings you have to <KBD>bind</KBD> to
+<KBD>&lt;All&gt;</KBD>, for semi-global bindings you need to <KBD>bind</KBD>  
+to all the relevant widgets in your application), '&lt;<i>keyname</i>&gt;' 
+can be things like:
+<pre>
+    &lt;Key&gt; <i>or</i> &lt;KeyPress&gt; <i>or</i> &lt;Any-KeyPress&gt;
+    &lt;KeyRelease&gt;
+    &lt;Button&gt; <i>or</i> &lt;ButtonPress&gt;
+    &lt;ButtonRelease&gt;
+    &lt;Button-1&gt; <i>or</i> &lt;B1&gt; 
+    &lt;Double-1&gt;
+    &lt;Enter&gt;
+    &lt;Leave&gt;
+    &lt;Motion&gt;
+</pre>
+To figure out what names perl/Tk uses for such &lt;bindings&gt; use the 
+"binder-finder" on a widget's .pm file. For example, you could find 
+bindings hidden inside of <KBD>Button.pm</KBD> by typing this at your 
+shell prompt:
+<pre>
+    perl -ne 'print if s/.*(&lt;[^&gt;]*&gt;).*/$1/g;' Button.pm
+</pre>
+while in the directory where <kbd>Button.pm</kbd> is located (and if you are
+not there then simply specify the <kbd>/<i>path</i>/<i>to</i>/Button.pm</kbd>).
+Note that due to inheritance (<i>e.g.</i>the type of script bindings that are 
+being discussed here) what the binder-finder turns up may not be the last word 
+on a given widget's behaviour. This may be especially true for a widget inside 
+of a compound/composite widget.
+Note also that the binder-finder will turn up things like &lt;FILEHANDLES&gt; 
+as well as honest &lt;Bindings&gt;. Discrimination in its use is called for
+(and while your at it you could have just as easily used an editor and actually
+ examined the code directly now couldn't you?).
+<p>
+To get an idea of what the code is for a <em>key</em> that you are interested 
+in try running the <KBD>xlib_demo</KBD> that comes in your <KBD>Tk-b&#35;</KBD> 
+directory. Hold your mouse pointer over the window that appears and simply 
+type the key that you are interested in. The code should appear in the window. 
+If you do not have perl/Tk up and running yet try 
+&quot;<i>xmodmap -pk</i>&quot; or look directly at the 
+<KBD>/usr/include/X11/keysymdef.h</KBD> file where keysym names are given with 
+an <KBD>XK_</KBD> pre-pended. Do not try things like the Tcl/Tk <KBD>%k</KBD>
+symbols in perl scripts. <KBD>%K</KBD>s will be mis-interpreted as 
+non-existant perl hashes. Instead look at the <KBD>Xevent</KBD> function.
+<p>
+Ali Corbin 
+<a href="mailto:corbin@adsw.fteil.ca.boeing.com">
+&lt;corbin@adsw.fteil.ca.boeing.com&gt;</a> recently posted a great
+little script for determining keyboard key bindings on a <kbd>MainWindow</kbd>:
+<pre>
+    #!/usr/local/bin/perl -w
+    use Tk;
+    $top = MainWindow-&gt;new();
+    $frame = $top-&gt;Frame( -height =&gt; '6c', -width =&gt; '6c',
+                            -background =&gt; 'black', -cursor =&gt; 'gobbler' );
+    $frame-&gt;pack;
+    $top-&gt;bind( '&lt;Any-KeyPress&gt;' =&gt; sub
+    {
+        my($c) = @_;
+        my $e = $c-&gt;XEvent;
+        my( $x, $y, $W, $K, $A ) = ( $e-&gt;x, $e-&gt;y, $e-&gt;K, $e-&gt;W, $e-&gt;A );
+
+        print "A key was pressed:\n";
+        print "  x = $x\n";
+        print "  y = $y\n";
+        print "  W = $K\n";
+        print "  K = $W\n";
+        print "  A = $A\n";
+    } );
+    MainLoop();
+</pre>
+To <KBD>bind</KBD> the action of one widget to that of another try taking a
+look at the .pm file for the widget of interest - is there a <KBD>bind</KBD>ing
+function already defined? If so you may use it. An example would be the use of
+&quot;Up&quot; &amp; &quot;Down&quot; <KBD>Button</KBD>s for a
+<KBD>Listbox</KBD>: one could <KBD>bind</KBD> the <KBD>Button</KBD>s to call
+<KBD>Tk::Listbox::UpDown</KBD>, however, Guy Decoux describes a much more
+clever way to use the <KBD>&lt;Up&gt;</KBD> and <KBD>&lt;Down&gt;</KBD> already
+defined in <KBD>Listbox.pm</KBD> (this does not work with Tk-b9.01):
+<pre>
+    #!/usr/local/bin/perl
+    use Tk;
+    $top = MainWindow-&gt;new;
+    $lb = $top-&gt;Listbox(-height =&gt; 10);
+    for($i=0; $i &lt; 120; $i++) {
+      $lb-&gt;insert('end', $i);
+    }
+    $f = $top-&gt;Frame;
+    $up = $f-&gt;Button(
+           -text =&gt; "Up",
+           -command =&gt; [ $lb-&gt;bind(ref $lb, '&lt;Up&gt;'), $lb]
+           );
+    $down = $f-&gt;Button(
+             -text =&gt; "Down",
+             -command =&gt;sub {&{$lb-&gt;bind(ref $lb, '&lt;Down&gt;')}($lb)}
+             );
+    $up-&gt;pack(-side =&gt; 'left');
+    $down-&gt;pack;
+    $f-&gt;pack;
+    $lb-&gt;pack;
+    MainLoop;
+</pre>
+
+
+<hr>
+	<p><a href="qna9.3.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.4">table of contents</a> | <a href="qna9.5.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

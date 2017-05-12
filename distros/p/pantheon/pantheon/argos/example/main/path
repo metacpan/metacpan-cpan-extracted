@@ -1,0 +1,4 @@
+root: $RealBin/../../argos
+code: $root/code
+conf: $root/conf
+run: $root/run

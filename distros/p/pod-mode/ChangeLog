@@ -1,0 +1,99 @@
+2010-10-13  Florian Ragwitz  <rafl@debian.org>
+
+	* v1.04
+
+	* pod-mode.el: Suggest autoloading instead of plain requiring.
+	(pod-version): Update version number - this hadn't happened since
+	1.01.
+	(pod-mode-command-face, pod-mode-head-face)
+	(pod-mode-command-text-face, pod-mode-verbatim-face)
+	(pod-mode-formatting-code-character-face)
+	(pod-mode-formatting-code-face, pod-mode-formatting-code-i-face)
+	(pod-mode-formatting-code-b-face)
+	(pod-mode-alternative-formatting-code-face)
+	(pod-mode-string-face): Inherit from the appropriate font-lock
+	face definitions instead of copying many of them.
+	(pod-add-support-for-imenu): Restore compatibility with Emacs 22.
+
+2010-07-08  Florian Ragwitz  <rafl@debian.org>
+
+	* v1.03
+
+	* Provide better dist metadata
+
+	* Don't ship example.pod with the dist
+
+2010-07-08  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v1.02
+
+	* pod-mode taken over by a lambda ninja :-)
+
+	* Big rework and improvements by Florian Ragwitz:
+	- introduce customizable, pod-specific faces
+	- new set of default fonts and sizes
+	- interactive commands/keybinds to create link formatting codes
+	- support weaver keywords for outline and imenu
+	- improve documentation
+	- support for balanced and nested formatting codes
+	- make Pod::Weaver command highlighting more robust
+
+2010-06-02  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v1.01
+
+	* fix meta information
+
+2010-06-02  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v1.0
+
+	* support for Dist::Zilla PodWeaver, by Florian Ragwitz
+	- Automatically load weaver keywords for files that
+	  are part of a project
+
+	* big version bump as Demonstration der Stärke :-)
+
+2009-02-15  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v0.502
+
+	* more meta fiddling, although it still ignores the "abstract:"
+
+2008-07-27  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v0.501
+	* fixed link to the Emacs Language Mode Creation Tutorial
+	(after resurrecting and hosting it)
+	* fiddle with META.yml to help the indexer
+
+2008-05-20  Steffen Schwigon  <ss5@renormalist.net>
+
+	* v0.5
+	* add META.yml to describe this distribution on CPAN
+	* add support for outline-minor-mode (#21828, Slaven Rezic)
+
+2005-08-22  Steffen Schwigon  <schwigon@cpan.org>
+
+	* v0.4
+	* imenu support, thanks to Slaven Rezic
+	* minor regex optimizations
+	* fixed incorrect regexes for L<>
+
+2005-04-01  Steffen Schwigon  <schwigon@cpan.org>
+
+	* v0.3
+	* more keywords
+	* X<>, Z<>
+	* more regexes for L<>
+
+2003-05-02  v0.2
+
+	* font-lock-function-name-face for E<> entities
+	* fixed handling of doublequoted strings (cpan #2469)
+	* small regex finetuning
+
+2003-04-25  v0.1
+
+	* initial version
+	* mostly syntax highlighting

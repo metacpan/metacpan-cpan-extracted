@@ -1,0 +1,41 @@
+<HTML>
+<HEAD><TITLE> 10.7. How do I get a PostScript(c) output of a Canvas w/ widgets?</TITLE></HEAD>
+<BODY><a name="A10.7"> 10.7. How do I get a PostScript(c) output of a <KBD>Canvas</KBD> w/ widgets?</a>
+
+<hr>
+</p><p>
+In general you don't. You can't do it in Tcl/Tk either (if that is any
+consolation). <a href="mailto:nik@tiuk.ti.com">Nick Ing-Simmons</a> posted an
+explicit discussion of what is involved:
+<PRE><I>
+Subj: RE: Canvases and postscript output
+
+On Tue, 28 Nov 95 14:37:09 PST
+Davis &lt;morry@dsg.tandem.com&gt; writes:
+! I have a canvas with text and some entry widgets that I want to create
+!postscript from. I used the 
+!widget-&gt;postscript( -file =&gt; 'ld.ps', -colormode  =&gt; 'gray');
+!the file gets created but its empty. Is there some other options I need?
+</I></PRE><BLOCKQUOTE>
+Core Tk cannot write postscript for embedded windows, the best it could 
+do would be to grab a Pixmap of the window as displayed. This is fine
+if the window is visible, but if it is scrolled off screen or under
+another application there is no pixmap.
+<p>
+Only complete fix is to have a <kbd>-&gt;postscript</kbd> method for every 
+possible widget which can render un-mapped widgets. This is non-trivial task.
+</BLOCKQUOTE><PRE><I>
+!Also I have a scrollbar for this canvas and when I scroll  the entry widget
+!actually scroll part way out of the frame the canvas is in. Why does this
+!happen and can I fix it? 
+</I></PRE><BLOCKQUOTE>
+The <kbd>Entry</kbd> widgets need to be descendants of the canvas or they 
+just get clipped to their parent.
+</BLOCKQUOTE>
+
+
+<hr>
+	<p><a href="qna10.6.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.7">table of contents</a> | <a href="qna10.8.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

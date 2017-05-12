@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use Tk;
+$main = MainWindow -> new;
+$but = $main->Button(-text => 'bell', -command => sub{ringit($main)})->pack;
+MainLoop;
+
+sub ringit { my $m = shift; $m->bell; }
+

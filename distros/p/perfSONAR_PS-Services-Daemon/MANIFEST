@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/EventTypeEquivalenceHandler.pm
+lib/perfSONAR_PS/Request.pm
+lib/perfSONAR_PS/RequestHandler.pm
+lib/perfSONAR_PS/Services/Base.pm
+lib/perfSONAR_PS/Services/Echo.pm
+logger.conf
+perfsonar
+perfsonar-daemon.init
+perl-perfSONAR_PS-Services-Daemon.spec
+psConfigureDaemon
+META.yml                                 Module meta-data (added by MakeMaker)

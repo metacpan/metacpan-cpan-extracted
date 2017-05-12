@@ -1,0 +1,6 @@
+punctuation.pm
+demo.pl
+Makefile.PL
+MANIFEST
+README
+t/01_nopunct.t

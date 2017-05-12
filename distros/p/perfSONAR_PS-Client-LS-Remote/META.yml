@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         perfSONAR_PS-Client-LS-Remote
+version:      0.09
+version_from: lib/perfSONAR_PS/Client/LS/Remote.pm
+installdirs:  site
+requires:
+    fields:                        0
+    Log::Log4perl:                 1
+    perfSONAR_PS::Client::Echo:    0.09
+    perfSONAR_PS::Common:          0.09
+    perfSONAR_PS::Messages:        0.09
+    perfSONAR_PS::Transport:       0.09
+    strict:                        0
+    Test::More:                    0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

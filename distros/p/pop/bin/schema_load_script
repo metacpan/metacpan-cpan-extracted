@@ -1,0 +1,18 @@
+#!/usr/bin/perl -l
+use POP::Schema_parser;
+
+my $parse = new POP::Schema_parser;
+$parse->parse(\*STDIN);
+if ($ARGV[0] eq '-init') {
+  @ARGV = ('INIT');
+} 
+unless (@ARGV) { @ARGV = grep {$_ ne 'INIT'} keys %$parse }
+foreach my $schema (@ARGV) {
+  push(@tables, map {$_->{'sql'}} grep {$_->{'type'} eq 'TABLE'} @{$parse->{$schema}});
+  push(@indices, map {$_->{'sql'}} grep {$_->{'type'} eq 'INDEX'} @{$parse->{$schema}});
+  push(@procs, map {$_->{'sql'}} grep {$_->{'type'} eq 'PROC'} @{$parse->{$schema}});
+  push(@misc, map {$_->{'sql'}} grep {$_->{'type'} eq 'MISC'} @{$parse->{$schema}});
+}
+for (@misc, @tables, @indices, @procs) {
+  print $_;
+} 

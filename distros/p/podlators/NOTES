@@ -1,0 +1,339 @@
+These are various mostly unorganized development notes related to things
+that could later be done but haven't been done yet.
+
+                      ------------------------------
+
+Jon Ericson <Jonathan.L.Ericson@jpl.nasa.gov> sent the following two
+patches for preliminary footnote support in Pod::Text and Pod::Man to
+pod-people.  The code isn't quite the approach that I'd use, but it would
+be a good starting point if the decision is ever made to implement
+footnote support.
+
+Here's his documentation followed by the patches.
+
+=head1 Footnotes
+
+Two POD elements are added to support footnotes:
+
+=over 
+
+=item * 
+
+C<NE<lt>E<gt>> interior sequenceN<F was already taken.N<Nested
+footnotes don't work correctly.  I don't think they should be
+supported.>>
+
+=item * 
+
+C<=footnote> directiveN<1>
+
+=back
+
+=footnote 1
+
+This method requires you to keep track of unique footnote IDs.  It
+allows multiple paragraphs,N<0> 
+
+  verbatim                                              paragraphs,
+
+=begin text
+
+and *format* specific paragraphs.
+
+=end text
+
+=begin html
+
+<p>and <strong>format</strong> specific paragraphs.</p>
+
+=end html
+
+=footnote 0
+
+I suppose this is neither here nor there, but I'm not a fan of
+multi-sentence (much less multi-paragraph) footnotes.  If the
+information is important, why not work it into the main text or put it
+in the Appendix?  If it isn't important, why include it at all?
+
+But some people seem to love them.  They put stories, jokes, code
+examples, detailed arguments, disclaimers, etc. in footnotes.  As a
+matter of principle, I wish they were disallowed in POD.
+Unfortunately, it would then be impossible for Larry to write the next
+I<Camel> in standard POD!N<You B<can> embed footnotes in the
+multi-paragraph style, but I don't think it should be supported.>
+
+=footnote
+
+The most common use of the footnote is for short parenthetical
+statements:
+
+  =head1 Why I love Perl.N<www.perl.com>
+
+  [Insert reasons here]
+
+which gets formatted:
+
+  Why I love Perl.[1]
+
+  [Insert reasons here]
+
+  ___
+  1
+      www.perl.com
+
+For the vast majority of footnotes, this is all you need to know.  The
+pod2X translators take care of the details for putting footnotes in X.
+pod2latex uses C<\footnote>, pod2html uses <a> tags, pod2text puts
+notes at the bottom of the document, etc.
+
+There is a limitation to the interior sequence version of
+footnotes---they can't contain pod paragraphs.N<*>  A general solution
+for the problem would be to add a macro language to pod.  I thought
+that it would be overkill.N<**>  Instead I added a footnote directive
+that associates footnote text with a specific footnote mark.  For
+instance if you wanted to make the HTML footnote different from the
+text version you could do something like:
+
+  =head1 Why I love Perl.N<12>
+
+  [Insert reasons here]
+
+  =footnote 12
+
+  =for text
+
+  www.perl.com
+
+  =for html
+
+  <a href="http://www.perl.com">The Perl web-site.</a>
+
+  =footnote
+
+First place a mark with the C<N> interior sequence.  Pod translators
+use the contents of the mark as a footnote ID which must match
+C</^[\d*]+$/>.  Sometime after the mark is placed, use the footnote
+directive to start the footnote section for that footnote ID.
+Footnote sections are ended with another footnote directive.  Note
+that the footnote ID is only used to tie a specific footnote mark to
+its text---the formatter is free to renumber (or re-mark) your
+footnotes.
+
+=footnote **
+
+Not to mention beyond my abilities to do right. :)
+
+=footnote *
+
+LaTeX doesn't allow C<\verb> within footnotes, at least not without an
+optional package.  (See
+http://www.tex.ac.uk/cgi-bin/texfaq2html?keyword=footnote&question=143)
+
+=footnote 42
+
+This is an orphaned footnote.  It's just sort of stuck in here with a
+footnote mark that doesn't go anywhere in the text.  Does anyone know
+where, if anywhere, it makes sense to put these?
+
+=cut
+
+--- /src/podlators-1.08/lib/Pod/Text.pm	Sat Feb 10 06:50:23 2001
++++ /src/podlators/lib/Pod/Text.pm	Tue Mar 13 20:35:23 2001
+@@ -330,6 +330,7 @@
+     elsif ($command eq 'F') { return $self->seq_f ($_) }
+     elsif ($command eq 'I') { return $self->seq_i ($_) }
+     elsif ($command eq 'L') { return $self->seq_l ($_) }
++    elsif ($command eq 'N') { return $self->seq_n ($_) }
+     else { carp "Unknown sequence $command<$_>" }
+ }
+ 
+@@ -461,6 +462,24 @@
+     $self->verbatim ($_, $line);
+ }
+ 
++sub cmd_footnote {
++    my $self = shift;
++    local $_ = shift;
++    s/\s+$//;
++    undef $$self{FOOTNOTE}, return unless length $_;
++    my $i = 0;
++    for my $note (@{$self->{NOTES}}) {
++	if ($note =~ /^[\d*]+$/) {
++	    if ($note eq $_) {
++		$$self{FOOTNOTE} = $i;
++		$self->{NOTES}[$i] = '';
++		return;
++	    }
++	}
++	$i++;
++    }
++    $$self{FOOTNOTE} = $i; # orphan footnote case
++}
+ 
+ ############################################################################
+ # Interior sequences
+@@ -526,6 +545,35 @@
+     $text;
+ }
+ 
++sub seq_n {
++    my $self = shift;
++    push @{$self->{NOTES}}, shift;
++    return '[' . @{$self->{NOTES}} . ']';
++}
++
++sub notes {
++    my $self = shift;
++    undef $$self{FOOTNOTE};
++    if (defined $self->{NOTES}){
++	$self->output('_' x 3 . "\n"); # "___\n" doesn't work
++	for my $note (0..$#{$self->{NOTES}}) {
++	    $self->output ($note + 1 . "\n");
++	    for (split /\n\n/, $self->{NOTES}[$note]) {
++		if (/^\s/) {
++		    $_ = "$_\n";
++		} else {
++		    $_ = $self->reformat("$_\n");
++		}
++		$self->output ($_);
++	    }
++	}
++	undef $self->{NOTES};
++    }
++};
++
++sub end_input {
++    $_[0]->notes;
++}
+ 
+ ############################################################################
+ # List handling
+@@ -615,7 +663,16 @@
+ }
+ 
+ # Output text to the output device.
+-sub output { $_[1] =~ tr/\01/ /; print { $_[0]->output_handle } $_[1] }
++sub output {
++    my $self = shift;
++    local $_ = shift;
++    tr/\01/ /;
++    if (defined $$self{FOOTNOTE}) {
++	$self->{NOTES}[$$self{FOOTNOTE}] .= "$_\n";
++    } else {
++	print { $self->output_handle } $_;
++    }
++}
+ 
+ 
+ ############################################################################
+
+
+--- /src/podlators-1.08/lib/Pod/Man.pm	Sat Feb 10 06:50:22 2001
++++ /src/podlators/lib/Pod/Man.pm	Thu Mar 15 03:18:01 2001
+@@ -614,6 +614,12 @@
+     # Add an index entry to the list of ones waiting to be output.
+     if ($command eq 'X') { push (@{ $$self{INDEX} }, $_); return '' }
+ 
++    if ($command eq 'N') {
++	push @{ $$self{NOTES} }, $_;
++        return bless \ ('\u\f(BS' . @{ $$self{NOTES} } . '\f(BE\d'),
++	  'Pod::Man::String';
++    }
++
+     # Anything else is unknown.
+     carp "Unknown sequence $command<$_>";
+ }
+@@ -785,6 +791,22 @@
+     $self->output ($_);
+ }
+ 
++sub cmd_footnote {
++    my $self = shift;
++    local $_ = shift;
++    s/\s+$//;
++    undef $$self{FOOTNOTE}, return unless length $_;
++    my $i = 0;
++    for my $note (@{$self->{NOTES}}) {
++	if ($note eq $_) {
++	    $$self{FOOTNOTE} = $i;
++	    $self->{NOTES}[$i] = '';
++	    return;
++	}
++	$i++;
++    }
++    $$self{FOOTNOTE} = $i; # orphan footnote case
++}
+ 
+ ############################################################################
+ # Link handling
+@@ -1067,7 +1089,35 @@
+ }
+ 
+ # Output text to the output device.
+-sub output { print { $_[0]->output_handle } $_[1] }
++sub output {
++    my $self = shift;
++    local $_ = shift;
++    if (defined $$self{FOOTNOTE}) {
++	$self->{NOTES}[$$self{FOOTNOTE}] .= $_;
++    } else {
++	print { $self->output_handle } $_;
++    }
++}
++
++sub notes {
++    my $self = shift;
++    undef $$self{FOOTNOTE};
++    if (defined $self->{NOTES}){
++	$self->makespace;
++	$self->output("___\n");
++	for my $note (0..$#{$self->{NOTES}}) {
++	    $self->makespace;
++	    $self->output ("\n" . $note + 1 . "\n");
++	    $self->makespace;
++	    $self->output ("$self->{NOTES}[$note]\n");
++	}
++	undef $self->{NOTES};
++    }
++};
++
++sub end_input {
++    $_[0]->notes;
++}
+ 
+ # Given a command and a single argument that may or may not contain double
+ # quotes, handle double-quote formatting for it.  If there are no double
+
+                      ------------------------------
+
+The following extra bits of *roff were in the original pod2man.  They're
+not currently used, but I don't want to lose track of them in case they're
+useful later.  They're for accents and special characters that Pod::Man
+currently doesn't have E<> escapes for.
+
+.if n \{\
+.    ds ? ?
+.    ds ! !
+.    ds q
+.\}
+.if t \{\
+.    ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.    ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.    ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(
+#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.    ds v \h'-1'\o'\(aa\(ga'
+.    ds _ \h'-1'^
+.    ds . \h'-1'.
+.    ds 3 3
+.    ds oe oe
+.    ds Oe OE
+.\}

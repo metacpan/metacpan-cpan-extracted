@@ -1,0 +1,70 @@
+From lns62::pvhp Thu Mar  7 17:52:21 1996
+Received: from cesr20.lns.cornell.edu (cesr20.lns.cornell.edu [128.84.170.20]) by lns598.lns.cornell.edu (8.6.11/8.6.11)
+	with ESMTP id RAA26555 for <pvhp>; Thu, 7 Mar 1996 17:51:58 -0500
+From: lns62::pvhp
+Received: from LNS62.DECnet MAIL11D_V3 (daemon@localhost) by cesr20.lns.cornell.edu (8.6.11/8.6.11) with SMTP id RAA24182 for <pvhp>; Thu, 7 Mar 1996 17:51:08 -0500
+Date: Thu, 7 Mar 1996 17:51:08 -0500
+Message-Id: <199603072251.RAA24182@cesr20.lns.cornell.edu>
+X-Authentication-Warning: cesr20.lns.cornell.edu: daemon owned process doing -bs
+To: cesr20::pvhp
+Subject: listbox.pm patch
+Status: R
+
+From:	IN%"travis@EvTech.com"  "Travis Hassloch x231"  7-MAR-1996 17:15:18.11
+To:	IN%"perlbug@perl.com"
+CC:	
+Subj:	Quieting Listbox.pm with -w
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I22CIK46XS8X0ITP@LNS62.LNS.CORNELL.EDU>; Thu,
+ 07 Mar 1996 17:15:06 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA267486848; Thu, 7 Mar 1996 17:14:08 -0500
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA265946680; Thu,
+ 7 Mar 1996 17:11:20 -0500
+Received: from mox.perl.com (perl.com) by africa.nicoh.com with ESMTP
+ (1.37.109.15/16.2) id AA265816674; Thu, 7 Mar 1996 15:11:14 -0700
+Received: from midway.evtech.com (midway.evtech.com [204.96.163.2])
+ by mox.perl.com (8.6.12/8.6.12) with ESMTP id PAA08049 for <perlbug@perl.com>;
+ Thu, 7 Mar 1996 15:10:32 -0700
+Received: from tahiti.evtech.com (tahiti.evtech.com [192.35.179.19])
+ by midway.evtech.com (8.7.3/8.6.9) with ESMTP id QAA17819 for
+ <perlbug@perl.com>; Thu, 7 Mar 1996 16:10:27 -0600 (CST)
+Received: from borneo (borneo.evtech.com [192.35.179.29])
+ by tahiti.evtech.com (8.6.12/8.6.12) with ESMTP id QAA18429 for
+ <perlbug@perl.com>; Thu, 7 Mar 1996 16:10:26 -0600
+Date: Thu, 07 Mar 1996 16:10:24 -0600
+From: Travis Hassloch x231 <travis@EvTech.com>
+Subject: Quieting Listbox.pm with -w
+Sender: owner-perl5-porters@nicoh.com
+To: perlbug@perl.com
+Message-id: <199603072210.QAA18429@tahiti.evtech.com>
+Content-transfer-encoding: 7BIT
+List-Name: perl5-porters
+Precedence: bulk
+
+*** Listbox.pm	Thu Mar  7 15:55:56 1996
+--- Listbox.pm.old	Thu Mar  7 15:56:24 1996
+***************
+*** 175,181 ****
+  {
+   my $w = shift;
+   my $el = shift;
+!  if (defined($Prev) && $el == $Prev)
+    {
+     return;
+    }
+--- 175,181 ----
+  {
+   my $w = shift;
+   my $el = shift;
+!  if ($el == $Prev)
+    {
+     return;
+    }
+--
+travis@evtech.com | The serum albumin of cyberspace | P=NP if (P=0 or N=1)
+At the core of every discipline is either mathematics or interpretive dance.
+Save the Internet!  Join the CIEC before 15 Mar 1996; http://www.cdt.org/ciec/
+

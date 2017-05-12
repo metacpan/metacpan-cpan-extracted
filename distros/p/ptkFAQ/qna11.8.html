@@ -1,0 +1,47 @@
+<HTML>
+<HEAD><TITLE> 11.8. How do I ring the bell?</TITLE></HEAD>
+<BODY><a name="A11.8"> 11.8. How do I ring the bell?</a>
+
+<hr>
+</p><p>
+The short answer is
+<pre>
+   $<i>widget</i> -&gt; bell;
+</pre>
+A slightly longer answer might include a fully functioning script:
+<pre>
+    #!/usr/bin/perl
+    use Tk;
+    $main = MainWindow -&gt; new;
+    $butn = $main-&gt;Button(-text =&gt; 'bell')
+    $butn-&gt;configure(-command =&gt; sub{ $butn-&gt;bell; });
+    $butn-&gt;pack();
+    MainLoop;
+</pre>
+An even longer answer would be a <A HREF="etc/bellit">fully functioning script with a callback</A>:
+<PRE>
+    #!/usr/bin/perl
+    use Tk;
+    $main = MainWindow -&gt; new;
+    $but = $main-&gt;Button(-text =&gt; 'bell', 
+                         -command =&gt; sub{ringit($main)})-&gt;pack;
+    MainLoop;
+    
+    sub ringit { 
+        my $m = shift; 
+        $m-&gt;bell; 
+    }
+</PRE>
+Simon Galton <A HREF="mailto:galtons@candu.aecl.ca">&lt;galtons@candu.aecl.ca&gt;</A>
+reminds us to be careful in that 
+<BLOCKQUOTE>
+ some systems remap this [the "console bell"] to anything from a digital sound 
+ to a flash on the screen.
+</BLOCKQUOTE>
+
+
+<hr>
+	<p><a href="qna11.7.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.8">table of contents</a> | <a href="qna11.9.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

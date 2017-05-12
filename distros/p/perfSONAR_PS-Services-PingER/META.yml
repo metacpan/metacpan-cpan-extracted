@@ -1,0 +1,24 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         perfSONAR_PS-Services-PingER
+version:      0.06
+version_from: lib/perfSONAR_PS/Services/MA/PingER.pm
+installdirs:  site
+requires:
+    Log::Log4perl:                 1
+    Module::Load:                  0.1
+    perfSONAR_PS::Common:          0.06
+    perfSONAR_PS::DB::File:        0.06
+    perfSONAR_PS::DB::RRD:         0.06
+    perfSONAR_PS::DB::SQL:         0.06
+    perfSONAR_PS::Error_compat:    0.06
+    perfSONAR_PS::Messages:        0.06
+    perfSONAR_PS::Services::Base:  0.06
+    perfSONAR_PS::Services::MA::General: 0.06
+    perfSONAR_PS::Transport:       0.06
+    perfSONAR_PS::XML::Document_string: 0.06
+    strict:                        0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

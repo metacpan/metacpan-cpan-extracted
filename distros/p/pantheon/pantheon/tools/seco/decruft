@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Vulcan::OptConf;
+use Vulcan::Cruft;
+use Vulcan::Sudo;
+
+use YAML::XS;
+use File::Basename;
+
+our $CYCLE = 3600;
+
+Vulcan::Sudo->sudo();
+
+=head1 SYNOPSIS
+
+ $0 [--daemon] [--interval time]
+
+=cut
+my %o = Vulcan::OptConf->load()->get( qw( daemon interval=i ) )->dump();
+my $cycle = $o{interval} || $CYCLE;
+
+do
+{
+    map { system "> $_" } map { glob "/var/spool/$_/*" } qw( mail mqueue );
+    my $conf = eval { YAML::XS::LoadFile( $o{conf} ) } || die "$o{conf}: $@";
+
+    while ( my ( $path, $conf ) = each %$conf )
+    {
+        for my $path ( grep { $path =~ /\/$/ ? -d : -f } glob $path )
+        {
+            my ( $cruft, @cut ) = Vulcan::Cruft->new( $path );
+
+            if ( -f $path )
+            {
+                $cruft->cut( %$conf );
+                @cut = Vulcan::Cruft->new( File::Basename::dirname( $path ) )
+                    ->cruft( %$conf ) if $conf->{age};
+            }
+            else { @cut = $cruft->cruft( %$conf ) }
+
+            warn join "\n", 'removed', sort( @cut ), "\n" if unlink @cut;
+        }
+    }
+} while $o{daemon} && sleep $cycle;
+
+exit 0;

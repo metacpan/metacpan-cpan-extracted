@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+# $Id: dump-lisp,v 1.3 1997/10/20 09:05:20 aas Exp $
+#
+# Try 'dump-lisp -f ~/.emacs' or something like that
+#
+
+use strict;
+use Lisp::Reader  qw(lisp_read);
+use Lisp::Printer qw(lisp_print);
+
+use Getopt::Std;
+use vars qw($opt_d $opt_s $opt_n $opt_v $opt_f);
+
+unless (getopts("dsvnf:")) {
+    $0 =~ s,.*/,,;
+    die "Usage: $0 [-d] [-s] [-n] [-v] [-f <file>] <expr>\n";
+}
+
+$Lisp::Reader::SYMBOLS_AS_STRINGS++ if $opt_s;
+$Lisp::Reader::NIL_AS_SYMBOL++ if $opt_n;
+$Lisp::Reader::DEBUG++ if $opt_v;
+
+my $lisp = "";
+if ($opt_f) {
+    local($/)=undef;
+    open(FILE, $opt_f) or warn "Can't open $opt_f: $!\n";
+    $lisp = <FILE>;
+    close(FILE);
+}
+$lisp .= "@ARGV" if @ARGV;
+
+my $form = lisp_read($lisp);
+print $opt_d ? Lisp::Printer::dump($form) : lisp_print($form), "\n";
+

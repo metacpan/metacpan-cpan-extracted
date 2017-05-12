@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+
+use Tk;
+
+my $main = MainWindow->new;
+
+my @fruits = ('Apple','Banana','Cherry','Date','Elderberry','Fig');
+my @nuts   = qw(Almond Brazil Chestnut Doughnut Elmnut Filbert);
+
+my $fruit_list = $main->Listbox();
+for (@fruits) { $fruit_list -> insert('end',$_); }
+$fruit_list->pack();
+my $fruitprint_button = $main->Button(
+                          -text => "print selection",
+                          -command => sub{ printthem($fruit_list) }
+                                      )->pack;
+
+my $nut_list = $main->Listbox(
+                              -selectmode => 'multiple',
+                              -exportselection => 0,
+                             )->pack;
+for (@nuts) { $nut_list -> insert('end',$_); }
+my $nutprint_button = $main->Button(
+                          -text => "print selection(s)",
+                          -command => sub{ printthem($nut_list) }
+                                      )->pack;
+
+my $quit_button = $main->Button(-text => "quit program", 
+                                -command => sub{exit},
+                                )->pack();
+
+MainLoop;
+
+sub printthem {
+  my $list = shift;
+  my @entries = $list->curselection;
+  for (@entries) { print $list -> get($_),"\n";}
+}
+
+__END__
+
+=head1 AUTHOR
+
+Peter Prymmer C<pvhp@lns62.lns.cornell.edu>
+
+=cut

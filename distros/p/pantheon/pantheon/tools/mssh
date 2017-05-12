@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Hermes;
+use MIO::SSH;
+use Vulcan::OptConf;
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = -1;
+@Vulcan::OptConf::CONF = qw( pass_through ignore_case );
+
+=head1 SYNOPSIS
+
+ $0 -r range [--timeout seconds] [--max number] \
+    [--user user] [--sudo sudoer] [--order] [--noop] cmd ..
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->get( qw( range=s timeout=i max=i user=s sudo=s order noop ) )
+    ->dump();
+
+$option->assert( 'range' );
+
+map { $_ .= '\;' if $_ !~ s/([&|]){2}\s*$/\\$1\\$1/ } @ARGV;
+
+my $range = Hermes->new( $option->dump( 'range' ) );
+my %cmd = map { $_ => \@ARGV } $range->load( delete $o{range} )->list();
+
+unless ( $o{noop} )
+{
+    unless ( $o{pass} = $ENV{PASSWD} )
+    {
+        print STDERR "password: ";
+        system 'stty -echo'; $o{pass} = <STDIN>; system 'stty echo';
+    }
+
+    $o{lock} = "/tmp/mssh.$$" if $o{order};
+}
+
+my %result = MIO::SSH->new( %cmd )->run( %o );
+my %mesg;
+
+while ( my ( $io, $mesg ) = each %result )
+{
+    while ( my ( $mesg, $node ) = each %$mesg )
+    {
+        push @{ $mesg{$io} }, join ': ', $range->load( $node )->dump, $mesg;
+    }
+}
+
+for my $io ( sort keys %mesg )
+{
+    print "---\n$io:\n";
+    map { print "  $_" } @{ $mesg{$io} };
+}
+
+exit 0;

@@ -1,0 +1,219 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+BEGIN {
+    unshift(@INC, "lib") if -f "lib/PerlBench.pm";
+}
+
+use PerlBench qw(timeit);
+use Sys::Hostname qw(hostname);
+use Digest::MD5 qw(md5_hex);
+use File::Path qw(mkpath);
+use Getopt::Long qw(GetOptions);
+use File::Spec::Functions qw(file_name_is_absolute);
+
+my $resdir = "perlbench-results";
+my $hostname = hostname();
+my $perl = $^X;
+my $VERBOSE = 0;
+
+my %opt;
+GetOptions(
+   'verbose+' => \$VERBOSE,
+) || usage();
+
+my @tests = @ARGV ? (@ARGV) : do {
+    die "Can't find any benchmarks directory" unless -d "benchmarks";
+    use File::Find;
+    my @f;
+    File::Find::find(sub { /\.b$/ && push(@f, $File::Find::name) }, "benchmarks");
+    sort @f;
+};
+die unless @tests;
+
+$| = 1;
+
+die "Need absolute perl name" unless file_name_is_absolute($perl);
+
+print "Host: $hostname\n";
+my $hostdir = "$resdir/$hostname";
+if (-d $hostdir) {
+    # check that this host look similar
+}
+else {
+    mkpath($hostdir, 0, 0755) || die "Can't create $hostdir: $!";
+    file("$hostdir/osname.txt", "$^O\n");
+    file("$hostdir/osversion.txt", get_os_version()."\n");
+    system("uname -a >$hostdir/uname-a.txt") if $^O ne "MSWin32";
+    system("uname -X >$hostdir/uname-X.txt") if $^O eq "solaris";
+    system("cp /proc/cpuinfo $hostdir/cpuinfo.txt") if -f "/proc/cpuinfo";
+}
+
+print "Perl: $perl\n";
+my $perl_V = qx($perl -V);
+
+my $perldir = "$hostdir/perls/" . md5_hex("$perl\0$perl_V");
+if (-d $perldir) {
+    # check that this perl looks similar
+    die "perl -V output doesn't match"
+	unless file("$perldir/config-summary.txt") eq $perl_V;
+}
+else {
+    mkpath("$perldir/tests", 0, 0755);
+    file("$perldir/path.txt", $perl);
+    system(qq($perl -v >$perldir/version.txt));
+    file("$perldir/config-summary.txt", $perl_V);
+    system(qq($perl -MConfig=config_sh -e "print &config_sh()" >$perldir/config.sh));
+}
+
+for my $test (@tests) {
+    print "Test-File: $test\n";
+    run_test($test);
+}
+
+
+sub run_test {
+    my $test = shift;
+    open(my $fh, "<", $test) || die "Can't open $test: $!";
+    my $header = 1;
+    my %prop;
+    my @init;
+    my @code;
+    while (<$fh>) {
+	if ($header) {
+	    if (/^\#\s*(\w+)\s*:\s*(.*)/) {
+		$prop{lc($1)} = $2;
+	    }
+	    else {
+		$header = 0;
+	    }
+	}
+	else {
+	    if (/^\#\#\#\s*TEST\s*$/) {
+		die if @init;
+		@init = @code;
+		@code = ();
+	    }
+	    else {
+		push(@code, $_);
+	    }
+	}
+    }
+    close($fh);
+
+    print "Test-Name: $prop{name}\n" if $prop{name};
+
+    trim(\@init);
+    trim(\@code);
+
+    my %opt;
+    $opt{verbose} = 1 if $VERBOSE;
+    $opt{init} = join("", @init) if @init;
+    $opt{repeat} = $prop{repeat} if $prop{repeat};
+    $opt{enough} = $prop{enough} if $prop{enough};
+
+    my $start = time2iso();
+    my $res = timeit(join("", @code), %opt);
+
+    my $resfile = $start;
+    $resfile =~ s/ /T/;  # spaceless iso format
+    $resfile =~ s/[-:]//g;  # compact and windows compatible
+    $resfile = "$perldir/tests/$resfile.pb";
+    open($fh, ">", $resfile) || die "Can't create $resfile: $!";
+    my $end = substr(time2iso(), 11);
+
+    # system info
+    print $fh "Date: $start ($end)\n";
+    print $fh "PerlBench-Version: $PerlBench::VERSION\n";
+    print $fh "Test: $test md5:", md5_hex(file($test)), "\n";
+    print $fh "Perl: $perl $]\n";
+    print $fh "Hostname: $hostname\n";
+    if (-x "/usr/bin/uptime") {
+	my($up) = qx(/usr/bin/uptime);
+	chomp($up);
+	$up =~ s/\s+/ /g;
+	$up =~ s/^\s+//;
+	print $fh "System-Uptime: $up\n";
+    }
+
+    # test results
+    print $fh "Cycles: $res->{count}\n";
+    printf $fh "Loop-Overhead: %.1f%%\n", 100*$res->{loop_overhead_relative};
+    print $fh "Samples: $res->{n}\n";
+    print $fh "Min: $res->{min}\n";
+    print $fh "Med: $res->{med}\n";
+    print $fh "Max: $res->{max}\n";
+    print $fh "Avg: $res->{avg}\n";
+    print $fh "Std-Dev: $res->{stddev}\n";
+
+    close($fh) || die "Can't write $resfile: $!";
+    print "Test-Result: $resfile\n";
+}
+
+sub time2iso
+{
+    my $time = shift;
+    $time = time unless defined $time;
+    my($sec,$min,$hour,$mday,$mon,$year) = localtime($time);
+    return sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+            $year+1900, $mon+1, $mday, $hour, $min, $sec);
+}
+
+sub trim {
+    my $lines = shift;
+    shift(@$lines) while @$lines && $lines->[0] =~ /^$/;
+    pop(@$lines) while @$lines && $lines->[-1] =~ /^$/;
+}
+
+sub file {
+    my $name = shift;
+    if (@_) {
+        my $content = shift;
+        open(my $f, ">", $name) || die "Can't create '$name': $!";
+        binmode($f);
+        print $f $content;
+        close($f) || die "Can't write to '$name': $!";
+    }
+    else {
+        open(my $f, "<", $name) || return undef;
+        binmode($f);
+        local $/;
+        return scalar <$f>;
+    }
+}
+
+sub get_os_version {
+    if ($^O eq "MSWin32") {
+	my($string, $major, $minor, $build, $id, $spmajor, $spminor, $suitemask, $producttype) = Win32::GetOSVersion();
+	if ($id == 0) {
+	    $major = 0;
+	    $minor = 0;
+	}
+	my $ver = "Windows $major.$minor";
+	$ver .= ".$build" if $build;
+	if ($id >= 2 && $major >= 4) {
+	    if ($spmajor || $spminor) {
+		$ver .= " SP$spmajor.$spminor";
+	    }
+	}
+	my $name = {
+	    "0.0.0" => "Win32s",
+            "1.4.0" => "Windows 95",
+	    "1.4.10" => "Windows 98",
+            "1.4.90" => "Windows Me",
+            "2.3.51" => "Windows NT 3.51",
+	    "2.4.0" => "Windows NT 4",
+	    "2.5.0" => "Windows 2000",
+            "2.5.1" => "Windows XP",
+            "2.5.2" => "Windows Server 2003",
+            "2.6.0" => "Windows Vista",
+        }->{"$id.$major.$minor"} || "Windows";
+	$ver .= " ($name $string)";
+	return $ver;
+    }
+
+    my($ver) = qx(uname -sr);
+    chomp($ver);
+    return $ver;
+}

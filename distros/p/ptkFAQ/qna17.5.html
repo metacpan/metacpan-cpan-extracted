@@ -1,0 +1,87 @@
+<HTML>
+<HEAD><TITLE> 17.5. How do you fork on System V (HP)?</TITLE></HEAD>
+<BODY><a name="A17.5"> 17.5. How do you <KBD>fork</KBD> on System V (HP)?</a>
+
+<hr>
+</p><p>
+Kraegeloh Martin  &lt;mkr@dm-server.cv.com&gt;
+<a href="http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.11/0046.html">
+ originally asked</a>:
+<PRE><i>
+! Subj: signal handling difference on HP vs. SUN
+!
+! the following code will fork an xterm with vi in it, and it
+! will refuse to do so while the first xterm is still running.
+! works fine on my sun.
+! On HP however, the second time an xterm is started, NO handler
+! is called when the child dies.
+!
+! the code:
+! ===================== 8&lt; ===============================
+! $SIG{CHLD}=\&amp;w;
+!
+! sub w{
+!    $pid=wait;
+!    print STDERR "died: $pid\n";
+!    if ( $have == $pid ) { $have = 0; }
+! }
+</i></PRE>
+To which a part of Nick Ing-Simmons' 
+ <a href="http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.11/0048.html">
+ response</a> was:
+<P><BLOCKQUOTE>
+I suspect HPUX is SysV-ish not BSD or POSIX. So every time a signal fires,
+it removes the handler - you need to reset it in the handler:
+</BLOCKQUOTE><PRE>
+    sub w{
+        $SIG{CHLD}=\&amp;w;
+        $pid=wait;
+        print STDERR "died: $pid\n";
+        if ( $have == $pid ) { $have = 0; }
+     }
+ 
+</PRE><BLOCKQUOTE>
+Whether you reset it before/after the wait may be very important ...
+</BLOCKQUOTE><p>
+Then Bjarne Steinsbo &lt;bjarne@hsr.no&gt;
+ <a href="http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.11/0052.html">
+ followed up with</a>:
+<p><BLOCKQUOTE>
+That's not the whole story...  Another problem is that <KBD>SIGCLD</KBD> interrupts
+the read system call on SysV-ish (I like that word! :-) systems.  This
+means that you have to test why <KBD>""</KBD> fails, and act accodingly.  A
+program that works on both Sun and HP is:
+</BLOCKQUOTE><PRE>
+    $SIG{CHLD}=\&amp;w;
+    while(1){
+       $_ = ;
+       $! = 0, next if $! =~ /Interrupted/;
+       last if $! or !defined $_;
+       if($have){
+            print STDERR "child still alive\n";
+       }
+       else{
+            if(($pid=fork()) != 0){
+               $have=$pid;
+               print STDERR "forked $pid\n";
+            }
+            else {
+               exec("xterm -e vi") 
+            }
+       }
+    }
+
+    sub w{
+       $pid=wait;
+       print STDERR "died: $pid\n";
+       if ( $have == $pid ) { $have = 0; }
+       $SIG{CHLD}=\&amp;w;
+    }
+</PRE>
+
+
+<hr>
+	<p><a href="qna17.4.html">Previous</a> | Return to <a href="ptkTOC.html#TOC17.5">table of contents</a> | <a href="qna18.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

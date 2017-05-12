@@ -1,0 +1,10 @@
+.releaserc
+Changes
+lib/pragma.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/pragma.t
+t/subclass.t
+t/XXX.pm

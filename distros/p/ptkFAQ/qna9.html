@@ -1,0 +1,86 @@
+<HTML>
+<HEAD><TITLE>9. How do I get widget X to do Y ?</TITLE></HEAD>
+<BODY><a name="A9">9. How do I get widget <I>X</I> to do <I>Y</I> ?</a>
+
+<hr>
+</p><p>
+There are a number of tasks that can be accomplished with perl/Tk widgets,
+configurations, and bindings (a few that can't and a few that require specific 
+tricks). 
+Beginners are encouraged to work through the examples in
+<a href="pod/UserGuide.html"><KBD>UserGuide.pod</KBD></a>. Some examples from 
+<a href="pod/UserGuide.html"><KBD>UserGuide.pod</KBD></a> are addressed in this
+document among those that follow.
+<p>
+Basically a widget can be &quot;created&quot; by simply calling the sub of the 
+same name:
+<pre>
+    my $main = new MainWindow;
+</pre>
+will set aside the necessary system memory <i>etc.</i> for a new 
+<KBD>MainWindow</KBD> widget (it does not <em>appear</em> until after the 
+<KBD>MainLoop;</KBD> call). The object &quot;created&quot; is then callable 
+via the variable <KBD>$main</KBD>. So, for example, if you wanted a 
+<KBD>Button</KBD> in your <KBD>MainWindow</KBD>, then this: 
+<PRE>
+    $main-&gt;Button();
+</PRE>
+would be a very basic example of a widget command. If you wanted to later call
+this button widget you would need a &quot;widget tag or ID&quot; to &quot;get a
+handle on it&quot;. Instead of the above call try something like:
+<PRE>
+    my $button = $main-&gt;Button();
+</PRE>
+The variable <KBD>$button</KBD> is how you refer to the Button widget in
+subsequent calls, such as when we call the <KBD>pack</KBD> routine:
+<PRE>
+    $button -&gt; pack;
+</PRE>
+A complete script that incorporates these ideas to make a very plain button
+would look like:
+<PRE>
+    #!/usr/bin/perl -w
+    use Tk;
+    use strict;
+    my $main = new MainWindow;
+    my $button = $main -&gt; Button();
+    $button -&gt; pack;
+    MainLoop; 
+</PRE>
+But who wants such a plain looking button? You can provide a number of 
+different widget configurations via calls to the <KBD>configure</KBD> routine 
+as in:
+<PRE>
+    #!/usr/bin/perl -w
+    use Tk;
+    use strict;
+    my $main = new MainWindow;
+    my $button = $main-&gt;Button();
+    $button -&gt; configure(-text =&gt; 'Press me!');
+    $button -&gt; pack;
+    MainLoop; 
+</PRE>
+The Perl motto is &quot;there is more than one way to do it.&quot; - perl/Tk
+remains quite true to this motto as well. Note that the above script could 
+have been written quite succinctly without the use of either the 
+<KBD>$main</KBD> or <KBD>$button</KBD> variables as:
+<PRE>
+    #!/usr/bin/perl -w
+    use Tk;
+    use strict;
+    new MainWindow -&gt; Button(-text =&gt; 'Press me!') -&gt; pack;
+    MainLoop; 
+</PRE>
+But if you want your widgets to actually <em>do</em> things then you must set
+up callback procedures as discussed later...
+<p>
+As of Tk-b9(.01) the <KBD>-</KBD> sign in front of options (like 
+<KBD>-text</KBD> in the above example) will be optional (hence 
+<KBD>-&gt;Button(text =&gt; 'Press me!')</KBD>).
+
+
+<hr>
+	<p><a href="qna8.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9">table of contents</a> | <a href="qna9.1.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

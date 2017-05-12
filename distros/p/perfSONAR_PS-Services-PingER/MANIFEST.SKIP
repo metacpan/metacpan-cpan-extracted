@@ -1,0 +1,16 @@
+CVS/.*
+\.bak$
+\.svn/.*
+\.sw[a-z]$
+\.tar$
+\.tar\.gz$
+\.tgz$
+^Makefile$
+^Makefile\.[a-z]+$
+^blib/
+^mess/
+^pm_to_blib$
+^tmp/
+~$
+^perl-perfSONAR.*\.spec$
+^link-modules.pl$

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Use a Perl 5 group of modules/features",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "perl5",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.1",
+            "version" : "0.99"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Sub::Exporter" : "0",
+            "Test::Exception" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/perl5-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/perl5-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/perl5-pm.git",
+         "web" : "https://github.com/ingydotnet/perl5-pm"
+      }
+   },
+   "version" : "0.21"
+}
+

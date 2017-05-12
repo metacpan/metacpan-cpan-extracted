@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+#    eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
+#        if $running_under_some_shell;
+
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Pod::LaTeX::Book;
+
+
+my $man = 0;
+my $help = 0;
+
+## Parse options and print usage if there is a syntax error,
+## or if usage was explicitly requested.
+GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+## If no arguments were given, exit with usage info
+pod2usage("$0: No files given.")  if ( (@ARGV == 0) );
+
+my $confFile = shift @ARGV;
+
+pod2usage("$0: configuration file $confFile not found.")
+    unless ( -e $confFile );
+
+# create a parser
+my $parser = Pod::LaTeX::Book->new ( );
+
+# configure it
+$parser->configure_from_file( $confFile );
+
+# and use it
+$parser->parse( );
+
+__END__
+
+=head1 NAME
+
+pod2book - Convert a number of POD pages into a LaTeX book
+
+=head1 SYNOPSIS
+
+    pod2book [options] conf_file
+
+    Options:
+       -help            brief help message
+       -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<pod2book> takes a collection of POD pages specified in the
+configuration file and turns them into a single LaTeX document. Run
+the commands on the resulting file (let's assume it's called book.tex)
+
+   pdflatex book
+   pdflatex book
+   makeindex book
+   pdflatex book
+
+to produce the book in PDF format. Keep your fingers crossed when
+running pdflatex ;-).
+
+=head1 SEE ALSO
+
+See L<Pod::LaTeX::Book> for details on the format of the configuration file.
+
+=cut
+
+
+
+
+

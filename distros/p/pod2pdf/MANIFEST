@@ -1,0 +1,11 @@
+Changes
+MANIFEST			This list of files
+README
+Makefile.PL
+artistic-2_0.txt
+bin/pod2pdf
+lib/App/pod2pdf.pm
+t/compile.t
+t/pod.t
+t/test_manifest
+META.yml                                 Module meta-data (added by MakeMaker)

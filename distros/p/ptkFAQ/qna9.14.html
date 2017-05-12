@@ -1,0 +1,31 @@
+<HTML>
+<HEAD><TITLE> 9.14. How do I specify fonts?</TITLE></HEAD>
+<BODY><a name="A9.14"> 9.14. How do I specify fonts?</a>
+
+<hr>
+</p><p>
+The quick answer is to specify the <kbd>font</kbd> configuration option of your
+widget as in:
+<pre>
+    #!/usr/local/bin/perl -w
+    use Tk;
+    $main = MaiWindow-&gt;new();
+    $labl = $main -&gt; Label('-text' =&gt; "Foo", '-font' =&gt; "fixed");
+    $labl -&gt; pack;
+    MainLoop;
+</pre>
+The long answer involves figuring out what fonts you have access to locally.
+The Unix programs <i>xlsfonts</i> and <i>xfontsel</i> are useful in this
+regard.
+<p>
+The perl/Tk version of <i>xfontsel</i> was distributed as the
+<kbd>font_test</kbd> script in the Tk-b9.01 build directory.
+<p>
+See also the later <a href="qna19.html">question (within this FAQ) on international fonts</a>.
+
+
+<hr>
+	<p><a href="qna9.13.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.14">table of contents</a> | <a href="qna9.15.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

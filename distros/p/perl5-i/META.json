@@ -1,0 +1,58 @@
+{
+   "abstract" : "perl5 plugin for perl5i",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "perl5-i",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::y2038" : "20100403",
+            "perl" : "v5.8.1",
+            "perl5" : "0.10",
+            "perl5i" : "v2.6.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/perl5-i-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/perl5-i-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/perl5-i-pm.git",
+         "web" : "https://github.com/ingydotnet/perl5-i-pm"
+      }
+   },
+   "version" : "0.12"
+}
+

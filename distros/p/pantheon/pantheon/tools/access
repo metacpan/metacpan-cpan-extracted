@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use MIO::TCP;
+use Poros::Query;
+use Vulcan::Sudo;
+use Vulcan::OptConf;
+
+our $PORT = 12345;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 -r range [--delete] [--add] users
+
+=cut
+Vulcan::Sudo->sudo();
+
+my $option = Vulcan::OptConf->load();
+my %o = Vulcan::OptConf->load()->get( qw( range=s delete add ) )->dump();
+my @conf;
+
+exit unless $o{add} || $o{delete};
+
+for my $user ( @ARGV )
+{
+    my %param = ( user => $user );
+
+    if ( $o{add} )
+    {
+        map { next unless ( $param{$_} ) = `grep -P '^$user:' /etc/$_`;
+            chop $param{$_} } qw( passwd shadow );
+
+        if ( my ( $sudo ) = `grep -P '^$user ' /etc/sudoers` )
+        {
+            chop $sudo; $param{sudoers} = $sudo;
+        }
+    }
+    push @conf, \%param;
+}
+
+my %query = ( code => 'access', argv => \@conf );
+my $range = Hermes->new( $option->dump( 'range' ) );
+
+my ( %result, %mesg ) = MIO::TCP
+    ->new( map { join ':', $_, $PORT } $range->load( delete $o{range} )->list )
+    ->run( %o, input => Poros::Query->dump( \%query ) );
+
+while ( my ( $type, $mesg ) = each %result )
+{
+    while ( my ( $mesg, $node ) = each %$mesg )
+    {
+        map { $_ =~ s/:$PORT$// } @$node;
+        $mesg =~ s/--- \d+\n$//;
+        $node = $range->load( $node )->dump();
+        $mesg{$type}{$node} = YAML::XS::Load( $mesg ) if $mesg;
+    }
+}
+
+YAML::XS::DumpFile \*STDOUT, \%mesg if %mesg;
+exit 0;

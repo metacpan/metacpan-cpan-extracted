@@ -1,0 +1,54 @@
+<H2>[PREV]  <A HREF="4mr8p2$kmk@csnews.cs.colorado.edu">[NEXT]</A>  <A HREF="4mqnin$5o6@news.service.uci.edu">[PREV Thread]</A>  <A HREF="4mqq4a$n44@ns.mad.servicom.es">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2><HR><ADDRESS> Dave Disser <disser@hpsdly.sdd.hp.com>
+</ADDRESS>
+<TITLE> searching the @ISA tree</TITLE>
+<ADDRESS><H1> searching the @ISA tree</H1>
+</ADDRESS>
+<ADDRESS> 08 May 1996 11:09:55 -0700
+ Hewlett Packard, San Diego Division
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.misc">comp.lang.perl.misc</A>
+</DL>
+<HR>
+<PRE>Is there any sort of builtin way to tell if an object is a subclass of
+another?  I can check it with this code, but I want to use a
+'standard' way if it's there.
+
+sub isa {
+    my($self, $class, $seen) = @_;
+
+    return 1 if (ref $self or $self) eq $class;
+    for (@{(ref $self or $self) . '::ISA'}) {
+	next if ++$seen-&gt;{$_} &gt; 1;
+	return 1 if $_ eq $class or &isa($_, $class, $seen);
+    }
+
+    return 0;
+}
+
+@FOO::ISA = (BAR);
+@BAR::ISA = (BAZ);
+$x = {};
+bless $x, FOO;
+
+print &isa($x, FOO), " FOO\n";
+print &isa($x, BAR), " BAR\n";
+print &isa($x, BAZ), " BAZ\n";
+print &isa($x, BUZ), " BUZ\n";
+
+yields:
+
+1 FOO
+1 BAR
+1 BAZ
+0 BUZ
+
+
+-- 
+Dave Disser
+
+</PRE>
+<HR><H2>[PREV]  <A HREF="4mr8p2$kmk@csnews.cs.colorado.edu">[NEXT]</A>  <A HREF="4mqnin$5o6@news.service.uci.edu">[PREV Thread]</A>  <A HREF="4mqq4a$n44@ns.mad.servicom.es">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2>

@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Hermes;
+use Vulcan::OptConf;
+
+$| ++;
+
+my $option = Vulcan::OptConf->load();
+my %o = $option->get( qw( list count ) )->dump();
+
+my $cluster = Hermes->new( $option->dump( 'range' ) );
+my $range = Hermes->new();
+my $output;
+
+map { $range->add( $cluster->load( $_ ) ) }
+    @ARGV, -t STDIN ? () : map { split /\s+/ } <STDIN>;
+
+=head1 SYNOPSIS
+
+=head3 list
+
+Print range as a random list.
+
+$0 expr .. --list
+
+=cut
+if ( $o{list} ) { $output = join "\n", $range->list() }
+
+=head3 count
+
+$0 expr .. --count
+
+=cut
+elsif ( $o{count} ) { $output = $range->list() }
+
+=head3 normalize
+
+Print a range expression
+
+$0 expr ..
+
+=cut
+else { $output = $range->dump() }
+
+print "$output\n";
+exit 0;

@@ -1,0 +1,58 @@
+NAME
+    pragma - A pragma for controlling other user pragmas
+
+DESCRIPTION
+    The "pragma" pragma is a module which influences other user pragmata
+    such as lint. With Perl 5.10 you can create user pragmata and the
+    "pragma" pragma can modify and peek at other pragmata.
+
+A basic example
+    Assume you're using the "myint" pragma mentioned in perlpragma. For
+    ease, that pragma is duplicated here. You'll see it sets the "myint"
+    value to 1 when on and 0 when off.
+
+        package myint;
+        
+    use strict;
+        use warnings;
+        
+    sub import {
+            $^H{myint} = 1;
+        }
+        
+    sub unimport {
+            $^H{myint} = 0;
+        }
+        
+    1;
+
+    Other code might casually wish to dip into "myint":
+
+        no pragma 'myint';      # delete $^H{myint}
+        use pragma myint => 42; # $^H{myint} = 42
+
+        print pragma->peek( 'myint' ); # prints '42'
+
+    The above could have been written without the "pragma" module as:
+
+        BEGIN { delete $^H{myint} }
+        BEGIN { $^H{myint} = 42 }
+
+        print $^H{myint};
+
+CLASS METHODS
+    "use pragma PRAGMA => VALUE"
+    "pragma->import( PRAGMA => VALUE )"
+    "pragma->poke( PRAGMA => VALUE )"
+        Sets "PRAGMA"'s value to "VALUE".
+
+    "no pragma PRAGMA"
+    "pragma->unimport( PRAGMA )"
+        Unsets "PRAGMA".
+
+    "pragma->peek( PRAGMA )"
+        Returns the current value of "PRAGMA".
+
+SUBCLASSING
+    All methods may be subclassed.
+

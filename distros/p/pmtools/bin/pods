@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+# pods - print out all pod paths
+#
+# this is a perl program not a shell script
+# so that we can use the correct perl 
+
+use strict;
+use warnings;
+
+our $VERSION = '2.0.0';
+
+system $^X, "-S", "stdpods";
+system $^X, "-S", "pminst", "-l";
+
+__END__
+
+=head1 NAME
+
+pods - print out all pod paths
+
+=head1 DESCRIPTION
+
+This program is a front end to print out the paths of all the standard
+podpages and the modules.
+
+=head1 SEE ALSO
+
+faqpods(1), modpods(1), sitepods(1), podpath(1), pminst(1), and stdpod(1).
+
+=head1 AUTHORS and COPYRIGHTS
+
+Copyright (C) 1999 Tom Christiansen.
+
+Copyright (C) 2006-2014 Mark Leighton Fisher.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it
+under the terms of either:
+(a) the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+(b) the Perl "Artistic License".
+(This is the Perl 5 licensing scheme.)
+
+Please note this is a change from the
+original pmtools-1.00 (still available on CPAN),
+as pmtools-1.00 were licensed only under the
+Perl "Artistic License".

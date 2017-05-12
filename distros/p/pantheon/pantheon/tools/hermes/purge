@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use Hermes::DBI::Root;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::THIS = 'hermes';
+
+=head1 SYNOPSIS
+
+Delete hermes databases entries
+
+ $0 --cluster clusters --table table [--key nodes] [--value values]
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->get( qw( cluster=s table=s key=s value=s ) )->dump();
+
+my %range = $option->dump( 'range' );
+my $range = Hermes->new( %range );
+my ( $drop, %query ) = 1;
+
+for my $index ( qw( key value ) )
+{
+    next unless defined $o{$index};
+    $drop = 0;
+
+    next unless my @list = $range->load( $o{$index} )->list();
+    $query{$index} = [ 1 => @list ];
+}
+
+for my $cluster ( $range->load( $o{cluster} || [] )->list() )
+{
+    my $db = Hermes::DBI::Root->new( File::Spec->join( $o{root}, $cluster ) );
+
+    for my $table ( $range->load( $o{table} || [] )->list() )
+    {
+        if ( %query ) { $db->delete( $table, %query ) }
+        elsif ( $drop ) { $db->drop( $table ) }
+    }
+}
+
+exit 0;

@@ -1,0 +1,21 @@
+personal.pm version 0.22
+========================
+
+This is namespace collisions solution for scripts working under mod_perl.
+
+Every package, loaded with 'use personal' will be renamed "on the fly"
+into some unique name and tied to the current script. That mean, what every
+script can have his personal packages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+AUTHOR
+
+Andrian Zubko aka Ondr, <ondr@cpan.org>

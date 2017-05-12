@@ -1,0 +1,146 @@
+v2.0.0  2014-02-03 17:59:29 EST  Mark Leighton Fisher
+
+  - Bumped version to v2.0.0 because of the major architectural
+    change -- the 'pmtools' module now contains the routine
+    new_pod_iterator(), which creates an iterator over @INC for
+    all of the variants of a POD's name ('LIB/MODULE.pm',
+    'LIB/MODULE.pod', and 'LIB/pod/MODULE.pod').  This change
+    is for when the POD is separate from its corresponding Perl
+    module file (and is inspired by an upcoming Debian release).
+  - Fixed pman and podpath to use new_pod_iterator(). This
+    should fix rt.cpan.org #89006: "Carp has no POD on my
+    5.18.1 installation -> still test suite failures with
+    1.51".
+  - Switched to the somewhat-more-standard 3-number versioning
+    scheme.
+  - Removed the increasingly-obsolete 'Makefile.lame'.
+
+v1.54  2013-10-19 14:21:26 EST  Mark Leighton Fisher
+
+  - Updated $VERSION in the modules and documented it too :)!
+
+v1.53  2013-10-18 17:31:35 EST  Mark Leighton Fisher
+
+  - Tried to update $VERSION in the modules.
+
+v1.52  2013-09-28 19:00:47 EST  Mark Leighton Fisher
+
+  - Updated $VERSION in the modules.
+
+v1.51  2013-09-27 06:19:01 EST  Mark Leighton Fisher
+
+  - NOTE: These are all fixes in the tests.
+  - Fixed rt.cpan.org 88843, "t/pmall.t takes a long time" by using
+    a head(1) clone (t/head.pl) to grab just the first 100 lines
+    of pmall output, then matching against the general form of
+    pmall output rather than specifically looking for Scalar::Util.
+  - Fixed the tests to use Tie::Hash (pure Perl) instead of
+    Scalar::Util, as there may or may not be a ...Scalar/Util.pm
+    depending on how Perl was packaged and installed (Scalar::Util
+    can exist as a pure Perl module and (more powerfully) as a mix
+    of Perl and XS).
+  - Fixed t/pmfunc.t and t/pmcheck.t to just check $? != 127 (i.e.
+    the program ran in some way) rather than looking for a specific
+    exit code. pmfunc does not work again yet, and pmcheck may or
+    may not return an error depending whether your Perl configuration
+    is correct.
+  - Fixed t/pman.t, t/pmcat.t, and t/pmdesc.t to use the Carp module
+    because Carp always has POD (Tie::Hash may not depending on
+    the Perl version, and see above for Scalar::Util problems).
+    
+v1.50  2013-09-20 17:00:33 EST  Mark Leighton Fisher
+
+  - This is the "Testing" release of pmtools! All of the
+    pmtools now have tests.
+  - Fixed so all programs and modules use a fixed value
+    (literal) for $VERSION. This seems to work better with
+    the CPAN toolchain. As I also updated all of the
+    version numbers, this will fix rt.cpan.org
+    "#88534: pmtools 1.40: Still has "1.30" in pmtools.pm"
+  - Fixed so all tests add the pmtools to the PATH, whether
+    or not the test actually needs it. This should fix
+    rt.cpan.org "#88780: test failure".
+  - Fixed pfcat documentation to always refer to "pfcat".
+  - Fixed rt.cpan.org "#85352: typo fixes".
+
+v1.40  2013-09-04 16:53:36 EST  Mark Leighton Fisher
+
+  - This is the "Kwalitee" release of pmtools! All of the
+    Test::Kwalitee and Test::Kwalitee::Extra tests now pass.
+  - I have (briefly) tested this release on Debian 7.1
+    with Perl 5.8.8, 5.14.2, and 5.18.1.
+  - Please note that there are currently only tests for
+    basepods and faqpods. My current plan is add tests for
+    all other programs and modules in the next release.
+  - This is the first release where I used Dist::Zilla to
+    create the release. A special thanks to David Golden
+    for bundling some many useful Dist::Zilla plugins
+    together (Dist::Zilla::PluginBundle::DAGOLDEN).
+  - All programs and modules now 'use strict' and
+    'use warnings' (part of "Kwalitee").
+  - Licensing information is now in the LICENSE section
+    for programs and modules (part of "Kwalitee').
+  - There are now LICENSE, MYMETA.json, META.yml, and
+    MYMETA.yml files (part of "Kwalitee").
+  - Programs are now in the standard location 'bin'.
+  - Devel::Loaded is now in the standard location
+    lib/Devel/Loaded.pm.
+  - There is now a 'pmtools' module (lib/pmtools.pm).
+  - 'pmtools' is now the source of the version number for
+    all other programs and modules in pmtools. This should
+    satisfy dsteinbrunner's pull request of April 27, 2013.
+  - 'pminclude' lists the directories in @INC. This
+    replaces the poorly-named 'pmdirs' program.
+  - Documentation for Devel::Loaded has been fixed. This
+    should satisfy neilbowers' pull request of December 21,
+    2012 and neilbowers' pull request of July 16, 2013.
+  - I've fixed some permissions and such that should satisfy
+    dolmen's pull request of December 25, 2012.
+  - INTERNAL DETAIL: This version was developed on a
+    separate branch rather than 'master' (some Git
+    goodness).
+
+v1.30  2013-01-18 17:24:19 EST  Mark Leighton Fisher
+
+  - Moved to Git for source control.
+  - Added the GitHub repo
+    https://github.com/markleightonfisher/pmtools.
+  - Fixed Devel/Loaded.pm so it is not added to the
+    output. Thanks to NEILB@cpan.org for spotting this
+    bug (a modern Perls bug).
+  - Patched pmeth to flag Perl constants as such (thanks
+    to jpierce@cpan.org for the patch). XS constants
+    are not yet marked (some C-fu needs to be applied).
+  - Patched basepods to use 'pods' as the directory for
+    the base PODs (modern Perls use 'pods'). Alas, this
+    appears to be inspired by a CPANgnome, as there was
+    no Requestor on the ticket. :(
+
+v1.20  2012-12-07 15:25:50 EST  Mark Leighton Fisher
+
+  - Patched pminst so only unique package names are printed.
+    Thanks to Matthew Persico for the patch. (Honorable
+    mention goes to Andrew Pam, but Matthew's patch is
+    smaller and more robust as it handles an @INC with
+    directories in any order.)
+  - Fixed pminst to ignore non-existent directories.
+  - Added pmcheck, a tool to check that Perl is set up
+    correctly for use with Perl modules. Currently,
+    pmcheck only verifies that everything in @INC is an
+    existing, readable directory.
+
+v1.10  2008-01-18 06:57:21 EST  Mark Leighton Fisher
+
+  - Added copyrights in my name as well as Tom Christiansen.
+  - Changed to dual-license like Perl: GNU and Perl Artistic.
+    This was at the request of the Fedora project, as they
+    wanted a version of pmtools licensed under GNU.
+
+v1.01  2006-03-21 21:33:52 EST  Mark Leighton Fisher
+
+  - Two sets of patches from Jose Pedro Oliveira:
+    1. Added missing pmeth to Makefile.PL.
+    2. "$mod" was partially renamed to "$module" in my copy; this
+       patch restores it to "$mod".
+  - Added Changes and TODO files.
+  - Updated MANIFEST with Changes and TODO.

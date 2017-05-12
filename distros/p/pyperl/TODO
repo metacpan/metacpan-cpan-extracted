@@ -1,0 +1,80 @@
+PYPERL TODO
+-----------
+
+On Win32: free_thread_ctx() needs to be called in perl.pyd's DllMain()
+when the thread detaches (not sure if python has a standard way to do
+this)
+
+Python::Object wrappings for lists and dictionaries should perhaps
+always evaluate to a TRUE value??
+
+Python::coerce
+
+Python::dir
+
+Python::execfile
+
+Python::isinstance/issubclass
+
+Python::x?range
+
+Python::slice
+
+Keyword behaviour should perlhaps be implemented in Python::funcall()
+instead of the AUTOLOAD.  That way it would also work when callable
+objects are called directly through "&{}" overloading.
+
+Python::Err::Exception(Python:Err::AssertionError) should return 1.
+Need issubclass() kind of check.
+
+Python::{getattr,getitem,funcall} should perhaps also unwrap sequences
+and mappings in list context so they get compatible with perl
+arrays/hashes.
+
+perl.eval("") does not raise an exception on syntax errors.
+This is actually a perl in perl's perl_eval_sv() API.
+
+perl.require() could return an object that provided access to names
+withing the required namespace.  E.g.:
+
+    m = perl.require("MIME::Base64")
+    m.encode("foo")
+
+   Problem: Should the getattr() return static or class methods?
+   Could make m.new() a class method any anything else plain
+   functions.  Does not work too well with DBI.  Could have
+   a perl.require_class("DBI") function then....
+
+Use magic to clear up PerlPyErr objects.
+
+Make it possible to call perl.eval() in array context.
+
+Implement array.sort()
+
+Implement compare function for svrv_objects.
+
+'from perl.digest.md5 import md5_hex': can we make this work?
+
+When doing direct maniplulation of perl data from python we might risk
+getting a croak.  Especially if the data underneath happens to be
+tied.  Substitute all calls to the perl API in svrv_object with safe
+try_* versions.
+
+Python access to tied perl stuff.  I am sure there are stuff in
+svrv_object that does not work as well for tied arrays or tied hashes.
+
+Mapping of Python Unicode strings to SvPVs with SvUTF8?
+
+Make perl visible in tracebacks of exceptions that pass through perl.
+
+Tranparently pass file objects between langauges.  Both seems to have
+FILE* to be compatible with.
+
+Make 'python in perl' build without manual tweaks.
+
+Make it possible to have 'perl in python' and 'python in perl'
+installed together.
+
+Improve test suite.
+  - test the lock stuff
+  - make multitreaded tests

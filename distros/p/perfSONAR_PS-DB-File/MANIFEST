@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/DB/File.pm
+perl-perfSONAR_PS-DB-File.spec
+t/perfSONAR_PS::DB::File.t
+t/testfiles/blank.xml
+t/testfiles/garbage0.xml
+t/testfiles/simpleXML.xml
+t/testfiles/simpleXMLNoTag.xml
+META.yml                                 Module meta-data (added by MakeMaker)

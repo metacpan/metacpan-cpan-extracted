@@ -1,0 +1,31 @@
+---
+abstract: 'Optimized module loading for forking or non-forking processes'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0.80
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: prefork
+name: prefork
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  List::Util: 0.18
+  Scalar::Util: 0.18
+  perl: 5.005
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/prefork
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/prefork
+version: 1.04

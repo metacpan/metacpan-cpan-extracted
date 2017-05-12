@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+use Vulcan::OptConf;
+use Data::Dumper;
+use File::Spec;
+$Vulcan::OptConf::ARGC = 1;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 app [--stage] [--clean] [--switch] [--status] 
+      [--rollback apps,conf,data ]  [ --limit KBPS ] [--verbose]
+
+=cut
+
+use constant SWITCHDIR => '/home/s/var/hdp/home/cloudops/deploy';
+
+my ( $option, %seco );
+BEGIN { $option = Vulcan::OptConf->load(); %seco = $option->dump( 'seco' ) }
+
+use lib $seco{lib};
+use Deploy;
+
+my %o = $option->get( qw( stage clean switch status rollback=s limit=i verbose ) )->dump;
+my $deploy = Deploy->new( File::Spec->join( SWITCHDIR, $ARGV[0] ) );
+
+$Deploy::VERBOSE = $o{verbose};
+$deploy->stage( limit => $o{limit} ) if $o{stage};
+$deploy->clean() if $o{clean};
+$deploy->switch( ) if $o{switch};
+$deploy->rollback( split ',', $o{rollback} ) if $o{rollback};
+YAML::XS::DumpFile \*STDOUT, scalar $deploy->status() if $o{status};
+
+YAML::XS::DumpFile \*STDOUT, @$deploy
+unless grep{ $o{$_} } qw( stage clean switch rollback status );

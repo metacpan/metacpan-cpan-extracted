@@ -1,0 +1,10 @@
+ChangeLog
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+dist.ini
+lib/Emacs/PodMode.pm
+pod-mode.el

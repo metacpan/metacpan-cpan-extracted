@@ -1,0 +1,11 @@
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- ./lib/CPAN.pm-pre-prereq	Wed Dec  3 19:58:58 2003
+|+++ ./lib/CPAN.pm	Mon Dec  8 17:25:30 2003
+--------------------------
+Patching file CPAN.pm using Plan A...
+Hunk #1 succeeded at 4825 (offset -16 lines).
+Hunk #2 succeeded at 4849 (offset -16 lines).
+Hunk #3 succeeded at 4898 (offset -16 lines).
+done

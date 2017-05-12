@@ -1,0 +1,71 @@
+0.12	3 April 2012
+	Fix test-suite so that it also (presumably) passes all tests in Win
+	with strawberry perl.
+
+0.11	31 March 2012
+	Some pod fixes and brought up to current code esthetics.  Also checked
+	it runs on 5.14.2 threaded and unthreaded.
+
+0.10	6 February 2009
+	Added support for more complex persona specifications, specifically
+	!( foo || bar ) to indicate that code should be compiled for all
+	but the given personas.
+
+0.09	5 February 2009
+	Fixed test-suite so we don't die on OS's that don't support setting
+	environment variables on the commandline, such as Win*.
+
+	30 January 2009
+	Fixed test-suite so that any existing script by the name 'foo' does
+	not interfere with our 'foo' for testing script behaviour.
+
+0.08	29 January 2009
+	Added wildcard functionality to "only_for", and the possibility to
+        specify multiple "only_for"'s in on call..  Rearranged pod slightly
+	to de-emphasize command line parameter handling, as we now support
+	having persona dependent code simply in a script.  Adapted tests to
+	test for new functionalities.
+
+0.07	29 January 2009
+	Added capability to use persona filtering easily inside a script,
+	without having to resort to funny things: the funny things now happen
+	nicely embedded inside "import".  Added tests for this functionality
+	as well, of course!
+
+	Added some path information to make tests pass if no previous version
+	of persona is installed: apparently any installed version was leaking
+	into parts of the test.
+
+0.06	26 January 2009
+	Removed the -require- handler: it is possible to set %INC from the
+	@INC handler (I should have read the "perldoc -f require" more
+	carefully).
+
+	Now uses the normal handling if there are no skipped lines found:
+	if there are, __FILE__ is now set to what it would be without it
+	having been processed.
+
+0.05	25 January 2009
+	Added code to have any errors in -require- be reported from the "right"
+	location, to avoid code breakage by stupid core modules such as
+	"base.pm" that seem to depend on specific call stack info when a
+	-require- fails.
+
+0.04	25 January 2009
+	Removed dependency to non-core module List::MoreUtils.  Got so used
+	to using that module that I incorrectly assumed it was core (well,
+	maybe it should be ;-).  Spotted by Frank Wiegand.
+
+0.03	25 January 2009
+	Externalized parsing logic in "path2source" class method.
+
+	Added -require- handler so that we can properly set the %INC setting
+	of the processed file.  Adapted CAVEATS section accordingly.
+
+	And more tests of course.
+
+0.02	24 January 2009
+	Changed the abstract.  Fixed some warnings.  Added a CAVEATS section.
+
+0.01	23 January 2009
+	First version of persona.pm.

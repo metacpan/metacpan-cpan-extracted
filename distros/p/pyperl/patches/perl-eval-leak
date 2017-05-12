@@ -1,0 +1,106 @@
+X-From-Line: gsar@molotok.activestate.com Tue Jun 06 08:06:57 2000
+Return-Path: <gsar@molotok.activestate.com>
+Delivered-To: gisle@g.aas.no
+Received: (qmail 32052 invoked from network); 6 Jun 2000 08:06:54 -0000
+Received: from localhost (127.0.0.1)
+  by localhost with QMTP; 6 Jun 2000 08:06:54 -0000
+Received: (qmail 3671 invoked by uid 414); 6 Jun 2000 07:39:19 -0000
+Delivered-To: aas-gisle@aas.no
+Received: (qmail 3662 invoked from network); 6 Jun 2000 07:39:19 -0000
+Received: from molotok.activestate.com (199.60.48.208)
+  by mail.linpro.no with SMTP; 6 Jun 2000 07:39:19 -0000
+Received: from activestate.com (IDENT:root@forge.activestate.com [199.60.48.17])
+	by molotok.activestate.com (8.9.3/8.9.3) with ESMTP id RAA24883;
+	Mon, 5 Jun 2000 17:57:33 -0700
+Received: from molotok.activestate.com (IDENT:root@molotok.activestate.com [199.60.48.208])
+	by activestate.com (8.9.3/8.9.3) with ESMTP id RAA10344;
+	Mon, 5 Jun 2000 17:57:33 -0700
+Received: from molotok.activestate.com (IDENT:gsar@molotok.activestate.com [127.0.0.1])
+	by molotok.activestate.com (8.9.3/8.9.3) with ESMTP id RAA24877;
+	Mon, 5 Jun 2000 17:57:33 -0700
+X-Gnus-Mail-Source: file:/var/spool/mail/gisle
+Message-Id: <200006060057.RAA24877@molotok.activestate.com>
+To: Gisle Aas <gisle@ActiveState.com>
+cc: gsar@ActiveState.com, Developers <dev@ActiveState.com>
+Subject: Re: perl_eval_pv() leaks memory 
+In-reply-to: Your message of "29 May 2000 17:08:47 -0000."
+             <20000529170847.15855.qmail@eik.g.aas.no> 
+Date: Mon, 05 Jun 2000 17:57:33 -0700
+From: Gurusamy Sarathy <gsar@ActiveState.com>
+Lines: 73
+Xref: eik.g.aas.no box:20229
+
+On 29 May 2000 17:08:47 -0000, Gisle Aas wrote:
+>I am debugging memory leaks for the python/perl glue and have problems
+>getting my calls to perl_eval_pv() not to leak.  This is a minimized
+>test program:
+>
+>---------------------------------------------------------------->8-----
+>#include <EXTERN.h>
+>#include <perl.h>
+>
+>#ifdef LINUX
+>
+>void print_mem()
+>{
+>  FILE *f = fopen("/proc/self/status", "r");
+>  char buf[1000];
+>  while (fgets(buf, sizeof(buf), f)) {
+>    if (memcmp(buf, "VmSize", 6) == 0) {
+>      fputs(buf, stdout);
+>    }
+>  }
+>  fclose(f);
+>  fflush(stdout);
+>}
+>
+>#endif
+>
+>int main(int argc, char**argv, char**env)
+>{
+>  int i;
+>  char *embedding[] = {"", "-e", "0"};
+>  PerlInterpreter *my_perl = perl_alloc();
+>  perl_construct(my_perl);
+>  perl_parse(my_perl, NULL, 3, embedding, NULL);
+>  perl_run(my_perl);
+>
+>  for (i = 0; i < 100000; i++) {
+>    ENTER;
+>    SAVETMPS;
+>
+>    perl_eval_pv("1", FALSE);
+>
+>    FREETMPS;
+>    LEAVE;
+>
+>    if (!(i % 1000))
+>      print_mem();
+>  }
+>}
+>
+>---------------------------------------------------------------->8-----
+>
+>The process size grows (slowly) as the program runs.  Is there
+>anything I do wrong or is this a genuine perl leak?
+>
+>I get leaking behaviour on all perls I have tried it with;
+>perl5.004_04, perl5.005_03, and perl-5.6.0.
+
+This leak should be fixed now.  You can either get the individual patch
+numbers 6162, 6163, 6194, 6195, and 6201 (all of which address leaks)
+from:
+
+    ftp://ftp.linux.activestate.com/pub/staff/gsar/APC/diffs/
+
+Or get the entire latest sources with:
+
+    rsync -avuz rsync://ftp.linux.activestate.com/perl-current perl-current
+
+Enjoy.
+
+
+Sarathy
+gsar@ActiveState.com
+
+

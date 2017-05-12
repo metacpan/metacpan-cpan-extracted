@@ -1,0 +1,29 @@
+perfSONAR_PS::Client::Status::MA README File
+============================================
+
+Description
+-----------
+
+perfSONAR_PS::Client::MA::Status is a module that provides an OO interface for
+performing queries and storing data against the perfSONAR_PS L2 Status service.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Client::Status::MA'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

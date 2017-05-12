@@ -1,0 +1,223 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+lb-constructor
+
+=head1 SYNOPSIS
+
+Uses three Listboxes to demonstrate perl/Tk Listbox usage.
+
+There are comments and commented stubs of code sprinkled throughout 
+this script - have a look!
+
+=head1 REQUIREMENTS
+
+Perl 5 and the Tk (-b9.01 or higher) extension to perl.
+
+=head1 AUTHOR
+
+Peter Prymmer C<pvhp@lns62.lns.cornell.edu>
+
+=cut
+
+use Tk;
+
+my $main = MainWindow->new;
+
+# basic data fixed statements:
+#########################################################################
+my @alist = ('an item','another','and another','yet another','and so on');
+my @blist = qw(A-item B-item C-item D-item E-item);
+my @clist = (0..24);
+
+# This is a hash of list refs:
+my %listlist = ( 
+                 ' alist' => \@alist,
+                 ' blist' => \@blist,
+                 ' clist' => \@clist,
+               );
+# If you want to see what it looks like then uncomment this for loop:
+#for (sort(keys %listlist)) {
+#    print $_,"=",$listlist{$_}," ",@{$listlist{$_}},"\n"; 
+#}
+
+# This is also a hash of anonymous list refs: 
+my %addlist = (
+                 ' alist' => ['and so forth','and somesuch','so and so'],
+                 ' blist' => [ qw(F-item G-item H-item) ],
+                 ' clist' => [ (25..28) ],
+              );
+
+# begin left column:
+#########################################################################
+my $leftframe = $main->Frame()->pack('-side' => 'left');
+
+my $leftlabel = $leftframe->Label(
+    -text => "First select a\nlist to begin with:"
+                        )->pack(-fill => 'x');
+
+my $left_list = $leftframe->Listbox(
+  );
+
+for (sort(keys %listlist)) {
+ $left_list -> insert('end',$_);
+}
+
+$left_list->pack();
+
+
+# construct middle-left border|divider:
+my $mlframe = $main->Frame(
+                           -relief => 'raised',
+                           -borderwidth => '1',
+                          )->pack(
+                                  '-fill' => 'y',
+                                  '-expand' => '1',
+                                   -ipadx => 1,
+                                   -ipady => 1,
+                                  '-side' => 'left',
+                                 );
+
+# construct middle column:
+#########################################################################
+my $midframe = $main->Frame()->pack('-side' => 'left');
+my $midlabel = $midframe->Label(
+    -text => "This is the Listbox\nunder construction:"
+                        )->pack(-fill => 'x');
+
+# this little frame contains Listbox and accompanying Scrollbar:
+my $midlistframe = $midframe->Frame()->pack();
+my $mid_scroll = $midlistframe->Scrollbar->pack(
+                                                -side => 'right', 
+                                                -fill => 'y',
+                                               );
+my $mid_list = $midlistframe->Listbox(
+                               -yscrollcommand => [$mid_scroll => 'set'],
+                               -exportselection => 0,
+                                     );
+$mid_scroll->configure(-command => [$mid_list => 'yview']);
+$mid_list->pack(-side => 'left', 
+                -expand => 'yes', 
+                -fill => 'both',
+               );
+$mid_list->bind('<Double-1>' =>
+                   sub{ printit($mid_list) }
+# unfortunately anon. subs wait till exit of script to execute: 
+#                   sub{print $_[0]->get('active') }
+#                   sub{print $mid_list->get('active') }
+               );
+
+my $midprint_button = $midframe->Button(
+                    -text => "print selection",
+# this will work    -command => sub{ printit($mid_list) }
+                    -command => sub{ printthem($mid_list) }
+# unfortunately anon. subs wait till exit of script to execute: 
+#                    -command => sub{print $mid_list->get('active') }
+                                  )->pack;
+my $rem_button = $midframe->Button(
+                  -text => "delete selection",
+                  -command => sub{
+                                  $mid_list->delete('active')
+                                 },
+                                  )->pack;
+my $del_button = $midframe->Button(
+                  -text => "delete list",
+                  -command => [sub{shift->SetList(())},$mid_list], # a null list
+                                  )->pack;
+
+
+# construct middle-right border|divider:
+   $mlframe = $main->Frame(
+                           -relief => 'raised',
+                           -borderwidth => '1',
+                          )->pack(
+                                  '-fill' => 'y',
+                                  '-expand' => '1',
+                                   -ipadx => 1,
+                                   -ipady => 1,
+                                  '-side' => 'left',
+                                 );
+
+# construct right column:
+#########################################################################
+# Note on packing: since this is last Frame of 3 left|right|none 
+# are equivalent:
+#my $rightframe = $main->Frame()->pack('-side' => 'right');
+#my $rightframe = $main->Frame()->pack('-side' => 'left');
+my $rightframe = $main->Frame()->pack();
+my $right_list = $rightframe->Listbox(
+# this is a Tcl/Tk-ism:        -selectMode => 'multiple',
+                               -selectmode => 'multiple',
+                               -exportselection => 0,
+                                     )->pack;
+my $rtadd_button = $rightframe->Button(
+                                -text => "add to top",
+                                -command => sub{
+                          $mid_list->insert( 0      ,$right_list->get('active'))
+                                               },
+                                      )->pack;
+my $rsadd_button = $rightframe->Button(
+                                -text => "add before selection",
+                                -command => sub{
+                          $mid_list->insert('active',$right_list->get('active'))
+                                               },
+                                      )->pack;
+my $rsadd_button = $rightframe->Button(
+                                -text => "add to bottom",
+                                -command => sub{
+                          $mid_list->insert( 'end'  ,$right_list->get('active'))
+                                               },
+                                      )->pack;
+my $rightprint_button = $rightframe->Button(
+                                         -text => "print selection",
+                                         -command => sub{ printthem($right_list) }
+                                         )->pack;
+my $rdel_button = $rightframe->Button(
+                                -text => "delete this list",
+                                -command => sub{
+                                    # another Listbox deletion technique:
+                                    $right_list->delete(0,'end') 
+                                               },
+                                  )->pack;
+
+# now that $mid_list and $right_list exist we switch back left to 
+# add some buttons:
+#########################################################################
+my $ladd_button = $leftframe->Button(-text => "OK", 
+# Here we wish to dereference the [a|b|c]list-th element of our hashes 
+# of list refs:
+   -command => [
+                sub{
+                 $mid_list->SetList(@{$listlist{$left_list->get('active')}});
+                 $right_list->SetList(@{$addlist{$left_list->get('active')}});
+                   } 
+               ],
+                                    )->pack();
+
+# while we're at it let's have an escape route:
+my $quit_button = $leftframe->Button(-text => "quit program", 
+                                     -command => sub{exit},
+                                    )->pack();
+
+
+MainLoop;
+
+sub printit {
+  my $list = shift;
+  my $entry = $list->get('active');
+  print "$entry\n";
+}
+
+sub printthem {
+  my $list = shift;
+  my @entries = $list->curselection;
+  for (@entries) { print $list -> get($_),"\n";}
+}
+
+__END__
+
+
+Peter Prymmer
+pvhp@lns62.lns.cornell.edu
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: poest
+version: 0.20030407
+license: perl
+distribution_type: module
+requires:
+  POE: 0.25
+  POE::Component::Server::SMTP: 1.4
+  POE::Session::MultiDispatch: 0
+  perl: 5.5.3
+recommends:
+  Config::General: 0
+build_requires:
+  Test::More: 0
+conflicts: {}
+generated_by: Module::Build version 0.16

@@ -1,0 +1,58 @@
+## Path:             Hardware/UPS
+## Description:	   UPS configuration
+## ServiceRestart:   upsperld
+#
+## Type:             string(/dev/ttyS0)
+## Default:          ""
+#
+# The serial device used by Hardware-UPS-Perl.
+#
+UPS_PORT=""
+
+## Type:             string(root)
+## Default:          ""
+#
+# The mail address a message is sent to by upswatch.pl in case of emergency.
+#
+UPS_MAILTO=""
+
+## Type:             string(Megatec)
+## Default:          "Megatec"
+#
+# Switch to specify the UPS driver to start upswatch.pl with
+#
+UPS_DRIVER=""
+
+## Type:             string()
+## Default:          ""
+#
+# Switch to specify the options to start upswatch.pl with
+#
+#  -d, --debug-level [debuglevel]:  the debuglevel   
+#  -g, --grace-period grace      :  the grace period in minutes before shutdown
+#  -l, --loop-time loop          :  the loop time in seconds
+#
+UPS_WATCH_OPTIONS=""
+
+## Type:             string(localhost)
+## Default:          ""
+#
+# The (resolvable) host where a Hardware-UPS-Perl agent upsagent.pl is
+# running.
+#
+UPS_AGENT_HOST=""
+
+## Type:             integer
+## Default:          9050
+#
+# The TCP port used by the Hardware-UPS-Perl agent upsagent.pl
+#
+UPS_TCPPORT=""
+
+## Type:             yesno
+## Default:          no
+#
+# Switch to specify whether a Hardware-UPS-Perl agent upsagent.pl should be
+# started or not at local host.
+#
+UPS_START_AGENT=""

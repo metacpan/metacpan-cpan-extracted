@@ -1,0 +1,897 @@
+Archive-name: perl-faq/ptk-faq/part1
+Posting-Frequency: monthly
+Last-modified: Wed May 15 22:26:55 EDT 1996
+URL: http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+Version: 0.03
+
+URL (Hypertext-split): http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+URL (Plaintext): http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+Image-supplement: http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ftp-Archive: ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt
+ftp-Archive: ftp://ftp.wpi.edu/perl5/pTk-FAQ
+ftp-Archive: ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+e-mail-Archive: ptkfaq@pubweb.bnl.gov
+gopher-Archive: 128.84.219.153
+
+Perl/Tk FAQ part 1 of 5 - Getting Started  
+***************************************** 
+
+
+ ______________________________________________________________________
+ 
+ 
+ 
+ 5. How do I build it? 
+ 
+ In general, building perl/Tk requires: 
+ 
+  1. A made & installed perl (requires a C language compiler). You may need
+    different versions of perl depending on which version of Tk you wish to run. 
+  2. A C language compiler for the Tk code itself. 
+  3. A linkable Xlib (.o, .so, .a, etc.) for X-windows. 
+ 
+ Perl/Tk has been successfully built using various vendors' cc compilers, as well as
+ with the free GNU gcc compiler. A make utility of some sort (make/gmake) will
+ be extremely helpful. 
+ 
+ The versions of the various Perl utilities that you need on hand are roughly as follows:
+ 
+ 
+   Utility     Version              Tk version/comments
+   perl        5.001m               Tk-b8 (not 5.001n)
+   perl        5.002b1f (or higher) Tk-b9 (9.01 recommended)
+   perl        5.002b1f (or higher) Tk-b9.01
+   perl        5.002                Tk-b10
+   perl        5.002                Tk-b11
+   perl        5.002                Tk-b11.01
+   perl        5.002 (or 002_01)    Tk-b11.02
+ 
+   MakeMaker   4.18 (or higher)     Tk-b8
+   MakeMaker   5.14 (or higher)     Tk-b9.01 
+   MakeMaker   5.21 (not? higher)   Tk-b11+
+ 
+   xsubpp
+ 
+ Step - by - step the commands to build the Tk extension to Perl are (for the
+ dynamically linked version) roughly as follows: 
+ 
+  1. make install # the appropriate version of perl. 
+  2. uninstall # prior versions of the Tk extension to perl. 
+  3. gunzip -c Tk-b*.tar.gz | tar xvf - 
+  4. cd Tk-b* 
+  5. read INSTALL 
+  6. perl Makefile.PL 
+  7. make 
+  8. make test 
+  9. make install 
+ 
+ For the statically linked version you would `make tkperl` just after executing
+ the `make` step and before the `make test` step. A relatively easy way to
+ determine if the perl on your system allows for dynamic linking was mentioned by
+ Kenneth Albanowski <kjahds@kjahds.com>. If the following does not say 
+ "dl_none.xs" then you probably do not have dynamically linked perl (or perhaps
+ a very non-Unix perl): 
+ 
+     perl -e 'use Config; print $Config{dlsrc},"\n"'
+ 
+ Here is a little more detailed discussion of each the steps just given: 
+ 
+  o Install Perl (5.001m for Tk-b8 [not 5.001n], at least 5.002b1f for b9.01, 5.002
+    for b11.01, 5.002 for b11.02) For code locations see a CPAN site (separate
+    question in this FAQ), the actual installation instructions come bundled in
+    the perl***.tar.gz distribution file. (Perl Configure & make troubles are
+    beyond the scope of this FAQ - please see the Perl FAQ itself for more help
+    with this critical step.)
+    You can install perl almost anywhere you like by specifying the -Dprefix=
+    /path argument to sh Configure 
+  o Unpack perl/Tk outside the Perl distribution
+    (i.e. outside the perl build, perl install, or perl lib areas).
+    gunzip Tk-b*.tar.gz
+    tar -xvf Tk-b*.tar
+    (this area Tk-b*/ will be referred to as your ``Tk build'' directory)
+    (optional: with Tk-b9.01, to avert most pod2man errors later on you may
+    wish to apply Nick's document patch.) 
+  o Read INSTALL carefully
+    cd Tk-b*
+    pager INSTALL
+    where pager is the program you use to scroll through text files more or less.
+    Be sure to read it and don't just pound away on the spacebar. 
+  o If necessary remove any previously installed version of perl/Tk
+    If you had a previously working version of Tk installed, you may need to
+    resurrect the Makefile for it and execute:
+    make uninstall
+    make realclean
+    before you unpack the new version. (The uninstall target of MakeMaker is
+    relatively new so please be careful here.)
+    Also note that as of Tk-b10 there is now an uninstall perl script in the Tk
+    build directory. Run that script before the perl Makefile.PL step if you
+    had a previously installed Tk extension (especially if the version number was
+    prior to b10, e.g. Tk-b9.01 or Tk-b8). 
+  o Compile and test.
+    perl Makefile.PL
+    (see below for more on this step.)
+    make
+    (if and only if building static: make tkperl
+    make test (Tk-b10++ not prior versions)
+  o Install.
+    make install 
+  o Play with it.
+    basic_demo (modify #! line if nec., or specify /path/to/perl
+    ./basic_demo)
+    warning if you build Tk-b9.01 with perl5.002gamma then change the line in 
+    basic_demo from
+    use lib ./blib;
+    to
+    use lib qw(blib/arch blib/lib); 
+ 
+ On the perl Makefile.PL step it may be necessary to give explicit locations of
+ the required X11 libraries and/or include headers. For example: 
+ 
+     perl Makefile.PL X11=/usr/local/X11R5
+ 
+ or 
+ 
+     perl Makefile.PL X11INC=/usr/local/share/X11R5/include \
+                      X11LIB=/usr/local/arch/X11R5/lib
+ 
+ There are system and site dependencies in all of the above steps. However, the largest
+ single source of build trouble comes from not using the latest versions of the various
+ utilities (C compiler, make, etc.). In particular ensure that when you say perl
+ Makefile.PL that the perl that gets invoked is up to date - use which perl
+ and perl -v to determine this. If necessary specify the full path name to your perl5
+ interpreter/compiler. (Some people do not rm their older perl interpreters when
+ upgrading to a more recent version - beware.) 
+ 
+ If you still run into trouble take a look at the INSTALL, the README and the 
+ README file for your specific system (e.g. README.AIX, README.OSF, etc.). You
+ might also find your system mentioned in the ptk hyper-mail archive at: 
+ 
+     http://pubweb.bnl.gov/~ptk/
+ or
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/
+ or
+     ftp://ftp.ccd.bnl.gov/pub/ptk/archives/
+ 
+ or the Perl 5 Porters page at one of the following URLs: 
+ 
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/
+     http://www.hut.fi/~jhi/perl5-porters.html
+     http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/
+ 
+ If you wish to discuss your Tk build problems with others run and save the output
+ from the myConfig script in the Tk build directory (the output may already be in
+ the myConfig.out file from your Tk-b# build directory), as well as the 
+ myconfig script in your perl build directory. It is often helpful to include the output
+ of either (or both) of these scripts in your discussion. 
+ 
+ Presented here are the beginnings of a list of problems associated with building
+ Tk-b# on various platforms (for help building perl itself please refer to the Perl FAQ).
+ This list is in no way complete nor authoritative (nor is it necessarily even
+ up-to-date!) but simply lists problems people have reported. Keep in mind that your 
+ installation may differ (e.g. location differences such as /usr/bin/perl vs. 
+ /usr/local/bin/perl) even if its the same platform listed here: 
+ 
+ Platforms:
+ ==========
+ 
+ AIX: 
+    As of perl5.002b & Tk-b9.01 README.AIX says no patching is necessary. 
+ 
+    For Tk-b8: modifying the perl.exp file may be necessary. There is a patch
+    in Tk-b8/README.AIX. It may be necessary to make regen_headers
+    after the patch. 
+ HPUX: 
+    For Tk-b11: One person reports a need to add #define TIMEOFDAY_TZ
+    to the tkConfig.h header file in order to compile on HPUX 9.05. 
+ 
+    Previous versions: Most people seem to prefer the dynamic linking afforded by
+    a recent version of the gcc compiler on this system. 
+ Linux: 
+    John C. Wingenbach indicates that should you encounter an error message
+    like Cannot find -lX11 anywhere at ./myConfig line 184
+    when running your perl Makefile.PL (under Slakware 3.0) that you
+    should be more specific about -l/path/to/libX11.a.
+    Adam Wasserman <awasser@hermes.sgc.com> has graciously provided a
+    compilation of Linux compilation trials & tribulations. It is an (as yet
+    un-edited) document available at: 
+    http://w4.lns.cornell.edu/~pvhp/ptk/etc/linux_compile_compilation.txt
+ MachTen:
+    Mark Pease <pease@act.sps.mot.com> mentions that:
+    I was able to get Tk-b11.02 running under MachTen 2.2 perl5.002_01. I did
+    need to make one change to get a round a MachTen problem. In
+    pTk/tclUnix.h, pwd.h is included, but it is also included pTk/tkPort.h (which is
+    included in Lang.h, which is use by tclUnixUtil.c, whew!) 
+ 
+    MachTen's pwd.h can't be included more that once or you get an error. 
+ 
+    It looked to me like tclUnix.h was only used in tclUnixUtil.c, so I commented
+    out the #include <pwd.h> in tclUnix.h. 
+ NetBSD:
+    Jesus M. Gonzalez <jgb@gsyc.inf.uc3m.es> mentions success with:
+    "Tk-b11.01 compiles, installs and runs just out of the box in
+    NetBSD-1.1/i386. I just followed the INSTALL instructions" 
+ NeXTSTEP:
+    Gerd Knops recently posted a discussion of the steps to get perl running on
+    several NeXTSTEPs to p5p.
+ OSF/1: 
+    As of perl5.002b & Tk-b9.01 you will probably be able to follow the usual
+    instructions. John Stoffel <john@wpi.edu> reports that if you use gcc (rather
+    than cc) you should use at least version 2.7.2 
+ 
+    For Tk-b8: make is reputedly not up to the task on this system. 
+    Tk-b8/README.OSF recommends gmake instead.
+    Stephane Bortzmeyer <bortzmeyer@pasteur.fr> reports a successful build
+    with Perl 5.001m, xsubpp 1.922, MakeMaker 4.23. He points out that it was
+    necessary for him to upgrade the xsubpp and MakeMaker that he received
+    with his copy of Perl5.001m. 
+ SCO: 
+    For Tk-b8: Eric J. Bohm <bohm@cs.Buffalo.EDU> reported a need to
+    comment out line(s) from myConfig and GNUMakefiles using GNU
+    make 3.67. (See Tk-b8/README.SCO for specifics.) 
+ SGI (Irix): 
+    For Tk-b11.02: Phillip Moore <wpm@morgan.com> reports a clean build on
+    IRIX 5.3. 
+ 
+    Matthew Black <black@csulb.edu> recently mentioned a need to apply
+    "patchSG0000596" to get perl sockets to work. His message was copywritten
+    and is not included here. Send e-mail to him to find out where the get
+    "patchSG0000596". 
+ Suns: 
+    SunOS (BSD):
+    For Tk-b10 on SunOS 4.1.3_U1
+    using SparcWorks acc 3.0.1 Frederick L. Wagner <derf@ti.com> reports
+    needing to use the perl malloc rather than the system malloc() when building
+    perl.
+    For Tk-b8: Tom Tignor <tpt2@BBN.COM> reports the following on SunOS
+    (sun4m sparc): Tue, 28 Nov 1995 13:19:42
+    In trying to make, I got a "write: argument mismatch" error for the file
+    ptK/Lang.h. I looked at the file and found the offending function,
+    Tcl_GetOpenFile, which has a third argument called "doWrite" (not "write")
+    in tkGlue.c. I changed the argument from "write" to "doWrite" in Lang.h and
+    it's compiling fine (for the moment. :) 
+    Solaris (System V):
+    For Tk-b8: There is trouble getting perl to use Socket routines (i.e. trouble
+    with make perl itself not necessarily trouble with Tk-b#). See the perl FAQ
+    for more info or the .shar file that Tom Christiansen occasionally posts to 
+    comp.lang.perl.misc. Further information on perl inter process c
+    ommunication can be found in the perlipc* files at: 
+    ftp://ftp.perl.com/perl/info/everything_to_know/. 
+ SVR4: 
+    For Tk-b8: Martha G. Armour and Len Reed report on two separate
+    hardware platforms running SVR4 - extensive details in 
+    Tk-b8/README.SVR4. Interestingly, they report no trouble at all on Linux.
+ Ultrix:
+    Peter Prymmer reports that with Tk-b11 it was necessary to change the line
+    in Makefile.PL that reads:
+    'LIBS' => ["$xlib -lX11 -lpt -lsocket -lnsl -lm"],
+    to read:
+    'LIBS' => ["$xlib -lX11 -lpt -lsocket -lnsl -lm
+    -ldnet"],
+    because of a newer X11 in /usr/local that needed the DECnet protocol linking. 
+ 
+    John Stoffel reports a successful build of static Tk-b10 on Ultrix 4.5. 
+ 
+ non-Unix(ish)es:
+ ================
+ 
+ Information on non-Unix(ish) perl platforms may be obtained from the perl
+ metaFAQ (pmFAQ) at 
+ 
+    http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html
+ 
+ or the Perl 5 Porters (p5p) page at: 
+ 
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/
+     http://www.hut.fi/~jhi/perl5-porters.html
+     http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/
+ 
+ In general your non-Unix platform must be able to support perl 5 and Xlib (a C
+ compiler and a make utility are tremendously useful too). The long list of UNIX and 
+ non-unix perl 5 ports, Tcl/Tk ports, and Perl/Tk ports that used to appear here has
+ now moved to a separate web page at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkPORT.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 6. Where is the Documentation? 
+ 
+ Documentation is "in the works": there are several books dealing with perl/Tk in
+ progress, and a growing FAQ (the document you are presently reading). 
+ 
+ In the meantime the available information resources can be split into Perl/Tk, Perl,
+ and Tcl/Tk documentation categories: 
+ 
+ Perl/Tk Specific Documentation
+ ==============================
+ 
+ The man pages
+ -------------
+ 
+ As of Tk-b9.01 the various perl/Tk pod documents are converted to roff format and
+ installed as part of the perl/Tk "make install" process. If you have a recent
+ verion of perl/Tk try something like man 3 Tk::Tk if this does not work check
+ with you system administrator for the proper MANPATH. (Tk-b9.01 people may be
+ interested in applying Nick's document patch to keep pod2man from complaining
+ too much during make install.) 
+ 
+ The newsgroup
+ -------------
+ 
+ The newsgroup name is comp.lang.perl.tk and this FAQ will be periodically posted to
+ that group. The newsgroup is the appropriate place to post questions - yes even
+ simple ones! (Although answers may be long in coming ... :-( 
+ 
+ The nTk/pTk mailing list
+ ------------------------
+ 
+ The mailing list is a supplement and a complement to the newsgroup 
+ comp.lang.perl.tk. All messages mailed to the list are forwarded to the newsgroup.
+ The nTk/pTk Mailing List Archive remains a useful source of information however,
+ and is accesible at either http://pubweb.bnl.gov/~ptk/, or via ftp at 
+ ftp://ftp.ccd.bnl.gov/pub/ptk/archives/ (both in the USA). You may search the
+ contents of the mailing list archives thanks to a cgi-bin script written by Achim
+ Bohnet in Germany at: 
+ 
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/
+ 
+ To subscribe to the mailing list you can send mail to majordomo@lists.stanford.edu (
+ i.e. <majordomo@lists.stanford.edu>) with the following command in the body of
+ your e-mail message: 
+ 
+     subscribe ptk joe.user@somewhere (Joe D. User)
+ 
+ To send a message to all recipients of the mailing list send e-mail to 
+ <ptk@lists.stanford.edu>. 
+ 
+ To remove yourself from the mailing list send mail to majordomo@lists.stanford.edu
+ (i.e. <majordomo@lists.stanford.edu>) with the following command in the body of
+ your e-mail message: 
+ 
+     unsubscribe ptk joe.user@somewhere (Joe D. User)
+ 
+ The demo programs
+ -----------------
+ 
+ Examine (and try running) the code in your Tk-b#/, perl5/Tk/demos/, and 
+ perl5/Tk/demos/widget_lib/ directories.
+ In order to determine where on your system the perl5/ directory is located type the
+ following one-line perl command (at your shell prompt - this is not a line from a perl
+ script): 
+ 
+     perl -e 'print join("\n",@INC),"\n";'
+ 
+ If that command does not turn up a perl5/ directory then make sure that you are
+ running perl 5 with the following: perl -v (again this can be entered at the shell
+ prompt). 
+ 
+ The pod documentation
+ ---------------------
+ 
+ As of Tk-b9.01 the various perl/Tk pod documents are converted to roff format and
+ installed as part of the perl/Tk installation process. If you have a recent verion of
+ perl/Tk try something like man 3 Tk::Tk. If this does not work check your man
+ path with 
+ 
+     perl -e 'use Config; print $Config{'man1dir'},"\n",$Config{'man3dir'},"\n"'
+ 
+ And if you still cannot find the manual pages check with your system administrator
+ for the proper MANPATH and/or Tk-# installation version. 
+ 
+ In your perl5/Tk/ directory there should be a number of .pod files including (but
+ not limited to) UserGuide.pod. The files are examples of the perl "plain old
+ documentation" format and are just about human readable as they are (e.g. you may 
+ more, cat, or less them; or send them to a printer). They are intended to be run
+ through a re-formatting program however. Such programs include pod2man, 
+ pod2html, and pod2latex (which get installed when you install perl) or 
+ pod2text which was written by Tom Christiansen. A command line like the
+ following (but subject to local variations) should work for you: 
+ 
+     pod2man perl5/Tk/UserGuide.pod | nroff -man | more
+ 
+ There should even be a perl script to run the above command for you. It is executed
+ as: 
+ 
+     perldoc perl5/Tk/UserGuide
+ 
+ Note that if there is pod like documentation in a perl module you may also execute 
+ perldoc on it as in: 
+ 
+     perldoc ColorEditor.pm
+ 
+ (please note that not all .pm mod files have pod embedded.) If you want that GUI
+ look and feel (like xman) make the appropriate changes to the following script: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     use Tk::Pod;
+     my $m = new MainWindow;
+     $m -> Pod(-file => 'Tk/ColorEditor.pm');
+     MainLoop;
+ 
+ Or better still use the tkpod program that gets installed when you 'make install'
+ Tk. It can be used like this: 
+ 
+     tkpod /usr/local/lib/perl5/pod/perl
+ 
+ The pod conversion to latex proceeds as you might guess, namely: 
+ 
+     pod2latex UserGuide.pod 
+ 
+ (according to the 1.1 version of pod2latex this will automatically generate a 
+ UserGuide.tex file hence you must have write access to the directory in which
+ the above command is carried out.) 
+ 
+ You may also convert the pod pages to HTML (the HyperText Markup Language of
+ World Wide Web documents). For example, command lines like the following (but
+ subject to local variations - is your web_browser configured to allow local access to a
+ file? - if not do this on a web-serving machine) should work for you: 
+ 
+     pod2html perl5/Tk/UserGuide.pod > UserGuide.html
+     web_browser_invocation UserGuide.html
+ 
+ In addition there is, on an experimental basis, a place to view the Tk-b9.01 
+ .pod->.html files from the perl5/Tk directory at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/pod/
+ 
+ (Please note that the perl pod specification does not allow for markup within a
+ verbatim paragraph - yet font changes often seem to be in either the
+ <XMP></XMP> or the <PRE></PRE> HTML environments generated by running
+ many of these .pod files through the latest version of pod2html. Alert browsers
+ are welcome to notify me of any errors in the hand-altered html files.) 
+ 
+ Translators pod2texinfo, pod2fm, etc., also exist. Check a CPAN site for these
+ scripts if you do not already have them. 
+ 
+ Newer versions: In your Tk-b10++/doc directory there should be a number of 
+ .htm files. These were originally Tcl/Tk man pages, but have been converted to Perl
+ syntax in html format. 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/doc/
+ 
+ Older versions: In your Tk-b#/doc directory there should be a number of .ht
+ files. These are conversions of Tcl/Tk man pages to html. (If you wish to browse them
+ at your own site you may wish to look at Mark Elston's cvtht script, or configure your
+ web-server/browser to recognize the .ht extension as a text/html mime.type.) The 
+ .ht are helpful to the perl/Tk programmer trying to remember the name of an
+ optional argument to pass to a given widget primitive. Note that insofar as these pages
+ do specify syntax it pertains to Tcl/Tk not perl/Tk, hence they must be translated.
+ The pages are on the web at: 
+ 
+     http://pubweb.bnl.gov/~ptk/doc/index.html
+     http://w4.lns.cornell.edu/~pvhp/ptk/b9.01-docnpod/doc/
+ 
+ A miscellany of internet perl/Tk resources includes: 
+ 
+ World Wide Web - perl/Tk man pages
+     http://pubweb.bnl.gov/~ptk/doc/index.html
+     http://w4.lns.cornell.edu/~pvhp/ptk/doc/
+     http://w4.lns.cornell.edu/~pvhp/ptk/pod/
+ Newsgroups
+     comp.lang.perl.tk
+     comp.lang.perl.misc
+     comp.lang.perl.anounce
+     comp.lang.tcl
+     comp.lang.tcl.announce
+     comp.answers
+     news.answers
+ Perl/Tk FAQ-Archives (ftp sites) [Note: FAQ may be many separate files]
+  (see also CPAN sites)
+     ftp://rtfm.mit.edu/pub/usenet/comp.lang.perl.tk
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/lang/perl/tk
+     ftp://ftp.uu.net/usenet/news.answers/perl-faq/ptk-faq
+     ftp://ftp.ccd.bnl.gov/pub/ptk/                   130.199.54.188
+     ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt         130.199.54.188
+     ftp://ftp.wpi.edu/perl5/pTk-FAQ                  130.215.24.209
+     ftp://perl.com/pub/perl/doc/ptkFAQ.gz            199.45.129.30
+     ftp://perl.com/pub/perl/doc/ptkFAQ.ps.gz         199.45.129.30
+ WWW-FAQ for perl/Tk
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ World Wide Web - perl/Tk info sites
+     http://pubweb.bnl.gov/~ptk/
+     http://fxfx.com/kgr/compound/ (Perl Tk Compound Widget Page)
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html (FAQ image supplement)
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/
+     http://w4.lns.cornell.edu/~pvhp/ptk/misc/
+     http://w4.lns.cornell.edu/~pvhp/ptk/PNMTYAK/
+     http://www.mirai.com/wks/
+ The Mailing list
+     majordomo@lists.stanford.edu 
+     ptk@lists.stanford.edu 
+ 
+ Perl Specific Documentation
+ ===========================
+ 
+ There are a growing number Perl books available. A more complete
+ Perl-bibliographic discussion than that given here is available in the Perl FAQ at: 
+ 
+     http://www.perl.com/perl/faq/Q2.2.html
+ 
+ The two early Perl books by Schwartz and Wall are very helpful (even if they do
+ pertain to perl 4 and not 5. Beware that perl/Tk makes extensive use of perl 5
+ features.): 
+ 
+  Learning Perl (The Llama)
+  Randal L. Schwartz
+  Copyright (c) 1993 O'Reilly & Associates Inc.
+  ISBN 1-56592-042-2 (English)
+  ISBN 2-84177-005-2 (French)
+  ISBN 3-930673-08-8 (German)
+  ISBN 4-89502-678-1 (Japanese)
+ 
+  Programming Perl (The Camel)
+  Larry Wall and Randal L. Schwartz
+  Copyright (c) 1991 O'Reilly & Associates Inc.
+  ISBN 0-937175-64-1 (English)
+  ISBN 3-446-17257-2 (German) (Programmieren in Perl, translator: Hanser
+  Verlag)
+  ISBN 4-89052-384-7 (Japanese)
+ 
+ For Perl 5 there will be an update to the Camel ("Learning More Perl"? the Alpaca?)
+ in preparation by Randal L. Schwartz, Tom Christiansen, Larry Wall, and Stephen
+ Potter, with a draft due at O'Reilly by the end of April 1996. There is some Perl5
+ (book material) information at: 
+ 
+     http://www.metronet.com/1h/perlinfo/perl5/
+ 
+ Jon Orwant (the organizer of the comp.lang.perl.tk newgroup) will have a book on
+ Perl 5 out in January 1996. (Please note that it is mostly about Perl 5, there is a some
+ discussion of four simple Perl/Tk programs, but it is not a book wholly devoted to
+ Perl/Tk.) The relevant info: 
+ 
+  Perl 5 Interactive
+  Jon Orwant
+  The Waite Group Press
+  ISBN: 1-57169-064-6
+ 
+ The perl 5 Quick Reference Guide (may require LaTeX for installation) can be
+ obtained from any CPAN ftp site. Detailed location information is also available at
+ the author's website: 
+ 
+     http://www.xs4all.nl/~jvromans/perlref.html
+ 
+ The quick reference guide has been turned into a small Nutshell handbook: 
+ 
+  Perl 5 Desktop Reference
+  Johan Vromans
+  Copyright (c) February 1996 O'Reilly & Associates Inc.
+  ISBN: 1-56592-187-9; Order number: 1879
+ 
+ Additional book information may be found at Tom Christiansen's perl & cgi books
+ page. The multi-part perl 5 man pages are available (assuming they have been
+ installed in your MANPATH, type man perl, man perlmod etc.). 
+ 
+ The perl man pages are also available on the web at a number of locations including: 
+ 
+ World Wide Web - perl 5.001m man pages 
+  (the 5.002 pages [listed below] are more useful though)
+   Australia
+     http://www.cs.mu.oz.au/~slf/perl5/perl.html
+     http://bwyan.anu.edu.au/perl.html
+   Austria
+     http://www.cosy.sbg.ac.at/comp/lang/perl/perl5man/perl.html
+   Brazil
+     http://www.lsi.usp.br/perl5/
+   Canada
+     http://csclub.uwaterloo.ca/perldoc/perl.html
+     http://stoner.eps.mcgill.ca/perl/perl.html
+   Germany
+     http://www.t-informatik.ba-stuttgart.de/Perl5/perl.html
+     http://www.dfv.rwth-aachen.de/doc/perl/perl.html
+   Norway
+     http://www.pvv.unit.no/sw/perl5/index.html
+   Slovak Republic
+     http://www.savba.sk/autori/perl/perl.html
+   Slovenia
+     http://www.ijs.si/perl/
+   Taiwan
+     http://www.ccu.edu.tw/perl5/index.html
+   UK
+     http://www.cs.man.ac.uk/~richardd/perl5/perl.html
+     http://ppewww.ph.gla.ac.uk/perl/perl.html
+   USA
+     http://rhine.ece.utexas.edu/~kschu/perlman.html
+     http://duggy.extern.ucsd.edu/perl/perl.html
+     http://tbone.biol.scarolina.edu/~dean/perl/perl.html
+     http://www.mit.edu:8001/perl/perl.html
+     http://icg.stwing.upenn.edu/perl5/perl.html
+     http://w4.lns.cornell.edu/public/compdoc/info/perl/perl.html
+ 
+ World Wide Web - perl 5.002 man pages 
+  (also very useful for previous versions of perl 5)
+   Canada
+     http://dymaxion.ns.ca/www/dv/perl_manual/index.html
+     http://wepil.uwaterloo.ca/~mathers/perl/perl.html
+   Czech Republic
+     http://infog.eunet.cz/~muaddib/perl5/index.html
+   Finland
+     http://www.hut.fi/~jhi/perl5/index.html
+   Germany
+     http://nat-www.uia.ac.be/perl/perl.html
+   Netherlands
+     http://www.cs.ruu.nl/pub/mirrors/CPAN/doc/manual/html/frame_index_long.html
+   USA
+     http://www.metronet.com/0/perlinfo/perl5/manual/perl.html
+     http://www.lafayette.edu/doughera/doughera/perl/manual/perl.html
+     http://www.va.pubnix.com/staff/stripes/perlinfo/
+     http://www.perl.com/perl/manual/
+     http://128.84.219.39/public/perl/manual/
+     http://www.ilap.com/perl/
+     http://saturn.lbcc.cc.or.us/www_root/docs/perl5/PERL.HTML
+ 
+ In addition to the CPAN ftp source sites, a miscellany of internet perl resources
+ includes: 
+ 
+ Newsgroups
+     comp.lang.perl.misc
+     comp.lang.perl.announce
+     comp.lang.perl.modules
+     comp.infosystems.www.authoring.cgi
+     comp.answers
+     news.answers
+ Perl FAQ-Archives (ftp sites) [Note: FAQ may be many separate files]
+     (see also the CPAN sites)
+   North America
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/
+     ftp://ftp.uu.net/usenet/news.answers/perl-faq  192.48.96.9
+     ftp://ftp.khoros.unm.edu/pub/perl/faq.gz       198.59.155.28
+   Europe 
+     ftp://ftp.cs.ruu.nl/pub/NEWS.ANSWERS/perl-faq/ 131.211.80.17
+     ftp://src.doc.ic.ac.uk/packages/perl/FAQ       146.169.2.10
+ Gopher Perl FAQ 
+     gopher://gopher.metronet.com/11/perlinfo/faq
+ WWW-FAQ for Perl
+     http://www.perl.com/perl/faq/
+     http://www.smartpages.com/bngfaqs/comp/lang/perl/top.html
+     http://www.smartpages.com/bngfaqs/comp/lang/perl/misc/top.html
+     http://www.smartpages.com/bngfaqs/comp/lang/perl/announce/top.html
+     http://www.cis.ohio-state.edu/hypertext/faq/usenet/perl-faq/top.html
+ Perl for Win32 FAQ  (discusses Win95)
+     http://www.perl.hip.com/PerlFaq.htm
+ 
+ Perl info sites
+ Gopher (gopher:70)
+   USA
+     gopher://gopher.metronet.com/11h/perlinfo
+ World Wide Web (http:80)
+   USA
+     http://www.yahoo.com/Computers_and_Internet/Languages/Perl/index.html
+     http://www.perl.com/
+     http://www.khoros.unm.edu/staff/neilb/perl/home.html
+     http://www.khoros.unm.edu:80/staff/neilb/perl/metaFAQ/
+     http://www.metronet.com/perlinfo/
+     http://www.metronet.com/perlinfo/perl5.html (Perl 5)
+     http://www.eecs.nwu.edu/perl/perl.html
+     http://128.84.219.39/public/perl/
+     http://www.virtualschool.edu/mon/Perl.html
+     http://www.hermetica.com/technologia/unexec/
+     http://www.oac.uci.edu/indiv/ehood/perlWWW/
+     http://web.sau.edu/~mkruse/www/scripts/
+     http://orwant.www.media.mit.edu/the_perl_journal/
+     http://www.perl.com/Architext/AT-allperl.html
+     http://www.mispress.com/introcgi/
+     http://www.walrus.com/~smithj/webcan/
+     http://web.syr.edu/~chsiao05/cps600_project.html
+     http://www.iftech.com/classes/webdev/webdev_perl.htm
+     http://www.cc.iastate.edu/perlmenu/
+   UK
+     http://pubweb.nexor.co.uk/public/perl/perl.html
+     http://www.bio.cam.ac.uk/web/form.html
+ Web references to Perl mailing lists
+     http://www.perl.com/perl/info/mailing-lists.html
+     http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/
+     http://www.hut.fi/~jhi/perl5-porters.html
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/
+ 
+ Tcl/Tk Specific Documentation
+ =============================
+ 
+ The two Tcl/Tk books by Ousterhout and Welch are very good starting points (you
+ must however, translate the tcl-isms to perl in the sample scripts): 
+ 
+  Tcl and the Tk Toolkit
+  John K. Ousterhout
+  Copyright (c) 1994 Addison-Wesley Publishing Company
+  ISBN 0-201-63337-X (alk. paper)
+  LOC QA76.73.T44097 1994; 005.13'3--dc20
+ 
+  Practical Programming in Tcl and Tk
+  Brent Welch
+  Copyright (c) 1995 Prentice Hall
+  ISBN 0-13-182007-9 
+ 
+ Within the tclsh or wish shells your manpath includes the tcl/tk man pages
+ (which may not be in your login manpath). Thus from the % prompt within either
+ shell type commands like: 
+ 
+     % man -k Tk
+ 
+ The Tcl/Tk Reference Guide is also a source of useful information. Although it's Tcl
+ specific most perl/Tk commands can be, more or less, easily derived from it. [As of
+ Tk-b9.01 the names of some functions and some configuration options have changed
+ slightly from their Tcl/Tk counterparts. With Tk-b9.01 (and higher) a great many
+ functions start with an upper case letter and continue with all lower case letters (e.g.
+ there is a perl/Tk Entry widget but no entry widget), and many configuration
+ options are all lower case (e.g. there is a perl/Tk highlightthickness option but
+ no highlightThickness option).] You may fetch the Tcl/Tk Reference Guide
+ (may require LaTeX for installation) from: 
+ 
+     ftp://ftp.slac.stanford.edu/software/TkMail/tkref-4.0.1.tar.gz 134.79.18.30
+     ftp://ftp.aud.alcatel.com/tcl/docs/tkref-4.0.1.tar.gz          198.64.191.10
+ 
+ There are a number of other Tcl/Tk resources on the internet including: 
+ 
+ Newsgroups
+     comp.lang.tcl
+     comp.lang.tcl.announce
+     comp.infosystems.www.authoring.cgi
+     comp.answers
+     news.answers
+ FAQ-Archive (ftp) [Note: Tcl FAQ may be many files, Tk FAQ is one file]
+     ftp://ftp.aud.alcatel.com/tcl/docs/                            198.64.191.10
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq/tk
+ WWW-FAQ for Tcl/Tk
+     http://www.smartpages.com/faqs/tcl-faq/top.html
+     http://www.smartpages.com/bngfaqs/comp/lang/tcl/top.html
+     http://www.cis.ohio-state.edu/hypertext/faq/usenet/tcl-faq/top.html
+     http://www.cis.ohio-state.edu/hypertext/faq/bngusenet/comp/lang/tcl/top.html
+     http://www.sco.com/Technology/tcl/Tcl.html
+ World Wide Web - Tcl/Tk info sites
+   Canada
+     http://web.cs.ualberta.ca/~wade/Auto/Tcl.html
+   UK
+     http://http2.brunel.ac.uk:8080/~csstddm/TCL2/TCL2.html
+     http://www.cis.rl.ac.uk/proj/TclTk/
+   USA
+     http://www.yahoo.com/Computers_and_Internet/Languages/Tcl_Tk/index.html
+     http://www.sunlabs.com/research/tcl/docs.html
+     http://www.sunlabs.com/research/tcl/4.0.html
+     http://www.sco.com/Technology/tcl/Tcl.html
+     http://www.neosoft.com/tcl/
+     http://www.elf.org/tcltk-man-html/contents.html
+ Tcl/Tk - miscellaneous extensions
+     ftp://ftp.cme.nist.gov/pub/expect/
+     http://www.cs.hut.fi/~kjk/porttk.html
+     http://www.cis.upenn.edu/~ioi/tix/tix.html
+     http://www.ece.cmu.edu/afs/ece/usr/svoboda/www/th/homepage.html
+     http://www.tcltk.com/ [incr Tcl]
+     http://www.neosoft.com/tcl/TclX.html
+     http://www.eolas.com/eolas/webrouse/tcl.htm [WebWish]
+     http://www.se.cuhk.hk/~hkng2/big5tk/big5tk.html
+     http://www.cs.uoregon.edu/~jhobbs/work/ [BLT etc.]
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 7. How do I write scripts in perl/Tk? 
+ 
+ Start your script as you would any perl script (e.g. #!/usr/bin/perl, 
+ #!/usr/local/bin/perl, #!/opt/bin/perl, [built static? then 
+ #!/usr/bin/tkperl], whatever, see the perlrun(1) man page for more
+ information).
+ Throwing the -w warning switch is recommended.
+ The use of the statement use strict; is recommended.
+ Use of the statement use Tk; is required.
+ 
+ A simple "Hello World!" widget script could be written as follows: 
+ 
+     #!/usr/local/bin/perl -w
+ 
+     use strict;
+     use Tk;
+ 
+     my $main = new MainWindow;
+     $main->Label(-text => 'Hello World!'
+                  )->pack;
+     $main->Button(-text => 'Quit',
+                   -command => sub{exit}
+                   )->pack;
+     MainLoop;
+ 
+ The MainLoop; statement is the main widget event handler loop and is usually
+ found in perl/Tk scripts (usually near the end of the main procedure after the widgets
+ have been declared and packed). MainLoop; is actually a function call and you
+ may see it written as MainLoop();, &Tk::MainLoop;, &Tk::MainLoop();, 
+ etc. 
+ 
+ Note the use of the -> infix dereference operator. Most things in calls to perl/Tk
+ routines are passed by reference. 
+ 
+ Note also the use of the => operator which is simply a synonym for the comma
+ operator (well it is a bit more than that :-). In other words, the arguments that get
+ passed to Label and Button in the above example are good old perl associative
+ arrays (perl 5 people prefer to call them "hashes" however). Indeed, we might have
+ written the above as: 
+ 
+     #!/usr/local/bin/perl -w
+ 
+     use strict;
+     use Tk;
+ 
+     my $main = new MainWindow;
+     $main->Label(-text , 'Hello World!'
+                  )->pack;
+     $main->Button(-text , 'Quit',
+                   -command , sub{exit}
+                   )->pack;
+     MainLoop;
+ 
+ Or even as: 
+ 
+     #!/usr/local/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+ 
+     my %hello = ('-text','Hello World!');
+     my %quit_com = ('-text' => 'Quit', '-command' => sub{exit});
+ 
+     $main->Label(%hello)->pack;
+     $main->Button(%quit_com)->pack;
+     MainLoop;
+ 
+ Note however, that the use of the => in the first method of writing this script makes
+ it look more "Tcl-ish" :-). 
+ 
+ Lastly, we note the extensive use of the my function in most perl/Tk programs. my is
+ roughly equivalent to local in Perl 4 - but is purported to be "faster and safer" as
+ well as much more strictly local in scope. See perlfunc(1) manpage for more
+ information on my. 
+ 
+ Other examples of code may be found in the perl5/Tk/demos/ directory and in 
+ perl5/Tk/demos/widget_lib/. 
+ 
+ (A variant on this scipt called hello is available in the file 
+ perl5/Tk/demos/hello in your own pTk distribution. Also, Source code for 
+ this and other examples from UserGuide.pod may be found at 
+ http://w4.lns.cornell.edu/~pvhp/ptk/pod/. To load code from the web save as a local 
+ filename, edit the first line to point to your perl interpreter, then: chmod u+x 
+ filename, then execute: filename.) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 8. What widget types are available under perl/Tk? 
+ 
+ The following Tk widget primitives are available under perl/Tk: 
+ 
+  o Button 
+  o Canvas 
+  o Checkbutton 
+  o Entry 
+  o Frame 
+  o Label 
+  o Listbox 
+  o Menu 
+  o Menubutton 
+  o Message 
+  o Radiobutton 
+  o Scale 
+  o Scrollbar 
+  o Text 
+  o Toplevel 
+ 
+ The following are Tix widget primitives available under perl/Tk: 
+ 
+  o HList 
+  o InputOnly 
+ 
+ There are (a lot of) other compound/composite/constructs available too. 
+ 
+ A good introduction to the primitives and how they may be used in conjunction with
+ each other may be found in the widget demo script. Note that all the widget demos
+ have a "Show Code" button. To help figure out what is happening in the script you
+ may, when the window appears, edit the text and instrument the code with print
+ statements and then simply press "Rerun Demo". Another place to see examples of
+ the primitives (on the web) is at the image supplement to this FAQ at the following
+ URL: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ 

@@ -1,0 +1,7 @@
+# $Id: TODO,v 1.6 2007/04/17 19:51:15 creile Exp $
+
+* update of documentation
+* problem with sending commands unrecognized by UPS (echo back)
+* rcfile ?
+* improvement of tests
+

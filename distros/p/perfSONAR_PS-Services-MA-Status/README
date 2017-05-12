@@ -1,0 +1,29 @@
+perfSONAR_PS::Services::MA::Status README File
+==============================================
+
+Description
+-----------
+
+The perfSONAR_PS::Services::MA::Status module allows one to make link status
+data available.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Services::MA::Status'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

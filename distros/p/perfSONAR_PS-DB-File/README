@@ -1,0 +1,29 @@
+perfSONAR_PS::DB::File README File
+==================================
+
+Description
+-----------
+
+perfSONAR_PS::DB::File is a module that provides a perfSONAR_PS::DB interface
+to an XML file.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::DB::File'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

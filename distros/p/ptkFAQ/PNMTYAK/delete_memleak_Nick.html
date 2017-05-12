@@ -1,0 +1,121 @@
+<H2>[PREV]  <A HREF="199605161452.JAA15245@coriolan.amicus.com">[NEXT]</A>  <A HREF="009A265E.EAC2CED2@lns62.lns.cornell.edu">[PREV Thread]</A>  <A HREF="319B50C3.41C67EA6@cs.man.ac.uk">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> nik@tiuk.ti.com (Nick Ing-Simmons)
+</ADDRESS>
+<TITLE> Re: b11.02 mem leak</TITLE>
+<ADDRESS><H1> Re: b11.02 mem leak</H1>
+</ADDRESS>
+<ADDRESS> 16 May 96 13:28:56 GMT
+ via, but not speaking for : Texas Instruments Ltd.
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<199605161300.JAA18685@Turkey.CC.Lehigh.EDU"><199605161300.JAA18685@Turkey.CC.Lehigh.EDU></A>
+</DL>
+<HR>
+<PRE>Stephen O Lidie <lusol@Turkey.CC.Lehigh.EDU> writes:
+&gt;Nick, Felix found a leak that indeed will crash your machine very rapidly (-;
+&gt;Felix, Nick normally reads only the pTk list, that's why I'm forwarding your
+&gt;problem.
+
+Like C code: 
+
+int main()
+{
+ int i;
+ for (i-0; i &lt; 50000; i++)
+  {
+   char *p = malloc(1024);
+  }
+}
+
+That leaks as there is no free().
+
+&gt;
+&gt;
+&gt;# WARNING: LEAKS MEMORY LIKE A SIEVE!  DON'T LET IT RUN AWAY!
+&gt;use Tk;
+&gt;use Tk::Pixmap;
+&gt;$fish = MainWindow-&gt;new();
+&gt;for ($i = 0; $i &lt; 50000; $i++) {
+&gt;    $blah = $fish-&gt;Pixmap(-file =&gt; 'thing.xpm');
+&gt;}
+
+That leaks for same reason  - no -&gt;delete
+
+
+This also "leaks"
+
+use Tk;
+$fish = MainWindow-&gt;new();
+for ($i = 0; $i &lt; 10; $i++) 
+{
+ $blah = $fish-&gt;Button(-text =&gt; 'button$i'');
+ $blah-&gt;pack;
+}
+
+No -&gt;destroy.
+
+But, you would not want all buttons deleted from screen
+as soon as $blah went out of scope.
+Likewise the "images" you have created above are still accessible via 
+(auto-generated) names: 
+
+#!/usr/local/bin/perl -w
+use Tk;
+use Tk::Pixmap;
+$fish = MainWindow-&gt;new();
+for ($i = 0; $i &lt; 10; $i++) {
+    $blah = $fish-&gt;Bitmap(-file =&gt; Tk-&gt;findINC('Tk.xbm'));
+}
+
+foreach $name ($fish-&gt;imageNames)
+ {
+  print "Have $name\n";
+ }
+
+__END__
+
+
+All Tk "objects" have to be destroyed (deleted) explicitly.
+There are non-user references to the objects from the MainWindow
+which needs to know its sub-objects (so it can delete them when it is
+destroyed...) - so you need to use -&gt;delete
+to break these references before perl structures will get disposed.
+
+&gt;
+&gt;I would expect this program not to grow in memory, but it apparently
+&gt;doesn't properly destruct the Pixmaps as they lose their 'last reference'
+&gt;(as $blah gets assigned to something new), so it grows and grows.
+&gt;
+&gt;I'm writing an application which aims to stay running forever and
+&gt;might get new pixmaps to display every so often.  However, I can
+&gt;find no way to destroy old Pixmap objects and reclaim their memory,
+&gt;which would obviously be bad.
+
+
+&gt;
+&gt;Any thoughts?
+
+To destroy image you need to : 
+
+1. Make sure no widget has it in use as a -image ...
+2. $image-&gt;delete;
+3. Get perl refcount to 0 - i.e. variables out of scope
+   deleted from hashes/arrays etc.
+
+
+
+
+==========================================================================
+This message was posted through the Stanford campus mailing list
+server.  If you wish to unsubscribe from this mailing list, send the
+message body of "unsubscribe ptk" to majordomo@lists.stanford.edu
+
+-- 
+This article was gatewayed from the ptk@lists.stanford.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: Majordomo@lists.Stanford.EDU
+</PRE>
+<HR><H2>[PREV]  <A HREF="199605161452.JAA15245@coriolan.amicus.com">[NEXT]</A>  <A HREF="009A265E.EAC2CED2@lns62.lns.cornell.edu">[PREV Thread]</A>  <A HREF="319B50C3.41C67EA6@cs.man.ac.uk">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

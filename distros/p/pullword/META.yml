@@ -1,0 +1,25 @@
+---
+abstract: 'The perl agent for Pullword(a online Chinese segmentation System) api!'
+author:
+  - 'ORANGE <bollwarm@ijz.me>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: pullword
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.11'
+  perl: '5.006'
+resources:
+  repository: https://git.oschina.net/ijz/pullword
+version: '0.02'

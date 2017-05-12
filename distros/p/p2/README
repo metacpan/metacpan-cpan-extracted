@@ -1,0 +1,26 @@
+NAME
+    p2 - activate p2 extensions
+
+SYNOPSIS
+      use p2;
+      # use extended p2 features and syntax, not found in p5p perl
+
+DESCRIPTION
+    use p2 is used to enable extensions for the experimental p2 perl5
+    implementation.
+
+    It needs to fail on p5p perl currently, but it would be fantastic if
+    these extensions can be used with p5p perl also someday.
+
+    See <http://perl11.org/p2/>
+
+AUTHOR
+    Reini Urban, <rurban@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by perl11.org
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14 or, at
+    your option, any later version of Perl 5 you may have available.
+

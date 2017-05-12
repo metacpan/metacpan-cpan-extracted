@@ -1,0 +1,85 @@
+	    <!-- \$RCSfile\$\$Revision\$\$Date\$ -->
+	    <!-- \$Log\$ -->
+	    <HTML>
+	    <TITLE>DIAL.PM</TITLE>
+<p><hr>
+
+<H1> 
+<A NAME="Dial.pm_name_0">
+NAME</A>
+</H1>
+
+Dial - an alternative to the scale widget
+<p><p><hr>
+
+<H1> 
+<A NAME="Dial.pm_synopsis_0">
+SYNOPSIS</A>
+</H1>
+
+ use Tk::Dial;
+<p>
+<XMP>
+ $dial = $top->Dial(-margin =>  20,
+                    -radius =>  48,
+                    -min    =>   0,
+                    -max    => 100,
+                    -value  =>   0,
+                    -format => '%d');
+ margin - blank space to leave around dial
+ radius - radius of dial
+ min, max - range of possible values
+ value  - current value
+ format - printf-style format for displaying format
+
+</XMP>
+<p>Values shown above are defaults.
+<p><p><hr>
+
+<H1> 
+<A NAME="Dial.pm_description_0">
+DESCRIPTION</A>
+</H1>
+
+A dial looks like a speedometer: a 3/4 circle with a needle indicating
+the current value.  Below the graphical dial is an entry that displays
+the current value, and which can be used to enter a value by hand.
+<p>The needle is moved by pressing button 1 in the canvas and dragging. The
+needle will follow the mouse, even if the mouse leaves the canvas, which
+allows for high precision. Alternatively, the user can enter a value in
+the entry space and press Return to set the value; the needle will be
+set accordingly.
+<p><p><hr>
+
+<H1> 
+<A NAME="Dial.pm_to_0">
+TO DO</A>
+</H1>
+
+ Configure
+ Tick marks
+ Step size
+<p><p><hr>
+
+<H1> 
+<A NAME="Dial.pm_authors_0">
+AUTHORS</A>
+</H1>
+
+Roy Johnson, rjohnson<STRONG>@shell</STRONG>.com
+<p>Based on a similar widget in XV, a program by John Bradley,
+bradley<STRONG>@cis</STRONG>.upenn.edu
+<p><p><hr>
+
+<H1> 
+<A NAME="Dial.pm_history_0">
+HISTORY </A>
+</H1>
+
+<XMP>
+ 
+August 1995: Released for critique by pTk mailing list
+
+</XMP>
+<p>
+</HTML>

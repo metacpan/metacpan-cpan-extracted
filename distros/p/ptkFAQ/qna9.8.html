@@ -1,0 +1,51 @@
+<HTML>
+<HEAD><TITLE> 9.8. How do I display a bitmap?</TITLE></HEAD>
+<BODY><a name="A9.8"> 9.8. How do I display a bitmap?</a>
+
+<hr>
+</p><p>
+You can display X bitmaps on your widgets with the <KBD>-bitmap</KBD>
+configuration option.  Typically <KBD>-bitmap</KBD>s are configured 
+into <KBD>Label</KBD>, <KBD>Frame</KBD>, 
+<KBD>Button</KBD>, <i>etc.</i> widgets (<KBD>Canvas</KBD> widgets are another 
+story however <a href="qna10.1.html">see question [10.1] below</a>). 
+In order to emphasize the bitmap option itself let us assume we were 
+specifying a bitmap for a <KBD>Label</KBD> with a call like:
+<PRE>
+    $main-&gt;Label(-bitmap =&gt; '<i>bitmap-name</i>')-&gt;pack;
+</PRE>
+Where <KBD><i>bitmap-name</i></KBD> could be any of the built in Tk bitmaps:
+<KBD>error</KBD>, <KBD>gray25</KBD>, <KBD>gray50</KBD>, <KBD>hourglass</KBD>, 
+<KBD>info</KBD>, <KBD>question</KBD>, <KBD>questhead</KBD>, 
+<KBD>warning</KBD> (see the <KBD>widget</KBD> demo for a full list).
+<p>
+In order to use some of the bitmaps in the <KBD>perl5/Tk/demos/images/</KBD>
+directory you would specify a fuller path name like:
+<PRE>
+    $main-&gt;Label(-bitmap =&gt; "\@$tk_library/demos/images/face")-&gt;pack;
+</PRE>
+Note the escaped <KBD>&quot;\@&quot;</KBD> on the directory specification (as
+well as the use of the <KBD>$tk_library</KBD> variable imported by <KBD>use
+Tk;</KBD>). If you wanted to specify a file called <KBD>foobar.xbm</KBD> in 
+the directory where you were running the script then either:
+<PRE>
+    $main-&gt;Label(-bitmap =&gt; '@foobar.xbm')-&gt;pack;
+#<i>or</i>
+    $main-&gt;Label(-bitmap =&gt; "\@foobar.xbm")-&gt;pack;
+</PRE>
+should work just fine. In another directory however that would be a problem. 
+So something like:
+<PRE>
+    $main-&gt;Label(-bitmap =&gt; "\@$ENV{'HOME'}/img/foobar.xbm")-&gt;pack;
+</PRE>
+will help someone who has an <KBD>img/foobar.xbm</KBD> file in their $HOME
+directory. If you don't mind the non-portability then hard-wiring in the full
+path name will help as well. (Or if you have write access then put your files
+in <KBD>Tk/demos/images/</KBD> <i>e.g.</i>)
+
+
+<hr>
+	<p><a href="qna9.7.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.8">table of contents</a> | <a href="qna9.9.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

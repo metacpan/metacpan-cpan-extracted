@@ -1,0 +1,80 @@
+<H2><A HREF="315BCC5C.A0A78F0@pac.soton.ac.uk">[PREV]</A>  [NEXT]  <A HREF="01I2VWQOLY1U8X43P0@LNS62.LNS.CORNELL.EDU">[PREV Thread]</A>  <A HREF="315BEF11.41C67EA6@micro.ti.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> lusol@Turkey.CC.Lehigh.EDU (Stephen O. Lidie)
+</ADDRESS>
+<TITLE> Re: LabEntry</TITLE>
+<ADDRESS><H1> Re: LabEntry</H1>
+</ADDRESS>
+<ADDRESS> 30 Mar 1996 16:06:07 GMT
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<315BCC5C.A0A78F0@pac.soton.ac.uk"><315BCC5C.A0A78F0@pac.soton.ac.uk></A>
+</DL>
+<HR>
+<PRE>James_Kingdon (jbk@pac.soton.ac.uk) wrote:
+: Silly question time...
+
+: When I was trying to implement a composite widget, the documentation
+: lead me to LabEntry as an example. When I looked at the source it
+: seemed to be a composite widget containing only an entry widget,
+: which was a bit mystifying at the time.
+
+: Now I could actually use a labelled entry widget and was wondering
+: whether the provided one is really as defective as it seems.
+
+: Am I missing something?
+
+Yes, you're forgetting just how crafty Nick is (;  Essentially, the
+Label is created iff you use -label, either when creating the widget
+or in a later configure() call:
+
+# Class LabeledEntry
+
+package Tk::LabEntry;
+require Tk::Frame;
+@ISA = qw(Tk::Frame);
+
+Tk::Widget-&gt;Construct('LabEntry');
+
+sub Populate 
+{
+ require Tk::Entry;
+ # LabeledEntry constructor.
+ #
+ my($cw, $args) = @_;
+ $cw-&gt;SUPER::Populate($args);
+      ^^^^^^^^^^^^^^^
+ # Advertised subwidgets:  entry.
+ my $e = $cw-&gt;Entry();
+ $e-&gt;pack('-expand' =&gt; 1, '-fill' =&gt; 'both');
+ $cw-&gt;Advertise('entry' =&gt; $e );
+ $cw-&gt;ConfigSpecs(DEFAULT =&gt; [$e]);
+ $cw-&gt;Delegates(DEFAULT =&gt; $e);
+ $cw-&gt;AddScrollbars($e) if (exists $args-&gt;{-scrollbars});
+} 
+
+1;
+
+Thus -label ConfigSpecs are created in the Populate found
+in Frame.pm, the LabEntry widget's superclass:
+
+
+sub Populate
+{
+ my ($cw,$args) = @_;
+ $cw-&gt;ConfigSpecs('-labelPack'     =&gt; [ METHOD, undef, undef, undef]);
+ $cw-&gt;ConfigSpecs('-labelVariable' =&gt; [ METHOD, undef, undef, undef]);
+ $cw-&gt;ConfigSpecs('-label'         =&gt; [ METHOD, undef, undef, undef]);
+}
+
+These METHOD specifications say "call the method by the same name as
+the -option", and if you examine Frame.pm you'll see where the Label
+is auto-created.
+
+Moral of the story:  when creating derived or composite widgets always
+call SUPER::Populate().
+</PRE>
+<HR><H2><A HREF="315BCC5C.A0A78F0@pac.soton.ac.uk">[PREV]</A>  [NEXT]  <A HREF="01I2VWQOLY1U8X43P0@LNS62.LNS.CORNELL.EDU">[PREV Thread]</A>  <A HREF="315BEF11.41C67EA6@micro.ti.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

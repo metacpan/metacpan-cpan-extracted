@@ -1,0 +1,16 @@
+This package allows PERL5LIB to be honoured in taint mode.
+
+After unpacking the distribution, to install this module type
+ 
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+This distribution provides
+
+        perl5lib
+
+Copyright (c) 2003 Brian McCauley <nobull@cpan.org>. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

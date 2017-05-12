@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+=head1 SYNOPSIS
+
+ $0 [ range .. ] [ fping options .. ]
+
+=cut
+use strict;
+use warnings;
+
+use Hermes;
+use Vulcan::OptConf;
+
+$| ++;
+
+my ( $range, @node ) = Hermes->new( Vulcan::OptConf->load()->dump( 'range' ) );
+
+push @node, shift while @ARGV && $ARGV[0] !~ /^-/;
+map { push @ARGV, $range->load( $_ )->list() } @node;
+system( 'fping', @ARGV );
+
+exit 0;

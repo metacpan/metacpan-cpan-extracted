@@ -1,0 +1,72 @@
+<HTML>
+<HEAD><TITLE> 11.4. Must I use &quot;my&quot; on all my variables?</TITLE></HEAD>
+<BODY><a name="A11.4"> 11.4. Must I use &quot;<KBD>my</KBD>&quot; on all my variables?</a>
+
+<hr>
+</p><p>
+If you <KBD>use strict;</KBD> (as recommended) the answer is
+&quot;probably&quot;. This 
+confines the variables names to your namespace - so your variable
+does not conflict with one in the module(s) your are using (you are at the
+least <KBD>use</KBD>ing<KBD> Tk;</KBD>). <KBD>my</KBD> does &quot;lexical
+scoping&quot; on a variable rather than the &quot;dynamic scoping&quot; done by
+<KBD>local</KBD> (like <kbd>auto</kbd> variables in C). The difference 
+between these two is that the scope of <KBD>my $var</KBD> is confined to the 
+block (<KBD>sub</KBD>, <KBD>if</KBD>, <KBD>foreach</KBD>, <I>etc.</I>) in 
+which it is declared and used, as opposedto <KBD>local $iable</KBD> which can 
+propogate to all blocks called by the block in which it is declared. In 
+general the confined scope of <KBD>my $var</KBD> means that its use will 
+proceed quicker and more efficiently than <KBD>local $iable</KBD>.
+<p>
+If you give a <EM>fully qualified</EM> variable name such as
+<pre>
+    $main::var = 1;  # No "my" needed
+</pre>
+Then no <KBD>my $var</KBD> is needed. However, the lexical scoping of 
+<KBD>my $var</KBD> makes it preferable.
+<p>
+If you choose to use <KBD>my</KBD> (as recommended) then beware that you should
+declare a variable <KBD>my</KBD> only at the first use (instantiation) of
+a variable. Consider yet another way to re-write the 
+&quot;Hello World!&quot; script:
+<PRE>
+    #!/usr/local/bin/perl -w
+    use strict;
+    use Tk;
+    my $main = new MainWindow;
+    my $label = $main-&gt;Label(-text =&gt; 'Hello World!');
+    my $button = $main-&gt;Button(-text =&gt; 'Quit',
+                               -command =&gt; sub{exit});
+    $label-&gt;pack;  #no "my" necessary here
+    $button-&gt;pack; #or here
+    MainLoop;
+</PRE>
+Considering the finite number of names (in particular the high probability that
+a variable named $label or $button was used in one or more of the extensions to 
+perl that you may be using) 
+it helps one's programming to <KBD>use strict;</KBD> and declare variables 
+yours alone with <KBD>my</KBD>.
+<p>
+James M. Stern points out that redundant <KBD>my</KBD> declarations are not 
+simply useless they can be dangerous as in the following script which will 
+not work:
+<PRE>
+    #!/usr/local/bin/perl -w
+    use strict;
+    use Tk;
+    my $main = new MainWindow;
+    my $label = $main-&gt;Label(-text =&gt; 'Hello World!');
+    my $main;   #WRONG: this $main overrides previous
+    my $button = $main-&gt;Button(-text =&gt; 'Quit', #will now fail
+                               -command =&gt; sub{exit});
+    $label-&gt;pack;  
+    $button-&gt;pack; 
+    MainLoop;
+</PRE>
+
+
+<hr>
+	<p><a href="qna11.3.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.4">table of contents</a> | <a href="qna11.5.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

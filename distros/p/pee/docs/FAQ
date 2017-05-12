@@ -1,0 +1,104 @@
+1. What is a PET file?
+
+PET stands for Perl Embedded Templates.  It is basically a file with
+a '.pet' extension.  It follows the PEE syntax (see the docs/SYNTAX file).
+
+
+2. What is an 'engine'?
+
+An engine is something that performs a repetitive task, and does it 
+effectively.  In PEE, an 'engine' is usually one that compiles and
+run PET files.
+
+
+3. How do I access the GET or POST data from PET?
+
+You may use the CGI.pm module, or any other modules.
+
+
+4. Can PEE be used with mod_perl?
+
+Yes.  There is an experimental engine to be used with mod_perl.
+Read INSTALL.modperl for installation instructions.
+
+
+5. You said that a perl expression may go between '<?=' and '?>',
+   but what is a perl expression?
+
+A perl expression is perl code that evaluates to a result.  It does NOT
+end with a semicolon (;).  Examples of expressions include '$var1', '1+3',
+'$a + $b', or '&askname()'.
+
+
+6. Can I have '?>' in any PEE blocks?
+
+If you have something like this:
+<?
+$var = '?>';
+?>
+
+PEE will parse the content wrongly, ending the code block prematurely
+and leaving the rest as text blocks.
+There is no special escape mechanism like using '\?\>' because it
+would introduce extra parsing overhead.  That is why something as
+absurd as '?>' is chosen.
+There are various workarounds to achieve that:
+1. $var = '?'.'>';  # concatenate the two chars together
+2. $var = '
+
+
+7. Does the 'include' directive support multiple level of includes?
+
+Yes, it does.  This is definitely supported:
+File A includes file B, which in turn includes file C, and so on.
+However, you have to make sure that there is no cyclical includes like this:
+File A includes file B, which in turn includes file A again.
+You'll have to kill the engine.pl process to stop it.
+
+
+8. I get a "malformed header from script" message in my apache error log
+
+This is usually accompanied by the error described in Q1.
+It happens when your script has not returned a valid header.
+Specifically, the only required header is the 'Content-type'.
+Apache will try to determine the Content-type by looking at the
+first few lines of your output, if it has '<html>' in it, it will send
+the 'Content-type' header as 'text/html'.
+
+Pee will not automatically print the HTTP headers for you.  This
+is to maintain compatibility with existing scripts that are still 
+using it.
+
+
+9. I get "Internal Server Error" on the browser.
+
+See Q7.
+
+
+10. The browser of web server log has some undecipherable error message,
+    how can I debug it?
+
+Pee can write a copy of the compiled code to a scratch directory.  To
+enable this, you can edit engine.pl and change the call to
+"new PEE::FileRunner" and include a second parameter like this:
+
+my $runner = Pee::FileRunner->new( "$template",
+					{debug=>1, scratchdir=>'/tmp/pee'});
+
+Make sure that '/tmp/pee' exists and writeable by the web server user
+(usually 'nobody').  Pee will convert '/'s in the template file name to
+'_'s ('/www/site/index.pet' becomes '_www_site_index.pet').
+This is the best way to debug your PEE templates.
+
+
+11. What are the Pee::* modules?  Do I use them?
+
+Generally, you should not need to use them.  They are used by the engine
+to compile and run PET files.
+
+
+12. Do I need mod_rewrite in order to run PEE?
+
+Not anymore.  As of version 1.03 it is recommended to use the Apache 'Action'
+directive to achieve the same thing.  Read the INSTALL (or INSTALL.*) file
+for configuration examples.

@@ -1,0 +1,36 @@
+NAME
+  pod2pdf - converts Pod to PDF format.
+
+INSTALLATION
+  Unzip and untar the archive, cd to the distribution
+  directory and enter the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+USAGE
+  pod2pdf [options] input.pod >output.pdf
+  
+  Options are described in the main pod2pdf documentation,
+  type 'perldoc pod2pdf' after installation.
+
+DEPENDENCIES
+  Requires the following modules:
+  
+    Getopt::ArgvFile
+    Pod::Escapes
+    PDF::API2
+  
+  Some functionality of pod2pdf will require the
+  following optional modules:
+  
+    File::Type
+    Image::Size
+    Paper::Specs
+
+AUTHOR
+  Written by Jon Allen (JJ) <jj@jonallen.info>
+  http://perl.jonallen.info/projects/pod2pdf
+

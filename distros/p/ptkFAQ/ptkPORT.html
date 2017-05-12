@@ -1,0 +1,1393 @@
+<HTML>
+<HEAD>
+<BASE HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkPORT.html">
+<TITLE>Perl/Tk (pedantic) porting pronouncements</TITLE>
+</HEAD><BODY>
+From: <A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A> (Peter Prymmer)<BR>
+Newsgroups: <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>,<A HREF="news:comp.lang.perl.announce">comp.lang.perl.announce</A>,<A HREF="news:comp.answers">comp.answers</A>,<A HREF="news:news.answers">news.answers</A><BR>
+Subject: Perl/Tk portability.<BR>
+Followup-To: <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A><BR>
+Summary: Perl/Tk on other platforms?<BR>
+Date: Thu May  9 21:37:09 EDT 1996<BR>
+URL: <A HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkPORT.html">http://w4.lns.cornell.edu/~pvhp/ptk/ptkPORT.html</A><BR>
+Version: DRAFT<BR>
+<BR>
+<BR>
+<H1>Peter Prymmer's primer pertaining to 
+    pertinent Perl/Tk platform porting politics (perchance policies?)</H1>
+
+<FORM METHOD="POST" ACTION="http://perl.com/cgi-bin/cpan_mod">
+<IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+<INPUT NAME="module" VALUE="Tk" TYPE="HIDDEN">
+<INPUT TYPE="submit" VALUE="Download pTk now!">
+</FORM>
+<FORM METHOD="GET" ACTION="http://perl.com/cgi-bin/cpan_mod">
+<IMG SRC="img/Tk_icon.gif" ALT="Tk icon">
+<INPUT NAME="module" VALUE="Tk" TYPE="HIDDEN">
+<INPUT NAME="readme" VALUE="1" TYPE="HIDDEN">
+<INPUT TYPE="submit" VALUE="examine README file for pTk...">
+</FORM>
+
+<BLOCKQUOTE>
+Wouldn't it be great to be able to take my favorite
+X-clock/file-browser/calculator and run it on any computer?<BR>
+<I>- anonymous</I>
+</BLOCKQUOTE>
+<BLOCKQUOTE>
+You can't play if you don't hack.<BR>
+<I>- even more anonymous</I>
+</BLOCKQUOTE>
+
+<hr>
+<pre>
+<a href="#INTRO">Intro.</a> | <a href="#LICENSE">License</a> | <a href="#INGREDIENTS">Ingredients</a> | <a href="#COOKBOOK">Cookbook</a> | <a href="#EFFICIENCY">Efficiency</a> | <a href="#PLATFORMS">Platforms</a> | <a href="#MISC">Misc.</a>
+</pre>
+<hr>
+
+<h2><a name="INTRO">Introduction</a></h2>
+It is the stated goal of Nick Ing-Simmons to turn John Ousterhout's <b>Tk</b> 
+X-toolkit into <b>ptk</b> the <b>p</b>ortable X <b>t</b>ool<b>k</b>it. From 
+the Tk-b11.01 README file:
+<pre>
+pTk sub-directory is a modified version of Tk4.0p3
+
+It has been modified to call "glue" functions rather than use libtcl.a - so it
+is completely independant of TCL.
+
+A goal is to have pTk directory and its library usable from 
+perl/Tcl/LISP/c++/python etc.  - perl is 1st.
+
+There are still serious snags with the others.
+</pre>
+So the stated goal is to eventually port to other languages.
+<p>
+How about the more modest goal of porting the Tk extension to perl5
+to the widest variety of platforms (other than Un*x)? That is the issue that 
+this document attempts to address. Please note that this document is a 
+collection of rumours and slightly out of date material - please exercise 
+extreme caution in the use of the information contained herein. For more 
+up-to-date information subscribe to the 
+<a href="mailto:ptk@lists.stanford.edu">ptk@lists.stanford.edu</a> mailing 
+list, by sending the message:
+<pre>
+    subscribe ptk joe@somewhere.com (Joe User)
+</pre> 
+to <a href="mailto:Majordomo@lists.Stanford.EDU">Majordomo@lists.Stanford.EDU</a>.
+<p>
+[BTW, There are no "answers" here - mostly pointers to other sources of useful
+information. I'm afraid you still have a lot of work to do :-)]
+<p>
+Nick Ing-Simmons has already 
+<a href="http://sun20.ccd.bnl.gov/%7Eptk/archive/ptk.1996.01/0062.html">mentioned</a> 
+the steps involved in such a 
+<a href="http://sun20.ccd.bnl.gov/%7Eptk/archive/ptk.1996.01/0062.html">port</a>
+
+<HR>
+<h2><a name="LICENSE">Licensing issues</a></h2>
+X is covered by some sort of license. The phrase <KBD>"X Window System"</KBD> was 
+originally copywritten by the Massachusetts Institute of Technology. I don't know, but
+perhaps the <a href="http://www.x.org/">X Consortium</a> has dibs on that phrase now.
+<p>
+Perl is copywritten by Larry Wall. Here I am reproducing a copywritten
+statement from the <A HREF="http://amber.ora.com/gnn/bus/ora/item/pperl.html">Camel</A> (pp 433):
+<BLOCKQUOTE>
+ Perl is copyrighted, and is thus <b>not</b> in the public domain -- it's just
+ freely available and freely redistributable (q.v.).
+</BLOCKQUOTE>
+ Perl is covered by a couple of licenses 
+(<a href="http://www.webtools.org/counter/copying.html">GPL</a> and 
+<a href="misc/Artistic">Artistic</a>).  Here is the 
+<a href="misc/perl5.002README"><kbd>README</kbd></a> file that comes with 
+perl5.002. There is also the <a href="misc/Artistic"><kbd>Artistic</kbd></a> 
+file that comes with perl5.002. Anyone seriously considering working toward 
+the advancement of perl ought read those files carefully, <em>very</em>
+carefully.
+<p>
+Nick Ing-Simmons' <a href="mailto:nik@tiuk.ti.com">nik@tiuk.ti.com</a> 
+ptk and assorted code is covered by copyright notices too:
+<pre>
+Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, with the exception
+of the files in the pTk sub-directory which have separate terms
+derived from those of the orignal Tk4.0 sources and/or Tix. 
+
+See pTk/<a href="misc/license.terms">license.terms</a> for details of this Tk license, 
+and pTk/<a href="misc/Tix.license">Tix.license</a> for the Tix license.
+</pre>
+Anyone seriously considering working toward the advancement of perl/Tk ought 
+read all the files mentioned thus far carefully.
+
+
+<HR>
+<h2><a name="INGREDIENTS">Necessary ingredients</a></h2>
+The absolute minimum you need is a C language (or C++) compiler. It is 
+tremendously helpful to have a few other things as well. 
+The short list is: a C-compiler, Xlib, perl5, the Perl/Tk kit, 
+and a make utility (preferably one that is amenable to a MakeMaker 
+port to your system).
+
+<h3>C language compiler</h3>
+<IMG SRC="../gif/C_icon.gif" ALT="../gif/C_icon.gif">
+Has <a href="ftp://prep.ai.mit.edu/pub/gnu"><b>gcc</b></a> been ported to your 
+platform? If so you are in luck as it is a C compiler most forgiving of coding 
+mistakes and/or "unconventionalities". However, it should be possible to port 
+perl and perl/Tk to any platform's C compiler.
+<p>
+Does your platform's C implementation (compiler &amp; linker) support 
+dynamic linking? If so that would be a
+plus, but it is not necessary. Having a C compiler (or a C++ compiler that can
+reasonably handle C) <em>is</em> necessary. If all you have is a C++ compiler
+that may be OK since a great many C++ compilers can pretend that they are C
+compilers.
+<p>
+ANSI-ness is not as big a deal as you might imagine. If you wind up building
+everything (including libX11 and perl) using your C compiler then everything
+ought to work even if your compiler is not ANSI compliant.
+It is a great idea (you _must_?) build Tk using the same compiler that you 
+used to build perl. If you are lucky enough to be able to use <b>MakeMaker</b> with 
+your perl then the correct C compiler will be invoked from the <kbd>Makefile</kbd> 
+when you type the <KBD>make</KBD> command.
+
+<h3>Xlib</h3>
+<A HREF="http://www.x.org/"><IMG SRC="img/xlogo64.gif" ALT="img/xlogo64.gif"></A>
+Recall that X started in about 1984 to be <em>the</em> platform independent
+interface thingy. It is <em>supposed</em> to work everywhere - yes even on your
+PC/AT, and even on your Mac (&lt;- on the Mac X even works with DECnet 
+transport protocol [though tcp/ip is much more common]!).
+<p>
+Here are some interesting excerpts from <b>X Window System C Library and
+Protocol Reference</b> by Robert W. Scheifler, James Gettys, Ron Newman, Al
+Mento, and Al Wojtas (&#169; 1988 MIT and DEC ISBN 1-55558-012-2):
+<BLOCKQUOTE>
+The X Window System, or X, is a network-transparent window system...that was
+designed at MIT.<BR>
+...<BR>
+It runs under ... several operating sytems.<BR>
+...<BR>
+Xlib is a C subroutine library that applications programs (clients) use to
+interface with the window system by means of a stream connection.
+</BLOCKQUOTE>
+Please note that while much X documentation refers to "X toolkits" (<i>e.g.</i>
+<b>Xt</b>, <b>Xm</b>, <b>Xmu</b>, <i>etc.</i>) such toolkits are typically 
+front ends to C subroutine libraries. Hence those "toolkits" are typically
+called from some other compiled language (which is usually C or C++). Tcl/Tk 
+and Perl/Tk are a bit more than mere "toolkits" in that they allow access to a 
+good deal of Xlib functionality via the other languages (Tcl and Perl 
+respectively). [BTW there also is a Lisp version of Xlib that you need not
+concern yourself with in an attemp to port Perl/Tk.]
+<p>
+Take a look at 
+<a href="http://www.x.org/consortium/GettingX.html">"Getting X"</a> from the
+folks who write and maintain <A HREF="http://www.x.org/">it</A>.
+They (the <a href="http://www.x.org/">X consortium</a>) also have a page on 
+<a href="http://www.ora.com/gnn/bus/ora/features/xres11.html">Writing Portable X Code</a> 
+which is a <em>must read</em> document.
+You should probably check out the 
+<a href="http://www.x.org/consortium/R6.1doc/man/X11/">Xlib man pages</a> too.
+<p>
+Perl/Tk can be built on Unix platforms under X11 R5, R6, and R6.1. I do not
+know if it has been built with prior releases.
+<p> 
+The critical Xlib files include: the sharable image <kbd>libX11<i>.a</i></kbd> (or 
+<kbd>libX11<i>.so</i></kbd>, or <kbd>LIBX11<i>.EXE</i></kbd>, or whatever 
+name.extension your system uses for this type of file), and the header file 
+<kbd>Xlib.h</kbd> (as in <kbd>#include &lt;Xlib.h&gt;</kbd>).
+
+<h3>Perl 5</h3>
+<a href="cpan.html">
+<IMG SRC="../img/camel.gif" ALT="../img/camel.gif"></a>
+You want the object oriented perl5 - the fresher the better (by that I mean
+try to get a very recent version). Perl 4 just will
+not cut it. Find a <a href="cpan.html">CPAN ftp site</a> near you.
+
+<h3>A "make" utility</h3>
+<pre>
+ <b>make</b> - Maintains up-to-date versions of target files and performs shell
+ commands
+</pre>
+On Unix platforms the standard <b>make</b> utility uses a Bourne shell type 
+syntax for carrying out compiling and linking of (usually complicated) source 
+code. There is also a GNU make utility called <b>gmake</b> - has it been 
+ported to your platform? Does your C compiler have "project files"? (These are
+equivalent to Makefiles.)
+<p>
+On VMS there is a commonly used MMK utility that uses a DCL shell syntax.
+<p>
+I would presume that a MacMaker could use AppleScript(?), a DOS|WIN|OS/2
+maker would use a CMD *.BAT file (or Rexx?), <i>etc.</i>. 
+On the microcomputers there are also commercial C compiler IDE's that do the 
+equivalent of <b>make</b> with .c and .h code typically using "project files".
+(You might want to disentangle yourself from the non-transportability 
+and awful licensing issues involved with these IDE's though.)
+<p>
+How good is your platforms' port of perl5? MakeMaker? Basically will:
+<pre>
+    perl Makefile.PL
+</pre>
+"work" on your platform (<i>i.e.</i> create the right type of Makefile [or 
+equivalent])? This question involves the platform specificity of the
+<a href="http://128.84.219.39/public/perl/manual/perlmod/ExtUtils/MakeMaker.html">
+<b>Extutils::MakeMaker</b></a> module. Note that there are <b>MM_Unix.pm</b>,
+<b>MM_OS2.pm</b>, and <b>MM_VMS.pm</b> modules to help on those platforms.
+To help develop <b>MM_<i>foo</i>.pm</b> on your Foonix platform, consider 
+subscribing to the MakeMaker mailing list
+<a href="mailto:makemaker@franz.ww.tu-berlin.de">makemaker@franz.ww.tu-berlin.de</a>.
+<p>
+Can your platforms' perl port turn .xs into .c and .h? In other words
+is your <b>h2xs</b> and <b>xsubpp</b> working? Either of these perl utilites 
+may require some modification for use on your system.
+With modern perl's one can make very effective use of statements like the
+following within the perl code:
+<pre>
+    use Config;
+    if $Config{osname} eq 'VMS' {
+        # VMS stuff goes here
+    }
+</pre>
+<p>
+Your perl5 <b>Autoload</b> utility should be working too (if your C compiler 
+does dynamic linking).
+How about 
+<a href="http://128.84.219.39/public/perl/manual/perlmod/ExtUtils/Mkbootstrap.html">
+ExtUtils::Mkbootstrap</a>?
+
+<h3>Perl/Tk kit</h3>
+<A HREF="http://perl.com/cgi-bin/cpan_mod?module=Tk">
+<IMG SRC="img/Xcamel.gif" ALT="X Camel"></A>
+Pick up a version that corresponds to the version of perl you will be using.
+Failing that pick up the <A HREF="http://perl.com/cgi-bin/cpan_mod?module=Tk">
+latest release</A>. Either should be available on <A HREF="cpan.html">CPAN</A>.
+
+<h3>other things</h3>
+<a href="ftp://ftp.aud.alcatel.com/tcl/">
+<IMG SRC="../gif/Tcl_icon.gif" ALT="../gif/Tcl_icon.gif"></a>
+Has <a href="ftp://ftp.smli.com/pub/tcl">Tcl/Tk</a> been ported to your 
+platform? If so you might consider looking
+through the relevant READMEs and/or Makefiles for that software package as 
+a guide to understanding how to port Perl/Tk to your system. (Hint: you want to
+try to <em>compile</em> it on your machine. In other words, 
+do not simply pkunzip a WISH.EXE file.)
+<p>
+<a href="ftp://prep.ai.mit.edu/pub/gnu">
+<IMG SRC="img/gnu.xbm" ALT="GNU X"></a>
+How about the <a href="ftp://prep.ai.mit.edu/pub/gnu"><b>xmkmf</b> program</a> or the 
+<a href="ftp://prep.ai.mit.edu/pub/gnu"><b>patch</b> program</a>? They would be
+useful (but are not necessary). 
+The previously mentioned <a href="ftp://prep.ai.mit.edu/pub/gnu"><b>gmake</b> program</a> 
+would be useful on any system. It may have been ported to yours.
+<p>
+Of course dealing with file distribution can be a portability problem in its
+own right. Perl code is typically distributed from CPAN sites via binary mode
+ftp of *.tar.gz files. Hence you need: <b>ftp</b>, <b>tar</b>, and
+<a href="ftp://prep.ai.mit.edu/pub/gnu"><b>gunzip</b></a>. Note that the 
+<b>gunzip</b> program is different from unzip and different from pkunzip.
+
+<HR>
+<h2><a name="COOKBOOK">Cookbook</a></h2>
+Your goal is to reduce it to something simple like:
+<pre>
+    perl Makefile.PL
+    make
+    make test
+    make install
+</pre>
+But of course, some ports do lose (or gain) a little in the translation. On systems 
+whose C-compiler only supports static linking making the static version 
+(perhaps <i>via</i> "<kbd>make tkperl</kbd>" after "<kbd>make</kbd>" and before 
+"<kbd>make test</kbd>") would be great too.
+<p>
+The first of these build steps (<kbd>perl Makefile.PL</kbd>) is the MakeMaker step
+and strictly speaking is not necessary if you can figure out an alternative
+means of quickly putting together a Makefile (or project file, or
+<i>whatever</i>) for not only <em>this</em> version of Perl/Tk but all 
+<em>subsequent</em> versions. (In other words hacking away with a text editor
+to come up with a Makefile for Tk-versionX to compile means that anyone making
+use of your port of Perl/Tk will be stuck with -versionX, meanwhile everyone
+else will have moved on to -versionX+1). On Unix systems 
+the <kbd>Makefile.PL</kbd> script that comes with the Tk module calls the 
+<kbd>myConfig</kbd> perl script to query the computer (actually the 
+<b>xmkmf</b> program) about where it's Xlib libraries and headers are. So 
+where on your system is <kbd>libX11<i>.a</i></kbd> (or 
+<kbd>libX11<i>.so</i></kbd>, whatever)? Where on your system is the 
+<kbd>Xlib.h</kbd> file? These are the types of questions that need answering
+when trying to compile the Tk extension to perl on your system.
+<p>
+The second of these build steps (<kbd>make</kbd>) is the compile, archive/library
+objects, and link step and must of course be translated into your platforms'
+C-compiler-and-linker's native format. As hinted there is an optional 
+<kbd>make tkperl</kbd> step for statically linked compiler/linkers [of course
+this target may or may not be in your Makefile depending on whether you
+<em>have</em> a <kbd>Makefile</kbd>].
+<p>
+The third step (<kbd>make test</kbd>) really only runs the <kbd>widget</kbd> 
+demo script to make sure nothing has gone wrong. On Unix systems the
+<kbd>Makefile</kbd> is set up with dependancies such that typing 
+<kbd>make test</kbd> will do a complete <kbd>make</kbd> if it had not already 
+been done. On a port to a system much different from Unix it would not be at
+all unreasonable to ask people to simply run the <kbd>widget</kbd> demo using
+perl in whatever fashion it is invoked on your system.<br>
+On Unix the <kbd>make install</kbd> step copies the code over to a special perl
+installlation directory. This step may be unnecessary on your system.<br>
+In sum: the <kbd>make</kbd> step of compiling (cc) object collection (ar) 
+and linking (ld) is most critical [so tricky in fact that that is why the
+<b>make</b> program was invented!], the first step is simply an automatic way 
+to get perl to set up the <kbd>Makefile</kbd> for you (and probably should not
+be overlooked by you).
+<p>
+You can of course read a detailed description of how to build Unix Perl/Tk in 
+the appropriate entry in the <a href="ptkTOC.html">Perl/Tk FAQ</a>. 
+<p>
+Nick Ing-Simmons has 
+<a href="http://sun20.ccd.bnl.gov/%7Eptk/archive/ptk.1996.01/0062.html">outlined</a>
+the steps necessary to port perl/Tk to other (non-unix) platforms:
+<hr>
+<h1>Re: Perl/Tk for NT</h1>
+Nick Ing-Simmons (<i>nik@tiuk.ti.com</i>)<br>
+<i>Fri, 12 Jan 96 08:54:30 GMT</i>
+<p>
+<!-- body="start" -->
+In &lt;30F594C8.5798@dsto.defence.gov.au&gt;<br>
+On Fri, 12 Jan 1996 09:22:56 +1030<br>
+Matthew Phillips &lt;mathew.phillips@dsto.defence.gov.au&gt; writes:<br>
+<i>&gt;Hi,</i><br>
+<i>&gt;</i><br>
+<i>&gt;I'm very impressed with your Perl/Tk package and am hoping to be able to</i><br>
+<i>&gt;use it for the GUI implementation of our next project.  However, we need</i><br>
+<i>&gt;to be able to run on Windows NT primarily, and UNIX (Solaris) at a later</i><br>
+<i>&gt;date.  I know there is an NT Tcl/Tk port, but what are the odds of a</i><br>
+<i>&gt;Perl/Tk port?  If there isn't one, how difficult would it be for a</i><br>
+<i>&gt;reasonably experienced UNIX hacker to convert the NT Tk package to be</i><br>
+<i>&gt;usable via Perl 5?</i><br>
+<i>&gt;</i><br>
+<i>&gt;Keep up the good work!</i><br>
+<i>&gt;</i><br>
+As far as work time goes I can justify (some) time spent on UNIX<br>
+perl/Tk. An NT (Win32) port would have to be a home (hobby) project,<br>
+and I don't have (or particularly want) an Win32 machine at home.<br>
+(My home machine is a dual CPU SPARCStation10,Solaris2.4.) <br>
+<p>
+<p>
+What 'we' need is a "reasonably experienced _NT_ hacker":<br>
+<p>
+What I need is someone that understands Win32 (or OS/2 as may be),<br>
+to figure out issues like DLL/OLE (which is just an acronym to me).<br>
+I could learn this stuff of course - guess I will some day - but don't<br>
+have the time to learn it now. Anyone who knows they need the port<br>
+knows more than I do in this area.<br>
+<p>
+The steps are :<br>
+<p>
+1. Build Perl for your environment - I think you need to re-compile <br>
+   from sources. This may be ntperl or via gcc-win32 or however.<br>
+<p>
+2. Work with me/porters to incorporate a "trivial" C extension to this perl,<br>
+   to see what is involved - we can do this 'static linked' if this <br>
+   helps.<br>
+<p>
+3. Build John Ousterhout's Tcl/Tk4.1a* for your environment, so that we<br>
+   understand what it can do and bits that need to be there.<br>
+<p>
+4. I apply my tk4.0 vs perl/Tk diffs<br>
+   to 4.1a and run all the C files though my munging perl scripts.<br>
+   I then have a UNIX 4.1a - my guess it might take  a day or two.<br>
+<p>
+5. Do same things as (4) to bits of 4.1a that UNIX does not use, based on <br>
+   understanding developed in (3).<br>
+<p>
+6. Then compile all those, iterate munging/compile as required.<br>
+<p>
+7. Apply the "how do we add a C extension" lessons from (2) to objects<br>
+   from (6) to get perl/Tk executable(s).<br>
+<p>
+8. Sort out inevitable filename/UNIXisms issues in *.pm files.<br>
+<p>
+<p>
+I can do (4) almost anytime. But there is little point unless someone<br>
+is going to use it soon as otherwise it will have to all be done again<br>
+if a new Tk4.* comes out...<br>
+<!-- body="end" -->
+<hr>
+Well that is what Nick had to say about WinNT|Win32|OS/2 in particular - but 
+of course the methods described are equally applicable to <em>any</em> 
+other platform.
+<p>
+For help in understanding what is involved in Nick's step number 2 above consider
+working through the example given in the 
+<a href="http://128.84.219.39/public/perl/manual/perlxstut.html">perlxstut</a> 
+man page (as well as
+<a href="http://128.84.219.39/public/perl/manual/perlxs.html">perlxs(1)</a> 
+and the pod docs for 
+<a href="http://128.84.219.39/public/perl/manual/perlmod/ExtUtils/MakeMaker.html">
+MakeMaker</a>.)
+<p>
+In step number 4 Nick is referring to the Unix <b>diff</b> program that
+tells you the difference between two files (usually text files). The output of
+<b>diff</b> are the "diff files" that Nick is referring to. The inverse of
+the <b>diff</b> program is Larry Wall's <b>patch</b> program (which is also 
+distributed separately as a GNU utility - unfortunately not as a perl script!). 
+Do you have a <b>patch</b> program on your system that would allow you to 
+apply Nick's diff files? If you do not then you will need to do a lot of hand 
+editing (it is possible to simply read diff files - they are plaintext).
+<p>
+Note that on the <kbd>perl Makefile.PL</kbd> step (under Unix) it is sometimes 
+necessary to give explicit locations of the required X11 libraries and/or 
+include headers. For example, if libraries and headers are in one location 
+(that the <b>xmkmf</b> program cannot find) then:
+<pre>
+    perl Makefile.PL X11=/usr/local/X11R6
+</pre>
+or, if the headers are in one place and the sharable libraries are in another
+place then:
+<pre>
+    perl Makefile.PL X11INC=/usr/local/share/X11R6/include \
+                     X11LIB=/usr/local/arch/X11R6/lib
+</pre>
+Where the Unix line continuation character "<kbd>\</kbd>" has been used to
+split the long input (that is the tcl line continuation character too :-).
+Hence, on VMS it should be possible to say:
+<pre>
+    perl Makefile.PL X11INC=SYS$SYSTEM: -
+                      X11LIB=SYS$LIBRARY:DECW$XlibShr.EXE/SHARE
+</pre>
+and have a <kbd>DESCRIP.MMS</kbd> file pop out! (Unfortunately perl has
+different ideas about what $SYSTEM and $LIBRARY mean on that system.)
+<p>
+Nick has also <a href="misc/MacTkPerl-Nick.html">recently commented</a> on the 
+primary differences between the Tcl/Tk code and his Perl/Tk code.
+
+<HR>
+<h2><a name="EFFICIENCY">Porter Efficiency</a></h2>
+<ul>
+<li>Wave a handsome tip under his nose.</li>
+<li>Avoid functions that aren't implemented everywhere.<BR>
+    You can use <b>eval</b> tests to see what's available.</li>
+<li>Don't expect native float and double to <b>pack</b> and <b>unpack</b> on
+    foreign machines.</li>
+<li>Use network byte order when sending binary data over the network.</li>
+<li>Don't send binary data over the network.</li>
+<li>Check <b>$]</b> to see if the current version supports all the features you use.</li>
+<li>Put the <b>eval exec</b> hack in even if you don't use it.</li>
+<li>Put the <b>#!/usr/bin/perl</b> hack in even if you don't use it.</li>
+<li>Test for variants of UNIX commands.<BR>
+    Some <i>finds</i> can't handle <b>-xdev</b>, for example.</li>
+<li>Avoid variant UNIX commands if you can do it internally.</li>
+<li>Use the C preprocessor to find out what kind of machine you're running on.</li>
+<li><i>Read the Camel...</i></li>
+</ul>
+If programming was easy, they wouldn't need something as complicated as a human
+being to do it, now would they?
+<p>
+<i>Read the <A HREF="http://amber.ora.com/gnn/bus/ora/item/pperl.html">Camel...</A></i>
+
+<HR>
+<h2><a name="TESTING">Testing your system</a></h2>
+
+Herein follows a discussion of a simple C program that uses X and contrasts 
+it with an equivalent simple perl script, a simple wish script, and a simple
+perl xs subroutine. Following any or all of these steps ought to help you
+uncover problem areas for compiling perl/tk on your system. The discussion of
+the xs extension might also help folks who wish to write their own widgets.
+<p>
+<B><I>Lesson 0: hiworld.c</I></B><BR>
+In an effort to test your ability to port and use Xlib on your platform consider writing
+and compiling a <em>very</em> simple C program that uses Xlib. For example 
+<a href="PNMTYAK/hiworld.c"><kbd>hiworld.c</kbd></a>. On a typical UNIX computer 
+I can compile and link that program with a command like:
+<pre>
+    cc hiworld.c -lX11
+</pre>
+whereas if I used the GNU C compiler that would simply be:
+<pre>
+    gcc hiworld.c -lX11
+</pre>
+(and you may need other <KBD>-l</KBD> or <KBD>-L</KBD> arguments depending on the details
+ of your system.)
+<p>
+It is amusing to note that the equivalent functionality of that 
+<A HREF="PNMTYAK/hiworld.c">roughly 73 line C program</A> can, 
+with Perl/Tk to the rescue, be written in 
+<a href="PNMTYAK/hiworld.pl">about 10 lines</a>:
+<pre>
+    #!/usr/bin/perl -w
+    use Tk;
+    my $m = MainWindow-&gt;new;
+    my $c = $m -&gt; Canvas(-height =&gt; 200, -width =&gt; 300,);
+    $c -&gt; pack;
+    $c -&gt; create('text', 40, 50, '-text' =&gt; "Hello World!");
+    $m -&gt; bind('&lt;Any-KeyPress&gt;' =&gt; sub{exit});
+    $m -&gt; bind('&lt;Button-1&gt;' =&gt; sub {
+        $c -&gt; create('text',$c-&gt;XEvent-&gt;x,$c-&gt;XEvent-&gt;y, -text =&gt; "Hi.") });
+    MainLoop;
+</pre>
+(Note the tcl/tk version is only <A HREF="PNMTYAK/hiworld.tcl">6 lines!</A>, 
+ neither of which is really fair to the C version since it cannot even refresh 
+ the additional "<kbd>Hi.</kbd>" strings on expose events the way the 
+ perl and wish scripts do automatically.)
+<p>
+<B><I>Lesson 1: Makefile</I></B><BR>
+Assuming you are able to figure out how to compile and link 
+<A HREF="PNMTYAK/hiworld.c"><kbd>hiworld.c</kbd></A>, an additional step to 
+take would be to try coming up with a <kbd>Makefile</kbd> for it (although this
+would <em>not</em> be necessary if you have <b>MakeMaker</b> and can follow the
+steps in Lesson 2 below). The crude way to create a <kbd>Makefile</kbd> 
+is to simply use a text editor to write something like this:
+<pre>
+    hiworld : hiworld.c
+            cc -o hiworld hiworld.c -lX11
+</pre>
+which would be invoked with "<kbd>make hiworld</kbd>" for example. It is considered
+much more fashionable to throw in a bunch of <i>macros</i> into one's 
+<kbd>Makefile</kbd>'s as in the following:
+<pre>
+    CC = cc
+    X11 = -lX11
+    all : hiworld
+    hiworld : hiworld.c
+            $(CC) -o hiworld hiworld.c $(X11)
+</pre>
+which is still invoked via "<kbd>make hiworld</kbd>" even though it looks a little
+more complicated.
+<p>
+<B><I>Lesson 2: h2xs, xsubpp, hiworld.xs, Makefile.PL</I></B><BR>
+The point of this exercise is not to show how to "add X routines to perl" (even
+though that is what it does). The point is to illustrate the use of
+<b>h2xs</b>, <b>xsubpp</b>, <b>ExtUtils::MakeMaker</b>, <i>et al.</i> Please note
+that each of these useful perl utilities may or may not have been ported to your
+system. If not then see if you can lend a hand in doing the port. 
+<p>
+Following the <a href="http://128.84.219.39/public/perl/manual/perlxstut.html">perlxstut(1)</a>
+man page we go to an otherwise unused directory and type:
+<pre>
+    h2xs -A -n Howdy
+</pre>
+and note the creation of a new <kbd>Howdy</kbd> directory with four new 
+files: <A HREF="PNMTYAK/Howdy.xs"><kbd>Howdy.xs</kbd></A>, 
+<A HREF="PNMTYAK/Howdy.pm"><kbd>Howdy.pm</kbd></a>, 
+<A HREF="PNMTYAK/Makefile.PL"><kbd>Makefile.PL</kbd></a>, 
+and <kbd>MANIFEST</kbd> (with later versions
+of <b>h2xs</b> there will also be a <KBD>test.pl</KBD> and a <KBD>Changes</KBD> 
+file).
+<p>
+To get our Xlib code into Howdy we 
+will need to append (and slightly modify) the contents of 
+<A HREF="PNMTYAK/hiworld.c"><kbd>hiworld.c</kbd></A> to 
+<A HREF="PNMTYAK/Howdy.xs"><kbd>Howdy.xs</kbd></A> (on Unix that would be
+something like <kbd>cat hiworld.c >> Howdy.xs</kbd>.) We edit Howdy.xs to
+add the required <kbd>CODE:</kbd> and <kbd>OUTPUT: RETVAL</kbd> statements, as
+well as to change function <kbd>main(argv argc)</kbd> to a funtion 
+<kbd>hiworld(argv argc)</kbd> (clever name eh?). So that now the head of Howdy.xs
+appears as:
+<PRE>
+&#35;include "EXTERN.h"
+&#35;include "perl.h"
+&#35;include "XSUB.h"
+&#35;include &lt;X11/Xlib.h&gt;
+&#35;include &lt;X11/Xutil.h&gt;
+
+
+MODULE = Howdy          PACKAGE = Howdy
+
+int 
+hiworld(argc, argv)
+        int argc
+        char argv
+        CODE:
+</PRE>
+(note the function type of <kbd>int</kbd>, although <kbd>void</kbd> would have been 
+just as appropriate.) 
+The tail of Howdy.xs now appears as:
+<PRE>
+        XCloseDisplay(mydisplay);
+        OUTPUT:
+        RETVAL
+</PRE>
+(note the absence of a call to <kbd>exit(0);</kbd>, and an absence of the 
+ braces <kbd>{}</kbd> for <kbd>main</kbd>.)
+<p>
+We turn our attention to the <kbd>Howdy/Makefile.PL</kbd> file and change 
+the line that says:
+<pre>
+    'LIBS'      => [''],   # e.g., '-lm' 
+</pre>
+to read something like what we needed to use to compile hiworld.c from the
+command line, like:
+<pre>
+    'LIBS'      => ['-lX11'],   # e.g., '-lm' 
+</pre>
+We can now say 
+<pre>
+    perl Makefile.PL
+    make
+    make install
+</pre>
+(note that after <KBD>make</KBD> and before <KBD>make install</KBD> you may be
+able to <KBD>make test</KBD> if you have updated <KBD>test.pl</KBD>. Also, statically linked 
+Howdy perl binaries can be made by running:
+<pre>
+    make -f Makefile.aperl inst_perl MAP_TARGET=perl
+</pre>
+after <KBD>make</KBD> and before <KBD>make test</KBD>.)
+After <KBD>make install</KBD> it is possible to run perl scripts that call the 
+<kbd>hiworld()</kbd> subroutine in as little as three simple lines of perl:
+<pre>
+    #!/usr/bin/perl
+    use Howdy;
+    $return = &amp;Howdy::hiworld($a, $b);
+</pre>
+That is all there is to it! For illustrative and testing purposes I have made a
+distribution copy of the 
+<a href="PNMTYAK/Howdy-0.1.tar.gz"><kbd>Howdy</kbd></a> "module" for perl. 
+[Please also note that a much more extensive discussion of such an extension 
+<em>as a Tk widget building exercise</em> is taking shape as 
+<a href="PNMTYAK/Howdy-widget.html">this document</a>.]
+<p>
+You may experience tremendous difficulty in getting any of the above steps to 
+work (they work pretty smoothly on most Unices). Hopefully, by following these 
+steps you will encounter the problem areas that need work on your platform's 
+port of perl. Do not be discouraged - ask around for help.
+<p>
+Of course it should not ultimately be necessary for you to use these 
+techniques (h2xs <i>et al.</i>) in a "standard compile" of Perl/Tk on your 
+system because Nick Ing-Simmons has already packaged everything for you. 
+Trying this test out as a means of uncovering what could possibly cause 
+trouble on linking Xlib calls to your perl ought to help with the port of 
+Perl/Tk to your system however.
+<p>
+<B><I>Lesson 3: Tk's Makefile.PL</I></B><BR>
+The <kbd>Makefile.PL</kbd> that is distributed with Tk is considerably more 
+complicated than the trivial one that we just made for Howdy in lesson 2. 
+Among other things the Makefile.PL with Tk calls external perl scripts that 
+try to call 
+the <i>xmkmf</i> utility on your system. Note that if your system does not 
+have <i>xmkmf</i> you may need to tell perl just where the Xlib stuff is 
+sitting on your system. This is why it is sometimes necessary to say something 
+like:
+<pre>
+    perl Makefile.PL X11=/usr/local/X11R6
+</pre>
+or, if the headers are in one place and the sharable libraries are in another
+place then:
+<pre>
+    perl Makefile.PL X11INC=/usr/local/share/X11R6/include \
+                     X11LIB=/usr/local/arch/X11R6/lib
+</pre>
+(Another reason that specifying any of the <KBD>X11</KBD> macros may be necessary 
+is to force a choice of one version of X11 over the default that gets specified 
+by <i>xmkmf</i> X11R6 over X11R5 for example.) 
+<p>
+The statement within the main Tk Makefile.PL:
+<pre>
+    require "./myConfig";    
+</pre>
+invokes the myConfig script for snooping out X on your system.
+Note also that in the <kbd>Tk*/config</kbd> directory there are a number of 
+tiny C programs for testing platform dependent things like: signed vs unsigned 
+char's and TIMEOFDAY_NO_TZ.
+<p>
+Tk's Makefile.PL also makes use of the <kbd>Tk*/Tk/MM*.pm</kbd> packages for 
+help in making the multiple Makefiles necessary for the complete build.
+
+<HR>
+<h2><a name="PLATFORMS">Platforms</a></h2>
+
+This collection of information is very informal.
+<p>
+You might find your system mentioned in the ptk hyper-mail archive at:
+<pre>
+    <a href="http://pubweb.bnl.gov/~ptk/">http://pubweb.bnl.gov/~ptk/</a>
+<i>or</i>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/</a>
+<i>or</i>
+    <a href="ftp://ftp.ccd.bnl.gov/pub/ptk/archives/">ftp://ftp.ccd.bnl.gov/pub/ptk/archives/</a>
+</pre>
+or the Perl 5 Porters <b>(p5p)</b> page at one of the following URLs:
+<pre>
+    <a href="http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/">http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/</a>
+    <a href="http://www.hut.fi/~jhi/perl5-porters.html">http://www.hut.fi/~jhi/perl5-porters.html</a>
+    <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/</a>
+</pre>
+or the perl metaFAQ <b>(pmFAQ)</b> at
+<pre>
+   <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html</a>
+</pre>
+
+If you wish to discuss your Tk build problems with others run and save the
+output from the <kbd>myConfig</kbd> script in the Tk build directory
+(the output may already be in the <kbd>myConfig.out</kbd> file from your 
+Tk-b&#35; build directory), as well as the <kbd>myconfig</kbd> script in your 
+perl build directory. It is often helpful to include the output of either 
+(or both) of these scripts in your discussion.
+<p>
+
+Presented here are the <EM>beginnings</EM> of a list of problems* 
+associated with
+building Tk-b&#35; on various operating systems.
+Note that a working definition of "UNIX" would probably have to mention 
+something like:
+<BLOCKQUOTE>
+ That form of computer operating system which has proven so wildly
+ popular that one (or more) organization(s) has (have) attempted to either
+ sue or demand payment from one (or more) other organization(s) over the use
+ of the word "UNIX".
+</BLOCKQUOTE>
+I am not completely sure if all of the following meet this criterion...
+(You are welcome to visit a <a href="../perl/nixnix.html">separate page</a> 
+on <a href="../perl/nixnix.html">non UNIX perl platforms</a> if you like.)
+<p>
+(* &amp; successes are marked with an icon - meaning one or more versions of 
+Perl/Tk has been reported to run on the named OS. Conversely, the absence of an
+icon cannot be construed to mean that Perl/Tk does not run there. The abscence
+of an icon may merely mean that I missed the announcement of the successful 
+build [<i>if</i> such an announcement was made] :-) 
+
+<h3>The platform list:</h3>
+
+
+<DL>
+
+<DT>68K:
+  (perhaps your best bet is <a href="http://www.tenon.com/">Mach Ten</a>
+  with <a href="http://www.tenon.com/blurb.html">X</a>, or 
+  <a href="http://puma.bevd.blacksburg.va.us/openmac/index.html">
+  MacLinux/MacBSD</a> (?) </DT>
+ <DD>.</DD>
+
+<DT><a href="http://www.macos.apple.com/macos/strategy_tocs/onunix.html">A/UX:</a></DT>
+ <DD>.</DD>
+
+<DT>Acorn: </DT>
+ <DD>.</DD>
+
+<DT>AIX: </DT>
+<DD> 
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ As of perl5.002b &amp; Tk-b9.01 <KBD>README.AIX</KBD> says no patching is
+ necessary. 
+ <p>
+ For Tk-b8: modifying the <KBD>perl.exp</KBD> file may be necessary. There is 
+ a patch in <KBD>Tk-b8/README.AIX</KBD>. It may be necessary to 
+ <KBD>make regen_headers</KBD> after the patch.
+ <p>.</DD>
+
+<DT>Amiga: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>)</DT>
+ <DD>.</DD>
+
+<DT>Atari: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+ <DD>.</DD>
+
+<DT>BSD4.4: </DT>
+ <DD>.</DD>
+
+<DT>DOS: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+ <DD>.</DD>
+
+<DT>Dynix: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+ <DD>.</DD>
+
+<DT><a href="http://www.cs.pdx.edu/~trent/gnu/hurd/">GNU Hurd:</a></DT>
+ <DD>.</DD>
+
+<DT>HP-UX: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ For Tk-b11: One person reports a need to add <KBD>#define TIMEOFDAY_TZ</KBD>
+ to the <KBD>tkConfig.h</KBD> header file in order to compile on HPUX 9.05.
+ <P>
+ Previous versions: Most people seem to prefer the dynamic linking afforded by 
+ a <em>recent</em> version of the gcc compiler on this system.
+ <p>.</DD>
+
+<DT>Human68K:
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+ <DD>.</DD>
+
+<DT>Linux: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ John C. Wingenbach indicates that should you encounter an error message
+ like <KBD>Cannot find -lX11 anywhere at ./myConfig line 184</KBD> when running
+ your <KBD>perl Makefile.PL</KBD> (under Slakware 3.0) that you should be
+ more specific about <KBD>-l/<I>path</I>/<I>to</I>/libX11.a</KBD>.<BR>
+ Adam Wasserman &lt;awasser@hermes.sgc.com&gt; has graciously provided a 
+ compilation of Linux compilation trials &amp; tribulations. It is an (as yet
+ un-edited) document available at:
+ <a href="etc/linux_compile_compilation.txt">
+ <KBD>http://w4.lns.cornell.edu/~pvhp/ptk/etc/linux_compile_compilation.txt</KBD></a>
+ <p>.</DD>
+
+<DT>LynxOS: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+ <DD>.</DD>
+
+<DT><a href="/~pvhp/perl/macperl.html">Mac:</a></DT>
+<DD>
+ Check the <kbd>ports/mac/</kbd> directory at 
+ <a href="qna4.html">CPAN site</a> [when last checked in
+ January 1996 the binary in this dir corresponded to perl4.036 which is
+ inadequate for the Tk extension :-(]<br>
+ <a href="http://err.ethz.ch/members/neeri.html">Matthias Neeracher</a> is 
+ leading the effort to implement 
+ <a href="http://err.ethz.ch/members/neeri/macintosh/perl.html">
+ perl5 for the Mac</a>.
+ There is also a mailing list for MacPerl: send a message body of 
+ "subscribe" to
+ <a href="mailto:mac-perl-REQUEST@iis.ee.ethz.ch">&lt;mac-perl-REQUEST@iis.ee.ethz.ch&gt;</a>. 
+ The list itself is addressed as
+ <a href="mailto:mac-perl@iis.ee.ethz.ch">&lt;mac-perl@iis.ee.ethz.ch&gt;</a>
+ There is a hypermail archive of the MacPerl list at
+ <a href="http://www.its.unimelb.edu.au:801/hma/pub/macperl/">
+ http://www.its.unimelb.edu.au:801/hma/pub/macperl/</a>
+ <p>
+ There is a FAQ-like question &amp; answer document for MacPerl at:<br>
+ <kbd><a href="http://err.ethz.ch/members/neeri/macintosh/perl-qa.html">
+ http://err.ethz.ch/members/neeri/macintosh/perl-qa.html</a></kbd>
+ (see also 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>)
+ <p>
+ The latest versions of the <a href="ftp://ftp.smli.com/pub/tcl/">source code</a> 
+ for Tcl/Tk have build directories for Macs.
+ <p>
+ For Xlib on this platform your choices appear to be limited to commercial
+ packages:
+ <ul>
+ <li>eXodus <a href="http://www.wpine.com/">(White Pine)</a></li>
+ <li><a href="http://www.macos.apple.com/macos/safe/compat/maetech/maetech6.html">MacX</a> || 
+     <a href="http://www.macos.apple.com/macos/strategy_tocs/onmacos.html">MacX</a>
+     (Apple Computer Inc.)</li>
+ <li><a href="http://www.netmanage.com/netmanage/pcx/xoftware/xmac.html">Xoftware</a> (NetManage)</li>
+ <li><a href="http://www.tenon.com/XTenInfo/XTenHome.html">XTen Home Page</a> (Tenon's X for power Macs)</li>
+ </ul>
+ <p>
+ In private communication with Richard Stallman the previous ban on GNU work
+ for the MacPlatform has now been lifted (presumably because of competition it
+ is no longer a closed, proprietary computer platform). However, regarding a 
+ port of the latest gcc to the Mac: "we have more urgent priorities".
+ <p>
+ For Perl/Tk see also <a href="http://www.tenon.com/">Mach Ten</a>.
+ <p>.
+ </DD>
+
+<DT><a href="http://puma.bevd.blacksburg.va.us/openmac/index.html">MacBSD|MacLinux</a>(?)</DT>
+ <DD>.</DD>
+
+<DT><a href="http://www.tenon.com/">Mach Ten:</a></DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ Mark Pease <a href="mailto:pease@act.sps.mot.com">&lt;pease@act.sps.mot.com&gt;</a>
+ [Co-Author (with Carl Dichter) of Software Engineering with Perl] 
+ reports that on his Mac IIcx running Tenon's MachTen 2.2 (BSD 4.3) with a
+ Mach kernel running on top of the Mac OS - it takes 3 hours
+ to compile perl and an additional 5 hours to compile the Tk extension.
+ He managed with Tk-b9.01 using Tenon's X11R5 version 3.1. (Strictly
+ speaking Mark considers this MachTen to be Unix.)
+ <p>
+ See also Tenon's <a href="http://www.tenon.com/XTenInfo/XTenHome.html">
+ XTen Home Page</a> (X for power Macs).
+ <p>.</DD>
+
+<DT>NetBSD:</DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ Jesus M. Gonzalez &lt;jgb@gsyc.inf.uc3m.es&gt; mentions success with:<BR>
+ <i>"Tk-b11.01 compiles, installs and runs just out of
+ the box in NetBSD-1.1/i386. I just followed the INSTALL
+ instructions"</i>
+ <p>.</DD>
+
+<DT>NeXT/NeXTSTEP:</DT>
+ <DD>
+ Gerd Knops recently posted a <a href="etc/next.steps.txt">discussion 
+ of the steps to get perl running on several NeXTSTEP</a>s  to p5p.
+ <p>.</DD>
+
+<DT><a href="http://www.leo.org/cgi-bin/leo-dls/pub/comp/os/os2/gnu/script/00-index.html">OS/2</a>:</DT>
+<DD>For perl itself see the <kbd>os2/README</kbd> file that comes with 
+ perl. Ilya Zakharevich 
+ <a href="mailto:ilya@math.ohio-state.edu">&lt;ilya@math.ohio-state.edu&gt;</a>
+ recommends a GNU make patch available from
+ <kbd><a href="ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2">ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2</a></kbd>
+<BLOCKQUOTE><I>
+PVHP@LNS62.LNS.CORNELL.EDU writes:<BR>
+&gt; By the way Ilya - do you have Tk running on OS/2 ?<BR>
+&gt; Any hints or advice you could lend would be appreciated.</I>
+<P><I>
+I got the volume 9 of devcon today, maybe I will try to use DAPI to
+port the windows stuff. I need it badly, but not going to spend a lot
+of time on this.</I>
+<P><I>
+Ilya
+</I></BLOCKQUOTE>
+ Ilya has ported Tk 4.1 to OS/2 and it too is available from:
+ <pre>
+    <a href="ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2">ftp://ftp.math.ohio-state.edu/pub/users/ilya/os2</a>
+ </pre>
+ Here is what the author of the port had to say about it:
+<BLOCKQUOTE><I>
+  It takes ./generic part of the source, and compiles it pretending that
+  it is UNIX using UNIXish CRT. It takes a ./win part and compiles it
+  using Win32/OS/2 libraries (DAPIE).</I>
+ <P><I>
+  There are 2 or 3 places where I needed patches to soften the conflicts
+  which obviously arise, 7 symbols intentionally missing in DAPIE, and 3
+  bugs in DAPIE which I should code around. That's all.
+</I></BLOCKQUOTE>
+ <p>Be sure to see the 
+ <a href="http://borneo.gmd.de/~veit/os2/xf86os2.html">XFree86/OS2 project</a> 
+ page.
+ <p>
+ If you insist on spending money to do your port then some commercial
+ Xlib alternatives are:
+ <ul>
+ <li><a href="http://direct.boulder.ibm.com/us/desktop/appdev/p29a.htm">OnCmd xBase for OS/2</a> from IBM.</li>
+ <li><a href="http://www.raleigh.ibm.com/tcp/tcpprod.html">Networking-TCP/IP for OS/2</a>  (be sure to get X <em>client</em>)</li>
+ <li><a href="http://direct.boulder.ibm.com/us/desktop/network/p41a.htm">TCP/IP for OS/2</a> (be sure to get X <em>client</em>)</li>
+ </ul>
+ <p>.</DD>
+
+<DT>OSF/1: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ As of perl5.002b &amp; Tk-b9.01 you will probably be able to follow the
+ usual instructions. John Stoffel &lt;john@wpi.edu&gt; reports that if you use
+ gcc (rather than cc) you should use at least version 2.7.2
+ <p>
+ For Tk-b8: <KBD>make</KBD> is reputedly not up to the task on this system.
+ <KBD>Tk-b8/README.OSF</KBD> recommends <KBD>gmake</KBD> instead.<BR>  
+ Stephane Bortzmeyer 
+ <a href="mailto:bortzmeyer@pasteur.fr">&lt;bortzmeyer@pasteur.fr&gt;</a>
+ reports a successful build with <b>Perl 5.001m</b>, <b>xsubpp 1.922</b>, 
+ <b>MakeMaker 4.23</b>. He points out that it was necessary for him to 
+ upgrade the xsubpp and MakeMaker that he received with his copy of 
+ Perl5.001m.
+ <p>.</DD>
+
+<DT>qnx: </DT>
+ <DD>Perl 5.002 definitely runs on this system.
+ <p>.</DD>
+
+<DT>SCO: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ For Tk-b8: Eric J. Bohm 
+ <a href="mailto:bohm@cs.Buffalo.EDU">&lt;bohm@cs.Buffalo.EDU&gt;</a>  
+ reported a need to
+ comment out line(s) from <KBD>myConfig</KBD> and <KBD>GNUMakefile</KBD>s using
+ GNU make 3.67. (See <KBD>Tk-b8/README.SCO</KBD> for specifics.)
+ <p>.</DD>
+
+<DT>SGI (Irix): </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ Matthew Black 
+ <a href="mailto:black@csulb.edu">&lt;black@csulb.edu&gt;</a> recently
+ mentioned a need to apply &quot;patchSG0000596&quot; to get perl sockets
+ to work. His message was copywritten and is not included here. Send 
+ <a href="mailto:black@csulb.edu">e-mail to him</a> 
+ to find out where the get &quot;patchSG0000596&quot;. 
+ <p>.</DD>
+
+<DT>Suns: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif"><BR>
+  <STRONG>SunOS (BSD):</STRONG><BR>
+  For Tk-b10 on SunOS 4.1.3_U1<BR>
+  using SparcWorks acc 3.0.1 Frederick L. Wagner &lt;derf@ti.com&gt; reports
+  needing to use the perl malloc rather than the system malloc() when building
+  perl.<BR>
+  For Tk-b8: 
+  Tom Tignor <a href="mailto:tpt2@BBN.COM">&lt;tpt2@BBN.COM&gt;</a> reports the 
+  following on SunOS (sun4m sparc):
+	<I>
+	Tue, 28 Nov 1995 13:19:42<BR>
+	In trying to make, I got a "write: argument mismatch" error
+	for the file ptK/Lang.h. I looked at the file and found the offending
+	function, Tcl_GetOpenFile, which has a third argument called "doWrite"
+	(not "write") in tkGlue.c. I changed the argument from "write" to
+	"doWrite" in Lang.h and it's compiling fine (for the moment. :)
+	</I><BR>
+  <STRONG>Solaris (System V):</STRONG><BR>
+  For Tk-b8: 
+  There is trouble getting <b>perl</b> to use <b>Socket</b> routines
+  (<i>i.e.</i> trouble with <kbd>make</kbd> perl itself not necessarily
+  trouble with Tk-b&#35;). See the <a
+  href="http://www.perl.com/perl/faq/Q4.21.html">perl FAQ</a> for more 
+  info or the <a href="etc/SolSock.shar"><kbd>.shar</kbd></a> file that 
+  Tom Christiansen occasionally 
+  posts to <a href="news:comp.lang.perl.misc">comp.lang.perl.misc</a>.
+  Further information on perl <b>i</b>nter <b>p</b>rocess
+  <b>c</b>ommunication can be found in the <kbd>perlipc*</kbd> files at:
+  <a href=" ftp://ftp.perl.com/perl/info/everything_to_know/">
+  <kbd>ftp://ftp.perl.com/perl/info/everything_to_know/</kbd></a>.
+  <p>.</DD>
+
+<DT>SVR4: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ For Tk-b8: 
+ Martha G. Armour and Len Reed report on two separate hardware platforms
+ running SVR4 - extensive details in <KBD>Tk-b8/README.SVR4</KBD>. 
+ Interestingly, they report no trouble at all on Linux. 
+ </DD>
+
+<DT>SVR5:</DT>
+ <DD>.</DD>
+
+<DT>Ultrix: </DT>
+ <DD>
+ <IMG SRC="img/T_pTk.gif" ALT="img/T_pTk.gif">
+ Peter Prymmer reports that with Tk-b11 it was necessary to change the line in
+ Makefile.PL that reads:<br>
+ <kbd>'LIBS'    => ["$xlib -lX11 -lpt -lsocket -lnsl -lm"],</kbd><br>
+ to read:<br>
+ <kbd>'LIBS'    => ["$xlib -lX11 -lpt -lsocket -lnsl -lm -ldnet"],</kbd><br>
+ because of a newer X11 in /usr/local that needed the DECnet protocol linking.
+ <p>
+ John Stoffel reports a successful build of static Tk-b10 on Ultrix 4.5.
+ <p>.</DD>
+
+<DT>Venix: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+ <DD>(This one should win an award for the coolest sounding UNIX ripoff name ;-)<p>.</DD>
+
+<DT><a href="../perl/VMS.html">VMS:</a> </DT>
+<DD> Charles Bailey <a href="mailto:bailey@genetics.upenn.edu">&lt;bailey@genetics.upenn.edu&gt;</a>
+ has done a wonderful job porting perl5 to VMS. It can be built using MMS, 
+ <a href="http://www.wku.edu/www/madgoat/mmk.html">MMK</a>, or 
+ VMS <a href="http://www.openvms.digital.com/cd/GMAKE/">GMake</a> or 
+ <a href="http://www.openvms.digital.com/cd/IMAKE/">IMake</a>. 
+ Not (yet?!) distributed on CPAN it is available from:
+ <kbd>
+ <a href="ftp://genetics.upenn.edu/perl5/perl5_vmstest.zip">ftp://genetics.upenn.edu/perl5/perl5_vmstest.zip</a>
+ </kbd> (Recommendations:
+ do not try anything but a VMS web browser to follow the hyperlink as 
+ browsers on other OSes do not grok the 
+ protocol on VMS ftp servers too well. If you do not have a VMS web-browser  
+ then use line mode 
+ <a href="http://www.wku.edu/www/madgoat/mgftp.html">ftp</a> instead. Do use an 
+ <a href="http://quest.jpl.nasa.gov/Info-ZIP/UnZip.html#VMS">UNZIP</a> 
+ specifically compiled for the VMS file system.)
+ <p>
+ Angel Li has ported Tcl7.5a2 and Tk4.1a2 to VMS and maintains a web page at<br>
+ <kbd>
+ <a href="http://www.rsmas.miami.edu/vms-tcl.html">http://www.rsmas.miami.edu/vms-tcl.html</a>
+ </kbd><p>. </DD>
+
+<DT>Win 95: </DT>
+ <DD>
+ (see Win NT, DOS, or the page at:
+ <kbd><a href="http://www.inxpress.net/~moewes/computer/perl95.html">
+ http://www.inxpress.net/~moewes/computer/perl95.html</a></kbd>)
+ <p>.
+ </DD>
+
+<DT>Win NT: </DT>
+ <DD>
+ Gary Ng <a href="mailto:garyn@winclient.com">&lt;garyn@winclient.com&gt;</a>
+ is currently working on an NT port of perl5.002. For a C compiler he uses
+ VC++ 4.0, but adds that there is a RSXNT which allows you to run emx port
+ of gcc (2.7.2). "It is great for porting unix utilities."
+ <p>
+ Be sure to check out Cygnus' 
+ <a href="http://www.cygnus.com/misc/gnu-win32/">gnu win32 stuff</a>.
+ <p>
+ The <b>hip</b> port was conducted under contract with Microsoft
+ corporation<BR>
+ See hip info on (perl5 only no Tk extension) at:
+ <kbd><a href="http://www.perl.hip.com/">http://www.perl.hip.com/</a></kbd>
+ There is a mailing list for hipsters at: 
+ <a href="mailto:Perl-Win32@mail.hip.com">&lt;Perl-Win32@mail.hip.com&gt;</a>.<BR>
+ There is also a mailing list for users at: 
+ <a href="mailto:Perl-Win32-users@mail.hip.com">&lt;Perl-Win32-users@mail.hip.com&gt;</a>.<BR>
+ There is a moderated mailing list for announcements at: 
+ <a href="mailto:Perl-Win32_announce@mail.hip.com">&lt;Perl-Win32_announce@mail.hip.com&gt;</a>.<BR>
+ Questions concerning any of these lists can be addressed by sending e-mail to:
+ <a href="mailto:perl-win32-owner@mail.hip.com">&lt;perl-win32-owner@mail.hip.com&gt;</a>.
+ To unsubscribe from perl-win32-users send a message of 
+ <kbd>unsubscribe perl-win32-users</kbd> to 
+ <a href="mailto:majordomo@mail.hip.com">&lt;majordomo@mail.hip.com&gt;</a>.<br>
+ If you are <em>still</em> having trouble with that list try sending e-mail to 
+ <a href="mailto:dick_hardt@hip.com">&lt;dick_hardt@hip.com&gt;</a>
+<p>
+ Unfortunately, the <b>hip</b> 
+ <A HREF="http://www.perl.hip.com/PerlFaq.htm">NT Perl FAQ</A> mentions:
+ <ul>
+ <li><b>5.What do I need to compile the source code? </b><br>
+      You need a win32 compiler ( such as <b>MSVC2.0</b> or the 
+      <b>Win32 SDK</b> ). The makefiles require <b>nmake</b> to build the tree. 
+ <li><b>8.What's in store for the future? </b><br>
+      Lots of interesting stuff. Module extensions for NT. 
+ </ul>
+ The <a href="http://www.perl.hip.com/man-pages/status.htm">NT Perl unsupported page</a> 
+ mentions:
+ <ul>
+ <li><b>Dynaloader</b><br>
+ The dynaloader has not been implemented in this release. Any extension that
+ requires dynamic loading is not supported.
+ </ul>
+ The <a href="http://www.perl.hip.com/man-pages/win32.htm">Win32 info page</a>
+ mentions:
+ <ul>
+ <li>The <a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a> newsgroup is probably of little use to users of Perl
+     for Win32, but the other two (newsgroups: <a href="news:comp.lang.perl.misc">c.l.p.misc</a>, 
+     <a href="news:comp.lang.perl.announce">announce</a>) 
+     are indispensable sources of information. 
+ </ul>
+ Be sure to see also the 
+ <a href="http://www.perl.hip.com/man-pages/oleauto.htm">OLE extension to NT Perl</a>!
+ <p>
+ The latest versions of the <a href="ftp://ftp.smli.com/pub/tcl/">source code</a> 
+ for Tcl/Tk have build directories for PC-style microcomputers.
+ <p>
+ Nick Ing-Simmons has recently (Jan 96) <a href="http://sun20.ccd.bnl.gov/%7Eptk/archive/ptk.1996.01/0062.html">commented</a>
+ on the steps necessary to get perl/Tk running on these sorts of platforms.
+ Check out: 
+ <kbd>
+ <a href="http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1996.01/0062.html">http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1996.01/0062.html</a>
+ </kbd><p>
+ Apparently on this platform a pre-packaged Xlib is something that people are
+ only willing to charge you money for. 
+ There are a number of commercial X packages for this platform such as:<BR>
+ <ul>
+ <li><a href="http://www.intergraph.com/nfs/xlt_ovr.htm">eXalt - Home Page</a></li>
+ <li><a href="http://www.windowsnt.digital.com/software/excur.htm">eXcursion for Windows NT and Windows 3.1</a> (also win 95) from DEC.</li>
+ <li><a href="http://www.xinside.com/">X Inside</a></li>
+ <li><a href="http://www.xtreme.it/index.eng.html">Xtreme Home Page</a> (english version - for PCs)</li>
+ <li><a href="http://www.zinc.com/">Zinc Software Incorporated</a></li>
+ </ul>
+ <p>.
+ </DD>
+
+<DT>Xenix: 
+ (see 
+ <a href="http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html">pmFAQ</a>
+ or 
+ <a href="http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/">p5p</a>) </DT>
+
+</DL>
+
+Note that hints files exist for the following OSes for compiling perl5 with
+Configure:
+<PRE>
+3b1             dynixptx        irix_6_2        next_3_0        sunos_4_0   
+aix             epix            isc             opus            sunos_4_1   
+altos486        esix4           isc_2           os2             svr4   
+apollo          fps             linux           powerux         ti1500   
+aux             freebsd         machten         sco             titanos   
+bsdos           genix           machten_2       sco_2_3_0       ultrix_4   
+convexos        greenhills      mips            sco_2_3_1       unicos   
+cxux            hpux            mpc             sco_2_3_2       unisysdynix   
+dec_osf         i386            mpeix           sco_2_3_3       utekv   
+dgux            irix_4          ncr_tower       sco_2_3_4       uts   
+dnix            irix_5          netbsd          solaris_2   
+dynix           irix_6          next_3          stellar
+</PRE>
+
+
+<HR>
+<h2><a name="MISC">Miscellany</a></h2>
+OK here is a bunch of info that simply would not fit easily into any of the
+above categories. Maybe some of this is useful...
+<p>
+Be sure to check out the 
+<a href="http://www.x.org/consortium/R6.1doc/man/X11/">Xlib man pages</a>. 
+See the <a href="http://www.zeta.org.au/~rosko/pigui.htm">PIGUI FAQ</a> for
+more information. 
+There is also the 
+<a href="http://www.cis.ohio-state.edu/hypertext/faq/usenet/x-faq/top.html">comp.windows.x</a>
+FAQ. 
+There is a <a href="http://www.wri.com/~cwikla/widget/index.html">Widget FAQ</a> 
+too. 
+There is also <a href="http://www.rahul.net/kenton/xsites.html">Kenton Lee's</a> 
+excellent Xsite page. 
+<a href="http://www.xbg.com/">Zona Research Inc.</a> provides a X news
+sub$cription service. Whereas the 
+<a href="http://landru.unx.com/DD/advisor/index.shtml">The X Advisor Home
+Page</a> appears to be free (for the online version at least). 
+Be sure to pay an occasional visit to the 
+<a href="http://www.yahoo.com/Computers_and_Internet/Software/X_Window_System/index.html">
+X Window System</a> page at Yahoo for the latest hype[r]link.
+<p>
+Here are the some of the many fine people that distribute X for free (the way
+it's authors and copyright holders intended):
+<ul>
+<li><a href="http://www.x.org/"><em>The</em> X consortium</a></li>
+<li><a href="http://www.xfree86.org/">XFree86(TM): Home Page</a></li>
+<li><a href="http://borneo.gmd.de/~veit/os2/xf86os2.html">XFree86/OS2 project</a></li>
+</ul>
+There are a number of commercial vendors of X code that tout
+"platform independence" more strongly than does the 
+<a href="http://www.x.org/">X consortium itself</a> among them these organizations
+that typically offer Xlib for sale (usually to microcomputer users) [some have
+free demo versions available]:
+<ul>
+<li><a href="http://www.netmanage.com/netmanage/ocxcontest/">ActiveX</a> (Win) from Netmanage</li>
+<li><a href="http://www.intergraph.com/nfs/xlt_ovr.htm">eXalt - Home Page</a></li>
+<li><a href="http://www.windowsnt.digital.com/software/excur.htm">eXcursion for Windows NT and Windows 3.1</a> (also win 95) from DEC (free demo).</li>
+<li>eXodus <a href="http://www.wpine.com/">(White Pine)</a></li>
+<li><a href="http://direct.boulder.ibm.com/us/desktop/appdev/p29a.htm">OnCmd xBase for OS/2</a> from IBM.</li>
+<li><a href="http://www.metrolink.com/">Metro-X</a></li>
+<li><a href="http://www.raleigh.ibm.com/tcp/tcpprod.html">Networking-TCP/IP for OS/2</a></li>
+<li><a href="http://direct.boulder.ibm.com/us/desktop/network/p41a.htm">TCP/IP for OS/2</a></li>
+<li><a href="http://www.xinside.com/">X Inside</a></li>
+<li><a href="http://www.tenon.com/XTenInfo/XTenHome.html">XTen Home Page</a> (Tenon's X for power Macs)</li>
+<li><a href="http://www.xtreme.it/index.eng.html">Xtreme Home Page</a> (english version - for PCs)</li>
+<li><a href="http://www.unipress.com/cat/xvision.html">XVision</a> (UniPress Inline Catalog)</li>
+<li><a href="http://www.zinc.com/">Zinc Software Incorporated</a></li>
+</ul>
+Here are some X related newsgroups:
+<ul>
+<li><a href="news:comp.windows.x">comp.windows.x</a> (unmoderated)</li>
+<li><a href="news:comp.windows.x.announce">comp.windows.x.announce</a> (moderated)</li>
+</ul> 
+Slightly unrelated X newsgroups include:
+<ul>
+<li><a href="news:comp.windows.x.motif">comp.windows.x.motif</a></li>
+</ul> 
+
+<h3><a name="GLOSSARY">Glossary:</a></h3>
+<DL COMPACT>
+<DT>aka</DT>
+ <DD><b>a</b>lso <b>k</b>nown <b>a</b>s. aka a.k.a.</DD>
+<DT>C</DT>
+ <DD>A <b>C</b>omputer language (it is <b>c</b>ompiled).</DD>
+<DT>cc</DT>
+ <DD><b>C</b> <b>c</b>ompiler 
+ (the one your hardware/software vendor sold to you, as opposed to gcc).
+ Also, the typical name of the program that does the compiling of C 
+ programs on your system (it may do more).</DD>
+<DT><a href="news:comp.lang.perl.tk">c.l.p.tk</a></DT>
+ <DD>a usenet newsgroup for discussion of Perl/Tk. aka comp.lang.perl.tk.</DD>
+<DT><a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a></DT>
+ <DD>a usenet newsgroup for discussion of Perl/Tk. aka c.l.p.tk.</DD>
+<DT>CPU</DT>
+ <DD><B>C</B>entral <B>P</B>rocessing <B>U</B>nit.</DD>
+<DT>DLL</DT>
+ <DD><B>D</B>ynamic <B>L</B>ink <B>L</B>ibrary: available on the Windows 
+     platforms, OS/2 (others?).</DD>
+<DT><i>e.g.</i></DT>
+ <DD><B>e</B>xempli <B>g</B>ratia.</DD>
+<DT><i>et al.</i></DT>
+ <DD><B>et al</B>ii.</DD>
+<DT><i>etc.</i></DT>
+ <DD><B>et c</B>etera.</DD>
+<DT><a href="ftp://prep.ai.mit.edu/pub/gnu"><b>gcc</b></a></DT>
+ <DD>The GNU C compiler.</DD>
+<DT>FLAN</DT>
+ <DD><b>F</b>our <b>L</b>etter <b>A</b>cronym <b>N</b>ame. Also, a 
+     delicious custard-like dessert</DD>
+<DT>GNU</DT>
+ <DD><B>G</B>nu's <B>N</B>ot <B>U</B>nix. (That's a recursive acronym in case you missed it).</DD>
+<DT>GUI</DT>
+ <DD><B>G</B>raphical <B>U</B>ser <B>I</B>nterface.</DD>
+<DT>IDE</DT>
+ <DD><b>I</b>ntegrated <b>D</b>evelopment <b>E</b>nvironment. Usually an expensive 
+     compiler/maker/language-sensitive-editor package for microcomputers.</DD>
+<DT>microcomputer</DT>
+ <DD>computers that employ the hardware designs of the popular Motorola or Intel/AMD/Cyrex CPUs.
+     Examples include MacIntoshes and PCs. Operating systems include linux, MachTen,
+     NetBSD, Qnx, and FreeBSD.</DD>
+<DT><a href="http://web.mit.edu/">mit</a></DT>
+ <DD><a href="http://web.mit.edu/"><b>M</b>assachusetts <b>I</b>nstitute of <b>T</b>echnology</a>. 
+     An institution of higher learning for primarily technical fields of 
+     study in Massachusetts USA.</DD>
+<DT><a href="http://www.microsoft.com/oledev/olemkt/oleis.htm">OLE</a></DT>
+ <DD><b>O</b>bject <b>L</b>inking and <b>E</b>mbedding A cross-platform object 
+     (usually a GUI thing) brought to you mainly by 
+     <a href="http://www.microsoft.com/oledev/olemkt/oleent/whenwhat.htm">Microsoft Inc.</a></DD>
+<DT>perk</DT>
+ <DD>?</DD>
+<DT>perl</DT>
+ <DD><b>p</b>ractical <b>e</b>xtraction and <b>r</b>eport <b>l</b>anguage, <i>or</i>
+     <b>p</b>athologically <b>e</b>clectic <b>r</b>ubbish <b>l</b>ister.</DD>
+<DT>port</DT>
+ <DD>The left side of a ship when onboard and facing the bow (the forward moving direction assuming
+     the ship is moving forward).</DD>
+<DT>porter</DT>
+ <DD>One who carries or "ports" from one place to another. <i>e.g.</i> The passenger platform of the 
+     53rd street pier to the Champagne suite on the "Sunshine Deck" (Sun DEC?).</DD>
+<DT>pTk</DT>
+ <DD><b>p</b>ortable <b>T</b>ool<b>k</b>it, <i>or</i>
+     <b>p</b>ure     <b>T</b>ool <b>k</b>it, <i>or</i>
+     a mailing list devoted to an interpreted GUI programming language.</DD>
+<DT>Stanford</DT>
+ <DD>a University in northern California (between San Jose and San Francisco).
+ Where the W library was developed along with the V operating system.</DD>
+<DT>Tcl</DT>
+ <DD><b>T</b>ool <b>c</b>ommand <b>l</b>anguage. (Not to be confused with Perl.)</DD>
+<DT>thingy</DT>
+ <DD>An (american?) english term for that which is difficult to name or remember the name of.
+     aka thingamabob, thingamajig, doo-hickey, <i>etc</i>.</DD>
+<DT>TI</DT>
+ <DD><b>T</b>exas <b>I</b>nstruments.</DD>
+<DT>Tk</DT>
+ <DD><b>T</b>ool <b>k</b>it.</DD>
+<DT>TLA</DT>
+ <DD>[<b>T</b>wo|<b>T</b>hree] <b>L</b>etter <b>A</b>cronym.</DD>
+<DT>UK</DT>
+ <DD><b>U</b>nited <b>K</b>ingdom.</DD>
+<DT>X</DT>
+ <DD>The letter after W. Don't laugh! If you read your X-history you will see why this is not such a
+     dumb definition.</DD>
+<DT>widget</DT>
+ <DD>A component of a bitmapped display or GUI. Examples include <kbd>Button</kbd>s, 
+     <kbd>Scrollbar</kbd>s and the like.</DD>
+<DT><a href="http://www.wpi.edu/">wpi</a></DT>
+ <DD><b>W</b>orcester <b>P</b>olytechnic <b>I</b>nstitute. An institution of higher learning for
+     primarily technical fields of study in Massachusetts USA.</DD>
+</DL>
+
+<hr>
+<pre>
+<a href="#INTRO">Intro.</a> | <a href="#LICENSE">License</a> | <a href="#INGREDIENTS">Ingredients</a> | <a href="#COOKBOOK">Cookbook</a> | <a href="#EFFICIENCY">Efficiency</a> | <a href="#PLATFORMS">Platforms</a> | <a href="#MISC">Misc.</a>
+</pre>
+<HR>
+<ADDRESS>
+I am:<BR>
+<A HREF="http://w4.lns.cornell.edu/~pvhp/">Peter Prymmer</A><BR>
+<A HREF="http://w4.lns.cornell.edu/">Wilson Synchrotron Laboratory</A><BR>
+<A HREF="http://www.cornell.edu/">Cornell University</A><BR>
+<A HREF="http://www.ithaca.ny.us/">Ithaca</A>, 
+ <A HREF="http://wings.buffalo.edu/world/nywww.html">NY</A> 
+ <A HREF="http://www.mit.edu:8001/geo?Ithaca">14853</A><BR><BR>
+<A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A><BR>
+</ADDRESS>
+<p><A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A> | 
+ <A HREF="ptkFAQ.html">perl/Tk FAQ</A> | 
+ <A HREF="ptkTOC.html">FAQ Table of Contents</A>
+
+</BODY>
+</HTML>
+
+
+
+
+

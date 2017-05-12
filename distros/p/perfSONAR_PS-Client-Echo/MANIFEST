@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/Client/Echo.pm
+perl-perfSONAR_PS-Client-Echo.spec
+psping
+t/perfSONAR_PS::Client::Echo.t
+META.yml                                 Module meta-data (added by MakeMaker)

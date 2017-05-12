@@ -1,0 +1,296 @@
+#! /Users/jj/bin/perl
+
+# pod2pdf.pl - converts Pod to PDF format
+#
+# Copyright (C) 2007 Jon Allen <jj@jonallen.info>
+#
+# This software is licensed under the terms of the Artistic
+# License version 2.0.
+#
+# For full license details, please read the file 'artistic-2_0.txt' 
+# included with this distribution, or see
+# http://www.perlfoundation.org/legal/licenses/artistic-2_0.html
+
+
+#--Load required modules and activate Perl's safety features---------------
+
+use strict;
+use warnings;
+use App::pod2pdf;
+use File::Basename qw/basename/;
+use File::Spec::Functions;
+use FindBin qw/$Bin/;
+use Getopt::ArgvFile qw/argvFile/;
+use Getopt::Long;
+use POSIX qw(locale_h);
+
+
+#--Load config files-------------------------------------------------------
+
+# Define config filename as <application_name>.conf
+(my $configfile = basename($0)) =~ s/^(.*?)(?:\..*)?$/$1.conf/;
+
+# Include config file from the same directory as the pod2pdf script
+if (-e "$Bin/$configfile") {
+  unshift @ARGV,'@'."$Bin/$configfile";
+}
+
+# If we have been packaged with PAR, include the config file from the
+# application bundle
+if ($ENV{PAR_TEMP} and -e "$ENV{PAR_TEMP}/inc/$configfile") {
+  unshift @ARGV,'@'."$ENV{PAR_TEMP}/inc/$configfile";
+}
+
+argvFile();  # Process @ARGV to load specified config files. (Function
+             # from Getopt::ArgvFile - interpolates "@filename" entries
+             # in @ARGV with the contents of the specified file)
+             
+             
+#--Parse command-line options----------------------------------------------
+
+my %options = (
+  'page-height'      => '=i',
+  'page-width'       => '=i',
+  'page-size'        => '=s',
+  'page-orientation' => '=s',
+  'margins'          => '=i',
+  'left-margin'      => '=i',
+  'right-margin'     => '=i',
+  'top-margin'       => '=i',
+  'bottom-margin'    => '=i',
+  'header'           => '!',
+  'footer'           => '!',
+  'title'            => '=s',
+  'footer-text'      => '=s',
+  'icon'             => '=s',
+  'icon-scale'       => '=s',
+  'timestamp'        => '!',
+  'output-file'      => '=s',
+);
+
+my %config;
+GetOptions(\%config,
+  optionspec(%options),
+  version => sub{ print "This is pod2pdf, version $App::pod2pdf::VERSION\n"; exit }
+) or die("[Error] Could not parse options");
+
+$config{title}  = (@ARGV) ? $ARGV[0] : 'STDIN' unless (exists $config{title});
+$config{title} .= (' - ' . ((@ARGV) ? scalar localtime($^T - (-M $ARGV[0])*24*60*60) : scalar localtime)) if (exists $config{timestamp});
+
+
+#--Set output location-----------------------------------------------------
+
+if (my $outfile = $config{output_file}) {
+  open STDOUT,'>',$outfile or die("Cannot open output file $outfile: $!\n")
+}
+
+
+#--Tell the OS we are going to create binary data--------------------------
+
+setlocale(LC_ALL,'C');
+binmode *STDOUT;
+
+
+#--Parse our Pod-----------------------------------------------------------
+
+my $parser = App::pod2pdf->new(%config);
+(@ARGV) ? $parser->parse_from_file($ARGV[0]) : $parser->parse_from_filehandle(\*STDIN);
+
+$parser->output;
+
+exit;
+
+
+#--------------------------------------------------------------------------
+
+sub optionspec {
+  my %option_specs = @_;
+  my @getopt_list;
+  while (my ($option_name,$spec) = each %option_specs) {
+    (my $variable_name = $option_name) =~ tr/-/_/;
+    (my $nospace_name  = $option_name) =~ s/-//g;
+    my $getopt_name = ($variable_name ne $option_name) ? "$variable_name|$option_name|$nospace_name" : $option_name;
+    push @getopt_list,"$getopt_name$spec";
+  }
+  return @getopt_list;
+}
+
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+=head1 NAME
+
+pod2pdf - converts Pod to PDF format
+
+=head1 DESCRIPTION
+
+pod2pdf converts documents written in Perl's POD (Plain Old Documentation)
+format to PDF files.
+
+=head2 Usage
+
+ pod2pdf [options] input.pod >output.pdf
+
+If no input filename is specified, pod2pdf will read from STDIN, e.g.
+
+ perldoc -u File::Find | pod2pdf [options] >File-Find.pdf
+
+=head2 Options
+
+pod2pdf accepts the following command-line options:
+
+=over
+
+=item C<--output-file>
+
+Sets the output filename for the generated PDF file. By default pod2pdf will output
+to STDOUT.
+
+=item C<--page-size>
+
+Sets the page size to be used in the PDF file, can be set to any of the standard
+paper sizes (A4, A5, Letter, etc). Defaults to A4.
+
+=item C<--page-orientation>
+
+Controls if pages are produces in landscape or portrait format. Defaults to 'portrait'.
+
+=item C<--page-width>, C<--page-height>
+
+Sets the width and height of the generated pages in points (for using non-standard
+paper sizes).
+
+=item C<--left-margin>, C<--right-margin>, C<--top-margin>, C<--bottom-margin>
+
+Allows each of the page margins (top, bottom, left, and right) to be individually
+set in points. 
+
+=item C<--margins>
+
+Sets all page margins to the same size (specified in points).
+
+=item C<--header>, C<--noheader>
+
+Controls if a header (containing the page title, and optional timestamp and icon)
+will be included on each page. Defaults to on, so use C<--noheader> to disable.
+
+=item C<--title>
+
+Sets the page title (defaults to the input filename).
+
+=item C<--timestamp>
+
+Boolean option - if set, includes the 'last modified' timestamp of the input file in
+the page header.
+
+=item C<--icon>
+
+Filename of an icon to be displayed in the top left corner of each page.
+
+=item C<--icon-scale>
+
+Scaling value for the header icon (defaults to 0.25).
+
+=item C<--footer>, C<--nofooter>
+
+Controls if a footer (containg the current page number and optional text string)
+will be included on each page. By default the footer will be included, so use 
+C<--nofooter> to disable.
+
+=item C<--footer-text>
+
+Sets an optional footer text string that will be included in the bottom left corner
+of each page.
+
+=item C<--version>
+
+Prints version number and exits.
+
+=back
+
+=head2 Configuration files
+
+Sets of command-line options may be saved into configuration files. 
+
+A configuration file contains options in the same format as used by pod2pdf on the command-line,
+with one option given on each line of the file, e.g.
+
+ --page-size A5
+ --page-orientation landscape
+
+To use a config file, invoke pod2pdf with the option C<@/path/to/configfile.conf>.
+
+For example, if you wanted to always include a company logo, timestamp, and copyright 
+notice in your PDF files, create a file F<mycompany.conf> containing the following:
+
+ --icon "/path/to/your/logo.png"
+ --footer-text "Copyright 2007 MyCompany Limited"
+ --timestamp
+
+Then invoke pod2pdf as:
+
+ pod2pdf @/path/to/mycompany.conf input.pod >output.pdf
+
+If you create a config file called F<pod2pdf.conf> and place this in the same 
+directory as the pod2pdf script, it will be loaded as the default configuration.
+
+=head1 POD ENTENSIONS
+
+As well as the standard POD commands (see L<perlpodspec>), pod2pdf supports the following
+extensions to the POD format:
+
+=over
+
+=item C<=ff>
+
+The C<=ff> command inserts a page bread (form feed) into the document.
+
+=item C<< OE<lt>...E<gt> >>
+
+The C<< OE<lt>...E<gt> >> formatting code inserts an external object (file) into the document. This
+is primarily intended for embedding images, e.g.
+
+ O</path/to/figure1.jpg>
+
+to insert diagrams, etc into documentation.
+
+pod2pdf supports the file types JPG, GIF, TIFF, PNG, and PNM for embedded objects.
+
+=back
+
+=head1 DEPENDENCIES
+
+pod2pdf requires the following modules to be installed:
+
+=over
+
+=item L<PDF::API2>
+
+=item L<Pod::Escapes>
+
+=item L<Getopt::ArgvFile>
+
+=back
+
+Additionally to use images, the modules L<File::Type> and L<Image::Size> must
+be installed, and to specify alternative page sizes the L<Paper::Specs> module
+is required.
+
+=head1 SEE ALSO
+
+The pod2pdf homepage: L<http://perl.jonallen.info/projects/pod2pdf>
+
+For more information about POD, read the L<perlpod> manpage or see the POD page
+on the Perl 5 Wiki (L<http://www.perlfoundation.org/perl5/index.cgi?pod>).
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2007 Jon Allen (JJ) <jj@jonallen.info>
+
+This software is licensed under the terms of the Artistic
+License version 2.0.
+
+For full license details, please read the file F<artistic-2_0.txt> 
+included with this distribution, or see
+L<http://www.perlfoundation.org/legal/licenses/artistic-2_0.html>.

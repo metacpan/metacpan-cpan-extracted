@@ -1,0 +1,49 @@
+<H2><A HREF="31908A89.542B@rome.itd.sterling.com">[PREV]</A>  [NEXT]  <A HREF="4mq8q9$9cu@larry.rice.edu">[PREV Thread]</A>  <A HREF="199605081416.JAA07628@dione.cs.rice.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> a904209@pluto.tiuk.ti.com
+</ADDRESS>
+<TITLE> Re: Help trying to display bitmap on a button ??</TITLE>
+<ADDRESS><H1> Re: Help trying to display bitmap on a button ??</H1>
+</ADDRESS>
+<ADDRESS> 10 May 1996 08:53:48 GMT
+ Texas Instruments Ltd.
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<31908A89.542B@rome.itd.sterling.com"><31908A89.542B@rome.itd.sterling.com></A>
+</DL>
+<HR>
+<PRE>     Tim Metzger <Tim_Metzger@rome.itd.sterling.com> wrote in article <31908A89.542B@rome.itd.sterling.com> :
+&gt;
+&gt;I was under the impression, after reading the limited 
+&gt;documentation that I have, that to display a bitmap on
+&gt;a button all I would need to do is use the -bitmap
+&gt;instead of -text and supply the bitmap name.  Well this
+&gt;doesn't work and I get the message
+&gt;
+&gt;<bitmap> not defined at /usr/local/lib/perl5/Tk/Widget.pm
+&gt;
+&gt;What's the trick to getting a bitmap to display on a button ??
+&gt;Do I need to include some specific file ?
+
+Core Tk needs an '@' on the front of the bitmap path name, and perl needs @
+to be escaped.
+
+Here is an example:
+
+#!/usr/local/bin/perl -w
+use Tk;
+my $mw = MainWindow-&gt;new;
+my $path   = Tk-&gt;findINC("Tk.xbm");
+print "path is $path\n";
+my $button = $mw-&gt;Button(-bitmap =&gt; "\@$path");
+$button-&gt;pack;
+MainLoop;
+
+__END__
+
+
+</PRE>
+<HR><H2><A HREF="31908A89.542B@rome.itd.sterling.com">[PREV]</A>  [NEXT]  <A HREF="4mq8q9$9cu@larry.rice.edu">[PREV Thread]</A>  <A HREF="199605081416.JAA07628@dione.cs.rice.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

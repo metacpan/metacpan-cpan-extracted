@@ -1,0 +1,11 @@
+--- #YAML:1.0
+name:                Pfacter
+version:             1.13
+abstract:            Collect and display facts about the system
+license:             perl
+distribution_type:   module
+requires:
+    Getopt::Long:           0
+author:
+    - Scott Schneider <sschneid@gmail.com>
+

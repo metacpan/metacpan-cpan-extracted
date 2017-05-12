@@ -1,0 +1,66 @@
+#!# perl: argos/code/r.generic.example * this is incomplete *
+use strict;
+
+use YAML::XS;
+use File::Basename;
+
+use Hermes;
+use Vulcan::OptConf;
+
+return sub
+{
+    my %param = @_;
+    my ( $data, $param ) = @param{ qw( data param ) };
+    my $tier = join '|', @{ $param{tier} };
+    my $range = Hermes->new( Vulcan::OptConf->load()->dump( 'range' ) );
+
+    my $ua = LWP::UserAgent->new;
+    my $db = $range->db();
+    my ( $path, %data, %cluster );
+
+    for my $file ( @$data )
+    {
+        my $data = YAML::XS::LoadFile( $file );
+        my $name = File::Basename::basename( $file );
+
+        $path ||= File::Basename::dirname( $file );
+
+        while ( my ( $mesg, $node ) = each %$data )
+        {
+            my %sort;
+
+            for my $node ( @$node )
+            {
+                if ( ref $node )
+                {
+                    push @{ $sort{ $node->[1] } }, $node->[0];
+                }
+                else
+                {
+                    my @cluster = map { @$_ }
+                        $db->search( 'name', node => [ 1, $node ] ),
+                        $db->search( 'name', info => [ 1, $node ] );
+
+                    $cluster{$node} ||= @cluster
+                        ? \@cluster : [ 'unknown cluster' ];
+
+                    map { push @{ $sort{$_} }, $node } @{ $cluster{$node} };
+                }
+            }
+
+            $mesg = YAML::XS::Load( $mesg ) if $mesg =~ /^---/;
+            %sort = map { $_ => $range->load( $sort{$_} )->dump } keys %sort;
+            push @{ $data{$name} }, { node => \%sort, mesg => $mesg };
+        }
+    }
+
+    $data = "$param{name}.report";
+    YAML::XS::DumpFile( "$path/$data", \%data );
+
+    $data .= join ' ', ':', keys %data,
+        sprintf "(%s:%s)", @param{ qw( count esc ) };
+
+    printf STDERR "sending %s .. ", $data;
+
+    ## to be implemented
+};

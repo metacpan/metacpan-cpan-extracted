@@ -1,0 +1,8 @@
+i:/perllib/bin/decode-base64
+i:/perllib/bin/decode-qp
+i:/perllib/bin/encode-base64
+i:/perllib/bin/encode-qp
+i:/perllib/lib/5.8.2/os2/MIME/Base64.pm
+i:/perllib/lib/5.8.2/os2/MIME/QuotedPrint.pm
+i:/perllib/lib/5.8.2/os2/auto/MIME/Base64/Base64.bs
+i:/perllib/lib/5.8.2/os2/auto/MIME/Base64/Base64JN.dll

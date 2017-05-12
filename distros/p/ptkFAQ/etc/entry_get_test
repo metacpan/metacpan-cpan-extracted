@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+#
+# from userguide.pod example 1.1:
+# 
+use strict;
+use Tk;
+
+my $main = MainWindow -> new();
+my $entry = $main->Entry();
+$entry ->pack;
+$main->Button(-text => 'Print', 
+              -command => sub{do_print($entry)}
+              )->pack;
+MainLoop;
+
+sub do_print {
+    my ($widget) = @_;
+    my $entered = $widget -> get();
+    print "The string \"$entered\" was entered \n";
+}
+

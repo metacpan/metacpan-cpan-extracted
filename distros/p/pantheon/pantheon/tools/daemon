@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename;
+
+use Vulcan::Daemon;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::ARGC = 1;
+
+my %o = Vulcan::OptConf->load()->get( qw( run kill tail=s ) )->dump();
+my $daemon = Vulcan::Daemon->new( %o, name => basename( shift ) );
+
+=head1 SYNOPSIS
+
+Operate a daemontools service.
+
+=head3 kill
+
+ $0 name --kill
+
+=head3 run
+
+ $0 name --run
+
+=cut
+exit 0 if map { $daemon->$_ } grep { $o{$_} } qw( kill run );
+
+=head3 tail
+
+ $0 name --tail number
+
+=cut
+
+if ( $o{tail} ) { $daemon->tail( $o{tail} ) }
+
+=head3 status
+
+ $0 name
+
+=cut
+else { system sprintf "svstat %s", $daemon->path() }
+
+exit 0;
+

@@ -1,0 +1,18 @@
+POP_DBI_DRIVER=
+POP_DB_SERVER=
+POP_DB_DB=
+POP_DB_USER=
+POP_DB_PASSWD=
+POP_POXLIB=
+POP_SYSTEM=
+POP_PID_FILE=
+# POP_LID_FILE - filename to store the incrementing logfile id
+POP_LID_FILE=
+# POP_LOG_FILE - filename of the logfile
+POP_LOG_FILE=
+# MAILER - command line for mailer to use when sending messages regarding
+# system errors.
+POP_MAILER=
+# ADMIN_EMAIL - email address to use when sending messages regarding system
+# errors.
+POP_ADMIN_EMAIL=

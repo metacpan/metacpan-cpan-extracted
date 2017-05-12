@@ -1,0 +1,41 @@
+% load required LaTeX packages
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+
+\usepackage[pdftex,
+            pdftitle={Catalyst --- Essential Documentation},
+            colorlinks,
+            breaklinks,
+            pdfauthor={Edited by: bpp}]{hyperref}
+
+\usepackage[papersize={7.44in,9.68in},scale=0.8]{geometry}
+
+\usepackage{listings}
+\newcommand{\MyHookSign}{\hbox{\ensuremath\hookleftarrow}}
+% \lstset{basicstyle={\small\ttfamily},
+%         numberbychapter=false,showstringspaces=false,
+%         classoffset=0,%
+%         language=Perl,commentstyle={\footnotesize\ttfamily},
+%                       keywordstyle={\bfseries},
+%                       identifierstyle={\ttfamily},%
+%         classoffset=1,%
+%         language=SQL,commentstyle={\footnotesize\ttfamily},
+%                      keywordstyle={\bfseries},
+%                      identifierstyle={\ttfamily}}
+\lstset{basicstyle={\footnotesize\ttfamily},
+        breaklines=true,prebreak={\space\MyHookSign}}
+
+\usepackage{makeidx}
+\makeindex
+
+\usepackage{fancyvrb}
+
+% Manually assist with some of the bad line breaks
+\hyphenation{cre-ative-com-mons DA-TA-BA-SES Con-fig-Loa-der 
+             Tem-plate Tool-kit Plug-ins PLUG-INS}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

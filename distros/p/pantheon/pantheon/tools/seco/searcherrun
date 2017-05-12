@@ -1,0 +1,118 @@
+#!/da1/s/ops/perl/bin/perl
+
+use strict;
+use warnings;
+
+use Carp;
+use Vulcan::Sudo;
+use Vulcan::OptConf;
+use Vulcan::ProcLock;
+use File::Spec;
+
+my %seco;
+
+BEGIN
+{
+    $Vulcan::OptConf::THIS = 'seco';
+    %seco = Vulcan::OptConf->load()->get( qw( sudo=s ) )->dump();
+    Vulcan::Sudo->sudo( $seco{sudo} ||= 'search' );
+}
+
+use lib $seco{lib};
+use SECO::Index;
+use SECO::Index::Incr;
+use SECO::Conf::Auto;
+use SECO::Engine;
+use SECO::Engine::Search;
+
+die "you has let the user run engine? are sure?\n"
+unless -e File::Spec->join( ( getpwuid $< )[7], 'ytt' );
+
+my $host = Sys::Hostname::hostname();
+my $conf = SECO::Conf::Auto->new( $seco{conf} );
+my $info = $conf->search( $host );
+my ( $tier, $dc, $replica ) = @{ $info->{$host} };
+
+confess "invalid config file!" unless $seco{index};
+
+my $engine = SECO::Engine::Search->new();
+my $user = $engine->{user};
+exit 1 unless $user eq ( getpwuid $< )[0];
+
+my $home = $engine->{path}{home};
+my $lock = Vulcan::ProcLock->new( "$home/.runlock" );
+exit 1 unless $lock->lock();
+
+my %flags;
+map { $flags{$_} = $engine->path( run => ( $seco{index}{$_} || "ops_build.$_" ) ) }
+    qw( status inc full pack fastpack lock );
+
+do { warn "locking"; sleep 10; exit 0 } if -f $flags{lock};
+
+my $mode = -f $flags{fastpack} ? 'fastpack' : undef;
+$mode = -f $flags{pack} ? 'pack' : -f $flags{inc} ? 'inc' : $mode;
+$mode = -f $flags{full} ? 'full' : $mode;
+
+do { sleep 10; exit 0 } unless $mode;
+
+if ( $tier =~ /pf$/ )
+{
+    if ( -f ( my $list = $engine->path( qw( data TransData CurFileList.txt) ) ) )
+    {
+        my $newlist = $engine->path( qw( data TransData build.list ) );
+        system "mv $list $newlist";
+
+        $engine->stop() unless $mode eq 'inc';
+
+        system "echo 'run' > $flags{status}";
+        eval {
+            my $build = SECO::Engine::Build->new();
+            $mode eq 'fastpack' ? $build->pack() :
+                $build->start( mode => $mode, nozlog => $seco{index}{nozlog} );
+        };
+    }
+}
+else 
+{
+    my $hdfs = $engine->{env}{PECTL}{hdfs} || $seco{index}{hdfs};
+    my $version = $engine->{env}{PECTL}{version} || $engine->{env}{VERSION}{version};
+    my $repo = $seco{index}{repo};
+    $repo =~ s/\$RUNUSER/$user/;
+    
+    my $indexer = SECO::Index::Incr->new( version => $version, dc => $dc,
+            hdfs => $seco{index}{fuse} . "/$hdfs", repo => $repo, env => $engine->{env} );
+    
+    $engine->stop() unless $mode eq 'inc';
+    
+    system "echo 'run' > $flags{status}";
+    
+    eval { $indexer->run( mode => $mode, nozlog => $seco{index}{nozlog},
+        purge => $seco{index}{purge} ||= 0 ) ; };
+}
+
+if ( $@ )
+{
+    system "echo 'failed' > $flags{status}";
+    map { system "rm -f $flags{$_}" } qw( inc full pack fastpack );
+    confess "run failed $@";
+}
+else
+{
+    print "build run success\n";
+    system "rm -f $flags{$mode}";
+    unless ( $mode eq 'inc' )
+    {
+        eval { $engine->start(); };
+        if ( $@ )
+        {
+            system "echo 'failed' > $flags{status}";
+            $engine->stop();
+            confess "start Engine failed $@";
+        }
+        print "start Engine success\n";
+    }
+    system "echo 'success' > $flags{status}";
+}
+
+sleep 10;
+exit 0;

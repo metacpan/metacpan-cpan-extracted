@@ -1,0 +1,87 @@
+<HTML>
+<HEAD><TITLE> 9.2. How do I arrange the layout of my widgets?</TITLE></HEAD>
+<BODY><a name="A9.2"> 9.2. How do I arrange the layout of my widgets?</a>
+
+<hr>
+</p><p>
+To control the layout and appearance of widgets in a window one makes use of a 
+<i>geometry manager</i>, as well as <i>-pad</i>ding, <i>-fill</i>, 
+<i>-expand</i>, and <i>-anchor</i> options of individual widgets.
+<p>
+A <i>geometry manager</i> is any Tk procedure for controlling the 
+arrangement of widgets in your application window.  The predominant geometry 
+manager used in both Tcl/Tk and perl/Tk is <KBD>pack</KBD> also known 
+informally as the &quot;packer&quot; (other geometry managers are the 
+&quot;placer&quot; and the <KBD>canvas</KBD> widget itself but are much less 
+popular. There is also 
+<a href="qna15.6.html">Nick Ing-Simmon's Table widget</a> 
+[discussed in a <a href="qna15.6.html">later question</a>] and  
+<a href="qna15.6.html">BLT_Table</a> [which made it's way into perl/Tk thanks 
+to Guy Decoux - but is also discussed in a 
+<a href="qna15.6.html">later question</a>]. So far 
+<a href="http://www.cis.upenn.edu/~ioi/tix/doc/man/Form.html">tixForm</a> 
+is for Tcl/Tk only, but a perl/Tk version of Tix is in the works.
+You can invoke <KBD>pack</KBD> at the time of widget creation via calls like:
+<PRE>
+    $<I>widget</I>-&gt;pack;
+</PRE>
+where <I>widget</I> can be any of the perl/Tk widget primitives. Widget option
+lists are usually passed as an associative array (hash) in parentheses thusly:
+<PRE>
+    $<I>widget</I>(<I>-option0</I> =&gt; <I>value0</I>,<I>-option1</I> =&gt; <I>value1</I>)-&gt;pack;
+</PRE>
+<KBD>pack</KBD> is often used in conjunction with the <KBD>frame</KBD> 
+container widget to arrange your widgets much like a hiearchically arranged 
+set of window panes (ultimately in a rectangular &quot;tiling&quot; fashion of 
+sorts). An example of this would be:
+<PRE>
+    my $top2 = $main-&gt;Toplevel;
+    my $frame = $top2-&gt;Frame;
+    $frame-&gt;pack;
+    $frame-&gt;Label(-text =&gt; 'Left2')-&gt;pack(-side =&gt; 'left');
+    $frame-&gt;Label(-text =&gt; 'Right2')-&gt;pack(-side =&gt; 'right');
+    $top2-&gt;Label(-text =&gt; 'Bottom2')-&gt;pack(-side =&gt; 'bottom');
+    MainLoop;
+</PRE>
+Note that <KBD>pack</KBD> itself is given parameters in this example. The
+<EM>default</EM> behavior for <KBD>pack</KBD> is equivalent to specifying 
+<KBD>-side =&gt; 'top'</KBD> which can be overridden as in the above example.
+<p>
+	 (Full source code for <a href="pod/ex2.pl">this</a> and other examples 
+	 from <a href="pod/UserGuide.html">UserGuide.pod</a> may be 
+	 found at <a href="pod/">http://w4.lns.cornell.edu/~pvhp/ptk/pod/</a>. 
+	 To load code from the web save as a local file say <KBD>ex2.pl</KBD>, 
+	 edit the first line to point to your perl interpreter, 
+	 change permission using: <KBD>chmod u+x ex2.pl</KBD>, then type the
+	 name of your script: <KBD>ex2.pl</KBD>.)
+<p>
+One of the more helpful options to pass to <KBD>pack</KBD> when trying to get a
+given widget layout &quot;just right&quot; is through <i>padding</i>: either
+<KBD>-padx</KBD> or <KBD>-pady</KBD>. The details of the use of <KBD>pad</KBD>
+depend on which specific widget you are trying to <KBD>pack</KBD>. In fact you
+can often add the <KBD>-pad</KBD> in the call to create the widget rather 
+than in the call to <KBD>pack</KBD>.
+<p>
+There is also the <KBD>-anchor</KBD> configuration option for widgets. A good
+introduction to the 9 possible <KBD>-anchor</KBD> (and <KBD>-overanchor</KBD>) 
+values is given by the <KBD>popup</KBD> demo in your <KBD>Tk-b&#35;/</KBD>
+directory.
+<p>
+When setting a widget within a <KBD>frame</KBD> next to another widget one may
+wish to make use of the <KBD>-fill =&gt; '</KBD><i>style</i><KBD>'</KBD> (where
+<i>style</i> = <kbd>none | x | y | both</kbd>) options of either 
+<KBD>pack</KBD> or the widget itself. A typical situation where this is used is 
+in setting up the <KBD>Scrollbar</KBD> next to a <KBD>Canvas</KBD> or
+<KBD>Text</KBD> widget.
+<p>
+Another aspect to consider when laying out your widgets is their behavior under
+resize operations (grabbing a part of the window frame and making it bigger or
+smaller - details depend on your window manager). This may be controlled by the
+<KBD>-expand</KBD> option of either <KBD>pack</KBD> or the widget itself.
+
+
+<hr>
+	<p><a href="qna9.1.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.2">table of contents</a> | <a href="qna9.3.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

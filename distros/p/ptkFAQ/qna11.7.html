@@ -1,0 +1,59 @@
+<HTML>
+<HEAD><TITLE> 11.7. How do I change the cursor/color?</TITLE></HEAD>
+<BODY><a name="A11.7"> 11.7. How do I change the cursor/color?</a>
+
+<hr>
+</p><p>
+Nick Ing-Simmons <a href="mailto:nik@tiuk.ti.com">&lt;nik@tiuk.ti.com&gt;</a> 
+and others posted a series of answers to this type of question. In summary what 
+they said was:
+<p><BLOCKQUOTE>
+Basically 
+</BLOCKQUOTE><PRE>
+    $mw-&gt;configure(-cursor =&gt; ... );
+</PRE><BLOCKQUOTE>
+Unless you use one of built-in cursors it gets messy.
+<p>
+Here copy of what <KBD>Tk/demos/color_editor</KBD> does:
+</BLOCKQUOTE><PRE>
+    #!/usr/local/bin/perl -w
+    use Tk;
+    my $mw = MainWindow-&gt;new;
+    $mw-&gt;configure(-cursor =&gt; ['@' . Tk-&gt;findINC('demos/images/cursor.xbm'), 
+                                    Tk-&gt;findINC('demos/images/cursor.mask'),
+                                     'red', 'green']);
+    MainLoop;
+</PRE><BLOCKQUOTE>
+That says that argument to <kbd>-cursor</kbd> is a list of 4 things:
+</BLOCKQUOTE>
+<ol>
+<li>. Pathname to bitmap with <kbd>'@'</kbd> prepended to say it isn't a built in name
+      (Using <kbd>findINC</kbd> to locate file relative to Tk install location.)
+<li>. Pathname to mask bitmap (no <kbd>@</kbd> required)
+<li>. Foreground colour
+<li>. Background colour
+</ol>
+<PRE><I>
+! I want to remap it for the MainWindow
+! and will be using a pixmap.
+</I></PRE><BLOCKQUOTE>
+You won't be using a Pixmap with normal X11.
+X11 allows *bitmap* with optional mask (another bitmap), and two colours.
+<p>
+The optional nature of the mask means that a simple call with a list reference 
+like:
+</BLOCKQUOTE><PRE>
+    $mw-&gt;configure(-cursor =&gt; ['watch', 'red', 'blue']);
+</PRE><BLOCKQUOTE>
+should work alright.
+</BLOCKQUOTE><p>
+You may also obtain the value of the default cursor for a widget using
+something like <kbd>-&gt;optionGet</kbd>. 
+
+
+<hr>
+	<p><a href="qna11.6.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.7">table of contents</a> | <a href="qna11.8.html">Next</a>
+
+
+</p><hr><p>
+</BODY></HTML>

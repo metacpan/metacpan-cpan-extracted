@@ -1,0 +1,29 @@
+<HTML>
+<HEAD><TITLE> 9.17. How do I obtain Menus that do not tear off?</TITLE></HEAD>
+<BODY><a name="A9.17"> 9.17. How do I obtain <kbd>Menu</kbd>s that do not tear off?</a>
+
+<hr>
+</p><p>
+<a href="mailto:nik@tiuk.ti.com">Nick Ing-Simmons</a> outlined a couple of ways
+to achieve this result. The critical feature being the 
+<kbd>-tearoff =&gt; 0</kbd> configuration option of the <kbd>Menu</kbd>.
+In <a href="mailto:nik@tiuk.ti.com">Nick's</a> words:
+<PRE>
+    my $mb = $parent-&gt;Menubutton(...);    # The button
+    my $menu = $mb-&gt;Menu(-tearoff =&gt; 0);  # Create a non-tearoff menu
+    $mb-&gt;configure(-menu =&gt; $menu);       # Tell button to use it.
+    $mb-&gt;command(....);
+</PRE><BLOCKQUOTE>
+Above is for clarity - you can loose <kbd>$menu</kbd> variable:
+</BLOCKQUOTE><PRE>
+    my $mb = $parent-&gt;Menubutton(...);  
+    $mb-&gt;configure(-menu =&gt; $mb-&gt;Menu(-tearoff =&gt; 0));  
+    $mb-&gt;command(....);
+</PRE>
+
+
+<hr>
+	<p><a href="qna9.16.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.17">table of contents</a> | <a href="qna10.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

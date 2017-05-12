@@ -1,0 +1,80 @@
+<HTML>
+<HEAD><TITLE> 16.3. Is there a debugger specifically for perl/Tk?</TITLE></HEAD>
+<BODY><a name="A16.3"> 16.3. Is there a debugger specifically for perl/Tk?</a>
+
+<hr>
+</p><p>
+Not for the latest version - but the <KBD>-w</KBD> switch and <KBD>use
+strict;</KBD> are always helpful with debugging as they provide informative
+error messages. You can, of course, run under the regular debugger using:
+<pre>
+    perl -d <i>myscript</i>
+</pre>
+Gurusamy Sarathy 
+<a href="mailto:gsar@engin.umich.edu">&lt;gsar@engin.umich.edu&gt;</a> 
+has built a PERL5DB file called Tkperldb (which despite the name is for 
+pTk not Tk/perl). One must install an early de-bugger then apply a patch to
+bring the debugger up to date.
+The early debugger kit is available from:
+<pre>
+    <a href="ftp://ftp.perl.com/pub/perl/ext/TK/Tkperldb-a1.tar.gz">ftp://ftp.perl.com/pub/perl/ext/TK/Tkperldb-a1.tar.gz</a>
+</pre>
+And Gurusamy Sarathy notes that the patch to bring the debugger up to date is 
+available at:
+<pre>
+ You need a post 5.001m perl that has support for debugging closures. 
+ Or you can simply apply:
+
+   <a href="http://www-personal.umich.edu/~gsar/perl5.001m-bugs.patch">http://www-personal.umich.edu/~gsar/perl5.001m-bugs.patch</a>
+
+ to 5.001m. (5.002beta includes all the fixes in the above patch).
+</pre>
+Note that a perl debugger may be invoked within your script with a line like:
+<pre>
+    $ENV{'PERL5DB'} = 'BEGIN { require Tkperldb }';
+</pre>
+See <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perldebug.html">
+<KBD>man perldebug(1)</KBD></a> for more help.
+<p>
+Keep in mind that you are programming in perl after all. 
+The perl debug line mode is available to you through executing
+the following from your shell:
+<pre>
+    perl -de 0
+</pre>
+Whereupon you must enter all the lines of a script including 
+<KBD>use Tk;</KBD>. (Fancier file reads &amp; <KBD>eval</KBD>s are 
+possible - but if you are getting that sophisticated why not 
+create your own custom PERL5DB file?)
+When using <KBD>perl -dwe 0</KBD> beware of the <i>emacs</i> like 
+line editing under this debugger, and  
+be forewarned that as soon as you type in the <KBD>MainLoop;</KBD> 
+statement perl will no longer read from &lt;STDIN&gt;.
+<p>
+Ilya Zakharevich &lt;ilya@math.ohio-state.edu&gt; points out that
+very recent perldb versions will allow for simultaneous X and STDIN reads. He
+also points out:
+<pre>
+Note that you may use 
+
+    sub myLoop {
+      if (defined &amp;DB::DB) {
+        while (1) {             # MainWindow-&gt;Count
+          Tk::DoOneEvent(0);
+        }
+      } else {
+        MainLoop;
+      }
+    }
+
+(and I hope the analogous provision will be in MainLoop in 
+ tk-b9 - hi, Nick ;-)
+</pre>
+
+
+
+<hr>
+	<p><a href="qna16.2.html">Previous</a> | Return to <a href="ptkTOC.html#TOC16.3">table of contents</a> | <a href="qna16.4.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

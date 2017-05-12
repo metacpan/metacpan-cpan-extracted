@@ -1,0 +1,76 @@
+nik@tiuk.ti.com 
+
+Re: How to make a read-only text widget?
+****************************************
+
+6 Nov 1995 16:33:47 GMT Texas Instruments Ltd. 
+
+Newsgroups: 
+   comp.lang.perl.tk 
+References: 
+   <47l66m$s6q@montespan.pasteur.fr> 
+
+
+
+     Stephane Bortzmeyer wrote in article <47l66m$s6q@montespan.pasteur.fr> :
+>
+>
+>(I program with Perl and Perl/Tk. However, I believe the problem is not Perl-
+>dependant. Followup set to comp.lang.perl.tk.)
+>
+>I'm trying to make a "read-only" text widget. The purpose is to have the 
+>output of a program displayed in a nice wdiget with scrolling, selection, 
+>copy-and-paste, etc. But of course, I don't want the user to edit the text, 
+>only my program will modify it.
+>
+>I thought of two ways:
+>
+>- a canvas with text in it. It's not easy to use canvases (specially with 
+>  scrolling) and it seems I'll have to manage the text selection myself.
+>
+>- a text widget with keys disabled (through bind) to make it read-only. 
+>  I redefined  but  still works!
+>
+>What is the best way to achieve that?
+>
+There will probablt be a readonly text widget in production perl/Tk.
+It will be based on 'bind' scheme you outline.  
+
+The beginings of this are even in Tk-b8  - look at Tk-b8/Text/Text.pm
+and you will see that Text's 'classinit' calls bindRdOnly.
+
+Thus something like: 
+
+package Tk::ROText;
+@ISA = qw(Tk::Text);
+
+Tk::Widget->Construct('ROText');
+
+sub classinit
+{
+ my ($class,$mw) = @_;
+ $class->bindRdOnly($mw);
+ return $class;
+}
+
+package main;
+
+$parent->ROText(...);
+
+
+Should do the trick. There may be a few snags - help me out by finding them.
+
+Note that you can also $text->configure(-state => 'disabled');
+
+     Name:           state
+     Class:          State
+     Command-Line Switch:           -state
+
+          Specifies one of two states for the  text:   normal  or
+          disabled.   If the text is disabled then characters may
+          not be inserted or deleted and no insertion cursor will
+          be displayed, even if the input focus is in the widget.
+
+The irritation here is that code cannot insert/delete either
+so you have to keep changing state. 
+

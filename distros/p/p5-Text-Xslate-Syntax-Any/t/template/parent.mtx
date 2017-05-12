@@ -1,0 +1,3 @@
+Kolon {[% include "child.tx"%]}
+Metakolon {[% include "child.mtx"%]}
+TT {[% include "child.tt" %]}

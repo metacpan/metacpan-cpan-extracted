@@ -1,0 +1,546 @@
+Archive-name: perl-faq/ptk-faq/part5
+Posting-Frequency: monthly
+Last-modified: Wed May 15 22:26:55 EDT 1996
+URL: http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+Version: 0.03
+
+URL (Hypertext-split): http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+URL (Plaintext): http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+Image-supplement: http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ftp-Archive: ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt
+ftp-Archive: ftp://ftp.wpi.edu/perl5/pTk-FAQ
+ftp-Archive: ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+e-mail-Archive: ptkfaq@pubweb.bnl.gov
+gopher-Archive: 128.84.219.153
+
+Perl/Tk FAQ part 5 of 5 - Miscellany       
+************************************ 
+
+
+ ______________________________________________________________________
+ 
+ 
+ 
+ 18. How do I "clear the screen"? 
+ 
+ What screen are you trying to clear? 
+ 
+ If you are trying to clear a tty (e.g. xterm) screen then try either of the following
+ within your script: 
+ 
+     system "clear";
+ or
+     print `clear`;
+ 
+ (where the choice between these two depends on the rest of the script: the first is fast
+ - but proceeds via fork and may not occur at exactly the time that you want it to in
+ the script). 
+ 
+ David and Rachel Weintraub <davidw@cnj.digex.net> recommend using the old 
+ termcap.pl p4 library. You might also consider the perl 5 equivalents: Term.pm
+ (especially the Term::Control module), Curses.pm, Perlmenu.pm, PV. 
+ 
+ If you are trying to eliminate a TopLevel or a MainWindow then try: 
+ 
+     $main -> destroy;
+ 
+ If you would rather not destroy then try: 
+ 
+     $main->withdraw;    # remove
+ 
+     $main->deiconify;   # put back
+ 
+ If $w is a sub-window (sub-widget) then 
+ 
+     $w->pack('forget'); # remove if packed (newer Tk-b9.01++) 
+     $w->packForget;     # remove if packed (older versions)
+     $w->pack(...);      # put back
+ 
+ There are also ways to call low level C-ish versions: 
+ 
+     $w->UnmapWindow; 
+ 
+ but that is for special purposed only.... 
+ 
+ If you are trying to erase an $item on a Canvas then try: 
+ 
+     delete($item);
+ 
+ (Thanks to the post by <a904209@pluto.tiuk.ti.com> which extended this answer
+ considerably.) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 19. Are there any international font packages for perl/Tk? 
+ 
+ In principle you may specify the -font configuration option on all your Button, 
+ Entry, Label, Message, etc. widgets. In addition to the Unix programs xfontsel
+ and xlsfonts you may find xset useful for determining and/or specifying fonts -
+ especially international ones. 
+ 
+ Kobayasi Hiroaki <kobayasi@sowa.is.uec.ac.jp> has converted the Tcl/Tk
+ "japanization" by <nisinaka@sra.co.jp> so that it may be used with perl/Tk. It is
+ presently available (the current README file is in Japanese) from: 
+ 
+     ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/Tk-b9.jp-a6.gz
+ 
+ From the author's own description: 
+ 
+ Currently, the "japanization patch for perl/Tk" enables:
+ 
+   [1] To show kanji & ASCII (by choosen kanji-font) in every widget.
+   [2] To edit kanji (double width of ASCII) correctly in Text & Entry.
+   [3] To support of Kanji Input method. (tkKinput.c)
+   [4] Automatic kanji-code-detection & conversion with 'insert/get'.
+       Supports: "JIS(Japanese Industrial Standard)", "MS-KANJI", "EUC".
+ 
+ & the patch lacks:
+ 
+   [5] by manual Kanji-code conversion. (JIS <=> MS-KANJI <=> EUC)
+   [6] 'Good' interface to specify kanji-code used in internal. (tkWStr.c)
+   [7] Documentation in English about [1-6].
+       # but, since interface-change is suspected in near future, 
+       # documenting them is ...
+ 
+ I thought that[5-7] was not enough for world-people, but already worth
+ for natives. So I announced it on "fj.lang.perl".
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 20. Are there any other ways to create X interfaces from perl? 
+ 
+ Yes. A short list would have to mention: 
+ 
+ For perl 4: 
+    WAFE, STDWIN
+ For perl 5:
+    Sx (uses Athena & Xlib), Motif (uses Motif & Xt), Fresco (post X11R6)
+ 
+ There is also Malcolm Beattie's Tkperl (which is largely incompatible with perl/Tk). 
+ 
+ Further information on X interfaces to Perl is provided in the perl FAQ. 
+ 
+ SGI folk may be interested in the OpenGL Perl Module (Sun folk too - if you have
+ "mesaGL" installed). 
+ 
+ For perl generation of GIF images see the question in this FAQ on graphics modules.
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 21. Where can I get more information on graphics modules? 
+ 
+ The GD.pm perl module is a perl interface to the C code of a similar name and was
+ written by Lincoln Stein. It allows for the generation of GIF (Graphics Inline
+ Format) images from within a perl script. The module itself is available from any 
+ CPAN ftp site, and Lincoln maintains an informational web page at: 
+ 
+     http://www-genome.wi.mit.edu/ftp/pub/software/WWW/GD.html
+ 
+ The gd/GIF.pm module is similar to GD.pm (generates GIFs using gd.c) and was
+ written by Roberto Cecchini who maintains a web page for his module at: 
+ 
+     http://www.fi.infn.it/pub/perl/GIF/
+ 
+ The JPEG.pm module was written by Nick Ing-Simmons expressly for use with the
+ Tk family of modules. It is distributed on CPAN in the authors/id/NI-S/
+ directories as a Tk-JPEG-*.tar.gz file. 
+ 
+ If you will be interfacing to the pgplot FORTRAN routines you might consider Karl
+ Glazebrook's pgperl which has a web page at: 
+ 
+     http://www.ast.cam.ac.uk/~kgb/pgperl.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 22. Are there any major applications written in perl/Tk? 
+ 
+ Yes. In fact, there are some interesting perl/Tk applications already available from: 
+ 
+ Your own Tk-b# distibution:
+ ---------------------------
+ 
+ The following programs may be found in your own Tk-b#/ directory: 
+ 
+ 
+ program        description
+ pfm            perl file manager - cute iconic front to emacs
+ ptknews        a GUI perl newsreader (Tk-b9.01) - a work in progress.
+ tkpsh          perl/Tk equivalent of wish.
+ toyedit        a Text widget editor.
+ 
+ The following programs may be found either in your demos directory (consult the 
+ README file there for fuller descriptions) or in your perl/bin install directory: 
+ 
+ 
+ program        description
+ browse         Simple file browser front end for emacs.
+ color_editor   Front end to Tk::ColorEditor
+                allows RGB, CMY, and HSV color cube manipulation
+                (based on tcolor.tcl).
+ ixset          GUI front end to xset - for terminal settings.
+ pgs            Perl front end to Ghostscript (for viewing PostScript(c) files).
+ rmt            perl/Tk 
+                "development shell/remote control application"
+                You can launch or talk to other perl/Tk apps with rmt.
+ rolodex        Like the Tcl/Tk app of the same name.
+                Requires editing for personal use.
+ timer          Stopwatch - like seconds timer.
+ tkpod          The perl gui pod viewer (like xman).
+ tkweb          The perl gui web browser.
+ 
+ Other perl/Tk application distributors:
+ ---------------------------------------
+ 
+ ptkb.pl
+    an xbiff like mailbox watcher. Available from 
+    ftp://ftp.wpi.edu/perl5/pTk-Modules/ptkb.pl 
+ bioTkperl
+    Was announced by Gregg Helt <gregg@fruitfly.berkeley.edu> recently. See
+    the home page at: http://www.cbil.upenn.edu/~dsearls/bioTk.html. Source at: 
+    ftp://fruitfly.berkeley.edu/pub/bioTk/bioTkperl0.8.tar.gz 
+ EVA
+    Hiroaki Kobayasi's EVA is a sophisticated wish like perl/Tk "shell". It is
+    available from: ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/eva-*.tar.gz 
+ plop
+    Stephen Lidie's very useful arbitrary function Plot Program, was featured in
+    the premier issue of The Perl Journal and is available on the web at: 
+    http://orwant.www.media.mit.edu/the_perl_journal/programs/Vol_1_Issue_1_Tk/plop
+ Workspace
+    Is an integrated front end to the fvwm window manager that makes use of
+    Perl/Tk. See the web page at http://www.mirai.com/wks/ for more information.
+ www
+    The original 8 line wonder by Jon Orwant. Pick it up (and modify it) from: 
+    http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.08/0411.html. (Please note:
+    www is for amusement, the more serious perl/Tk browser - tkweb - is
+    distributed with Tk-b# and is "only" 60 lines long!.) 
+ 
+ Be sure to also check the newsgroups comp.lang.perl.tk, comp.lang.perl.announce, 
+ comp.lang.perl.misc, and comp.lang.perl.modules, as well as the mailing list archive
+ for more Perl/Tk program and package announcements. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 23. What is the history of pTk and perl/Tk? 
+ 
+ This list is only slowly coming together. Please forgive any absences. 
+ 
+  o tkperl5a5 is announced Thu, 20 Oct 1994 14:44:23 +0000 (BST) 
+ 
+ NOTE
+ This project is unrelated to the one which is adding usersubs to
+ perl4 to get access to Tk via Tcl. Often, postings on comp.lang.perl
+ just say "tkperl" without saying which one is meant. They are two
+ totally different kettles of fish.
+ 
+ --Malcolm (Beattie)
+ 
+  o Fri, 25 Nov 94 14:29:53 GMT Nick Ing-Simmons is working on what will be
+    known as "nTk" eventually. 
+  o Mon, 12 Dec 94 08:56:36 GMT, Nick Ing-Simmons reports: 
+ 
+ I have a re-port of ext/Tk nearly ready for alpha.
+ It builds its own "pTk" library from sources semi-automatically derived
+ from Tk3.6.  There is no Tcl library at all. 
+ 
+ Would anyone like to assist me in testing it?
+ 
+  o nTk-a2 announced Fri, 16 Dec 1994 10:59:36 -0500 
+  o nTk-a3 announced Mon, 19 Dec 1994 18:03:27 -0500 
+  o nTk-a5 announced Fri, 23 Dec 1994 10:18:16 -0500 (last to use Tk 3.6 ?) 
+  o nTk-a6 first to use Tk 4.0 (?) 
+  o nTk-a7 announced Fri, 13 Jan 1995 10:55:27 -0500 
+  o nTk-a8 has appeared before Tue, 17 Jan 95 09:04:33 GMT 
+  o nTk-a9 has appeared before Wed, 18 Jan 95 19:25:10 GMT 
+  o nTk-a10 announced Tue, 24 Jan 1995 14:32:02 -0500 
+  o nTk-a11 announced Tue, 31 Jan 95 19:05:32 GMT 
+  o Malcolm Beattie suggests the nTk -> Tk name change, Larry Wall concurs 
+  o nTk-a12 announced Thu, 16 Feb 1995 09:12:26 -0500 
+  o Nick Ing-Simmons calls for a new mail list Thu, 16 Feb 95 14:13:55 GMT 
+  o Tk-a13 announced Wed, 1 Mar 1995 11:38:15 -0500 (Name has changed
+    from "nTk") 
+  o Tk-b1 announced Tue, 14 Mar 95 16:58:40 GMT 
+  o Tk-b2 announced Wed, 29 Mar 95 15:52:44 BST 
+  o Tk-b3 announced Fri, 31 Mar 95 16:54:54 BST 
+  o Tk-b4 announced Fri, 12 May 1995 11:45:32 -0400 EST 
+  o Tk-b5 announced Mon, 26 Jun 95 17:14:06 BST 
+  o Tk-b6 announced Fri, 21 Jul 95 15:42:35 BST 
+  o Tk-b7 announced Fri, 28 Jul 95 15:16:02 BST 
+  o Tk-b8 announced Wed, 16 Aug 95 12:34:05 BST 
+  o an RFD (Request For Discussion) for a new usenet group comp.lang.perl.tk is
+    circulated by Jon Orwant Fri, 4 Aug 1995 08:29:46 -0400 
+  o unmoderated newsgroup comp.lang.perl.tk passes by a vote of 352 to 18 with 1
+    abstention in an announcement made Mon, 9 Oct 1995 10:13:17 -0400
+    (EDT). The new group makes its appearance at news-servers roughly 18
+    October 1995. 
+  o Tk-b9.01 announced Wed, 20 Dec 95 10:06:47 GMT. 
+  o Tk-b10 announced Sat, 23 Mar 96 17:16:27 GMT. 
+  o Tk-b11 announced Mon, 1 Apr 96 16:44:48 GMT. 
+  o Tk-b11.01 announced Wed, 3 Apr 96 17:48:09 GMT. 
+  o Tk-b11.02 announced 10 Apr 96 12:52:28 GMT. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 24. What can we expect the future to hold? 
+ 
+ Here is a summary of the Tk-b11.02 announcement: 
+ 
+ Changes in b11.02 
+ 
+  o Fix for K&R 'cc' (e.g. Sun's /bin/cc) compile. 
+  o 'Scrolled' scrollbars now only get packed (dynamically) when required. 
+  o Tweaks for perl5.002_01 
+  o Tidied up basic_credentials stuff to HTML/Web.pm a bit 
+  o Brought Pod viewer up to date. 
+  o Fixed memory leak in Tk::Callback->new, highlighted by recent 'after'
+    changes. 
+ 
+ The gamma release is not far off at all. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 25. How do I obtain the latest version of this FAQ? 
+ 
+ On the world wide web
+ ---------------------
+ 
+ Hypertext (split by question): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+ Hypertext (whole thing - may be too large for some browsers, but is amenable to
+ searching): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ As far as I know any other source may be slightly out of date with respect to those two
+ web URLs. Nevertheless, there are many other places to retrieve this FAQ from, in a
+ variety of formats, such as: 
+ 
+ Plaintext (whole): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ Plaintext (multi-part): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ0.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ1.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ2.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ3.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ4.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ5.txt
+ or gzipped PostScript(c) (about 60 US 8.5"x11" pages):
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.ps.gz
+ or gzipped PostScript(c) (about 60 A4 pages):
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.A4.ps.gz
+ 
+ For those without WWW access:
+ -----------------------------
+ 
+ usenet newsgroup
+ ~~~~~~~~~~~~~~~~
+ 
+ This FAQ will be posted to the newsgroup comp.lang.perl.tk. This FAQ will also be
+ posted to comp.answers and news.answers, hence, this FAQ is being carried by the
+ big usenet anonymous ftp servers such as 
+ 
+     ftp://rtfm.mit.edu/pub/usenet/
+     ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+     ftp://rtfm.mit.edu/pub/usenet/comp.lang.perl.tk
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/lang/perl/tk
+ 
+     ftp://ftp.uu.net/usenet/news.answers/perl-faq/ptk-faq
+     etc.
+ 
+ For information on usenet please see 
+ 
+     news.software.nntp
+     http://www.academ.com/academ/nntp.html
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/news/answers/usenet/site-setup
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/news/answers/usenet/software/part1
+     http://info.internet.isi.edu/in-notes/rfc/files/rfc977.txt
+     ftp://ftp.academ.com/pub/nntpclnt
+     http://www.w3.org/hypertext/WWW/LineMode/Defaults/AboutNewsServers.html
+ 
+ Note that perl/Tk now comes with a script called ptknews that may help you. Don't
+ forget Larry Wall's rn program either (or derivatives of the *rn form). 
+ 
+ ftp
+ ~~~
+ 
+ This FAQ is available via ftp from: 
+ 
+ USA                                                  IP
+     ftp://ftp.ccd.bnl.gov/pub/ptk/                   130.199.54.188
+     ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt         130.199.54.188
+     ftp://ftp.wpi.edu/perl5/pTk-FAQ                  130.215.24.209
+     ftp://perl.com/pub/perl/doc/ptkFAQ.gz            199.45.129.30
+     ftp://perl.com/pub/perl/doc/ptkFAQ.ps.gz         199.45.129.30
+ 
+ This FAQ is now being carried by the CPAN (Comprehensive Perl Archive
+ Network) ftp sites (thanks Tom ;-). At any of the CPAN locations go into the doc/
+ directory to retrieve either the ptkFAQ.gz file (gzipped plaintext), the 
+ ptkFAQ.html.gz file (gzipped html [with some links relative to
+ "http://w4.lns.cornell.edu/~pvhp/ptk/"]), or the ptkFAQ.ps.gz file (gzipped
+ PostScript(c)). 
+ 
+ See a previous question in this document for a more extensive list of CPAN locations.
+ 
+ e-mail services:
+ ~~~~~~~~~~~~~~~~
+ 
+ Send e-mail (content of message unimportant) to <ptkfaq@pubweb.bnl.gov> and
+ you will receive the text version of this FAQ. (Many thanks to Alan L. Stange at
+ Brookhaven for setting this up!) 
+ 
+ Those without FTP access can get the plaintext version via e-mail from the rtfm
+ archive. For help send e-mail to <mail-server@rtfm.mit.edu> with a message of:
+ 
+     send usenet/news.answers/finding-sources
+ 
+ The mail server at rtfm may be able to e-mail a plaintext version of this faq. Send
+ e-mail to <mail-server@rtfm.mit.edu> containing: 
+ 
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part0
+ 
+ Then send several more (separate) requests, such as: 
+ 
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part1
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part2
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part3
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part4
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part5
+ 
+ The ptk@lists.stanford.edu mailing list is devoted more to porting and development
+ issues. The URL's to this FAQ will occasionally be posted there, but not the full text
+ (it is simply too big - sorry).
+ 
+ Webmail Gateways:
+ ~~~~~~~~~~~~~~~~~
+ 
+ With e-mail you might try one of the (experimental & not necessarily reliable)
+ http-to-mail services such as either of the following:
+ 
+ When last tested the service at <webmail@www.ucc.ie> reported that the single 
+ ptkFAQ.txt file was too large to send. Hence, you must send several separate
+ e-mail requests to <webmail@www.ucc.ie>
+ A Subject: line is not required but do include the following one line message body
+ in your first e-mail: 
+ 
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ0.txt
+ 
+ Then send several more (separate) requests as follows: 
+ 
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ1.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ2.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ3.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ4.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ5.txt
+ 
+ please note: In days gone by this service would take several hours to send back both a
+ plaintext and a uuencoded version of the stated file - both within a single mail
+ message. The service did mention receiving more than 17,000 requests in October
+ 1995 alone and it is not known whether they will continue. 
+ 
+ 
+ Send e-mail to <agora@mail.w3.org>
+ with a one line message body (Subject: line not required) such as: 
+ 
+     SEND http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ 
+ please note: this last method bounced backed a "permanently out of service" message
+ when last attempted. The home page at http://www.w3.org/hypertext/WWW/Agora/
+ mentions "temporarily out of service", caveat netsurfer; the page at 
+ http://www.w3.org/pub/WWW/MailRobot/send.html does not mention being out of
+ service. 
+ System administrator and webmasters are encouraged to visit any of the following
+ pages: 
+ 
+     http://www.w3.org/pub/WWW/MailRobot/Overview.html
+     http://www.w3.org/pub/WWW/MailRobot/send.html
+     http://www.w3.org/hypertext/WWW/Mailing/Form.html
+     http://www.w3.org/hypertext/WWW/Agora/
+ 
+ and decide if they wish to set up a webmail gateway of their own. The agora.pl
+ script is written in perl and makes use of the www line mode browser. It could
+ presumably be re-written to use url-get.pl or any other fine code such as the
+ latest, greatest perl5 module for URL fetching :-) 
+ 
+ gopher
+ ~~~~~~
+ 
+ On a very experimental basis you might try: 
+ 
+     gopher-client 128.84.219.153
+ 
+ or in URL form: 
+ 
+     gopher://128.84.219.153/1
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 26. Acknowledgements & maintainer. 
+ 
+ The Perl/Tk extension to the Perl programming language is copywritten by its author
+ Nick Ing-Simmons <nik@tiuk.ti.com> whose Tk-b11.02/COPYING file reads as
+ follows: 
+ 
+ Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+ This package is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself, with the exception
+ of the files in the pTk sub-directory which have separate terms
+ derived from those of the orignal Tk4.0 sources and/or Tix. 
+ 
+ See pTk/license.terms for details of this Tk license,
+ and pTk/Tix.license for the Tix license.
+ 
+ Especial thanks to:
+ Nick Ing-Simmons for writing perl/Tk.
+ Malcolm Beattie for tkperl.
+ An anonymous comp.lang.perl.tk poster for writing the initial "pseudo-FAQ" that
+ got this started.
+ Larry Wall for writing extensible Perl 5 & John Ousterhout for writing Tk 4.
+ Tom Christiansen and Stephen P. Potter for writing and maintaining excellent perl
+ documentation, and general doc help.
+ Jon Orwant <orwant@media.mit.edu> for organizing the comp.lang.perl.tk Usenet
+ newsgroup.
+ Alan Stange & Tom Schlagel for the hypermail archive, the ftp & e-mail distribution
+ of the FAQ, etc.
+ Achim Bohnet for an excellent searchable hypermail archive.
+ Ilya Zakharevich <ilya@math.ohio-state.edu> for great perl/Tk pod docs.
+ Kobayasi Hiroaki <kobayasi@sowa.is.uec.ac.jp> for great perl/Tk scripts.
+ William J. Middleton <wjm@best.com> for archive help.
+ Ioi Kim Lam for Tix.
+ Larry Virden for cross-posting the Tcl FAQ.
+ 
+ In addition, this FAQ has benefitted from the contributions of many people all over
+ the net to whom I am quite grateful.
+ I am:
+ Peter Prymmer
+ Wilson Synchrotron Laboratory
+ Cornell University
+ Ithaca, NY 14853
+ 
+ pvhp@lns62.lns.cornell.edu
+ 
+ ______________________________________________________________________
+ 
+ 
+ Hypertext whole FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ Hypertext (split by question) FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+ Plaintext FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ Plaintext multi-part FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ[0..3].txt
+ Image-supplement: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html

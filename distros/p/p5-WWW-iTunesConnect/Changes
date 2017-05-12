@@ -1,0 +1,41 @@
+Revision history for Perl extension WWW::iTunesConnect.
+
+1.16  Mon Aug 13 2010
+	- Fix parsing of financial reports
+	- Add the ability to fetch all pages of the financial reports form
+	- Find the number of available financial reports
+
+1.15  Mon Aug  9 2010 11:00
+	- Apple changed "Sales\Trend Reports" to "Sales and Trends"
+	- New algorithm for finding the financial reports table
+	- Parse new financial report format
+
+1.14  Sat Feb  6 2010 17:35
+	- Update copright notice and iTC-tools link
+	- Allow POST requests to be redirected
+	- Check results from internal functions and return undef on error
+	- Don't search for the financial report form by name
+
+1.13  Sat Aug 29 2009 12:30:00
+	- Require LWP 5.829
+	- Find form inputs using id instead of name
+	- Manually assign version numbers (migrated from CVS to git)
+
+1.12  Wed Jan 21 2009 21:30:00
+	- Add support for fetching Financial Reports
+	- Apple seems to have dropped the extra sign-in page for Sales/Trend Reports
+	- Add parse_table() class method
+
+1.08  Fri Jan  2 2009 10:00:00
+	- Switch to using CVS Id tag for versioning
+	- Add support for the second login page for Sales/Trend reports
+	- Add support for fetching Sales/Trend Weekly Summary reports
+	- Add support for fetching Sales/Trend Monthly Free reports
+	- Add parse_sales_summary() class method for parsing a summary file into a hash
+
+0.02  Sat Dec  6
+	- Updates to form element names because Apple updated the pages
+
+0.01  Sat Nov 15 19:21:04 2008
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -m WWW::iTunesConnect

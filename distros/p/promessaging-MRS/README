@@ -1,0 +1,47 @@
+promessaging-MRS version 1.01
+=============================
+
+GENERAL INFORMATION
+
+MRS.pm provides the capibility to resolve the MCC (Mobile Country Code) and MNC (Mobile Network Code)
+for a given MSISDN (Mobile Station International ISDN Number, see E.164) of a mobile subscriber. Based upon
+information the service also delivers detailed data about the name of the home operator, country, timezone
+and other data.
+
+Also additional information about the on/offline status of the mobile subscriber and its current location
+(on country basis) can be retrieved depending on the provisioned service profile.
+
+TECHNICAL REALISATION
+
+The service (MSISDN Resolver Service) is built as a client/server achitecture based on the Simple Object Access
+Protocol (SOAP), the client exchanges with the server XML-encapsulated data transfered via HTTP.
+
+The MRS client submits a request to the server and in return receives the needed information or a exception if a failure
+or error occurs.
+
+The MRS server will process the query and try to lookup the subscriber via its direct SS7 access to MNOs
+(Mobile Network Operator) worldwide. If the subscriber does exist the MRS server will send the data back to the
+client or an exception if the subscriber is unknown or not reachable for other reasons.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+SOAP::Lite & XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Ask hotline@end2endmobile.com about license details.
+
+The MRS.pm module is property of End2End Denmark (E2E). Copyright End2End Denmark.
+All rights reserved.

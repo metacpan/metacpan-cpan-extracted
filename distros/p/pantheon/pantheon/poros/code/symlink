@@ -1,0 +1,27 @@
+### perl: poros/code/symlink
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use Vulcan::Symlink;
+
+return sub
+{
+    my ( %param, %result ) = @_;
+    my $argv = $param{argv};
+
+    $Vulcan::Symlink::ROLLBACK = shift @$argv if $argv->[0] && ! ref $argv->[0];
+
+    for my $conf ( @$argv )
+    {
+        my $link = Vulcan::Symlink->new( %$conf );
+        $link->make( %$conf ) unless $conf->{check};
+
+        my %link = $link->check();
+        map { $result{$_}{ $link{$_}[0] } = $link{$_}[1] } keys %link;
+    }
+
+    YAML::XS::DumpFile \*STDOUT, \%result if %result;
+    return 0;
+};

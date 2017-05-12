@@ -1,0 +1,158 @@
+From: gerti@BITart.com  2-FEB-1996 17:40:38.31
+To: perl5-porters@africa.nicoh.com
+CC: 
+Subj: MultiArchitectureBinaries work on NEXTSTEP
+
+
+Hello,
+
+NEXTSTEP is supported on 4 hardware platforms (m68k, ix86, hppa and
+sparc) and uses something called 'Multi Architecture Binaries' (MAB)
+that have executable code for multiple platforms in one file. The
+compiler supports cross compilation.
+
+So a SysAdmin that wanted to support perl on all four platforms
+had to do:
+
+- find a NEXTSTEP machine for each platform
+- configure, compile and install on each platform
+- combine the executables 'by hand'.
+
+This process easily takes a few hours. So instead of doing it all
+over again, I spend some time figuring out what changes were
+needed to compile perl 'quad-fat' on just one machine.
+
+I did get it to work, and the tests look fine.
+
+Could a kind soul that has a deeper understanding of the
+perl configuration process please take a look at my changes, and
+make suggestions of a 'more proper place' to add the modifications
+and how I can get those changes into the distribution?
+
+Here are the things I had to do (NEXTSTEP 3.3, Intel):
+
+Changes to config.sh:
+---------------------
+   - change the architecture names in all paths. Instead of
+   '<arch>-next' I used 'fat-next'. That should probably be NIHS-next,
+   since 'fat' does not specify 'how fat'. N,I,H and S are well
+   introduced identifiers for those platforms in the NeXT worlds.
+
+   Affected were: archlib, archlibexp, archname, installarchlib,
+   installsitearch, myarchname, oldarchlib, oldarchlibexp, sitearch,
+   sitearchexp,
+
+   - cc needs additional flags to indicate the desired target
+   platform(s). So I changed
+   cc='cc'
+   to
+   cc='cc -arch m68k -arch i386 -arch hppa -arch sparc'
+
+   - ld does not work for multiple platforms, instead cc
+   has to be used with the proper arch flags. So I changed
+   ld='ld'
+   to
+   ld='ld -arch m68k -arch i386 -arch hppa -arch sparc'
+
+   - To link the dynamically loaded extensions, cc (that is
+   used instead of ld due to the changes above) needs an
+   additional flag. So I changed
+   lddlflags='-r -L/usr/local/lib'
+   to
+   lddlflags='-nostdlib -r -L/usr/local/lib'
+
+
+Changes to config_h.SH:
+-----------------------
+   - During compilation, some of the compiler macros (MEM_ALIGNBYTES
+   and BYTEORDER) depend on the target cpu. To get those set properly
+   DURING compilation, I made the following change to config_h.SH:
+   At the end, before the line '!GROK!THIS!', I inserted:
+
+   #ifdef NeXT
+   #  import <architecture/ARCH_INCLUDE.h>
+   #  import ARCH_INCLUDE(next-fat/,cpu.h)
+   #endif
+
+   This requires a directory 'next-fat', with one subdirectory for
+   each architecture named like that architecture, and in there a
+   file named 'cpu.h' that defines the propper macros. This tar/gzipped
+   and uuencoded directory is at the end of this mail.
+
+Changes to pp.c:
+----------------
+   The current version of the GNU compiler used with NEXTSTEP
+   crashes compiling for hppa with optimization turned on for
+   those three subroutines: PP(pp_sin), PP(pp_cos) and PP(pp_exp).
+
+   As a quick fix, I surounded thos subroutines with:
+
+   #ifdef NeXT
+   #	if hppa
+   #		pragma CC_OPT_OFF
+   #	endif
+   #endif
+
+   and
+
+   #ifdef NeXT
+   #	if hppa
+   #		pragma CC_OPT_RESTORE
+   #	endif
+   #endif
+
+   This forces optimization off, and restores the current state
+   afterwards.
+
+Changes to ExtUtils::MakeMaker.pm:
+----------------------------------
+   On NEXTSTEP 'ar' can't handle MABs, instead 'libtool' has to
+   be used, with slightly changed parameters.
+
+   In MakeMaker.pm, I changed the line reading:
+   q{	$(AR) cr $@ $(OBJECT) && $(RANLIB) $@
+   to
+   q{	libtool -o $@ $(OBJECT) && $(RANLIB) $@
+
+   This change has obviously to be made dependend of the platform,
+   but I do not know enough about MakeMaker.pm to know how.
+
+Changes to AnyDBM_File.pm:
+--------------------------
+   It looks like a line '1;' is missing at the end; that made
+   some tests fail.
+
+
+Testresults:
+On the Intel machine I compiled on, all tests were succesfull.
+On the hp, lib/gdbm failed because the library was not available.
+On m68k, comp/cc failed (I do not have a cc installed on m68k),
+lib/ndbm, lib/odbm and lib/posix failed because of missing
+libraries.
+
+The only failure that I do not quite understand happened on
+m68k: lib/anydbm.....AnyDBM_File doesn't define a TIEHASH method at  
+./lib/anydbm.t line 18
+
+I do not have a Sun around, so it is not tested there yet.
+
+If you read till here: Thank you!
+
+And here the tar/gzip/uuencoded version of the next-fat directory:
+
+begin 644 next-fat.tar.gz
+M'XL(`-B0$C$``^V836O"0!"&<ZV_8L";T&9GO^*U4BF%VH+VTE,)NL90FX88
+MJ3^_NV@#2EL:,&NP\UR6#)-DPYMY9Y+,;,K+>5R&07.`9)%2$```RNT*P';K
+M[@`T,LFE%$K;+(L,0#6XIXKUJHP+@"`Q19G^DO>Q,&;I8T-^R;[T7^1YW-!+
+M\&?]%3(N(IO%F="DOP_V]9_FZZO%T>^!C&DI?]8?([[57RB4$=J`8,KJSXZ^
+MDV_XY_IWU]G,S&$T'+U<W]_=/@R>GX:33M?&TLP<A*%_$?9Z8:>S.\D%'\<W
+MPW&57T6`;:3@:/-A&1>)@5F:I.4*YN\%C"8#L%<Y]9,3CJK^4]'7;?!_:Q2V
+M_ZM(D?_[8%__%OB_9J[_:U3D_SZHY?^RCO\C%Y+\O^U4]?^F^Z]M\'_EZA^U
+MIOG?"_OZG][_-;KO?QZY[W_R_^:IY?^<YO]SHZK_51X7TV8:0#W_=_,_YTCS
+KOQ<.]&^D`=3R?^[\7W#)R/]]0/]_"((@"((@"((@".+\^01`O7A``"@``$CS
+`
+end
+
+
+---
+Gerd Knops ------------------------------------------ gerti@BITart.com

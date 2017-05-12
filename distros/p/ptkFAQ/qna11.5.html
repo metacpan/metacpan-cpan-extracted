@@ -1,0 +1,35 @@
+<HTML>
+<HEAD><TITLE> 11.5. Is there a way to find out what is in my perl/Tk &quot;PATH&quot;?</TITLE></HEAD>
+<BODY><a name="A11.5"> 11.5. Is there a way to find out what is in my perl/Tk &quot;PATH&quot;?</a>
+
+<hr>
+</p><p>
+Presuming this question is asking for a little more than the answer you get
+when you type:
+<pre>
+    ls perl5/Tk/*.pm
+</pre>
+there is a way to find out what gets EXPORTED by Tk.pm. Use a script like:
+<pre>
+    #!/usr/bin/perl
+    
+    use Tk;
+    require 'dumpvar.pl';
+    
+    dumpvar('Tk');
+</pre>
+or more succintly at the shell command prompt: 
+<pre>
+    perl -e 'use Tk; require "dumpvar.pl"; dumpvar("Tk");'
+</pre>
+The advantage of using <KBD>dumpvar</KBD> over <i>ls</i> is that it 
+gives you a <em>brief</em> summary of all the arguments your widgets want. 
+Note that the output is many lines and you may wish to pipe through 
+<i>more</i> or <i>less</i>.
+
+
+<hr>
+	<p><a href="qna11.4.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.5">table of contents</a> | <a href="qna11.6.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

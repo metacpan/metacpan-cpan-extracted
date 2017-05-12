@@ -1,0 +1,66 @@
+Perl benchmark suite
+--------------------
+
+This is a Perl benchmark suite.  It can be used to compare the
+relative speed of different versions of Perl.  You run the benchmark
+by starting the 'perlbench-run' script giving the path-name of various
+Perls you want to test as argument.  The perlbench-run program takes
+the following optional parameters:
+
+  -s               don't scale numbers (so that first perl is always 100)
+  -t <filter>      only tests that match <filter> regex are timed
+  -c <cpu-factor>  use this factor to scale tests instead of running the
+                   'cpu_factor' program to determine it.
+  -d <dirname>     what directory to save results in
+
+
+
+Creating new tests
+------------------
+
+The individual tests are found in a directory called "benchmarks".
+They expect to be started with at least a single number as argument.
+This number is the CPU speed factor as calculated by the 'cpu_factor'
+program.  This factor is used to scale the number of iterations that
+the test must run to give measurable timing.
+
+A new test is created by making a new file under the "benchmarks"
+directory.  The filename should end with the "*.t" suffix.  A test
+should look like this:
+
+  # Name: Regexp matching
+  # Require: 4
+
+  require 'benchlib.pl';
+
+  # YOUR SETUP CODE HERE
+  $a = 0;
+
+  &runtest(100, <<'ENDTEST');
+     # YOUR TESTING CODE HERE
+     $a++;  # for instance
+  ENDTEST
+
+The first part of the test declares some properties of the test.  The
+'require' property means that you need a perl with version number
+greater or equal to this to run the test (same as the 'require NUM'
+does for perl5).  You are advised to write the tests so that they can
+run under perl4 as well as perl5.
+
+You should then load the 'benchlib.pl' library.  This will take care
+of the command line arguments and also provide the function
+&main::runtest() which will perform the testing.  The first argument
+to runtest() is the test scale factor.  It should be set to some
+number that makes the test run for about about 10 seconds when given a
+proper CPU factor command line argument.  The second argument to
+runtest() is the code you want to test.  The code should be suitable
+as the body inside a loop.
+
+If you want to contribute some additional tests, please send them to
+<gisle@aas.no>.
+
+-----------------------------------------------------------------------
+© 1997,1998,1999,2005 Gisle Aas. All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

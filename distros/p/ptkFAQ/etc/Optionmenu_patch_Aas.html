@@ -1,0 +1,83 @@
+<H2><A HREF="9604181435.AA18480@pluto.tiuk.ti.com">[PREV]</A>  <A HREF="4l8r0i$d01@kruuna.helsinki.fi">[NEXT]</A>  <A HREF="Dq2KJ4.5Ju@world.std.com">[PREV Thread]</A>  <A HREF="4l6368$q0j@ptdcs5.ra.intel.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> aas@bergen.sn.no (Gisle Aas)
+</ADDRESS>
+<TITLE> A better Optionmenu</TITLE>
+<ADDRESS><H1> A better Optionmenu</H1>
+</ADDRESS>
+<ADDRESS> 18 Apr 96 14:25:25 GMT
+ ptk@guest.wpi.edu mailing list gateway
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+</DL>
+<HR>
+<PRE>This patch to Optionmenu allows us to have values associated with the
+selections that are not nessecary the same as the labels.  It also
+adds a new option (-variable) that will contain the current selection.
+It allows me to do this:
+
+$top-&gt;Optionmenu(-options =&gt; [[no =&gt; 'Norway'],
+                              [se =&gt; 'Sweden'],
+			      [dk =&gt; 'Denmark']],
+		 -variable =&gt; \$a,
+);
+
+This Optionmenu is backwads compatible with the one in Tk-b11.
+
+
+
+--- Tk-b11/Tk/Optionmenu.pm	Fri Mar  1 17:25:05 1996
++++ Tk/Optionmenu.pm	Thu Apr 18 16:16:21 1996
+@@ -23,15 +23,18 @@
+  # Should we allow -menubackground etc. as in -label* of Frame ?
+ 
+  $w-&gt;ConfigSpecs(-command =&gt; [CALLBACK,undef,undef,undef],
+-                 -options =&gt; [METHOD, undef, undef, undef] 
++                 -options =&gt; [METHOD, undef, undef, undef],
++		 -variable=&gt; [PASSIVE, undef, undef, undef],
+                 );
+ }
+ 
+ sub setOption
+ {
+- my ($w,$val) = @_;
++ my ($w, $val, $label) = @_;
+  my $var = $w-&gt;cget(-textvariable);
+- $$var = $val;
++ $$var = $label;
++ $var = $w-&gt;cget(-variable);
++ $$var = $val if $var;
+  $w-&gt;Callback(-command =&gt; $val);
+ }
+ 
+@@ -43,13 +46,18 @@
+    my $menu = $w-&gt;menu;
+    my $var = $w-&gt;cget(-textvariable);
+    my $width = $w-&gt;cget('-width');
+-   my $val;
++   my($val, $label);
+    foreach $val (@$opts) 
+     {
+-     my $len = length($val);
++     if (ref $val) {
++	($val, $label) = @$val;
++     } else {
++	$label = $val;
++     }
++     my $len = length($label);
+      $width = $len if (!defined($width) || $len &gt; $width);
+-     $menu-&gt;command(-label =&gt; $val, -command =&gt; [ $w , 'setOption', $val ]);
+-     $w-&gt;setOption($val) unless (defined $$var);
++     $menu-&gt;command(-label =&gt; $label, -command =&gt; [ $w , 'setOption', $val, $label ]);
++     $w-&gt;setOption($val, $label) unless (defined $$var);
+     }
+    $w-&gt;configure('-width' =&gt; $width);
+   }
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+</PRE>
+<HR><H2><A HREF="9604181435.AA18480@pluto.tiuk.ti.com">[PREV]</A>  <A HREF="4l8r0i$d01@kruuna.helsinki.fi">[NEXT]</A>  <A HREF="Dq2KJ4.5Ju@world.std.com">[PREV Thread]</A>  <A HREF="4l6368$q0j@ptdcs5.ra.intel.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

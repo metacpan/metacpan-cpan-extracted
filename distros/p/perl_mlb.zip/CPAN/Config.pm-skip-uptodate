@@ -1,0 +1,48 @@
+
+# This is CPAN.pm's systemwide configuration file. This file provides
+# defaults for users, and the values can be changed in a per-user
+# configuration file. The user-config file is being looked for as
+# ~/.cpan/CPAN/MyConfig.pm.
+
+$CPAN::Config = {
+  'build_cache' => q[300],
+  'build_dir' => q[k:/tmp/perl581_21211/.cpan/build],
+  'cache_metadata' => q[1],
+  'cpan_home' => q[k:/tmp/perl581_21211/.cpan],
+  'dontload_hash' => {  },
+  'expire_old_builds' => q[-1],
+  'flush_old_builds' => q[0],
+  'ftp' => q[d:/tcpip/bin/ftp.exe],
+  'ftp_proxy' => q[],
+  'getcwd' => q[cwd],
+  'gpg' => q[],
+  'gzip' => q[i:/UTILS/gzip.exe],
+  'histfile' => q[k:/tmp/perl581_21211/.cpan/histfile],
+  'histsize' => q[3000],
+  'http_proxy' => q[],
+  'inactivity_timeout' => q[0],
+  'index_expire' => q[365],
+  'inhibit_startup_message' => q[0],
+  'install_uptodate' => q[],
+  'keep_source_where' => q[k:/tmp/perl581_21211/.cpan/sources],
+  'lynx' => q[i:/emx.add/BIN/lynx.exe],
+  'make' => q[i:/emx.add/BIN/make.exe],
+  'make_arg' => q[-j4],
+  'make_install_arg' => q[-j4],
+  'makepl_arg' => q[],
+  'ncftp' => q[i:/UTILS/ncftp.exe],
+  'ncftpget' => q[],
+  'no_proxy' => q[],
+  'pager' => q[i:/UTILS/less.exe],
+  'prerequisites_policy' => q[follow],
+  'scan_cache' => q[atstart],
+  'shell' => q[sh],
+  'tar' => q[i:/UTILS/tar.exe],
+  'term_is_latin' => q[1],
+  'test_uptodate' => q[],
+  'unzip' => q[i:/UTILS/unzip.exe],
+  'urllist' => [q[ftp://ftp.cs.colorado.edu/pub/perl/CPAN/], q[ftp://ftp.ncsu.edu/pub/mirror/CPAN/], q[ftp://mirrors.kernel.org/pub/CPAN]],
+  'wget' => q[],
+};
+1;
+__END__

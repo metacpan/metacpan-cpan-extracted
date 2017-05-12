@@ -1,0 +1,65 @@
+
+
+
+
+                               PERL HBM
+			       --------
+
+
+           The Perl extension to HB and the Perl HB Module
+
+                         General Information
+
+
+
+
+
+
+
+1. DESCRIPTION
+
+    In this package you will find two different (although related) things.
+
+    The first is an interface for Perl to HB, allowing you to use the
+    functionality provided by the later from your Perl scripts (Perl
+    calls HB).  You can find that in the perlhb directory.
+
+    The second is an HBM allowing you to embed and execute Perl code
+    inside of your HB scripts (HB calls Perl).  You can find that in
+    the hbperl directory.
+
+    It should be noted that the second part of this package depends
+    on the first.  When HB calls Perl, Perl will need to call some of
+    the functions in HB back if it is to do anything useful.  For that
+    reason, you will need to install the HB extension to Perl if you
+    plan to use the Perl HBM.
+
+2. REQUERIMENTS
+
+    To use this extension you'll need:
+
+    - Perl 5.005. We have not tested this distribution in earlier releases
+      of the Perl interpreter. Do it and let us know if it works.
+
+    - HB 1.9.8 or newer. This packages uses functionality recently added
+      to HB and, for that reason, does not work in older versions.
+
+3. INSTALLATION
+
+    See the INSTALL file for instructions on how to build and install
+    this package.
+
+4. DOCUMENTATION
+
+    You can find more information on how to use HB from your Perl scripts
+    and how to use Perl from your HB files in the doc/ directory or
+    online at the following URL:
+
+        <http://bachue.com/hb/perl>
+
+5. AUTHOR
+
+    This package was created by Alejandro Forero Cuervo, who can be
+    reached at <bachue@bachue.com>. He encourages you to send him any
+    suggestions and patches you may want.
+

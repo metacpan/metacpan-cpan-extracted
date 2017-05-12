@@ -1,0 +1,434 @@
+=head1 NAME
+
+perlmodule - Embed a Perl interpreter in Python
+
+=head1 SYNOPSIS
+
+ import perl
+
+ # Simple arithmetics
+ six = perl.eval("3+3")
+
+ # Eval can also return functions
+ sum = perl.eval("sub { my $s = shift; $s += shift while @_; $s }")
+ print sum(1,2,3)
+
+ # Example of using a perl module from python
+ perl.require("Digest::MD5")
+ md5 = perl.callm("new", "Digest::MD5")
+ md5.add("Foo")
+ md5.hexdigest()
+
+ # Direct manipulation of perl data
+ inc = perl.get_ref("@INC")
+ inc.append("./extra")
+
+=head1 DESCRIPTION
+
+The C<perl> module allows you to easily embed a Perl interpreter in
+any Python program.  It can be used to invoke arbitrary Perl code,
+load any Perl modules and make calls directly into Perl functions.
+The Perl code invoked can call back into Python as it see fit.
+
+The following functions are made available by the C<perl> module:
+
+=over
+
+=item perl.eval( CODE )
+
+The C<perl.eval> function takes a string of perl code as argument and
+will let perl compile and execute the code.  The code is evaluated in
+scalar context and returns the value of the last statement executed.
+
+Any exception raised by perl will be turned into C<perl.PerlError>
+exception for Python.  The content of C<$@> is avalable as the value
+of the python exception.
+
+=item perl.require( MODULE )
+
+This will load the perl module into the perl interpreter.  If the
+module can not be located or fails to load properly, then a
+C<perl.PerlError> exception is raised.
+
+=item perl.call( FUNC, ARGS,... )
+
+This will call the perl function named C<FUNC> with the given
+arguments.  See the section about calling perl functions below.
+
+=item perl.callm( METHOD, OBJ, ARGS,... )
+
+This will call the perl method on the object with the given arguments.
+The C<OBJ> argument can also be a string denoting the name of a class.
+This is used to call class methods, like constructors.
+
+=item perl.defined( NAME )
+
+This function check if a thing identified by NAME is defined in the
+perl name space.  If the name is not prefixed with a perl data type
+symbol ("$", "@", "%", "$" or "&") then it is assumed to be the name
+of a function (i.e. "&" is assumed).
+
+=item perl.get_ref( NAME, [ CREATE ] )
+
+This function is used to obtain references to things inside the
+perl name space.  The function can also be used to construct new
+anonymous perl data objects.
+
+The C<NAME> argument is the name of the thing to obtain a reference
+to.  If the name is not prefixed with a perl data type symbol ("$",
+"@", "%", "$" or "&") then it is assumed to be the name of a function
+(i.e. "&" is assumed).  If the optional C<CREATE> argument is given
+and is TRUE, then the named object will be created unless it already
+exists.  If C<CREATE> is FALSE, and the named object does not exists,
+then a C<perl.PerlError> exception will be raised.
+
+If the C<NAME> argument is simply "$", "@" or "%" then a new scalar,
+array or hash is created and a reference to it is returned.  This is
+much more efficient than using something like perl.eval("[]") to
+obtain an anonymous perl array reference.
+
+=item perl.array( SEQUENCE )
+
+This function works in the same way as the python list() or tuple()
+builtin functions.  It will turn any python SEQUENCE object into a
+perl array.
+
+=back
+
+The following attributes are available:
+
+=over
+
+=item perl.PerlError
+
+The perl exception object.  See the section on Exceptions below.
+
+=item perl.MULTI_PERL
+
+This value is TRUE if the perlmodule was compiled with the MULTI_PERL
+flavour and FALSE otherwise.
+
+When MULTI_PERL is enabled, then each python thread will get its own
+separate perl interpreter.  This avoid the need for a perl lock and
+allow full concurrency for perl code executing in different threads.
+
+=back
+
+=head2 Calling perl functions
+
+There are 4 ways perl functions can be called from python.  Named
+functions and class methods can be invoked through the perl.call() and
+perl.callm() functions.  In additon reference to perl code objects and
+methods on reference to other perl objects can be called directly.
+
+Data types of arguments and return values are mapped between the
+languages as follows:
+
+ Python                Perl
+ --------------        ------------------------------------
+ None            <---> undef
+ string          <---> string
+ float           <---> number
+ int             <---> int
+ long            <---> int (or Python::Object if overflow)
+ perl ref object <---> ref
+ object          <---> Python::Object
+
+Python keyword arguments are passed to perl as key/value pairs after
+any other arguments.  Keywords that start with "C<__>" are reserved
+and not passed on.  The special keyword argument C<__wantarray__> can
+be used to specify what context to call the perl function in.  A
+function called in array context always return a tuple.
+
+Array context can also be set up with versions of perl.call() and
+perl.callm() with C<_tuple> suffix; i.e. perl.call_tuple() an
+perl.callm_tuple().
+
+=head2 Perl ref object
+
+Reference to perl objects (as returned by perl.get_ref() or passed to
+python as function arguments or return values) are wrapped up in a
+python extention type called C<perl ref object>.  The main purpose of
+these objects are to wrap arbitrary perl data such that it can be hold
+by python and passed back into perl at some later time.  In the same
+way python objects passed to perl are wrapped up as C<Python::Object>.
+
+The C<perl ref object> wrapper also provide behaviour that make the
+perl objects conform to the various interfaces that the corresponding
+python data type provide.  This make it possible to use perl data
+mostly transparently in existing python code.
+
+The following special attributes are supported by C<perl ref object>s.
+
+=over
+
+=item p.__class__
+
+This attribute denote the name of the class that the object is blessed
+into.  Perl objects can be blessed from python by assignment to the
+C<__class__> attribute.  A value of C<None> denotes an unblessed
+object.
+
+=item p.__type__
+
+This read-only attribute denote the type of the perl object.  It is a
+string like "SCALAR", "ARRAY", "HASH" or "CODE".
+
+The perl builtin ref() function can be defined in python like this:
+
+   def ref(o):
+      return o.__class__ or o.__type__
+
+=item p.__value__
+
+This attribute is only present for references to perl scalars.  It is
+used to dereference the scalar reference.  Example:
+
+  pid = perl.get_ref("$$")
+  print pid.__value__
+
+
+=item p.__wantarray__
+
+This attribute denoted the default context that is used if the object
+is called.  A value of C<None> denotes void context.  A TRUE value
+denotes list context and a FALSE value denote scalar context.  The
+default is C<0>, i.e. scalar context.
+
+=item p.__methodname__
+
+All C<perl ref object> can be assossiated with a method name.  If the
+object is called and this attribute is set, then we will try to call
+the correspondigly called perl method on the wrapped up perl object.
+
+=item p.foo
+
+Access to any other attribute will return a new C<perl ref object>
+that wraps the same underlying perl object, but which has the
+C<__methodname__> attribute initialized to the attribute name.  The
+result of this is simply that:
+
+  p.foo()
+
+works as expected.  The value of C<__wantarray__> will be inherited by
+the new wrapper.
+
+=item p.foo_tuple
+
+If an attribute with the suffix C<_tuple> is read, then a method
+wrapper is created with the C<__wantarray__> attribute set to a TRUE
+value.
+
+=back
+
+A perl array wrapped up as a C<perl ref object> support the following
+methods and operators that make it compatible with python lists:
+
+=over
+
+=item array.append(object)
+
+Appends a new element to the end of the array.  Same as perl's
+push(@array, $object)
+
+=item array.insert(index, object)
+
+Insert a new element at the indicated position in the array.  Similar
+to perl's splice(@array, $index, 0, $object)
+
+=item array.extend(seqence)
+
+Appends the elements a the sequence to the end of the array.  Same as
+perl's push(@array, @sequence)
+
+=item array.pop()
+
+Removes the last element from the array and returns it.  Same as
+perl's pop(@array)
+
+=item array.pop(index)
+
+Removes the element with the indicated index from the array and
+returns it.  Same as perl's splice(@array, $index, 1)
+
+=item array.remove(object)
+
+Searches for the given object in the array and removes first occurence
+if found. Raises an exception if no matching element is found.
+
+=item array.index(object)
+
+Searches for the given object in the array and returns the index to
+the first occurence found.  Raises an exception if no matching element is
+found.s
+
+=item array.count(object)
+
+Returns the number of occurences of the given object in the array.
+Similar to perl's scalar(grep $_ eq $object, @array).
+
+=item array.reverse()
+
+Reverse sequence of the elements of the array in-place.  Return None.
+
+=item array.sort()
+
+I<Not implemented yet.>
+
+=item array[i]
+
+Arrays can be indexed in the natural way.  Reference to out of bounds
+indexes raise an C<IndexError> exception.
+
+This automatically also enables various operations like:
+
+   x in array
+   x not int array
+   min(array)
+   max(array)
+
+   for x in array: ...
+   map(foo, array)
+   reduce(foo, array)
+   filter(foo, array)
+
+=item array[low:high]
+
+Slicing and assigment to slices are supported for arrays.
+
+=item del array[i]
+
+=item del array[low:high]
+
+=item array + array
+
+Arrays can be concatenated with the "+" operator.
+
+=item array * i
+
+Arrays can be repeated with the "*" operator.
+
+=back
+
+A perl hash wrapped up as a C<perl ref object> support the following
+methods that make it compatible with python dictionaries.  Note that
+the C<key> argument of perl hashes must be strings.  A C<TypeError>
+exception is raised if non-string keys are used.
+
+=over
+
+=item hash.has_key(key)
+
+Check if the hash has the key.  Same as perl's exists $hash{$key}.
+
+=item hash.keys()
+
+Returns a list of all keys. Same as perl's keys %hash.
+
+=item hash.values()
+
+Returns a list of all values.  Same as perl's values %hash.
+
+=item hash.items()
+
+Returns a list of (key, value) tuples.
+
+=item hash.clear()
+
+Removes all elements from the hash.
+
+=item hash.copy()
+
+Creates a new hash with the same elements and return it.
+
+=item hash.update(mapping)
+
+Updates hash with content of other mapping object.
+
+=item hash.get(key)
+
+Returns hash[key] if any value with the given key exists, C<None> otherwise.
+
+==item hash.get(key, default)
+
+Returns hash[key] if any value with the given key exists, C<default> otherwise.
+
+=item hash[key]
+
+Specific hashes values can be read or assigned to using subscription
+syntax.  Reading a non-existing key raise an C<KeyError> exception.
+
+=item del hash[key]
+
+Hash elements can be removed with the 'del' operator.
+
+=back
+
+Other features of all perl ref objects are:
+
+=over
+
+=item p(...)
+
+Perl ref objects can be called.  If the C<__methodname__> attribute is
+set, then this will try to call the given method with the wrapped perl
+reference as the object.  If the wrapped perl object is CODE, then it
+is called.
+
+=item str(p)
+
+Perl ref objects stringify as a string on the following form:
+
+  <perl Foo=HASH(0x80db1e0) ref at 810fff0>
+
+This shows a wrapper around a HASH blessed into the "Foo" package.
+
+=item repr(p)
+
+Same as str() currently.
+
+=item len(p)
+
+For arrays and hashes this return the size.  For all other things it
+will raise a TypeError exception.
+
+=item if p: ...
+
+Empty arrays and hashes evaluate to a false value in boolean contexts.
+Every other object will be TRUE.
+
+=back
+
+=head2 Exceptions
+
+If a perl exception is raised, and caught in python then the exception
+type object will be C<perl.PerlError> and the value will be the
+stringified stuff from C<$@>.
+
+=head1 BUGS
+
+Perl call frames are currently invisible in python tracebacks.
+
+=head1 COPYRIGHT
+
+(C) 2000-2001 ActiveState
+
+This code is distributed under the same terms as Perl; you can
+redistribute it and/or modify it under the terms of either the GNU
+General Public License or the Artistic License.
+
+THIS SOFTWARE IS PROVIDED BY ACTIVESTATE `AS IS'' AND ANY EXPRESSED OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL ACTIVESTATE OR ITS CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SEE ALSO
+
+L<Python::Object>

@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/DB/XMLDB.pm
+perl-perfSONAR_PS-DB-XMLDB.spec
+META.yml                                 Module meta-data (added by MakeMaker)

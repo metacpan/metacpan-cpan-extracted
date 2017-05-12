@@ -1,0 +1,843 @@
+
+=head1
+
+From:	IN%"tchrist@mox.perl.com"  "Tom Christiansen"  2-APR-1996 06:32:53.73
+To:	IN%"wjm@best.com"  "William J. Middleton"
+CC:	IN%"perl5-porters@africa.nicoh.com", IN%"tchrist@mox.perl.com"
+Subj:	RE: 425traps v1.05
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I321MV5SWG8X3LJI@LNS62.LNS.CORNELL.EDU>; Tue,
+ 02 Apr 1996 06:32:36 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA018704756; Tue, 2 Apr 1996 07:32:36 -0400
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA017974712; Tue,
+ 2 Apr 1996 07:31:52 -0400
+Received: from mox.perl.com (perl.com) by africa.nicoh.com with ESMTP
+ (1.37.109.15/16.2) id AA017854690; Tue, 2 Apr 1996 04:31:30 -0700
+Received: from localhost.perl.com (localhost.perl.com [127.0.0.1])
+ by mox.perl.com (8.6.12/8.6.12) with SMTP id EAA17251; Tue,
+ 2 Apr 1996 04:30:25 -0700
+Date: Tue, 02 Apr 1996 04:30:21 -0700
+From: Tom Christiansen <tchrist@mox.perl.com>
+Subject: Re: 425traps v1.05
+In-reply-to: "William J. Middleton"'s missive
+ <199604020649.WAA04800@shellx.best.com> of Mon, 01 Apr 1996 22:49:55 PST.
+Sender: owner-perl5-porters@nicoh.com
+To: "William J. Middleton" <wjm@best.com>
+Cc: perl5-porters@africa.nicoh.com, tchrist@mox.perl.com
+Message-id: <17247.828444621@mox.perl.com>
+Content-type: text/plain; charset=ISO-8859-1
+Content-transfer-encoding: 8bit
+List-Name: perl5-porters
+Precedence: bulk
+References: <199604020649.WAA04800@shellx.best.com>
+
+Her'es the file, converted for htmlification.  Prolly
+should be for poddification, but I'll leave that as an
+exercise for the reader.
+
+I had to change a little bit of the formatting to make it more regular.
+
+--tom
+
+=cut
+
+
+if (open(STDIN, "-|")) {
+    $/ = '';
+    while (<STDIN>) { 
+	s,</XMP>(\s*)<XMP>,$1,gis;
+	s,\s+</XMP>,</XMP>,gi;
+	print;
+    } 
+    exit;
+}
+
+while (<DATA>) {
+    if (s/# (?=\$Id.*)//) {
+	print <<EOT;
+<TITLE>Perl 425traps</TITLE>
+<h1>Perl4 to Perl5 Traps</h1>
+<P>
+EOT
+	next;
+    }
+    s/^#+\s*$/<P>/ && next;
+    s/^(\s+.*)/<XMP>$1<\/XMP>/ && next;
+    s{# (Example \d+\s+-\s*.*)}{\n\n<HR><H2>$1</H2>} && next;
+    s/^(?:# )?(perl[45].*?:)\s*(.*)/<DL><DT><I>$1<\/I><DD><XMP>$2<\/XMP><\/DL>/i && next;
+    if (s/# //) {
+	s/End of Examples//;
+	s,_(\w[\w\s]+\w)_,<I>$1</I>,g;
+	s/ ([\$\@%]\S+)/ <CODE>$1<\/CODE>/g 	    ||
+	    s,\b([sm](?=\W)\S+),<CODE>$1</CODE>,g   ||
+	    s,([^sm])(([/?]).*?\3),$1<CODE>$2</CODE>,g;
+	next;
+    }
+} continue { 
+    print;
+}
+
+__END__
+# $Id: 425traps,v 1.5 1996/04/02 06:12:29 bmiddlet Exp $
+#############################################################################
+# Example 1 - From perltrap
+#############################################################################
+# @ now always interpolates an array in double-quotish strings.
+
+    print "To: someone@somewhere.com\n";
+
+# perl4 prints: To:someone@somewhere.com
+# perl5 errors : Literal @somewhere now requires backslash
+
+#############################################################################
+# Example 2 - From perltrap
+#############################################################################
+# Barewords that used to look like strings to Perl will now look like subroutine
+# calls if a subroutine by that name is defined before the compiler sees them.
+# For example:
+
+       sub SeeYa { warn"Hasta la vista, baby!" }
+       $SIG{'TERM'} = SeeYa;
+       print "SIGTERM is now $SIG{'TERM'}\n";
+
+# perl4 prints: SIGTERM is main'SeeYa
+# perl5 prints: SIGTERM is now main::1
+# Use -w to catch this one
+
+#############################################################################
+# Example 3 - From perltrap
+#############################################################################
+# Symbols starting with "_" are no longer forced into package main, except
+# for $_ itself (and @_, etc.).
+
+    package test;
+    $_legacy = 1;
+
+    package main;
+    print "\$_legacy is ",$_legacy,"\n";
+
+# perl4 prints: $_legacy is 1
+# perl5 prints: $_legacy is 
+
+#############################################################################
+# Example 4 - From perltrap
+#############################################################################
+# Double-colon is now a valid package separator in an identifier.  Thus these
+# behave differently in perl4 vs. perl5, since the packages dont exist.
+
+    $a=1;$b=2;$c=3;$var=4;
+    print "$a::$b::$c ";
+    print "$var::abc::xyz\n";
+
+# perl4 prints: 1::2::3 4::abc::xyz
+# perl5 prints: 3  
+
+# On a related note, Paul Marquess reports:
+# Given that :: is now the preferred package delimiter, it is debatable
+# whether this should be classed as a bug or not.
+# (The older package delimiter, ' ,is used here)
+
+    $x = 10 ;
+    print "x=${'x}\n" ;
+
+# perl4 prints: x=10
+# perl5 prints: Can't find string terminator "'" anywhere before EOF 
+
+#############################################################################
+# Example 5 - From perltrap
+#############################################################################
+# s'$lhs'$rhs' now does no interpolation on either side.  It used to
+# interpolate $lhs but not $rhs.  (Still does not match a literal $ in string)
+
+    $a=1;$b=2;
+    $string = '1 2 $a $b';
+    $string =~ s'$a'$b';
+    print $string,"\n";
+
+# perl4 prints: $b 2 $a $b
+# perl5 prints: 1 2 $a $b
+
+#############################################################################
+# Example 6 - From perltrap
+#############################################################################
+# The second and third arguments of splice() are now evaluated in scalar
+# context (as the book says) rather than list context.
+
+    sub sub1{return(0,2) }          # return a 2-elem array
+    sub sub2{ return(1,2,3)}        # return a 3-elem array
+    @a1 = ("a","b","c","d","e");
+    @a2 = splice(@a1,&sub1,&sub2);  
+    print join(' ',@a2),"\n";
+
+# perl4 prints: a b
+# perl5 prints: c d e  
+
+#############################################################################
+# Example 7 - From perltrap
+#############################################################################
+# These are now semantic errors because of precedence:
+
+    @list = (1,2,3,4,5);
+    %map = ("a",1,"b",2,"c",3,"d",4);
+    $n = shift @list + 2;   # first item in list plus 2
+    print "n is $n, ";
+    $m = keys %map + 2;     # number of items in hash plus 2
+    print "m is $m\n";
+
+# perl4 prints: n is 3, m is 6
+# perl5 errors and fails to compile
+
+#############################################################################
+# Example 8 - From perltrap
+#############################################################################
+# The precedence of assignment operators is now the same as the precedence
+# of assignment.  Perl 4 mistakenly gave them the precedence of the associated
+# operator.  So you now must parenthesize them in expressions like
+
+    /foo/ ? ($a += 2) : ($a -= 2);
+
+# Otherwise
+
+    /foo/ ? $a += 2 : $a -= 2;
+
+# would be erroneously parsed as
+
+    (/foo/ ? $a += 2 : $a) -= 2;
+
+# On the other hand,
+
+    $a += /foo/ ? 1 : 2;
+
+# now works as a C programmer would expect.
+
+#############################################################################
+# Example 9 - From perltrap
+#############################################################################
+
+    open FOO || die;
+
+# is now incorrect.  You need parens around the filehandle.
+# Otherwise, perl5 leaves the statement as it's default precedence:
+
+    open(FOO || die);
+    
+# perl4 opens or dies 
+# perl5 errors: Precedence problem: open FOO should be open(FOO)
+
+#############################################################################
+# Example 10 - From perltrap
+#############################################################################
+# The elements of argument lists for formats are now evaluated in list
+# context.  This means you can interpolate list values now.
+
+    @fmt = ("foo","bar","baz");
+    format STDOUT=
+    @<<<<< @||||| @>>>>> 
+    @fmt;
+    .
+    write;
+
+# perl4 errors:  Please use commas to separate fields in file
+# perl5 prints: foo     bar      baz
+
+#############################################################################
+# Example 11 - From perltrap
+#############################################################################
+# You can't do a goto into a block that is optimized away.  Darn.
+
+    goto marker1;
+
+    for(1){
+    marker1:
+	print "Here I is!\n";
+    }
+
+# perl4 prints: Here I is!
+# perl5 dumps core (SEGV)
+
+#############################################################################
+# Example 12 - From perltrap
+#############################################################################
+# It is no longer syntactically legal to use whitespace as the name
+# of a variable, or as a delimiter for any kind of quote construct.
+# Double darn.
+
+    $a = ("foo bar");
+    $b = q baz ;
+    print "a is $a, b is $b\n";
+
+# perl4 prints: a is foo bar, b is baz
+# perl5 errors: Bare word found where operator expected 
+
+#############################################################################
+# Example 13 - From perltrap
+#############################################################################
+# The caller() function now returns a false value in a scalar context if there
+# is no caller.  This lets library files determine if they're being required.
+
+    caller() ? (print "You rang?\n") : (print "Got a 0\n");
+
+# perl4 errors: There is no caller
+# perl5 prints: Got a 0
+
+#############################################################################
+# Example 14 - From perltrap (with help from Tchrist)
+#############################################################################
+# m//g now attaches its state to the searched string rather than the
+# regular expression.  (Once the scope of a block is left for the sub, the 
+# state of the searched string is lost)
+
+    $_ = "ababab";
+    while(m/ab/g){
+       &doit("blah");
+    }
+    sub doit{local($_) = shift; print "Got $_ "}
+
+# perl4 prints: blah blah blah
+# perl5 prints: infinite loop blah...
+
+#############################################################################
+# Example 15 - From perltrap
+#############################################################################
+# reverse() is no longer allowed as the name of a sort subroutine.
+
+    sub reverse{ print "yup "; $a <=> $b }
+    print sort reverse a,b,c;
+
+# perl4 prints: yup yup yup yup abc
+# perl5 prints: abc
+
+#############################################################################
+# Example 16 - From perltrap
+#############################################################################
+# Double-quoted strings may no longer end with an unescaped $ or @.
+
+    $foo = "foo$";
+    $bar = "bar@";
+    print "foo is $foo, bar is $bar\n";
+
+# perl4 prints: foo is foo$, bar is bar@
+# perl5 errors: Final $ should be \$ or $name
+#
+# Note: perl5 _DOES NOT_ error on the terminating @ in $bar
+# This has been reported as a bug in perltrap
+
+#############################################################################
+# Example 17 - From perltrap (with help from Chaim Frenkel)
+#############################################################################
+# The archaic while/if BLOCK BLOCK syntax is no longer supported.
+
+    if { 1 } {
+       print "True!";
+    }
+    else {
+       print "False!";
+    }
+
+# perl4 prints: True!
+# perl5 errors: syntax error at test.pl line 1, near "if {"
+
+#############################################################################
+# Example 18 - From perltrap
+#############################################################################
+# Negative array subscripts now count from the end of the array.
+
+    @a = (1, 2, 3, 4, 5);
+    print "The third element of the array is $a[3] also expressed as $a[-2] \n";
+
+# perl4 prints: The third element of the array is 4 also expressed as
+# perl5 prints: The third element of the array is 4 also expressed as 4
+
+#############################################################################
+# Example 19 - From perltrap, example by Chaim Frenkel
+#############################################################################
+# The comma operator in a scalar context is now guaranteed to give a
+# scalar context to its arguments.
+
+    @y= ('a','b','c');
+    $x = (1, 2, @y);
+    print "x = $x\n";
+    # Perl4 prints:  x = c   # Thinks list context interpolates list
+    # Perl5 prints:  x = 3   # Knows scalar uses length of list
+
+#############################################################################
+# Example 20 - From perltrap
+#############################################################################
+# The ** operator now binds more tightly than unary minus.  
+# It was documented to work this way before, but didn't.
+
+    print -4**2,"\n";
+
+# perl4 prints: 16
+# perl5 prints: -16
+
+#############################################################################
+# Example 21 - From perltrap (with help from Chaim)
+#############################################################################
+# Setting $#array lower now discards array elements, and makes them
+# impossible to recover.
+
+    @a = (a,b,c,d,e);
+    print "Before: ",join('',@a);
+    $#a =1;
+    print ", After: ",join('',@a);
+    $#a =3;
+    print ", Recovered: ",join('',@a),"\n";
+
+# perl4 prints: Before: abcde, After: ab, Recovered: abcd
+# perl5 prints: Before: abcde, After: ab, Recovered: ab
+
+#############################################################################
+# Example 22 - From perltrap
+#############################################################################
+# The construct "this is $$x" used to interpolate the pid at that
+# point, but now tries to dereference $x.  $$ by itself still
+# works fine, however.
+
+    print "this is $$x\n";
+
+# perl4 prints: this is XXXx   (XXX is the current pid)
+# perl5 prints: this is 
+
+#############################################################################
+# Example 23 - From perltrap
+#############################################################################
+# The meaning of foreach has changed slightly when it is iterating over a
+# list which is not an array.  This used to assign the list to a
+# temporary array, but no longer does so (for efficiency).  This means
+# that you'll now be iterating over the actual values, not over copies of
+# the values.  Modifications to the loop variable can change the original
+# values.
+
+    @list = ('ab','abc','bcd','def');
+    foreach $var (grep(/ab/,@list)){
+       $var = 1;
+    }
+    print (join(':',@list));
+
+# perl4 prints: ab:abc:bcd:def
+# perl5 prints: 1:1:bcd:def
+#
+# To retain Perl 4 semantics you need to assign your list
+# explicitly to a temporary array and then iterate over that.  For
+# example, you might need to change
+
+    foreach $var (grep(/ab/,@list)){
+
+# to
+
+    foreach $var (@tmp = grep(/ab/,@list)){
+
+# Otherwise changing $var will clobber the values of @list.  (This most often
+# happens when you use $_ for the loop variable, and call subroutines in
+# the loop that don't properly localize $_.)
+
+#############################################################################
+# Example 24 - Submitted by Adobe folks
+#############################################################################
+# Creation of hashes on the fly with eval "EXPR" now requires either both $'s
+# to be protected in the specification of the hash name, or both curlies to
+# be protected.  If both curlies are protected, the result will be compatible
+# with perl4 and perl5.  This is a very common practice, and should be changed 
+# to use the block form of eval{}  if possible.
+
+    $hashname = "foobar";
+    $key = "baz";
+    $value = 1234;
+    eval "\$$hashname{'$key'} = q|$value|";
+    (defined($foobar{'baz'})) ?  (print "Yup") : (print "Nope");
+
+# perl4 prints: Yup
+# perl5 prints: Nope
+
+# Changing
+
+    eval "\$$hashname{'$key'} = q|$value|";
+
+# to
+
+    eval "\$\$hashname{'$key'} = q|$value|";
+
+# causes the following result:
+# perl4 prints: Nope
+# perl5 prints: Yup
+
+# or, changing to 
+
+    eval "\$$hashname\{'$key'\} = q|$value|";
+
+# causes the following result:
+# perl4 prints: Yup
+# perl5 prints: Yup
+# and is compatible for both versions
+
+#############################################################################
+# Example 25 - Submitted by Adobe folks
+#############################################################################
+# glob assignment from variable to variable will fail if the assigned
+# variable is localized subsequent to the assignment
+
+    @a = ("This is Perl 4");
+    *b = *a;
+    local(@a);
+    print @b,"\n";
+
+# perl4 prints: This is Perl 4
+# perl5 prints: 
+
+#############################################################################
+# Example 26 - Submitted by Johan Vromans
+#############################################################################
+# If no parentheses are used in a match, Perl4 sets $+ to
+# the whole match, just like $&. Perl5 does not.
+
+    "abcdef" =~ /b.*e/;
+    print "\$+ = $+\n";   
+
+# perl4 prints: bcde
+# perl4 prints: 
+
+#############################################################################
+# Example 27 - Submitted by Stephen Beal
+#############################################################################
+# Assignment of return values from logical tests 
+# does not work in perl5 when the test evaluates to false (0).
+# Logical tests now return an empty string, instead of 0
+
+    $p = ($test == 1);
+    print $p,"\n";
+
+# perl4 prints: 0
+# perl5 prints:
+
+#############################################################################
+# Example 28 - Submitted by Johan Vromans (Linux 1.3.45)
+# example from Danny Faught
+#############################################################################
+# 
+# Existing dbm databases created under perl4 (or any other dbm/ndbm tool)
+# may cause the same script, run under perl5, to fail.  The build of perl5
+# must have been linked with dbm/ndbm as the default for dbmopen() to
+# properly
+
+    dbmopen (%dbm, "file", undef);
+    print "ok\n";
+
+# perl4 prints: ok
+# perl5 prints: ok (IFF linked with -ldbm or -lndbm)
+
+# There are an _awful_ lot of people getting bit by  this with perl5.002
+# It seems to be a linux thing, and possibly NTPerl, but I sure need
+# more reports to grok out the problem - Bill
+
+#############################################################################
+# Example 29 - Submitted by Chaim Frenkel
+#############################################################################
+# Changes in unary negation (of strings)
+# This change effects both the return value and what it
+# does to auto(magic)increment.
+
+    $x = "aaa";
+    print ++$x," : ";
+    print -$x," : ";
+    print ++$x,"\n";
+
+# perl4 prints: aab : -0 : 1
+# perl5 prints: aab : -aab : aac
+
+#############################################################################
+# Example 30 - Submitted by Simon Chatterjee
+#############################################################################
+# s`lhs`rhs` is now a normal substitution, with no backtick
+# expansion 
+
+    $string = "";
+    $string =~ s`^`hostname`;
+    print $string, "\n";
+
+# perl4 prints: <the local hostname>
+# perl5 prints: hostname
+
+#############################################################################
+# Example 31 - Submitted by Simon Chatterjee
+#############################################################################
+# Formatted output and significant digits
+ 
+    print 7.373504 - 0, "\n";
+    printf "%20.18f\n", 7.373504 - 0;
+ 
+# Perl4:
+
+    7.375039999999996141
+    7.37503999999999614
+
+# Perl5:
+
+    7.373504
+    7.37503999999999614
+
+#############################################################################
+# Example 32 - Submitted by Danny Faught
+#############################################################################
+# perl 4 lets you modify constants:
+
+    $foo = "x";
+    &mod($foo);
+    for ($x = 0; $x < 3; $x++) {
+	&mod("a");
+    }
+    sub mod {
+	print "before: $_[0]";
+	$_[0] = "m";
+	print "  after: $_[0]\n";
+    }
+
+# perl4 output:
+    before: x  after: m
+    before: a  after: m
+    before: m  after: m
+    before: m  after: m
+
+# perl5 output:
+    before: x  after: m
+    Modification of a read-only value attempted at foo.pl line 12.
+    before: a
+
+#############################################################################
+# Example 33 - Submitted by Danny Faught
+#############################################################################
+Just a quick note to say that localizing @_ has always been broken
+in perl5 (especially where defgv is involved in other guises).  Try
+this from my 5.001m collection (I don't believe I ever took the time
+to report this :-()
+
+     for (1..10) { print "Trial $_\n"; &foo('a', 'b', 'c') }
+     sub foo { local(@_) = ('p', 'q', 'r'); }
+
+# This problem will be fixed in 5.003 - Bill
+
+#############################################################################
+# Example 34 - Noted in c.l.p.misc by Maurice Cinquini 
+#############################################################################
+I've even come across old perl4 programs which
+unconsciously rely on the bugs in earlier perl versions.
+
+    perl -e '$bar=q/not/; print "This is $foo{$bar} perl5"'
+
+# perl4 prints: This is not perl5
+# perl4 prints: This is perl5
+
+#############################################################################
+# Example 35 - Submitted by Markus F.X.J. Oberhumer and Danny Faught
+#############################################################################
+# Stricter parsing of variables used in regular expressions
+
+        s/^([^$grpc]*$grpc[$opt$plus$rep]?)//o;
+
+# perl4: compiles w/o error
+# perl5: with Scalar found where operator expected ..., near "$opt$plus"
+
+# an added component of this example, apparantly from the same script, is
+# the actual value of the s'd string after the substitution, e.g. - 
+
+    $grpc   = '\)'; 
+    $opt    = '\?';
+    $plus = '\+';
+    $rep  = '\*';
+    $_ = 'foo)?';
+    s/^([^$grpc]*${grpc}[$opt]?)/bar/;
+    print ;
+
+# perl4 prints: bar
+# perl5 prints: barfoo)?
+
+#############################################################################
+# Example 36 - Submitted by Kenneth Albanowski from Eric Hendrickson
+#############################################################################
+# Under perl5, m?x? matches only once, like ?x?. Under perl4, it matched
+# repeatedly, like /x/ or m!x!.
+
+    $test = "once";
+    sub match { $test =~ m?once?; }
+    &match();
+    if ( &match() ) {
+        # m?x? matches more then once
+        print "perl4\n";
+    } else {
+        # m?x? matches only once
+        print "perl5\n";
+    }
+
+# perl4 prints: perl4
+# perl5 prints: perl5
+
+#############################################################################
+# Example 37 - Submitted by Jerry Whelan
+#############################################################################
+# parsing; note the space between . and =
+
+    $string . = "more string";
+    print $string;
+
+# perl4 prints: more string
+# perl5 prints: syntax error at - line 1, near ". ="
+
+#############################################################################
+# Example 38 - Submitted by Danny Faught
+#############################################################################
+# The behavior is slightly different for:
+
+    print "$x", defined $x
+
+# perl4: 1
+# perl5: <no output, $x is not called into existence>
+
+#############################################################################
+# Example 39 - Submitted by Danny Faught
+#############################################################################
+# You also have to be careful about array references:
+# This may be related to example 24
+
+    print "$foo{"
+
+# perl4 prints: {
+# perl5 prints: syntax error
+
+#############################################################################
+# Example 40 - Submitted by Danny Faught
+#############################################################################
+# Similarly, watch out for:
+
+    $foo = "array";
+    print "\$$foo{bar}\n";
+
+# perl4 prints: $array{bar}
+# perl5 prints: $
+
+# Perl 5 is looking for $array{bar} which doesn't exist, but perl 4 is
+# happy just to expand $foo to "array" by itself.  Watch out for this
+# especially in evals.
+
+#############################################################################
+# Example 41 - Submitted by Danny Faught
+#############################################################################
+# This one is related to #4, but really related to precedence:
+
+    $a = "x"; print "$::a"
+
+perl4: -:a
+perl5: x
+
+#############################################################################
+# Example 42 - Submitted by Danny Faught
+#############################################################################
+# Better parsing in perl 5
+
+    sub foo {}
+    &foo
+    print("hello, world\n");
+
+# Since foo doesn't take any arguments, this seems to work by accident
+# with the missing semicolon under perl 4 even with -w.  
+#
+# But perl5 says:
+
+    syntax error at sub.pl line 3, near "print"
+    Execution of sub.pl aborted due to compilation errors.
+
+#############################################################################
+# Example 43 - Submitted by Danny Faught (From Earl Hood)
+#############################################################################
+# Variable suicide
+
+    $aGlobal{ "aKey" } = "global value";
+    print "MAIN:", $aGlobal{"aKey"}, "\n";
+    $GlobalLevel = 0;
+    &test( *aGlobal );
+
+    sub test {
+       local( *theArgument ) = @_;
+       local( %aNewLocal ); # perl 4 != 5.001l,m
+       $aNewLocal{"aKey"} = "this should never appear";  # unless identical with
+       print "SUB: ", $theArgument{"aKey"}, "\n";
+       $aNewLocal{"aKey"} = "level $GlobalLevel";   # what should print
+       $GlobalLevel++;
+       if( $GlobalLevel<4 ) {
+	   &test( *aNewLocal );
+       }
+    }
+
+# STDOUT from Perl 4.019 to 4.036 interpeters under DOS and OSF1:
+
+    MAIN:global value
+    SUB: global value
+    SUB: level 0
+    SUB: level 1
+    SUB: level 2
+
+# STDOUT from four various Perl 5.xx interpreters under DOS, win95, Linux, OSF1:
+
+    MAIN:global value
+    SUB: global value
+    SUB: this should never appear
+    SUB: this should never appear
+    SUB: this should never appear
+
+# Variable suicide behavior is more consistent under Perl 5.  Reason is
+# that if scalars are used, both Perl 4 and 5 exhibit the behavior as
+# Perl 5 for associative arrays.
+
+#############################################################################
+# Example 44 - Submitted by Adobe folks  (SysV Specific)
+#############################################################################
+# Under SysV OS's, seek() on a file opened to append ">>" now does the 
+# right thing w.r.t. the fopen() man page. e.g. - When a file is opened 
+# for append,  it  is  impossible to overwrite information already in
+# the file.
+
+    open(TEST,">>seek.test");
+    $start = tell TEST ;  
+    foreach(1 .. 9){
+	print TEST "$_ ";
+    }
+    $end = tell TEST ;   
+    seek(TEST,$start,0); 
+    print TEST "18 characters here"; 
+
+# Under perl4 (solaris) seek.test has: 18 characters here
+# Under perl5 (solaris) seek.test has: 1 2 3 4 5 6 7 8 9 18 characters here
+
+#############################################################################
+# Example 45 - Submitted by Lionel Cons  (HPUX Specific)
+#############################################################################
+#  Under HPUX, one had to reset any signal handler, within  the signal
+# handler function, each time a signal was handled with perl4.  With
+# perl5, the reset is now done correctly.  Any code relying on the
+# handler _not_ being reset will have to be reworked.
+
+    sub gotit {
+	print "Got @_... ";
+    }
+    $SIG{'INT'} = 'gotit';
+
+    $| = 1;
+    $pid = fork;
+    if ($pid) {
+	kill('INT', $pid);
+	sleep(1);
+	kill('INT', $pid);
+    } else {
+	while (1) {sleep(10);}
+    }
+
+# perl4 (HPUX) prints: Got INT...
+# perl5 (HPUX) prints: Got INT... Got INT...
+
+#############################################################################
+# End of Examples
+#############################################################################
+
+

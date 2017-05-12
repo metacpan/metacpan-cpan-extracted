@@ -1,0 +1,465 @@
+Revision history for pantheon.
+
+0.58    2014.02.24
+
+0.57    2014.01.24
+        Vulcan::Flags - new module
+        pantheon/tools/access - create .ssh
+        Vulcan::ExpSSH - remove -t
+
+0.56    2014.01.24
+        Happy Lunar New Year, 2015!
+
+0.55    2014.01.17
+        pantheon/tools/seco/search - bugfix
+        pantheon/tools/access - non-sudoer account support
+        SECO::Engine - qrw qnet order bugfix
+        Poros::Query - setgid bugfix
+
+0.54    2014.01.17
+
+0.53    2014.01.06
+        SECO::Engine - new(), prun()
+        SECO::Engine::Build - new()
+        SECO::Engine::Search - new()
+        SECO::Engine::Access - new()
+        SECO::Build::Incr - fastpack mode
+        pantheon/tools/seco/vips - new tool
+        pantheon/tools/seco/search - deprecate --qrt, add --lock
+        INSTALL.PL - include .install
+        INSTALL - use .install
+        .install - default installation environment
+
+0.52    2014.01.06
+
+0.51    2013.12.27
+        Cronos::Calendar - enhance performance and output format
+        Cronos::Policy - enhance performance for far offsets
+        Vulcan::ExpSSH - new module, deprecate SECO::ExpSSH;
+        Vulcan::Multicast - deprecate Pan::Multicast;
+        Notify - new module
+        SECO::Engine - setenv bugfix.
+        pantheon/tools/go - new tool, deprecate pantheon/tools/seco/go
+        pantheon/tools/hermes/node - bugfix
+        pantheon/tools/cronos/cal - relative year and alphabetical month
+        pantheon/tools/trust - new tool
+        poros/code/dump - multi-file support
+
+0.50    2013.12.27
+
+0.49    2013.12.23
+        MIO::TCP - verbose for run()
+        MIO::UDP - verbose for run()
+        MIO::CMD - verbose for run()
+        Cronos - hms support for epoch()
+        Cronos::Period - bugfix
+        Cronos::Policy - default period, timezone, order
+        Cronos::Calendar - new module
+        SECO - decruft
+        SECO::Index - decruft
+        SECO::Index::Log - new module
+        SECO::Index::Full - decruft
+        SECO::Index::Incr - decruft
+        SECO::Engine - skip directory setup
+        SECO::Engine::Build - nozlog for start()
+        pantheon/tools/.config.example - replace .config
+        pantheon/tools/cronos/cal - new tool
+        pantheon/tools/cronos/zone - new tool
+        pantheon/tools/cronos/list - bugfix
+        pantheon/tools/cronos/make - load config in reverse order
+        pantheon/poros/code/pantheon - remove before untar
+        pantheon/poros/code/symlink - configurable rollback extension
+        INSTALL.PL - cp .config.example .config when abscent
+        UPDATE - specify munge path through $ENV{PERL_PATH}
+
+0.48    2013.12.23
+
+0.47    2013.12.13
+        UPDATE - set installation ownership by environment variable $OWNER
+        MIO::SSH - sudo multiple commands support
+        Vulcan::Mrsync - dedup when paths are same
+        Vulcan::Phasic - do not dedup
+        Janus::Ctrl - dump()
+        SECO::Engine::Build - bugfix
+        Cronos - new module
+        Cronos::Period - new module
+        Cronos::Policy - new module
+        pantheon/tools/cronos/make - new tool
+        pantheon/tools/cronos/list - new tool
+        pantheon/tools/cronos/now - new tool
+        pantheon/tools/seco/dancer - removed
+        pantheon/tools/mssh - load password from environment variable $PASSWD
+        pantheon/tools/passwd - set environment variable $PASSWD
+
+0.46    2013.12.13
+
+0.45    2013.12.02
+        SECO::Engine - cont
+        SECO::Engine::Build - cont
+        SECO::Engine::Access - new module
+        SECO::Engine::Search - qrw compatible
+        Argos::Map - bugfix, kill hanging threads
+        Pan::Util - removed
+        Vulcan::File - new module
+        Vulcan::Symlink - always make rollback link
+        pantheon/tools/seco/search - qrw compatible
+        pantheon/tools/seco/hits - use SECO::Engine::Access
+        pantheon/poros/code/nrid - replace pantheon/poros/code/qfed
+        pantheon/poros/code/access - new plugin
+        pantheon/poros/code/pantheon - add version
+        pantheon/tools/access - new tool
+        INSTALL.PL - enable hermes on initial installation
+
+0.44    2013.11.29
+
+0.43    2013.11.24
+        Janus - bugfix
+        SECO::Index - cont
+        SECO::Index::Incr - cont
+        SECO::Index::Full - cont
+        SECO::Index - bugfix
+        SECO::Conf::Auto - cont
+        SECO::Engine - cont
+        SECO::Engine::Build - cont
+        SECO::Engine::Search - cont
+        pantheon/tools/seco/whoismycluster - use SECO::Conf::Auto
+        pantheon/tools/seco/search - new tool
+        pantheon/tools/seco/dancer - remove hostlist
+
+0.42    2013.11.22
+
+0.41    2013.11.18
+        Janus::Sequence - bugfix
+        Vulcan::Symlink - bugfix
+        SECO::Index - cont
+        SECO::Index::Incr - cont
+        SECO::Index::Full - cont
+        SECO::Conf - bugfix
+        SECO::Conf::Auto - new module
+        SECO::Engine - cont
+        SECO::Engine::Build - new module
+        SECO::Engine::Search - new module
+
+0.40    2013.11.15
+
+0.39    2013.11.11
+        Vulcan::Daemon - 'script' option in conf
+        SECO::Index - cont
+        SECO::Index::Full - cont
+        SECO::Index::Incr - cont
+        pantheon/tools/seco/whoismycluster - lookup seco cluster
+        pantheon/poros/code/qfed - new plugin
+        pantheon/tools/seco/hits - new tool
+        pantheon/tools/poros/code/ctrl - search engine ctrl
+        pantheon/tools/seco/ctrl - removed
+        pantheon/argos/code/b.seco - 'local' option
+
+0.38    2013.11.08
+
+0.37    2013.10.29
+        Vulcan::SysInfo - new feature, {TIME}{local}, {TIME}{utc}; bugfix
+        Janus - janus name passed to Janus::Sequence
+        Janus::Sequence - bugfix, alarm; janus name passed in
+        Janus::Ctrl - bugfix
+        SECO - more variables
+        SECO::Conf - new feature, hostname as index
+        SECO::Index - rework
+        SECO::Index::Full - new module, incomplete
+        SECO::Index::Incr - new module, incomplete
+        SECO::Engine - new module, replace SECO::Ctrl
+        pantheon/poros/code/pantheon - new plugin
+        pantheon/janus/code/b.idc - bugfix
+        pantheon/tools/argos/watch - new feature, filter status
+
+0.36    2013.10.28
+
+0.35    2013.10.22
+        Argos::Map - pass path object to plugin *
+        Vulcan::Symlink - bugfix and new feature, rollback
+        Vulcan::Symlink::Conf - new module
+        SECO::ExpSSH - freebsd support
+        pantheon/argos/code/m.port - new feature, ad-hoc input *
+        pantheon/janus/code/b.idc - new plugin
+        pantheon/poros/code/symlink - new plugin
+        pantheon/tools/symlink - new tool
+
+0.34    2013.10.19
+
+0.33    2013.10.13
+        Vulcan::Cruft - new feature, count for cut()
+        Vulcan::Mrsync - new feature, parametrize nice *1
+        Vulcan::Daemon - bugfix
+        MIO - new module, interface *2
+        MIO::UDP - new module 
+        MIO::TCP - error on connect() failure, rework with IO::Socket
+        MIO::CMD - *2
+        MIO::SSH - *2
+        Hermes::Object - add clone() *3
+        Hermes::KeySet - remove clone() *3
+        Hermes::Integer - new module *3
+        Pan::Macro - temporarily removed
+        pantheon/argos/code/m.port - new plugin  *4
+        pantheon/argos/code/m.ssh - removed, replaced by m.port *4
+        pantheon/poros/code/grep - chop command output
+        pantheon/tools/seco/dance - bugfix
+        pantheon/tools/hermes/cache - bugfix
+        pantheon/tools/mrsync - new feature *1
+
+0.32    2013.10.12
+
+0.31    2013.10.09
+        MIO::TCP - bugfix
+        Vulcan::Sort - bugfix
+        Vulcan::NetMap - bugfix
+        pantheon/argos/code/b.seco - bugfix
+        pantheon/argos/code/r.seco - bugfix
+        pantheon/argos/code/m.grep - warning
+        pantheon/argos/code/m.sysinfo - warning
+        pantheon/argos/code/m.ssh - parametrize
+        pantheon/janus/code/b.seco - new plugin
+        pantheon/tools/argos/watch - new feature, sort by status
+
+0.30    2013.10.08
+
+0.29    2013.09.29
+        SECO::Ctrl - new feature, poll data count
+        SECO::Conf - reorganize replica, interface change *
+        Vulcan::Daemon - new feature, tail service log
+        pantheon/poros/code/seco - new plugin
+        pantheon/argos/code/m.ssh - new plugin
+        pantheon/argos/code/m.http - new feature, interface change *
+        pantheon/argos/code/b.seco - new feature
+        pantheon/argos/code/r.seco - bugfix
+        pantheon/tools/argos/watch - bugfix
+        pantheon/tools/daemon - new feature
+        pantheon/tools/mssh - minor change
+        pantheon/tools/seco/dance - SECO::Conf
+        pantheon/hermes/callback/seco - SECO::Conf
+
+0.28    2013.09.27
+
+0.27    2013.09.23
+        Vulcan::Sort - new module
+        Vulcan::NetMap - new module
+        Vulcan::Cruft - bugfix
+        Vulcan::Mrsync - bugfix
+        pantheon/argos/code/r.seco - bugfix
+        pantheon/tools/seco/decruft - bugfix
+        pantheon/tools/argos/watch - new tool
+
+0.26    2013.09.22
+
+0.25    2013.09.16
+        Pan::Multicast - new module, data distribution via multicast
+        Vulcan::SysInfo - bugfix
+        Cerew::DBI::Index - bugfix
+        pantheon/tools/seco/ntpsync - new tools
+        pantheon/tools/seco/decruft - new tools
+        pantheon/tools/caller - new tools
+
+0.24    2013.09.14
+
+0.23    2013.09.09
+        Hermes::Object - new module, object interface for overloaded operators
+        Hermes::KeySet - implements Hermes::Object
+        Vulcan::Cruft - new method cut() for log rotation
+        Vulcan::Daemon - defaults adjusted; bugfix, kill() now stops multilog
+        pantheon/argos/code/r.seco - bugfix for hermes lookup
+        pantheon/seco/callback/node - new callback
+        SECO::Index - SECO index build module
+        pantheon/tools/seco/index - new tools, build index
+
+0.22    2013.09.06
+
+0.21    2013.09.06
+        MIO::TCP - bugfix
+        Vulcan::Manifest - new module
+        Vulcan::DirConf - $Script and $RealScript macros
+        Hermes::Range - bugfix, symdiff
+        Makefile.PL - update dependencies
+        pantheon/tools/backup - new tool, backup pantheon site installation
+        pantheon/.backup - default backup manifest
+        pantheon/seco/callback/list - new callback
+        UPDATE - use Vulcan::Manifest
+
+0.20    2013.09.04
+
+0.19    2013.08.29
+        update - replaced by UPDATE, bugfix
+        MIO::SSH - new module
+        MIO::CMD - new feature, noop
+        Vulcan::OptConf - auto_help, propagates to all invocants.
+        pantheon/tools/mssh - new tool
+        pantheon/tools/mcmd - new feture, noop
+
+0.18    2013.08.27
+
+0.17    2013.08.20
+        update - new feature, for bisected releases.
+        pantheon/tools/seco/dance - seco dancer
+        pantheon/tools/seco/go - interactive ssh session via expect
+        pantheon/tools/seco/ctrl - search engine ctrl
+        pantheon/tools/seco/check - check seco configs
+        pantheon/seco/lib - various SECO modules
+        pantheon/tools/.config - add seco config
+        pantheon/hermes/callback/seco - use SECO
+        pantheon/argos/code/b.seco - use SECO
+        pantheon/argos/code/r.seco - generic report plugin
+        pantheon/argos/code/m.http - bugfix, accommodate SECO
+        SECO - base module
+        SECO::Conf - SECO configuration
+        SECO::Ctrl - SECO control logics
+        SECO::ExpSSH - automatic interactive ssh connection via expect
+
+0.16    2013.08.16
+        Hermes - new methods, db(), cb(); callback enhancement
+        Hermes::Call - callback enhancement
+        Argos::Map - bugfix, cache
+        Argos::Code::Map - bugfix, cache
+        update - destructor remove cruft
+        pantheon/argos/example/code/m.http - bugfix
+        pantheon/argos/example/code/m.grep - bugfix
+        pantheon/argos/example/code/m.sysinfo - bugfix
+        pantheon/argos/example/code/m.test - new plugin
+        pantheon/argos/example/code/r.generic - sample generic report plugin
+        pantheon/argos/example/conf/* - example config
+        pantheon/argos/example/main/* - example main config
+
+0.15    2013.08.13
+        Vulcan::Grep - new feature
+        pantheon/argos/code/m.grep - new plugin
+        pantheon/argos/code/m.http - minor enhancement
+        pantheon/argos/code/m.sysinfo - decruft
+        pantheon/poros/code/grep - new plugin, replace dmesg
+        update - integrate INSTALL.PL
+        INSTALL.PL - integrated
+
+0.14    2013.08.12
+        Hermes - new feature, callback supports regex
+        Hermes::Call - new feature, callback supports regex
+        pantheon/tools/hermes/dump - bugfix
+        pantheon/argos/code/m.http - new features, resolve hostname, debug
+
+0.13    2013.08.06
+        install.PL - new feature
+        pantheon/tools/hermes/dump - interface change
+        pantheon/tools/hermes/load - new feature, --filter
+
+0.12    2013.08.05
+        argos/code/m.http - bugfix
+        utils/* - removed
+        INSTALL.PL - automatic installation of scripts
+        INSTALL - replace .install
+        update - replace utils/update, functionally regressed to v0.04.
+
+0.11    2013.08.01
+        Vulcan::SysInfo - bugfix
+        Vulcan::OptConf - bugfix
+        tools/poros/client - new feature, argv plugin
+        poros/code/sysinfo - code reduction, no functional change
+        poros/code/dump - new plugin
+        poros/code/dmesg - bugfix
+        poros/path - default poros path config
+        poros/argv/* - argv plugins
+        utils/update - externalize installation list
+        .install - installation list
+        tools/.config - poros argv
+
+0.10    2013.07.31
+        Janus::Ctrl - bugfix
+        Argos::Ctrl - bugfix
+        Argos::Map - bugfix
+        Argos::Code::Map - bugfix
+        Argos::Reduce - stat supports wildcard
+        argos/conf.example/main.reduce - wildcard in stat
+        tools/argos/reduce - bugfix
+        tools/argos/ctrl - bugfix
+        poros/code/sysinfo - new feature, supports ARRAY of tests
+
+0.09    2013.07.29
+        utils/update - bugfix
+        utils/munge - bugfix
+        argos/code/m.http - bugfix
+        tools/* - use warnings 
+
+0.08    2013.07.24
+        pantheon - documentation bugfix
+        tools/* - change invocation line to /usr/bin/env perl
+        utils/update - new location for update
+        utils/cpanm - to automate installations of dependencies
+        utils/munge - new tool for munging perl scripts' invocation lines
+
+0.07    2013.07.22
+        argos/code/m.http - bugfix
+        tools/decruft - new tool
+        Vulcan::Phasic - reduce sleep period
+        Vulcan::Mrsync - reduce log verbosity
+        Vulcan::Cruft - replace Vulcan::RRLogDir
+        Janus::Sequence::Code - deprecate Janus::Plugin
+        update - root ownership for @INSTALL items; new feature --prereq
+
+0.06    2013.07.15
+        argos/conf.example/conf.reduce.r.generic 
+        tools/range - new feature, accept input from STDIN
+        tools/argos/run - removed, replaced by map * and reduce *
+        tools/argos/map - new tool, * replacing tools/argos/run --map
+        tools/argos/reduce - new tool, * replacing tools/argos/run --reduce
+        tools/{argos,janus,hermes}/* - Vulcan::Sudo->sudo()
+        tools/{sysinfo,daemon} - Vulcan::Sudo->sudo()
+        Argos::Reduce - bugfix
+        Vulcan::Grep - new module
+        Vulcan::Sudo - new module
+        poros/code/dmesg - new plugin
+        argos/code/m.http - new plugin, http map
+
+0.05    2013.07.08
+        janus/main/path - default janus path config
+        argos/conf.example/main.map 
+        argos/conf.example/conf.map.sysinfo 
+        argos/main/path - default argos path config
+        argos/code/b.generic - new plugin, generic batch
+        argos/code/m.sysinfo - new plugin, sysinfo map
+        daemon/path - default daemon path config
+        daemon/conf/poros.proxy - new service, poros proxy
+        daemon/conf/hermes.cache - new service, hermes cache 
+        poros/code/janus - new plugin
+        poros/code/sysinfo - new plugin
+        tools/poros/client - bugfix
+        tools/sysinfo - new tool
+        tools/hermes/purge - new tool
+        tools/mrsync - new feature, default src to invoking host
+        tools/.config - use path macro $ROOT
+        Vulcan::SysInfo - new feature, IFACE eth speed
+        Vulcan::OptConf - new feature, path macro $ROOT
+        Vulcan::DirConf - new feature, path macro $RealBin and $Bin
+        Vulcan::Daemon - new feature, path macro $RealBin and $Bin
+        Vulcan::SQLiteDB - bugfix
+        Vulcan::Mrsync - bugfix
+        Vulcan::Logger - bugfix
+        Poros::Query - new feature, bugfix
+        update - new feature, --dist --install
+
+0.04    2013.07.04
+        tools/poros/client - bugfix
+        tools/mrsync - new tool
+        Vulcan::Mrsync - new module
+        Vulcan::Phasic - bugfix
+        Hermes - new feature, query cond supports regex
+
+0.03    2013.07.01
+        Vulcan::RRLogDir - new module
+        Vulcan::Daemon - bugfix
+        MIO::TCP - input buffer
+        MIO::CMD - input buffer, bugfix
+        Poros - bugfix
+        tools/daemon - bugfix
+        tools/hermes/cache - new feature -d
+        tools/hermes/node - new tool
+        tools/poros/proxy - new tool
+        tools/poros/client - new tool
+
+0.02    2013.06.27
+        Makefile.PL
+
+0.01    2013.06.25
+        Rewrite of various DynGig modules

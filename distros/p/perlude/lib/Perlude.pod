@@ -1,0 +1,660 @@
+=encoding utf8
+
+=for HTML
+<a href="https://travis-ci.org/eiro/p5-perlude"><img src="https://travis-ci.org/eiro/p5-perlude.svg?branch=master"></a>
+<a href="http://badge.fury.io/pl/perlude"><img src="https://badge.fury.io/pl/perlude.svg" alt="CPAN version" height="18"></a>
+<a href="https://coderwall.com/eiro"><img alt="Endorse eiro on Coderwall" src="https://api.coderwall.com/eiro/endorsecount.png"/></a>
+
+=head1 SYNOPSIS 
+
+If you're used to a unix shell, Windows Powershell or any langage comming with
+the notion of streams, perl could be frustrating as functions like map and grep
+only works with arrays.
+
+The goodness of it is that C<|> is an on demand operator that can easily
+compose actions on potentially very large amount of data in a very memory
+and you can control the amount of consummed data in a friendly way.
+
+Perlude gives a better C<|> to Perl: as it works on scalars which can be both
+strings (like unix shell), numbers or references (like powershell).
+
+In L<Perlude::Tutorial> i show examples 
+
+The big difference is there is no C<|> operator, so the generator is used as
+function parameter instead of lhs of the pipe (still, the ease of composition
+remains). So the perlude notation of
+
+    seq 1000 | sed 5q
+
+is 
+
+    take 5, range 1, 1000
+
+this code returns a new iterator you want to consume, maybe to fold it in a
+array, maybe to act on each lastly generated element with the keyword C<now>
+(as "now, compute things you learnt to compute").
+
+    my @five = fold take 5, range 1, 1000;
+    map {say} take 5, range 1, 1000;
+
+a classical, memory agressive, Perl code would be
+
+    map {say} (1..1000)[0..4]
+
+Note that 
+
+    map {say} (1..4)[0..1000]
+
+is an error when 
+
+    now {say} take 1000, range 1,4
+
+Perlude stole some keywords from the Haskell Prelude (mainly) to make iterators
+easy to combine and consume.
+
+    map say, grep /foo/, <STDIN>;
+
+Perlude provides "streamed" counterpart where a stream is a set (whole or partial)
+of results an iterator can return.
+
+    now {say} filter {/foo/} lines \*STDIN;
+
+Now we'll define the concepts under Perlude. the functions provided are in the next section.
+
+=head2 an iterator
+
+is a function reference that can produce a list of at least one element at each calls.
+an exhausted iterator returns an empty list.
+
+Counter is a basic example of iterator
+
+    my $counter = sub {
+        state $x = 0;
+        $x++
+    };
+
+If you use Perl before 5.10, you can write
+
+    my $counter = do {
+        my $x = 0;
+        sub {$x++}
+    };
+
+(see "Persistent variables with closures") in the C<perldoc perlsub>.
+
+=head2 an iteration
+
+one call of an iterator
+
+    print $counter->();
+
+=head2 a stream
+
+the list of all elements an iterator can produce (it may be infinite).
+
+the five first elements of the stream of C<$counter>
+(if it wasn't previously used) is 
+
+    my @top5 = map $counter->(), 1..5;
+
+the perlude counterpart is 
+
+    my @top5 = fold take 5, $counter;
+
+=head2 a generator
+ 
+is a function that retuns an iterator.
+
+    sub counter ($) {
+        my $x = $_[0];
+        # iterator starts here
+        sub { $x++ }
+    }
+
+    my $iterator = counter 1;
+    print $iterator->();
+    
+=head2 a filter
+
+is a function that take an iterator as argument and returns an iterator,
+applying a behavior to the elements of the stream.
+
+such behavior can be removing or adding elements of the stream, exhaust it or
+applying a function in the elements of it.
+
+some filters are Perlude counterparts of the perl C<map> and C<grep>, other can 
+control the way the stream is consumed (think of them as unix shell filters).
+
+=head2 a consumer
+
+filters are about combining things nothing is computed as long as you don't
+use the stream. consumers actually starts to stream (iterate on) them
+(think python3 C<list()> or the perl6 C<&eager>).
+
+=head1 to sumarize
+
+A stream is a list finished by an empty list (which makes sense if you come
+from a functional language).
+
+	(2,4,6,8,10,())
+
+A an iterator is a function that can return the elements of an iterator one by
+one. A generator is a function that retuns the iterator
+
+	sub from_to { # the generator
+		my ( $from, $to ) = @_;
+		sub { # the iterator
+			return () if $from > $to;
+			my $r = $from;
+			$from+=2;
+			return $r
+		}
+	}
+
+note that perlude authors are used to implicit notations so we're used to write
+more like
+
+	sub {
+		return if $from > $to;
+		(my $r, $from) = ( $from, $from + 2 );
+		$r;
+	}
+
+(see the code of the C<&lines> generator)
+
+=head1 Examples
+
+find the first five zsh users
+
+    my @top5 =
+	fold
+	take 5,
+	filter {/zsh$/}
+	lines "/etc/passwd";
+
+A math example: every elements of fibo below 1000 (1 element a time in memory)
+
+    use Perlude;
+    use strict;
+    use warnings;
+
+    sub fibo {
+        my @seed = @_;
+        sub {
+            push @seed, $seed[0] + $seed[1];
+            shift @seed
+        }
+    }
+
+    now {say} takeWhile { $_ < 1000 } fibo 1,1;
+
+Used to shell? the Perlude version of 
+
+    yes "happy birthday" | sed 5q
+
+is 
+
+    sub yes ($msg) { sub { $msg } }
+    now {say} take 5, yes "happy birthday" 
+
+A sysop example: throw your shellscripts away
+
+    use Perlude;
+    use strictures;
+    use 5.10.0;
+
+    # iterator on a glob matches stolen from Perlude::Sh module
+    sub ls {
+        my $glob = glob shift;
+        my $match;
+        sub {
+            return $match while $match = <$glob>;
+            ();
+        }
+    }
+
+    # show every txt files in /tmp
+    now {say} ls "/tmp/*txt
+
+    # remove empty files from tmp
+
+    now { unlink if -f && ! -s } ls "/tmp/*"
+
+    # something more reusable/readable ?
+
+    sub is_empty_file { -f && ! -s }
+    sub empty_files_of { filter {is_empty_file} shift }
+    sub rm { now {unlink} shift }
+
+    rm empty_files_of ls "/tmp/*./txt";
+
+=head1 Function composition
+
+When relevant, i used the Haskell Prelude documentation descriptions and
+examples. for example, the take documentation comes from
+L<http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take>. 
+
+=head1 Functions
+
+=head2 generators
+
+=head3 range $begin, [ $end, [ $step ] ]
+
+A range of numbers from $begin to $end (infinity if $end isn't set) $step by $step.
+
+    range 5     # from 5 to infinity
+    range 5,9   # 5, 6, 7, 8, 9
+    range 5,9,2 # 5, 7, 9
+
+=head3 cycle @set
+
+infinitly loop on a set of values
+
+    cycle 1,4,7
+
+    # 1,4,7,1,4,7,1,4,7,1,4,7,1,4,7,...
+
+=head3 records $ref
+
+given any kind of ref that implements the "<>" iterator, returns a Perlude compliant iterator.
+
+    now {print if /data/} records do {
+        open my $fh,"foo";
+        $fh;
+    };
+
+=head3 as_open
+
+just easier (yet safer?) to use wrapper on the sub described in C<perldoc -f open>
+(also L<perlfunc/open>).
+
+the goal is to have an wrapper on open does a coercion (just return @_ if nothing to do). so
+
+=over 2
+
+=item *
+
+don't carre about prototype (so you can call it with an array, not only a list)
+
+=item *
+
+return a FILEHANDLE instead of having a side effect on the first variable
+
+=item *
+
+just return a FILEHANDLE passed as argument (so it's a coercion from C<@_> to an open handler).
+
+    open FILEHANDLE
+    open EXPR
+    open MODE,EXPR
+    open MODE,EXPR,LIST
+    open MODE,EXPR,REF
+
+=back
+
+=head3 lines @openargs
+
+if C<$openargs[0]> is a string, C<&open> @openargs (nothing done there if
+it's already a file handler).
+
+return an iterator that chomp the records of the open file.
+
+so
+
+    now {say} lines "/etc/passwd" 
+
+can be written like
+
+    now {say} apply { chomp; $_ } do {
+        open my $fh, "/etc/passwd";
+        sub {
+            return unless defined my $line = <$fh>;
+            chomp $line;
+            $line;
+        }
+    }
+
+=head2 filters
+
+filters are composition functions that take a stream and returns a modified stream.
+
+=head3 filter $xs
+
+the Perlude counterpart of C<grep>.
+
+    sub odds () { filter { $_ % 2 } shift }
+
+=head3 apply
+
+the Perlude counterpart of C<map>.
+
+    sub double { apply {$_*2} shift }
+
+=head3 take $n, $xs
+
+take $n, applied to a list $xs, returns the prefix of $xs of length $n, or $xs itself if $n > length $xs:
+
+    sub top10 { take 10, shift }
+
+    take 5, range 1, 10
+    # 1, 2, 3, 4, 5, ()
+
+    take 5, range 1, 3
+    # 1, 2, 3, ()
+
+=head3 takeWhile $predicate, $xs
+
+takeWhile, applied to a predicate $p and a list $xs, returns the longest prefix (possibly empty) of $xs of elements that satisfy $p
+
+    takeWhile { 10 > ($_*2) } range 1,5
+    # 1, 2, 3, 4
+
+=head3 drop $n, $xs
+
+drop $n $xs returns the suffix of $xs after the first $n elements, or () if $n > length $xs:
+
+    drop 3, range 1,5
+    # 4 , 5
+
+    drop 3, range 1,2
+    # ()
+
+=head3 dropWhile $predicate, $xs
+
+dropWhile $predicate, $xs returns the suffix remaining after dropWhile $predicate, $xs
+
+     dropWhile { $_ < 3 } unfold [1,2,3,4,5,1,2,3] # [3,4,5,1,2,3]
+     dropWhile { $_ < 9 } unfold [1,2,3]           # []
+     dropWhile { $_ < 0 } unfold [1,2,3]           # [1,2,3]
+
+=head2 misc
+
+=head3 unfold $array
+
+unfold returns an iterator on the $array ref so that every Perlude goodies can be applied. there is no side effect on the referenced array.
+
+    my @lower = fold takeWhile {/data/} unfold $abstract
+
+see also fold
+
+=head3 pairs $hash
+
+returns an iterator on the pairs of $hash stored in a 2 items array ref.
+
+    now {
+        my ( $k, $v ) = @$_;
+        say "$k : $v";
+    } pairs {qw< a A b B >};
+
+aims to be equivalent to
+
+    my $hash = {qw< a A b B >};
+    while ( my ( $k, $v ) = each %$hash ) {
+        say "$k : $v";
+    }
+
+except that:
+
+=over 4
+
+=item * 
+
+pairs can use an anonymous hash
+
+=item *
+
+can be used in streams
+
+=item *
+
+i hate the while syntax
+
+=back
+
+=head2 consumers
+
+=head3 now {actions} $xs
+
+read the $xs stream and execute the {actions} block with the returned element
+as $_ until the $xs stream exhausts. it also returns the last transformed element so that it can be used to foldl.
+
+(compare it to perl6 "eager" or haskell foldl)
+
+=head3 fold $xs
+
+returns the array of all the elements computed by $xs
+
+    say join ',',      take 5, sub { state $x=-2; $x+=2 } # CODE(0x180bad8)
+    say join ',', fold take 5, sub { state $x=-2; $x+=2 } # 0,2,4,6,8
+
+see also unfold
+
+=head3 nth $xs
+
+returns the nth element of a stream
+
+    say fold nth 5, sub { state $x=1; $x++ }
+    # 5
+
+=head3 chunksOf
+
+non destructive splice alike (maybe best named as "traverse"? haskell name?).
+you can traverse an array by a group of copies of elements
+
+    say "@$_" for fold chunksOf 3, ['a'..'f'];
+    # a b c
+    # d e f
+
+=head2 Composers
+
+=head3 concat @streams
+
+concat takes a list of streams and returns them as a unique one:
+
+    concat map { unfold [split //] } split /\s*/;
+
+streams every chars of the words of the text
+
+=head3 concatC $stream_of_streams
+
+takes a stream of streams $stream_of_streams and expose them as a single one.
+A stream of streams is a steam that returns streams.
+
+    concatC { take 3, range $_ } lines $fh
+
+take 3 elements from the range started by the values of $fh, so if $fh contains
+(5,10), the stream is (5,6,7,10,11,12)
+
+=head3 concatM $apply, $stream
+
+applying $apply on each iterations of $stream must return a new stream. concatM
+expose them as a single stream.
+
+    # ls is a generator for a glob
+
+    sub cat { concatM {lines} ls shift }
+    cat "/tmp/*.conf"
+
+=head1 Perlude companions
+
+some modules comes with generators so they are perfect Perlude companions
+(send me an exemple if yours does too).
+
+=head1 C<Path::Iterator::Rule>
+
+    use aliased qw(Path::Iterator::Rule find);
+
+    now {print}
+        take 3,
+        find->new
+        -> file
+        -> size('>1k')
+        -> and( sub { -r } )
+        -> iter(qw( /tmp ));
+
+you can use C<filter> instead of C<and>: 
+
+    now {print}
+        take 3,
+        filter {-r}
+        find->new
+        -> file
+        -> size('>1k')
+        -> iter(qw( /tmp )); 
+
+=head1 C<Path::Tiny>
+
+    use Path::Tiny;
+
+    now {print} take 3, path("/etc")->iterator;  
+
+    now {print}
+        take 3,
+        apply {chomp;$_}
+        records path("/etc/passwd")->openr_utf8( {qw( locked 1 )});
+
+=head1 C<curry>
+
+a very friendly way to write iterators. i rewrote the exemple from the 
+C<TAP::Parser> doc:
+
+    use TAP::Parser;
+     
+    my $parser = TAP::Parser->new( { tap => $output } );
+     
+    while ( my $result = $parser->next ) {
+        print $result->as_string;
+    }
+
+with Perlude
+
+    now {print $_->as_string."\n"} do {
+        my $parser =
+            TAP::Parser
+            -> new( { tap => path("/tmp/x")->slurp });
+        sub { $parser->next // () }
+    }
+
+with Perlude and curry
+
+    now {defined and print $_->as_string."\n"}
+        TAP::Parser
+        -> new( { tap => path("/tmp/x")->slurp })
+        -> curry::next;
+
+
+=head1 TODO / CONTRIBUTONS
+
+feedbacks and contributions are very welcome
+
+    http://github.com/eiro/p5-perlude
+
+=over 4
+
+=item * 
+
+Improve general quality:
+doc, have a look on L<http://cpants.cpanauthors.org/dist/perlude>,
+L<https://metacpan.org/pod/Devel::Cover>.
+
+=item *
+
+Explore test suite to know what isn't well tested. find bugs :) 
+
+    * see range implementation # what if step 0 ? 
+    * pairs must support streams and array
+    * provide an alternative to takeWhile to return the combo breaker
+    * explore AST manipulations for futher optimizations 
+
+=item *
+
+deprecate open_file and lines (or/and find a companion) as it is out of the 
+scope of Perlude and open_file seems scary (anything to avoid the C<open>
+prototype?). 
+
+=item * reboot C<Perl::builtins>
+
+remove the hardcoded C<f> namespace and use C<use aliased> instead.
+
+=item *
+
+ask for BooK and Dolmen if they mind to remove C<Perlude::Lazy> as noone seems
+to use it anymore.
+
+=item *
+
+C<Perlude::XS> anyone ?
+
+=item *
+
+Something to revert the callback mechanism: how to provide a generic syntax to
+use Anyevent driven streams or "callback to closures" (for example: Net::LDAP
+callback to treat entries onfly)
+
+=item *
+
+provide streamers for common sources CSV, LDAP, DBI (see C<p5-csv-stream>) 
+
+=back
+
+=head1 KNOWN BUGS
+
+not anymore, if you find one, please email  bug-Perlude [at] rt.cpan.org. 
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Philippe Bruhat (BooK)
+
+=item *
+
+Marc Chantreux (eiro)
+
+=item *
+
+Olivier MenguE<eacute> (dolmen)
+
+=back
+
+=head1 CONTRIBUTORS
+
+Burak Gürsoy (cpanization)
+
+=head1 ACKNOWLEDGMENTS
+
+=over 4
+
+=item *
+
+Thanks to Nicolas Pouillard and Valentin (#haskell-fr), i leanrt a lot about
+streams, lazyness, lists and so on. Lazyness.pm was my first attempt.
+
+=item *
+
+The name "Perlude" is an idea from Germain Maurice, the amazing sysop of
+http://linkfluence.com back to early 2010.
+
+=item *
+
+Former versions of Perlude used undef as stream terminator. After my talk at
+the French Perl Workshop 2011, dolmen suggested to use () as stream terminator,
+which makes sense not only because undef is a value but also because () is the
+perfect semantic to end a stream. So Book, Dolmen and myself rewrote the
+entire module from scratch in the hall of the hotel with a bottle of chartreuse
+and Cognominal.
+
+We also tried some experiments about real lazyness, memoization and so on. it
+becomes clear now that this is hell to implement correctly: use perl6 instead
+:)
+
+I was drunk and and mispelled Perlude as "Perl dude" so Cognominal collected
+some quotes of "The Big Lebowski" and we called ourselves "the Perl Dudes".
+This is way my best remember of peer programming and one of the best moment i
+shared with my friends mongueurs.
+
+=back
+
+=cut

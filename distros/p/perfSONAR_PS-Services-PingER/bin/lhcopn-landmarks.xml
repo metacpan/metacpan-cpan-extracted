@@ -1,0 +1,240 @@
+<pingertopo:topology xmlns:pingertopo="http://namespaces.slac.stanford.edu/schema/pinger/20071120"
+  xmlns:nmtl2="http://ogf.org/schema/network/topology/l2/20070707/" 
+  xmlns:nmtl3="http://ogf.org/schema/network/topology/l3/20070707/" 
+  xmlns:nmtl4="http://ogf.org/schema/network/topology/l4/20070707/" 
+  xmlns:nmtb="http://ogf.org/schema/network/topology/base/20070707/"
+  xmlns:nmwg="http://ggf.org/ns/nmwg/base/2.0/">
+  <nmtb:domain id="urn:ogf:network:domain=asgc.net">
+    <nmtb:node id="urn:ogf:network:domain=asgc.net:node=cern-1">
+      <nmtb:name type="string">cern-1</nmtb:name>
+      <nmtb:hostName>cern-1.r0.ams.asgc.net</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">30</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">10</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=asgc.net:node=cern-1:port=192.16.166.2">
+        <nmtl3:ipAddress type="IPv4">192.16.166.2</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=asgc.net:node=cern-bk">
+      <nmtb:name type="string">cern-bk</nmtb:name>
+      <nmtb:hostName>cern-bk.r0.chi.asgc.net</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">30</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">10</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=asgc.net:node=cern-bk:port=192.16.166.98">
+        <nmtl3:ipAddress type="IPv4">192.16.166.98</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+  </nmtb:domain>
+  <nmtb:domain id="urn:ogf:network:domain=cern.ch">
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-166-6">
+      <nmtb:name type="string">lhcopn-166-6</nmtb:name>
+      <nmtb:hostName>192.16.166.6</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">30</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">10</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-166-6:port=192.16.166.6">
+        <nmtl3:ipAddress type="IPv4">192.16.166.6</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-bnl">
+      <nmtb:name type="string">lhcopn-bnl</nmtb:name>
+      <nmtb:hostName>lhcopn-bnl.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-bnl:port=192.16.166.10">
+        <nmtl3:ipAddress type="IPv4">192.16.166.10</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-fnal-bu">
+      <nmtb:name type="string">lhcopn-fnal-bu</nmtb:name>
+      <nmtb:hostName>lhcopn-fnal-bu.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-fnal-bu:port=192.16.166.30">
+        <nmtl3:ipAddress type="IPv4">192.16.166.30</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-pic">
+      <nmtb:name type="string">lhcopn-pic</nmtb:name>
+      <nmtb:hostName>lhcopn-pic.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-pic:port=192.16.166.58">
+        <nmtl3:ipAddress type="IPv4">192.16.166.58</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-ral">
+      <nmtb:name type="string">lhcopn-ral</nmtb:name>
+      <nmtb:hostName>lhcopn-ral.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-ral:port=192.16.166.66">
+        <nmtl3:ipAddress type="IPv4">192.16.166.66</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-triumf">
+      <nmtb:name type="string">lhcopn-triumf</nmtb:name>
+      <nmtb:hostName>lhcopn-triumf.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-triumf:port=192.16.166.82">
+        <nmtl3:ipAddress type="IPv4">192.16.166.82</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-bnl-bu">
+      <nmtb:name type="string">lhcopn-bnl-bu</nmtb:name>
+      <nmtb:hostName>lhcopn-bnl-bu.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-bnl-bu:port=192.16.166.14">
+        <nmtl3:ipAddress type="IPv4">192.16.166.14</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-cnaf">
+      <nmtb:name type="string">lhcopn-cnaf</nmtb:name>
+      <nmtb:hostName>lhcopn-cnaf.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-cnaf:port=192.16.166.18">
+        <nmtl3:ipAddress type="IPv4">192.16.166.18</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-fnal">
+      <nmtb:name type="string">lhcopn-fnal</nmtb:name>
+      <nmtb:hostName>lhcopn-fnal.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-fnal:port=192.16.166.26">
+        <nmtl3:ipAddress type="IPv4">192.16.166.26</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-in2p3">
+      <nmtb:name type="string">lhcopn-in2p3</nmtb:name>
+      <nmtb:hostName>lhcopn-in2p3.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-in2p3:port=192.16.166.42">
+        <nmtl3:ipAddress type="IPv4">192.16.166.42</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+    <nmtb:node id="urn:ogf:network:domain=cern.ch:node=lhcopn-triumf-bu">
+      <nmtb:name type="string">lhcopn-triumf-bu</nmtb:name>
+      <nmtb:hostName>lhcopn-triumf-bu.cern.ch</nmtb:hostName>
+      <nmwg:parameters>
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=cern.ch:node=lhcopn-triumf-bu:port=192.16.166.86">
+        <nmtl3:ipAddress type="IPv4">192.16.166.86</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+  </nmtb:domain>
+  <nmtb:domain id="urn:ogf:network:domain=gridka.de">
+    <nmtb:node id="urn:ogf:network:domain=gridka.de:node=r-inet-gis-i-b7-2-cern">
+      <nmtb:name type="string">r-inet-gis-i-b7-2-cern</nmtb:name>
+      <nmtb:hostName>r-inet-gis-i-b7-2-cern.gridka.de</nmtb:hostName>
+      <nmwg:parameters id="100B">
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=gridka.de:node=r-inet-gis-i-b7-2-cern:port=192.16.166.34">
+        <nmtl3:ipAddress type="IPv4">192.16.166.34</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+  </nmtb:domain>
+  <nmtb:domain id="urn:ogf:network:domain=sara.nl">
+    <nmtb:node id="urn:ogf:network:domain=sara.nl:node=te3-4">
+      <nmtb:name type="string">te3-4</nmtb:name>
+      <nmtb:hostName>te3-4.sara-r1.sara.nl</nmtb:hostName>
+      <nmwg:parameters id="100B">
+        <nmwg:parameter name="packetSize">100</nmwg:parameter>
+        <nmwg:parameter name="count">10</nmwg:parameter>
+        <nmwg:parameter name="interval">300</nmwg:parameter>
+        <nmwg:parameter name="ttl">255</nmwg:parameter>
+        <nmwg:parameter name="measurementPeriod">10</nmwg:parameter>
+        <nmwg:parameter name="measurementOffset">30</nmwg:parameter>
+      </nmwg:parameters>
+      <nmtl3:port id="urn:ogf:network:domain=sara.nl:node=te3-4:port=192.16.166.74">
+        <nmtl3:ipAddress type="IPv4">192.16.166.74</nmtl3:ipAddress>
+      </nmtl3:port>
+    </nmtb:node>
+  </nmtb:domain>
+</pingertopo:topology>

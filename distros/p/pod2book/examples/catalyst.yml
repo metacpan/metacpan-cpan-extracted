@@ -1,0 +1,94 @@
+---
+DocOptions:
+  Title:  Catalyst --- Essential Documentation
+  Author: Edited by: bpp
+  TexOut: catalyst.tex
+  UserPreamble: \documentclass[11pt]{book}
+  UserPostamble: |
+    \cleardoublepage
+    \addcontentsline{toc}{chapter}{\numberline{}Index}
+    \printindex
+    \end{document}
+  AddPreamble: 1
+  Head1Level:  0
+  LevelNoNum:  4
+  ReplaceNAMEwithSection: 1
+  UniqueLabels: 1
+DocStructure:
+  - Input:
+      FileOrPod: preamble.tex
+  - Input:
+      FileOrPod: frontmatter.tex
+  - Section:
+      Level: part
+      Title: Catalyst
+  - Input:
+      FileOrPod: Catalyst::Manual::About
+  - Input:
+      FileOrPod: Catalyst::Manual::Intro
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial
+      SkipUntil: THANKS
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::Intro
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::CatalystBasics
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::BasicCRUD
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::Authentication
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::Authorization
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::Debugging
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::Testing
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::AdvancedCRUD
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Cookbook
+      SkipUntil: Basics
+  - Section:
+      Level: part
+      Title: DBIx::Class
+  - Input:
+      FileOrPod: DBIx::Class::Manual::Intro
+  - Input:
+      FileOrPod: DBIx::Class::Manual::Example
+  - Input:
+      FileOrPod: DBIx::Class::Manual::Cookbook
+  - Section:
+      Level: part
+      Title: Template Toolkit
+  - Input:
+      FileOrPod: Template::Manual::Intro
+  - Input:
+      FileOrPod: Template::Tutorial::Web
+  - Input:
+      FileOrPod: Template::Manual::Syntax
+  - Input:
+      FileOrPod: Template::Manual::Directives
+  - Input:
+      FileOrPod: Template::Manual::Variables
+  - Section:
+      Level: part
+      Title: HTML::Widget
+  - Input:
+      FileOrPod: HTML::Widget
+  - Section:
+      Level: part
+      Title: Appendix
+  - Input:
+      FileOrPod: Catalyst::Manual::Tutorial::Appendices
+      SkipUntil: DESCRIPTION
+  - Input:
+      FileOrPod: Catalyst::Manual::Plugins
+

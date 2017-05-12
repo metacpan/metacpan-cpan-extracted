@@ -1,0 +1,11 @@
+<?
+print "Content-type: text/plain\n\n";
+?>
+
+this is file 1
+
+we are going to include file 2 here:
+
+<?!include file2.inc ?>
+
+did you see that?

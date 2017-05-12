@@ -1,0 +1,27 @@
+include_test.pet
+
+This file includes the "included.txt" file:
+---
+this is 'included.txt'
+
+
+---
+The "README" in "generator/":
+---
+This is an example of how you can build your own caching page compiler.
+
+NOTE: This is not ready for production use, as I have not thoroughly
+      tested it yet.  It only exists as reference material.
+
+---
+The "run ning" in "../":
+---
+running fast
+
+---
+And the "haha.txt" in /tmp:
+---
+mua hahahahaha
+haha ha
+
+---

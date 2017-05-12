@@ -1,0 +1,170 @@
+[PREV] [NEXT] [PREV Thread] [NEXT Thread] [Index] 
+==================================================
+
+
+ilya@math.ohio-state.edu (Ilya Zakharevich) 
+
+Version 0.5.1 of extended text widget
+*************************************
+
+17 Feb 1996 00:26:25 GMT Department of Mathematics, The Ohio State University 
+
+Newsgroups: 
+   comp.lang.perl.announce,comp.lang.perl.tk 
+
+
+
+(Crossposted to c.t.t because of a rough TeX input filter, and because
+of the final target for this widget.)
+
+Version 0.5.1 of extended text widget is made available on
+ftp://ftp.math.ohio-state.edu/pub/users/ilya/etext. The version is
+based on tk4.0p3 (for TCL/Tk) and/or Tk-b9.01 (for Perl/Tk).
+
+Below is the README file of the distribution, part of CHANGES file,
+and general comments. 
+
+Latest changes
+~~~~~~~~~~~~~~
+0.4.4:
+        (Under Perl:)  Now the second component of the first argument of
+        layoutCallback is not the name of the widget, but actual reference to
+        the widget. However, a patch to tkGlue.c is needed. Not released
+        because of this.
+0.4.5:
+        One minor bug corrected, updated to sync with Tk-b8 and tk4.0p1.
+        No recompile of Tk is necessary.
+0.4.6:
+        Selection bug corrected, Tab works again (ListFactoryAppendList 
+        added), environment variable `kprefix' denotes prefixes for
+        special keys (default `Control-Meta-').
+0.4.7:
+        Hidden leaves where not hidden from BBox and Measure.
+        Perl demo updated (now only the pedestal is missing).
+        Doc brushed up by Norm Shelley.
+0.5.0:
+        Selection and search work. `txtWgt config -getFlags 1' works.
+0.5.1:
+        Note that case conversion during extraction works with DStrings only. 
+        Verbose mode works, making it possible to have Load/Save in
+                Perl demo.
+        Temporarily verbose output is put on 'block list' subcommand.
+        Menubar added to Perl demo (TeX from selection is not working so far).
+        Minimal TeX import added.
+-------------------------------------------------------
+The rest is README of the package:
+-------------------------------------------------------
+Etext is a drop in replacement for the Tk text widget. Currently there
+are two differences (if we forget about bugs):  addition of another
+type of text annotation: a block, and addition of an "object-oriented
+dump" command.
+
+Block have an internal structure, but the ultimate elements of this
+structure are identical to the rows in the text widget. All the
+editing commands work on blocks as well.
+
+The main difference between blocks and other possible annotations of
+the text widget is that blocks can properly nest in an arbitrary way,
+and that blocks perform a geometry management over its contents. This
+geometry management is governed by the code in interpreted language
+(say, TCL). Most features of blocks can be emulated by sufficiently
+deep hierarchy of embedded windows, but making this hierarchy easily
+editable can be a nontrivial exercise.
+
+Some examples what can be done by blocks (all this is done in the demo):
+
+        *       wise tabulation,
+        *       wise super- and subscripts,
+        *       fractions,
+        *       radicals,
+        *       labeled equations,
+        *       editable buttons.
+
+The distribution of etext contains replacement tkText*.[ch] files,
+differences with the base Tk version, and difference of Makefiles to
+make separate installation smaller. It also contains Makefile.my that
+can be used for reference purpose. The subdirectory doc contains the
+pod documentation file and the manpage and hypertext documents
+produced from this pod. Documentation contains all the supported
+features of the widget, discusses some features that can be supported
+in some other release, and mini-tutorial on creating a "pedestal"
+block.
+
+Currently etext is based on tk4.0b3 text widget, and Perl part is
+based on (patched) Tk-b9.01.
+
+Hypertext document is reachable on 
+
+ftp://ftp.math.ohio-state.edu/pub/users/ilya/etext/etext.html
+
+INSTALLATION:
+
+Get the distribution (say, from
+ftp://ftp.math.ohio-state.edu/pub/users/ilya/etext). Pick up the latest copy
+of the etext*.tar.gz. Then read INSTALL. 
+
+TESTING
+
+See INSTALL. 
+
+The following works under tcl, most parts work under perl too.
+
+        ./wish demo/etext.tcl
+
+(the perl demo may be started by
+        make test
+in the ./eText subdirectory, note that the perl demo has a lot of
+additional features, like menubar, simple-minded TeX input,
+saving/loading and others).
+
+The nontrivial actions in the resulting widget are bound to keypresses
+with Control- and Meta- modifiers simultaneously (one may change these
+modifiers by setting environment variable `kprefix' to, say, `Alt-' or
+`Control-x> <'). They are:
+
+        n       Reload the source.
+        q       Quit
+        r/R     switch on/off red foreground on selection.
+        b/B     switch on/off blue background on selection.
+        s/S     switch on/off small font on selection.
+        c       insert empty superSub block around insertion point.
+        f       insert empty fraction around insertion point.
+        e       insert empty equation with "()" as a label around 
+                insertion point.
+        d       insert empty radical around insertion point.
+        m       insert the "pedestal" block from the tutorial.
+        t       insert the "tabulation" block from the tutorial.
+
+If selection is active when you create a block with above keybindings,
+the block is created "around" selection.
+
+Additional keybindings: F10 converts selection to a "minimal" block,
+i.e., block with default geometry management: parts are placed one
+under another. F1, F2, F3 create some precooked samples of "minimal"
+blocks, F4 and F5 insert precooked samples of superSub block.
+
+Return inside block splits block element in two, Control-Return splits
+deeper (well, you better look into documentation to understand what it
+means). Deep split is used in superSub block to denote the boundary
+between multiple super- and sub-scripts.
+
+This means that to separate superscript of subscripts you should press
+Return, the same for numerator and denominator.
+
+It is good to read the documentation before running the demo, but
+editing of blocks should be highly intuitive. To delete block, select
+it and delete, do demolish it into components erase a boundary of a
+block. To join two components erase the boundary between them. Thats all!
+
+CONTACTING ME
+
+email ilya@math.ohio-state.edu if you find bugs, missing features,
+misprints and so on. In fact contact me anyway if you tried this
+widget, I would appreciate your feedback.
+
+
+
+
+[PREV] [NEXT] [PREV Thread] [NEXT Thread] [Index] 
+==================================================
+

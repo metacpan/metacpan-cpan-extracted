@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/perfSONAR_PS/Client/LS/Remote.pm
+perl-perfSONAR_PS-Client-LS-Remote.spec
+t/perfSONAR_PS::Client::LS::Remote.t
+META.yml                                 Module meta-data (added by MakeMaker)

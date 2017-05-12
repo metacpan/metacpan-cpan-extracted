@@ -1,0 +1,4 @@
+This is an example of how you can build your own caching page compiler.
+
+NOTE: This is not ready for production use, as I have not thoroughly
+      tested it yet.  It only exists as reference material.

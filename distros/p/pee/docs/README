@@ -1,0 +1,69 @@
+Perl Embedding Engine
+---------------------
+
+It is a template engine that allows embedded perl code in arbritrary
+text (HTML is most likely the case) templates.
+
+It is similar in concept to Sun's JSP and M$' ASP.
+
+The project is hosted on sourceforge.net
+Project homepage: http://pee.sourceforge.net/
+Author: William Tan <wil@dready.org>
+
+
+
+Features
+--------
+
+* Simple design
+
+The design of PEE is extremely simple.  The idea is that a template
+will be pre-compiled (we call it the "page compilation" process) into 
+valid perl code, which is then executed.
+
+
+* Simple syntax
+
+There are only 4 different types of special PEE tags that can go into
+the (HTML) template, i.e. code blocks, expression blocks, pee directives,
+and comment blocks.
+
+
+* Flexible
+
+Because the core of PEE is the page-compiler.  Special enhancements can
+be made outside of the core module, like cached compilation or execution
+daemon.
+You also have several choices for using PEE, from the most conservative
+(offline generation) to the more dynamic (Action directive), or invent your
+own!
+
+
+* Compatible
+
+The output is simply Perl, how much more compatible can you get?
+
+
+* Easy-to-install
+
+Unlike many template languages, PEE does not require mod_perl,
+which could be a pain.
+
+
+
+VIM syntax highlighting
+-----------------------
+If you are a VIM user, you may edit PET files with syntax highlighting.
+Install the 'misc/pet.vim'.  Read the VIM manual for instructions on
+installing syntax files.
+
+
+
+The documentation is organized as follows:
+
+INSTALL          - installation instructions
+INSTALL.FastCGI  - using PEE with FastCGI
+README           - this file
+SYNTAX           - directives
+FAQ              - faked questions & answers (until I get real ones :)
+TODO             - todo list

@@ -1,0 +1,6 @@
+---
+root: $RealBin/../../janus
+code: $root/code
+conf: $root/conf
+run: $root/run
+log: $root/log

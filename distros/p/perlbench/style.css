@@ -1,0 +1,19 @@
+body {
+    background: #FFFFFF;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 70%;
+    margin-left: 10mm;
+}
+
+h1 {
+    font-size: 200%;
+}
+
+h2 {
+    font-size: 150%;
+}
+
+small {
+    font-size: 50%;
+}

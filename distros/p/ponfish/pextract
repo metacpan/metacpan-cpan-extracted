@@ -1,0 +1,306 @@
+#!/usr/bin/perl -w
+use strict;
+use IO::File;
+use Data::Dumper;
+use Getopt::Long;
+
+##################################################################
+select( [select( STDERR ), $| = 1]->[0] );
+my $summarize			= 0;
+my $move_complete_archives	= 0;
+my $complete_archives_dir	= "done";
+my $extract_filenames_from_parfile	= 0;
+my $repair_only			= 0;	# NOT USED YET
+my $extract_dir			= "";
+GetOptions( "-s"	=> \$summarize,
+	    "-m"	=> \$move_complete_archives,
+	    "-d=s"	=> \$complete_archives_dir,
+	    "-efp"	=> \$extract_filenames_from_parfile,
+	    "-ro"	=> \$repair_only,
+	    "-ed=s"	=> \$extract_dir,
+	  );
+##################################################################
+my $LOG_FILE_DELIMITER	= "par2cmdline comes with ABSOLUTELY NO WARRANTY";
+##################################################################
+
+if( $summarize ) {
+  # Summarize one or more log files:
+  summarize( @ARGV );
+}
+if( $extract_filenames_from_parfile ) {
+  # Extract files from a par2 file: (testing purposes)
+  print Dumper( extract_filenames_from_par( @ARGV ) );
+  print "--->", grep( /part0*1.rar$/, extract_filenames_from_par( @ARGV ) ),"\n";
+  exit;
+}
+else {
+  repair_and_extract( @ARGV );
+}
+##################################################################
+##################################################################
+##################################################################
+
+sub summarize {
+  my @files	= @_;
+
+  my @archive_datas	= ();
+  for( @files ) {
+    my $IF	= IO::File->new( $_ ) || die "Error: can't find/open log file: '$_'\n";
+    my $data	= join "", <$IF>;
+    my @chunks	= split /$LOG_FILE_DELIMITER/, $data;
+    foreach my $chunk ( @chunks ) {
+      my %archive_data	= ( found	=> [],
+			    damaged	=> [],
+			    missing	=> [],
+			    parts_reqd	=> 0,
+			    status	=> "invalid",
+			  );
+      # Try to find all file info:
+      while( $chunk =~ /Target\: \"(.*?)\" - (found|damaged|missing)(.*?)\./sgi ) {
+	my($fn,$status,$blocks)	= ($1,lc( $2 ),$3);
+	if( $blocks =~ /(Found \d+ of \d+ data blocks)/i ) {
+	  $fn .= " $1";
+	}
+	push @{$archive_data{$status}},$fn;
+      }
+      if( $chunk =~ /repair complete/si ) {
+	$archive_data{status}		= "1: repair_complete";
+      }
+      elsif( $chunk =~ /All files are correct.*?repair is not required/ ) {
+	$archive_data{status}		= "2: all_files_correct";
+      }
+      elsif( $chunk =~ /You need (\d+) more recovery blocks/) {
+	$archive_data{status}		= "3: repair_not_possible";
+	$archive_data{parts_reqd}	= $1;
+      }
+      # done parsing the chunk...
+      # Note: we'll have one extra empty chunk after the split operation, so ignore that one:
+      if( $archive_data{status} ne "invalid" ) {
+	push @archive_datas, \%archive_data;
+      }
+    }
+  }
+  foreach my $ad ( sort { $a->{status} cmp $b->{status} } @archive_datas ) {
+#    print Dumper( $ad );
+#    next;
+    if( $ad->{parts_reqd} ) {
+      my @damaged	= @{$ad->{damaged}};
+      my @missing	= @{$ad->{missing}};
+      my $parts_reqd	= $ad->{parts_reqd};
+#      print "-"x66,"\n";
+      print "\n";
+      if( scalar @damaged ) {
+	print fjoin("---> damaged: ", "\n", @damaged );
+      }
+      if( scalar @missing ) {
+	print fjoin("---> missing: ", "\n", @missing );
+      }
+      print "---> You need $parts_reqd more recovery blocks to be able to repair.\n";
+#      print "-"x66,"\n";
+    }
+    else {
+#      print " ($ad->{found}[0])\n";
+#      print " ($ad->{status})\n";
+      print "OK: $ad->{found}[0] archive set is: $ad->{status}\n";
+      next;
+#      print Dumper( $ad );
+    }
+  }
+}
+
+sub fjoin {
+  my $pre	= shift;
+  my $post	= shift;
+  my $rv	= "";
+  while( my $str = shift ) {
+    $rv		.= $pre.$str.$post;
+  }
+  return $rv;
+}
+
+##################################################################
+sub unsplit {
+  my $fn	= shift;
+  system( "lxsplit", "-j", $fn );
+}
+
+sub repair_and_extract {
+  my @files	= @_;
+
+  # Join split files first:
+  my @split_files	= grep /001$/, @files;
+  if( scalar @split_files ) {
+    foreach my $split_file( @split_files ) {
+      unsplit( $split_file );
+    }
+  }
+
+  my @par_files	= grep /par2/i, @files;
+
+  print STDERR join("\n", @par_files ),"\n";
+
+  # First, attempt to lump related par files together:
+  my %base_to_pars	= ();
+  for ( @par_files ) {
+    my $base		= par_to_base( $_ );
+    if ( ! $base ) {
+      print STDERR "Skipping parity file: '$_'\n";
+    } else {
+      if ( $base_to_pars{$base} ) {
+	push @{$base_to_pars{$base}}, $_;
+      } else {
+	$base_to_pars{$base}	= [$_];
+      }
+    }
+  }
+
+  # Now for each group of par files, attempt a repair:
+  my $RD	= $ENV{PWD};			# Repair Dir
+  my $ED	= $extract_dir || $RD;		# Extract Dir
+  foreach my $base ( sort keys %base_to_pars ) {
+    print STDERR "-"x66,"\n";
+    print STDERR "# Attempting repair and extract on '$base' ...";
+    if ( attempt_repair( $base, $base_to_pars{$base} ) ) {
+      print STDERR   "\n","# `----> Successful repair:  '$base'\n";
+
+      # Repair successful!  Attempt to extract:
+      print STDERR 	"# `----> Attempting extract: '$base'... ";
+      my $file	= attempt_extract( $base, $base_to_pars{$base}[0], $RD, $ED );
+#      chdir $RD;
+      if ( $file ) {
+	print STDERR "\n","# `----> Successful extract: '$file'\n";
+      } else {
+	print STDERR "\n","# `----> FAILED EXTRACT:     '$base'\n";
+      }
+    } else {
+      print STDERR   "\n","# `----> FAILED REPAIR:      '$base'\n";
+    }
+    print STDERR "-"x66,"\n";
+  }
+}
+
+##################################################################
+sub par_to_base {
+  my $par		= shift;
+  if( $par =~ /^(.*)\.vol\d.*\.par2/i ) {
+    return $1;
+  }
+  if( $par =~ /^(.*)\.par2/i ) {
+    return $1;
+  }
+  else {
+    die "Invalid par file: '$par'\n";
+  }
+}
+
+sub attempt_repair {
+  my $base	= shift;
+  my $pars	= shift;
+  return ! system( "par2repair", @$pars );
+}
+
+
+sub attempt_extract {
+  my $base		= shift;
+  my $sample_parfile	= shift;
+  my $RD		= shift;
+  my $ED		= shift;
+
+  if( $repair_only ) {
+    print "Skipping extract!\n";
+    print STDERR "Skipping extract!\n";
+    return "";
+  }
+#  chdir( $ED );
+
+  my $source_dir	= "";
+  if( $sample_parfile =~ /(.*)\// ) {
+    $source_dir		= $1;
+  }
+
+  # First, attempt to parse par file to get the filenames of the
+  # archive.  These filenames may differ from the par filenames.
+  my @files		= extract_filenames_from_par( $sample_parfile );
+  my $key_rarfile	= "";
+
+  if( scalar @files ) {
+    # Here we have successfully extracted some filenames.  We'll attempt to use these
+    # to determine how to unpack the file:
+
+    # First - split into .part001...
+    $key_rarfile	= (grep( /part0*1\.rar$/i, @files))[0];
+    if( ! $key_rarfile ) {
+      # Unsuccessful, try simple .rar:
+      $key_rarfile	= (grep( /\.rar$/i, @files))[0];
+      if( ! $key_rarfile ) {
+	# Nope, try split file: 001, 002, ...
+	$key_rarfile	= [grep /\.0*1$/i, @files]->[0];
+      }
+    }
+    # If we found a file, try to extract it:
+    if( $key_rarfile ) {
+      print STDERR "(KEY: '$key_rarfile')";
+      if( $source_dir ) {
+	$key_rarfile	= $source_dir."/".$key_rarfile;
+      }
+      return extract( $key_rarfile );
+    }
+    print STDERR "No key file found in PAR archive list!  Falling through.\n";
+    # Otherwise, fall through and try to find the files through other methods:
+  }
+
+  $base		=~ s/\.$//;	# Strip off trailing dot...
+  foreach my $ext ( qw/.part01.rar .part001.rar .rar/ ) {
+#    print STDERR "checking '$base.$ext'\n";
+    if( -f $base.$ext ) {
+#      print STDERR "attempting extract of '$base.$ext'\n";
+      if( ! system( "rar", "x", $base.$ext ) ) {
+	return $base.$ext
+      }
+    }
+  }
+  # Check for split files:
+  my $ext	= ".001";
+  if( -f $base.$ext ) {
+    if( ! system( "lxsplit", "-j", $base.$ext ) ) {
+      return $base.$ext;
+    }
+    else {
+      return "";
+    }
+  }
+  # Check to see if the parchive files ended in .rar...:
+  if( $base =~ /\.rar/i ) {
+    $base	=~ s/\.rar//i;
+    return attempt_extract( $base );
+  }
+  else {
+    return "";
+  }
+}
+
+sub extract {
+  my $key_file	= shift;
+  if( ! system( "rar", "x", $key_file ) ) {
+    return $key_file;
+  }
+  return "";
+}
+
+sub extract_filenames_from_par {
+  my $parfile		= shift;
+  my $IF	       	= IO::File->new( $parfile ) || die "Can't open par file: '$parfile'";
+  my $data		= join( "", <$IF> );
+  my %filenames		= ();	# Store unique filenames
+  # Extract each file:
+#  print "Data: '$data'\n";
+#  while( $data =~ /PAR 2.0.FileDesc/g ) {
+#    print "YES!";
+#  }
+  while( $data =~ /PAR 2.0\0FileDesc.{56}(.*?)\0*PAR2\0PKT/sg ) {
+    my $fn	= $1;
+#    $fn		=~ s/\0+$//g;
+    $filenames{$fn}	= 1;
+  }
+  return sort keys %filenames;
+}

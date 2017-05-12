@@ -1,0 +1,122 @@
+
+
+
+
+                               PERL HBM
+                               --------
+
+
+           The HB extension to Perl and the Perl HB Module
+
+		      Installation Instructions
+
+
+
+
+
+
+
+1. GENERAL INSTRUCTIONS
+
+    This file contains information on how to build and install the
+    PerlHBM package.
+
+    First you'll need to install the HB extension to Perl.  That will
+    allow you to call functions in the HB library from your Perl script.
+    The steps to do this are described in detail at the section 2 of
+    this file.
+
+    Once you have succesfully installed the HB extension to Perl, you can
+    install the Perl HB module (that is, the Perl extension to HB).  It
+    will allow you to embed Perl code within your HB scripts.
+
+    If something goes wrong (and that is something likely to happen
+    at this point of time), use your common sense and try to fix the
+    Makefiles, sending me a complete report on the things you did so I
+    can consider them for the next release.
+
+
+2. INSTALLING THE HB EXTENSION TO PERL
+
+    Synopsis:
+
+        $ cd perlhb && perl Makefile.PL && make && make install
+
+    Detailed instructions:
+
+    1. Install HB.
+
+       You can always obtain the latest version of HB from:
+
+           <http://bachue.com/hb/hb.cgi/download>.
+
+       Note that this release only works with versions above 1.9.8.
+
+    2. Create the Makefile in the perlhb directory.
+
+       Change to the perlhb directory in this distribution (and stay
+       there until you have the extension installed) and issue the
+       following command:
+
+           $ perl Makefile.PL
+
+       It will look for the hb-config script that came with HB in
+       different directories and then create the Makefile, required in
+       the steps below.
+
+       If it fails to find hb-config (because you installed HB in an
+       unusual location), set an HB_CONFIG environment variable with the
+       full path to your hb-config script and pass it when you execute
+       this command (the example works on Bash):
+
+           $ HB_CONFIG="/home/azul/hb/bin/hb-config" perl Makefile.PL
+
+    3. Compile the extension.
+    
+       Issue the following command:
+       
+           $ make
+
+       It will look in the Makefile (created in step 2) for instructions
+       on what to do.
+
+    4. Install the extension
+
+       To install the extension you need to issue the following command:
+
+           $ make install
+
+       You will usually do this as the super user, unless you installed
+       Perl as a normal user.
+
+       You can now `use HB;' in your Perl scripts.
+
+
+3. INSTALLING THE PERL HB MODULE
+
+    Synopsis:
+
+    $ cd hbperl && make
+
+    It should be noted that in order to use the Perl HB module, you'll
+    need to install the HB extension to Perl. This is so because in
+    order to do anything useful from the Perl code that HB will execute,
+    you'll need to call some functions in HB.
+
+    Detailed instructions:
+
+    1. Compile the module
+
+       Change to the hbperl directory and build the module:
+
+           $ make
+
+       If all goes well, you'll now have a `perl.so' file. You can load
+       it in your HB files with the line:
+
+           :lib /path/perl.so
+
+       If something goes wrong, look at the output presented by the
+       hb-config script and try to fix it (don't forget to send me a
+       complete report so you won't have to fix it the next time HB
+       is released).

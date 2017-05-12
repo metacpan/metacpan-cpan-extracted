@@ -1,0 +1,4586 @@
+ Archive-name: perl-faq/ptk-faq
+ Posting-Frequency: monthly
+ Last-modified: Wed May 15 22:26:55 EDT 1996
+ URL: http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ Version: 0.03
+ 
+ URL (Hypertext-split): http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+ URL (Plaintext): http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ Image-supplement: http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ ftp-Archive: ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt
+ ftp-Archive: ftp://ftp.wpi.edu/perl5/pTk-FAQ
+ ftp-Archive: ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+ e-mail-Archive: ptkfaq@pubweb.bnl.gov
+ gopher-Archive: 128.84.219.153
+ 
+ Perl/Tk FAQ
+ ***********
+ 
+ 
+ 
+ The Perl/Tk extension to the Perl programming language is copywritten by its author
+ Nick Ing-Simmons <nik@tiuk.ti.com> whose Tk-b11.02/COPYING file reads as
+ follows: 
+ 
+ Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+ This package is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself, with the exception
+ of the files in the pTk sub-directory which have separate terms
+ derived from those of the orignal Tk4.0 sources and/or Tix. 
+ 
+ See pTk/license.terms for details of this Tk license, 
+ and pTk/Tix.license for the Tix license.
+ 
+ 
+ 
+ This compilation of Frequently Asked Questions & answers (FAQ) is intended to
+ answer several of the first (and mostly more basic) questions posted to the 
+ comp.lang.perl.tk newsgroup. 
+ 
+ This document concerns itself with the Perl/Tk programming language (or, if you
+ prefer, the Tk extension to Perl). Please beware that this is not the Perl FAQ, this is
+ not the Tcl FAQ, nor is this the Tcl/Tk FAQ. Each of those other documents are
+ useful sources of information for Perl/Tk programmers but are completely different
+ from this one. 
+ 
+ This is a dynamic document and contributions, clarifications, and corrections are 
+ most welcome! Please send e-mail to <pvhp@lns62.lns.cornell.edu>. With your help
+ this document will get better (-:
+ 
+ perl/Tk FAQ
+ 
+  1. What is perl/Tk? 
+  2. What is the difference between perl/Tk and Tkperl? 
+  3. Where is it? 
+  4. What/Where is CPAN? 
+  5. How do I build it? 
+  6. Where is the Documentation? 
+  7. How do I write scripts in perl/Tk? 
+  8. What widget types are available under perl/Tk? 
+  9. How do I get widget X to do Y ? 
+     1. How do I get a Button to call a Perl subroutine? 
+     2. How do I arrange the layout of my widgets? 
+     3. How do I get a Popup to popup? 
+     4. How do I bind keyboard keys? 
+     5. How do I add bindings? 
+     6. How do I bind the action of a slider (sic) to ... ? 
+     7. How do I configure a Scrollbar to scroll multiple widgets? 
+     8. How do I display a bitmap? 
+     9. How do I display an image? 
+     10. What Image types are available? 
+     11. Is there any way to have more than one Listbox contain a selection? 
+     12. How do I select a range of tags in a Text widget? 
+     13. How do I group Radiobuttons together? 
+     14. How do I specify fonts? 
+     15. How do I get the entry in an Entry? 
+     16. How do I hide a password Entry? 
+     17. How do I obtain Menus that do not tear off? 
+  10. How do I get a Canvas to ... ? 
+     1. Display a bitmap? 
+     2. Erase a display? 
+     3. Display an Image? 
+     4. What things can be created on a Canvas? 
+     5. How do I use the Canvas as a geometry manager? 
+     6. How do I get a Canvas to output PostScript(c)? 
+     7. How do I get a PostScript(c) output of a Canvas w/ widgets? 
+     8. How do I get the size of a Canvas? After a re-size? 
+     9. How do I bind different actions to different areas of the same 
+       Canvas? 
+  11. Common Problems. 
+     1. What do the ->, => and :: symbols mean? 
+     2. What happened to the ampersands &? 
+     3. What happened to the quotation marks? 
+     4. Must I use "my" on all my variables? 
+     5. Is there a way to find out what is in my perl/Tk "PATH"? 
+     6. What is the difference between use and require? 
+     7. How do I change the cursor/color? 
+     8. How do I ring the bell? 
+     9. How do I determine the version of perl/Tk that I am running? 
+     10. How do I call perl from C? 
+     11. How do I call Tcl code from perl/Tk? 
+  12. What are some of the primary differences between Tcl/Tk and Perl/Tk? 
+  13. How do I install new scripts | modules | extensions? 
+  14. How do I write new modules? 
+  15. Composite Widgets. 
+     1. How do I get a Dialog box? 
+     2. Is there a file selector? 
+     3. Is there a color editor? 
+     4. Is there a round Scale? 
+     5. Is there something equivalent to tkerror? 
+     6. Are there Tables? 
+  16. Programming/development tools. 
+     1. Is there a Tcl/Tk to perl/Tk translator? 
+     2. Is there something equivalent to wish in perl/Tk? 
+     3. Is there a debugger specifically for perl/Tk? 
+     4. Is there a GUI builder in perl/Tk? 
+  17. Processes & Inter-Process Communication under Perl/Tk. 
+     1. How does one get Perl/Tk to act on events that are not coming from X?
+     2. Is there a send and do I need xauth? 
+     3. How can I do animations using after? 
+     4. How do I update widgets while waiting for other processes to
+       complete? 
+     5. How do you fork on System V (HP)? 
+  18. How do I "clear the screen"? 
+  19. Are there any international font packages for perl/Tk? 
+  20. Are there any other ways to create X interfaces from perl? 
+  21. Where can I get more information on graphics modules? 
+  22. Are there any major applications written in perl/Tk? 
+  23. What is the history of pTk and perl/Tk? 
+  24. What can we expect the future to hold? 
+  25. How do I obtain the latest version of this FAQ? 
+  26. Acknowledgements & maintainer. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 1. What is perl/Tk? 
+ 
+ Perl/Tk (also known as pTk or ptk) is a collection of modules and code that attempts
+ to wed the easily configured Tk 4 widget toolkit to the powerful lexigraphic, dynamic
+ memory, I/O, and object-oriented capabilities of Perl 5. In other words, it is an
+ interpreted scripting language for making widgets and programs with Graphical User
+ Interfaces (GUI). (Examples of widget programs [not necessarily written in perl/Tk]
+ include xterm, xclock, most web-browsers, etc.. They are programs with "GUI"
+ interfaces of one sort or another and are subject to the effects of your window
+ manager.) 
+ 
+ Perl/Tk is based on "Tk 4.0p3" the widget Toolkit originally associated with the Tcl (
+ 
+ Tool command language) scripting language. However, Perl/Tk does not require any
+ of the lexical features/idiosynchrocies of Tcl. Perl/Tk uses perl 5 syntax, grammar,
+ and data structures. 
+ 
+ Like perl, wish, and even tclsh; perl/Tk is most easily used on a Unix computer
+ platform running X. Having said that, it is worth noting that things like Linux and
+ FreeBSD mean that the micro-computer hardware crowd too can have access to the
+ wonders of perl/Tk. Perl and Tcl/Tk have also been ported to non Unix operating
+ systems, there is no reason to suppose it cannot be done with the perl/Tk code
+ eventually as well. 
+ 
+ The perl/Tk package is still in beta phase and is being written primarily by Nick
+ Ing-Simmons <Nick.Ing-Simmons@tiuk.ti.com> at Texas Instruments in
+ Northampton, England. 
+ 
+ The pTk code proper is an externally callable Tk toolkit (i.e. a re-write of the Tk 4.0
+ code that allows easier external linking & calling, especially by perl). Ptk can then be
+ called from Perl 5 via the Tk.pm et al perl glue modules. Hence "ptk" does not
+ necessarily refer to Perl Tk but could be taken to mean portable Tk - given a glue
+ package to another language. The stated goal of the pTk code is to have its library
+ usable from perl, Tcl, LISP, C++, python, etc.. It just so happens that present work is
+ concentrating on perl. 
+ 
+ Historical note: "ptk" was known as "ntk" before about 11:30 EST 4 May 1995. 
+ 
+ The perl/Tk language is itself further extensible via the perl 5 module mechanism. A
+ number of composite widget extensions to the language have been written using perl
+ modules. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 2. What is the difference between perl/Tk and Tkperl? 
+ 
+ TkPerl was originally the name of a (now unsupported) perl 4 package that Malcolm
+ Beattie <mbeattie@sable.ox.ac.uk> at Oxford University called his code to wed the
+ Tk X toolkit with Perl. (He has referred to this code as a different "kettle of fish" from
+ perl/Tk.) 
+ 
+ Since that beginning Malcolm has also come up with a Tcl module for perl 5 that has
+ a Tcl::Tk module extension. That module allows the use of Tcl within a Perl script (
+ i.e. you must know both languages to get your widgets to work.) If you are interested in
+ that package instead, see the necessary kits for Malcolm Beattie's Tcl/Tk extensions
+ to Perl, which have been distrubuted as Tcl-b#.tar.gz and 
+ TclTk-b#.tar.gz files in the authors/id/MICB/ directory at CPAN sites
+ (locations given in a separate question in this FAQ). 
+ 
+ The name "tkperl" is sometimes applied to the "perl/Tk" or "ptk" package that is the
+ subject of this FAQ. Nick Ing-Simmons prefers "perl/Tk" as the name of the
+ package, with "pTk" or "ptk" as contractions of that name as well as referring to
+ something technically distinct: given the extensibility of the pTk code the "p" could
+ also be taken to mean 'portable' or 'pure' (not to be confused with either the Helsinki
+ University of Technology portTk, nor with Brian Warkentine's Rivet). In this
+ document the code of interest is either referred to as "perl/Tk", "pTk", or "ptk"
+ though the primary focus is on perl/Tk. 
+ 
+ Warning: do not attempt to install both perl/Tk and Tcl/Tkperl in the same perl
+ installation. The names in the respective modules overlap. In particular the Tcl::Tk
+ module is declared in a Tk.pm file - so a statement like: 
+ 
+     use Tk;
+ 
+ will probably confuse your perl. If you cannot live without either module then install
+ make & maintain separate perls for each and arrange your script writing accordingly
+ (this will not be easy). 
+ 
+ A more extensive comparison of the differences between the Tkperl and the perl/Tk
+ code is given in the Tcl-perl.pod file that is distributed with perl/Tk (see below
+ for locations). 
+ 
+ Lastly, it should be mentioned that if you build your Tk-b# statically rather than
+ dynamically it will make a new perl interpreter called tkperl (confusing isn't it?
+ :-). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 3. Where is it? 
+ 
+ Source code
+ -----------
+ 
+ Tk-b11.02 (the latest): you will need Perl 5.002, a recent MakeMaker and the 
+ 
+ Tk-b11.02 kit. To obtain all of these (as well as several other modules that
+ sophisticated Tk programs now rely on) visit a CPAN ftp site. CPAN (the
+ Comprehensive Perl Archive Network) and what you need to get from it, is discussed
+ in fuller detail in the next question. 
+ 
+ (This question remains for historical reasons as well as to discuss things that have not
+ quite made it to CPAN.) 
+ 
+ The Tk-b# kits used to be available from 
+ 
+     ftp://ftp.wpi.edu/perl5/          130.215.24.209
+ 
+ [ However, visiting the CPAN sites (discussed in the next question) should provide
+ you with all that you need (including other perl modules).] 
+ 
+ Please note that if you will be attempting to build with the old Tk-b9.01 then you will
+ probably also want Nick's document patch to go with that older kit, it is available
+ from: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/ptkpod-b9.01.patch
+ 
+ To construct Perl 5.002 go to a CPAN site and pick up the full kit (it will have some
+ mysterious name like perl5.002.tar.gz or something). 
+ 
+ As of November 1995 Tk-b# (various versions) are being distributed at CPAN ftp
+ sites (see later question in this FAQ) in the authors/id/NI-S/ directory. 
+ 
+ Tk-b8: For this older version you must have Perl (5.001m) (not n) and the ptk kit.
+ The Tk-b8 kit is at CPAN sites, as well as from: 
+ 
+ USA 
+     ftp://ftp.wpi.edu/perl5/Tk-b8.tar.gz              130.215.24.209
+     ftp://ftp.perl.com/pub/perl/ext/tk/               199.45.129.30
+     http://www.freebsd.org/ports/programming.html (pick up "pTk-b8")
+     http://www.metronet.com/perlinfo/perl5/extensions/Tk-b8.tar.gz 
+ UK
+     ftp://ftp.ox.ac.uk/pub/perl/Tk-b8.tar.gz          163.1.2.4
+ Germany
+     ftp://franz.ww.tu-berlin.de/pub/authors/NI-S/Tk-b8.tar.gz 130.149.200.51
+ Australia (please be patient and only try during off hours)
+     ftp://ftp.syd.dit.csiro.au/pub/perl5/ftp.wpi.edu  130.155.20.5
+ 
+ Perl 5.001m is available from one of the CPAN ftp sites in the src/5.0/ directory
+ as file perl5.001m.tar.gz. 
+ 
+ Binaries
+ --------
+ 
+ A pre-compiled binary distribution of Perl5.001m with Tk-b8 for Linux is available
+ from: 
+ 
+ Australia (please be patient and only try during off hours)
+     ftp://syd.dit.csiro.au/pub/perl5/local/perl5.001m+Tk-b8-Linux-ELF.tar.gz
+ 
+ It unpacks into /usr/local. You need to have ELF running and to have the ELF
+ X11 libraries (please be patient and only try during off hours). 
+ 
+ Binaries for the Perl 5 & Tk-b6 are available for a number of UNIX platforms
+ courtesy of Thomas Schlagel and Alan Stange of Brookhaven Lab at: 
+ 
+ USA
+     http://pubweb.bnl.gov/~ptk/
+ 
+ Thomas and Alan have recently (winter 1995-1996) announced that they will update
+ the Tk module version number of the many binaries they distribute. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 4. What/Where is CPAN? 
+ 
+ "CPAN" = Comprehensive Perl Archive Network a worldwide collection of
+ anonymous ftp sites for Perl et al (not to be confused with CTAN which is for TeX).
+ The files of particular interest to a perl/Tk programmer include: 
+ 
+  o The latest Tk-b# release should be in the authors/id/NI-S/ directory at
+    any CPAN ftp site (listed below). 
+  o The latest official Perl release should be in the src/ directory in a file called 
+    latest.tar.gz at any CPAN ftp site (listed below). 
+  o If you need something older or newer than the latest supported release try the 
+    src/5.0/ directory (for perl5.002_*.tar.gz e.g.) at any CPAN ftp
+    site (listed below).
+    (Also, if you need something really new try the incoming/ directory at any
+    site listed below.) 
+  o Alan Scheinine's SelFile.pm is in the authors/id/ALSCH/ directory at
+    any CPAN ftp site (listed below). 
+  o Guy Decoux's BLT_Table geometry manager is in the 
+    authors/id/GUYDX/ directory at any CPAN ftp site (listed below). 
+  o Ilya Zakharevich's eText plug in replacement for the Text widget is in the 
+    authors/id/ILYAZ/etext/ directory at any CPAN ftp site (listed
+    below). 
+  o The latest version of MakeMaker (the perl equivalent to imake/xmkmf) is
+    available from the authors/id/ANDK/ directory at any CPAN ftp site
+    (listed below). 
+  o To run the ptknews script you will need Mail/RFC822.pm from the 
+    Mailtools module kit, available from the authors/id/GBARR/
+    directory at any CPAN ftp site (listed below). 
+  o The build of Tk-b10(++) requires URI::URL and HTML::Parse these are
+    part of the libwww-perl-*.tar.gz kit, available from the 
+    authors/id/GAAS/ directory at any site listed below. 
+    libwww-perl-*.tar.gz in turn requires NET-FTP-*.tar.gz,
+    available from the authors/id/GBARR/ directory at any CPAN ftp site
+    (listed below). 
+  o Assorted documentation is in the doc/ directory at any CPAN ftp site (listed
+    below). 
+  o Fairly up-to-date versions of all sorts of documentation (including this FAQ
+    in various formats) is in the doc/, directory tree (you may have to go down
+    one or more directories) at any CPAN ftp site (listed below). 
+  o Most things perl/Tk (exclusive of external documentation such as this FAQ)
+    are also linked to a modules/by-module/Tk/ directory at any CPAN ftp
+    site (listed below). 
+ 
+ Here are the 40 CPAN sites/directories (with dotted quads [IP numbers] given on the
+ right for those without name-servers): 
+ 
+ Updated: Thu May 16 01:13:37 EDT 1996 
+ 
+ Africa
+   South Africa     
+     ftp://ftp.is.co.za/programming/perl/CPAN/           196.4.160.8
+ Asia
+   Hong Kong        
+     ftp://ftp.hkstar.com/pub/CPAN/                      202.82.0.80
+   Japan            
+     ftp://ftp.lab.kdd.co.jp/lang/perl/CPAN/             192.26.91.3
+   Taiwan           
+     ftp://dongpo.math.ncu.edu.tw/perl/CPAN/             140.115.25.3
+ Australasia
+   Australia        
+     ftp://coombs.anu.edu.au/pub/perl/CPAN/              150.203.76.2
+     ftp://ftp.mame.mu.oz.au/pub/perl/CPAN/              128.250.209.2
+   New Zealand      
+     ftp://ftp.tekotago.ac.nz/pub/perl/CPAN/             202.49.6.24
+ Europe
+   Austria          
+     ftp://ftp.tuwien.ac.at/pub/languages/perl/CPAN/     128.130.66.11
+   Czech Republic   
+     ftp://sunsite.mff.cuni.cz/MIRRORS/ftp.funet.fi/pub/languages/perl/CPAN/  194.50.16.66
+   Denmark          
+     ftp://sunsite.auc.dk/pub/languages/perl/CPAN/       130.225.51.30
+   Finland          
+     ftp://ftp.funet.fi/pub/languages/perl/CPAN/         128.214.248.6
+   France           
+     ftp://ftp.ibp.fr/pub/perl/CPAN/                     132.227.77.2
+     ftp://ftp.pasteur.fr/pub/computing/unix/perl/CPAN/  157.99.64.12
+   Germany          
+     ftp://ftp.leo.org/pub/comp/programming/languages/perl/CPAN/  131.159.0.252
+     ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN/           134.147.32.42
+   Greece           
+     ftp://ftp.ntua.gr/pub/lang/perl/                    147.102.222.210
+   Hungary          
+     ftp://ftp.kfki.hu/pub/packages/perl/CPAN/           148.6.0.5
+   the Netherlands  
+     ftp://ftp.cs.ruu.nl/pub/PERL/CPAN/                  131.211.80.17
+   Poland           
+     ftp://ftp.pk.edu.pl/pub/lang/perl/CPAN/             149.156.132.152
+     ftp://sunsite.icm.edu.pl/pub/CPAN/                  148.81.209.2
+   Portugal         
+     ftp://ftp.ci.uminho.pt/pub/lang/perl/               193.136.16.247
+   Slovenia         
+     ftp://ftp.arnes.si/software/perl/CPAN/              193.2.1.72
+   Spain            
+     ftp://ftp.rediris.es/mirror/CPAN/                   130.206.1.2
+   Sweden           
+     ftp://ftp.sunet.se/pub/lang/perl/CPAN/              130.238.127.3
+   Switzerland      
+     ftp://ftp.switch.ch/mirror/CPAN/                    130.59.1.40
+   UK               
+     ftp://ftp.demon.co.uk/pub/mirrors/perl/CPAN/        158.152.1.44
+     ftp://sunsite.doc.ic.ac.uk/packages/CPAN/           146.169.17.5
+     ftp://unix.hensa.ac.uk/mirrors/perl-CPAN/           129.12.200.129
+ North America
+   British Columbia 
+     ftp://mango.pinc.com/pub/mirrors/CPAN/              204.174.113.53
+   California       
+     ftp://ftp.digital.com/pub/plan/perl/CPAN/           204.123.2.4
+     ftp://ftp.cdrom.com/pub/perl/CPAN/                  165.113.58.253
+   Colorado         
+     ftp://ftp.cs.colorado.edu/pub/perl/CPAN/            128.138.243.20
+   Florida          
+     ftp://ftp.cis.ufl.edu/pub/perl/CPAN/                128.227.162.34
+   Illinois         
+     ftp://uiarchive.cso.uiuc.edu/pub/lang/perl/CPAN/    128.174.5.14
+   Massachusetts    
+     ftp://ftp.iguide.com/pub/mirrors/packages/perl/CPAN/  206.15.105.99
+   Oklahoma         
+     ftp://ftp.uoknor.edu/mirrors/CPAN/                  129.15.2.40
+   Texas            
+     ftp://ftp.sedl.org/pub/mirrors/CPAN/                198.213.9.194
+     ftp://ftp.metronet.com/pub/perl/                    192.245.137.6
+     ftp://ftp.sterling.com/CPAN/                        198.4.58.3
+ South America
+   Chile            
+     ftp://sunsite.dcc.uchile.cl/pub/Lang/perl/CPAN/     146.83.4.11
+ 
+ For those equipped with multi-protocol browsers you might pay a visit to Tom
+ Christiansen's CPAN multiplexer whose relevant Tk URLs are: 
+ 
+     http://perl.com/cgi-bin/cpan_mod?module=Tk
+     http://perl.com/cgi-bin/cpan_mod?module=Tk&readme=1
+ 
+ According to Stephen P. Potter some of the CPAN sites have decompression on the
+ fly for people who do not have programs like gunzip. For example, at the ufl site
+ (Florida USA) type this into your ftp session to download a gunzipped version of Tk: 
+ 
+     ftp> get Tk-b11.02.tar.gz Tk-b11.02.tar
+ 
+ If you have the appropriate CPAN and FTP modules already installed you can
+ retrieve a module from CPAN and carry out a complete installation with a perl
+ one-liner like this: 
+ 
+     perl -MCPAN -e 'install "Tk"'
+ 
+ For more information on CPAN you can send e-mail to the CPAN administrators, 
+ <cpan-adm@ftp.funet.fi>. If you know of some Perl resources that seem not to be in
+ the CPAN (you did check the contents listings in indices/, didn't you?) please tell
+ the CPAN administrators. If you have some modules/scripts/documentation yourself
+ that you would like to contribute to CPAN, please read the file 
+ authors/00upload.howto and let the CPAN administrators know about it. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 5. How do I build it? 
+ 
+ In general, building perl/Tk requires: 
+ 
+  1. A made & installed perl (requires a C language compiler). You may need
+    different versions of perl depending on which version of Tk you wish to run. 
+  2. A C language compiler for the Tk code itself. 
+  3. A linkable Xlib (.o, .so, .a, etc.) for X-windows. 
+ 
+ Perl/Tk has been successfully built using various vendors' cc compilers, as well as
+ with the free GNU gcc compiler. A make utility of some sort (make/gmake) will
+ be extremely helpful. 
+ 
+ The versions of the various Perl utilities that you need on hand are roughly as follows:
+ 
+ 
+   Utility     Version              Tk version/comments
+   perl        5.001m               Tk-b8 (not 5.001n)
+   perl        5.002b1f (or higher) Tk-b9 (9.01 recommended)
+   perl        5.002b1f (or higher) Tk-b9.01
+   perl        5.002                Tk-b10
+   perl        5.002                Tk-b11
+   perl        5.002                Tk-b11.01
+   perl        5.002 (or 002_01)    Tk-b11.02
+ 
+   MakeMaker   4.18 (or higher)     Tk-b8
+   MakeMaker   5.14 (or higher)     Tk-b9.01 
+   MakeMaker   5.21 (not? higher)   Tk-b11+
+ 
+   xsubpp
+ 
+ Step - by - step the commands to build the Tk extension to Perl are (for the
+ dynamically linked version) roughly as follows: 
+ 
+  1. make install # the appropriate version of perl. 
+  2. uninstall # prior versions of the Tk extension to perl. 
+  3. gunzip -c Tk-b*.tar.gz | tar xvf - 
+  4. cd Tk-b* 
+  5. read INSTALL 
+  6. perl Makefile.PL 
+  7. make 
+  8. make test 
+  9. make install 
+ 
+ For the statically linked version you would `make tkperl` just after executing
+ the `make` step and before the `make test` step. A relatively easy way to
+ determine if the perl on your system allows for dynamic linking was mentioned by
+ Kenneth Albanowski <kjahds@kjahds.com>. If the following does not say 
+ "dl_none.xs" then you probably do not have dynamically linked perl (or perhaps
+ a very non-Unix perl): 
+ 
+     perl -e 'use Config; print $Config{dlsrc},"\n"'
+ 
+ Here is a little more detailed discussion of each the steps just given: 
+ 
+  o Install Perl (5.001m for Tk-b8 [not 5.001n], at least 5.002b1f for b9.01, 5.002
+    for b11.01, 5.002 for b11.02) For code locations see a CPAN site (separate
+    question in this FAQ), the actual installation instructions come bundled in
+    the perl***.tar.gz distribution file. (Perl Configure & make troubles are
+    beyond the scope of this FAQ - please see the Perl FAQ itself for more help
+    with this critical step.)
+    You can install perl almost anywhere you like by specifying the -Dprefix=
+    /path argument to sh Configure 
+  o Unpack perl/Tk outside the Perl distribution
+    (i.e. outside the perl build, perl install, or perl lib areas).
+    gunzip Tk-b*.tar.gz
+    tar -xvf Tk-b*.tar
+    (this area Tk-b*/ will be referred to as your ``Tk build'' directory)
+    (optional: with Tk-b9.01, to avert most pod2man errors later on you may
+    wish to apply Nick's document patch.) 
+  o Read INSTALL carefully
+    cd Tk-b*
+    pager INSTALL
+    where pager is the program you use to scroll through text files more or less.
+    Be sure to read it and don't just pound away on the spacebar. 
+  o If necessary remove any previously installed version of perl/Tk
+    If you had a previously working version of Tk installed, you may need to
+    resurrect the Makefile for it and execute:
+    make uninstall
+    make realclean
+    before you unpack the new version. (The uninstall target of MakeMaker is
+    relatively new so please be careful here.)
+    Also note that as of Tk-b10 there is now an uninstall perl script in the Tk
+    build directory. Run that script before the perl Makefile.PL step if you
+    had a previously installed Tk extension (especially if the version number was
+    prior to b10, e.g. Tk-b9.01 or Tk-b8). 
+  o Compile and test.
+    perl Makefile.PL
+    (see below for more on this step.)
+    make
+    (if and only if building static: make tkperl
+    make test (Tk-b10++ not prior versions)
+  o Install.
+    make install 
+  o Play with it.
+    basic_demo (modify #! line if nec., or specify /path/to/perl
+    ./basic_demo)
+    warning if you build Tk-b9.01 with perl5.002gamma then change the line in 
+    basic_demo from
+    use lib ./blib;
+    to
+    use lib qw(blib/arch blib/lib); 
+ 
+ On the perl Makefile.PL step it may be necessary to give explicit locations of
+ the required X11 libraries and/or include headers. For example: 
+ 
+     perl Makefile.PL X11=/usr/local/X11R5
+ 
+ or 
+ 
+     perl Makefile.PL X11INC=/usr/local/share/X11R5/include \
+                      X11LIB=/usr/local/arch/X11R5/lib
+ 
+ There are system and site dependencies in all of the above steps. However, the largest
+ single source of build trouble comes from not using the latest versions of the various
+ utilities (C compiler, make, etc.). In particular ensure that when you say perl
+ Makefile.PL that the perl that gets invoked is up to date - use which perl
+ and perl -v to determine this. If necessary specify the full path name to your perl5
+ interpreter/compiler. (Some people do not rm their older perl interpreters when
+ upgrading to a more recent version - beware.) 
+ 
+ If you still run into trouble take a look at the INSTALL, the README and the 
+ README file for your specific system (e.g. README.AIX, README.OSF, etc.). You
+ might also find your system mentioned in the ptk hyper-mail archive at: 
+ 
+     http://pubweb.bnl.gov/~ptk/
+ or
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/
+ or
+     ftp://ftp.ccd.bnl.gov/pub/ptk/archives/
+ 
+ or the Perl 5 Porters page at one of the following URLs: 
+ 
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/
+     http://www.hut.fi/~jhi/perl5-porters.html
+     http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/
+ 
+ If you wish to discuss your Tk build problems with others run and save the output
+ from the myConfig script in the Tk build directory (the output may already be in
+ the myConfig.out file from your Tk-b# build directory), as well as the 
+ myconfig script in your perl build directory. It is often helpful to include the output
+ of either (or both) of these scripts in your discussion. 
+ 
+ Presented here are the beginnings of a list of problems associated with building
+ Tk-b# on various platforms (for help building perl itself please refer to the Perl FAQ).
+ This list is in no way complete nor authoritative (nor is it necessarily even
+ up-to-date!) but simply lists problems people have reported. Keep in mind that your 
+ installation may differ (e.g. location differences such as /usr/bin/perl vs. 
+ /usr/local/bin/perl) even if its the same platform listed here: 
+ 
+ Platforms:
+ ==========
+ 
+ AIX: 
+    As of perl5.002b & Tk-b9.01 README.AIX says no patching is necessary. 
+ 
+    For Tk-b8: modifying the perl.exp file may be necessary. There is a patch
+    in Tk-b8/README.AIX. It may be necessary to make regen_headers
+    after the patch. 
+ HPUX: 
+    For Tk-b11: One person reports a need to add #define TIMEOFDAY_TZ
+    to the tkConfig.h header file in order to compile on HPUX 9.05. 
+ 
+    Previous versions: Most people seem to prefer the dynamic linking afforded by
+    a recent version of the gcc compiler on this system. 
+ Linux: 
+    John C. Wingenbach indicates that should you encounter an error message
+    like Cannot find -lX11 anywhere at ./myConfig line 184
+    when running your perl Makefile.PL (under Slakware 3.0) that you
+    should be more specific about -l/path/to/libX11.a.
+    Adam Wasserman <awasser@hermes.sgc.com> has graciously provided a
+    compilation of Linux compilation trials & tribulations. It is an (as yet
+    un-edited) document available at: 
+    http://w4.lns.cornell.edu/~pvhp/ptk/etc/linux_compile_compilation.txt
+ MachTen:
+    Mark Pease <pease@act.sps.mot.com> mentions that:
+    I was able to get Tk-b11.02 running under MachTen 2.2 perl5.002_01. I did
+    need to make one change to get a round a MachTen problem. In
+    pTk/tclUnix.h, pwd.h is included, but it is also included pTk/tkPort.h (which is
+    included in Lang.h, which is use by tclUnixUtil.c, whew!) 
+ 
+    MachTen's pwd.h can't be included more that once or you get an error. 
+ 
+    It looked to me like tclUnix.h was only used in tclUnixUtil.c, so I commented
+    out the #include <pwd.h> in tclUnix.h. 
+ NetBSD:
+    Jesus M. Gonzalez <jgb@gsyc.inf.uc3m.es> mentions success with:
+    "Tk-b11.01 compiles, installs and runs just out of the box in
+    NetBSD-1.1/i386. I just followed the INSTALL instructions" 
+ NeXTSTEP:
+    Gerd Knops recently posted a discussion of the steps to get perl running on
+    several NeXTSTEPs to p5p.
+ OSF/1: 
+    As of perl5.002b & Tk-b9.01 you will probably be able to follow the usual
+    instructions. John Stoffel <john@wpi.edu> reports that if you use gcc (rather
+    than cc) you should use at least version 2.7.2 
+ 
+    For Tk-b8: make is reputedly not up to the task on this system. 
+    Tk-b8/README.OSF recommends gmake instead.
+    Stephane Bortzmeyer <bortzmeyer@pasteur.fr> reports a successful build
+    with Perl 5.001m, xsubpp 1.922, MakeMaker 4.23. He points out that it was
+    necessary for him to upgrade the xsubpp and MakeMaker that he received
+    with his copy of Perl5.001m. 
+ SCO: 
+    For Tk-b8: Eric J. Bohm <bohm@cs.Buffalo.EDU> reported a need to
+    comment out line(s) from myConfig and GNUMakefiles using GNU
+    make 3.67. (See Tk-b8/README.SCO for specifics.) 
+ SGI (Irix): 
+    For Tk-b11.02: Phillip Moore <wpm@morgan.com> reports a clean build on
+    IRIX 5.3. 
+ 
+    Matthew Black <black@csulb.edu> recently mentioned a need to apply
+    "patchSG0000596" to get perl sockets to work. His message was copywritten
+    and is not included here. Send e-mail to him to find out where the get
+    "patchSG0000596". 
+ Suns: 
+    SunOS (BSD):
+    For Tk-b10 on SunOS 4.1.3_U1
+    using SparcWorks acc 3.0.1 Frederick L. Wagner <derf@ti.com> reports
+    needing to use the perl malloc rather than the system malloc() when building
+    perl.
+    For Tk-b8: Tom Tignor <tpt2@BBN.COM> reports the following on SunOS
+    (sun4m sparc): Tue, 28 Nov 1995 13:19:42
+    In trying to make, I got a "write: argument mismatch" error for the file
+    ptK/Lang.h. I looked at the file and found the offending function,
+    Tcl_GetOpenFile, which has a third argument called "doWrite" (not "write")
+    in tkGlue.c. I changed the argument from "write" to "doWrite" in Lang.h and
+    it's compiling fine (for the moment. :) 
+    Solaris (System V):
+    For Tk-b8: There is trouble getting perl to use Socket routines (i.e. trouble
+    with make perl itself not necessarily trouble with Tk-b#). See the perl FAQ
+    for more info or the .shar file that Tom Christiansen occasionally posts to 
+    comp.lang.perl.misc. Further information on perl inter process c
+    ommunication can be found in the perlipc* files at: 
+    ftp://ftp.perl.com/perl/info/everything_to_know/. 
+ SVR4: 
+    For Tk-b8: Martha G. Armour and Len Reed report on two separate
+    hardware platforms running SVR4 - extensive details in 
+    Tk-b8/README.SVR4. Interestingly, they report no trouble at all on Linux.
+ Ultrix:
+    Peter Prymmer reports that with Tk-b11 it was necessary to change the line
+    in Makefile.PL that reads:
+    'LIBS' => ["$xlib -lX11 -lpt -lsocket -lnsl -lm"],
+    to read:
+    'LIBS' => ["$xlib -lX11 -lpt -lsocket -lnsl -lm
+    -ldnet"],
+    because of a newer X11 in /usr/local that needed the DECnet protocol linking. 
+ 
+    John Stoffel reports a successful build of static Tk-b10 on Ultrix 4.5. 
+ 
+ non-Unix(ish)es:
+ ================
+ 
+ Information on non-Unix(ish) perl platforms may be obtained from the perl
+ metaFAQ (pmFAQ) at 
+ 
+    http://www.khoros.unm.edu/staff/neilb/perl/metaFAQ/entry-04.html
+ 
+ or the Perl 5 Porters (p5p) page at: 
+ 
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/Perl5-Porters/
+     http://www.hut.fi/~jhi/perl5-porters.html
+     http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/
+ 
+ In general your non-Unix platform must be able to support perl 5 and Xlib (a C
+ compiler and a make utility are tremendously useful too). The long list of UNIX and 
+ non-unix perl 5 ports, Tcl/Tk ports, and Perl/Tk ports that used to appear here has
+ now moved to a separate web page at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkPORT.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 6. Where is the Documentation? 
+ 
+ Documentation is "in the works": there are several books dealing with perl/Tk in
+ progress, and a growing FAQ (the document you are presently reading). 
+ 
+ In the meantime the available information resources can be split into Perl/Tk, Perl,
+ and Tcl/Tk documentation categories: 
+ 
+ Perl/Tk Specific Documentation
+ ==============================
+ 
+ The man pages
+ -------------
+ 
+ As of Tk-b9.01 the various perl/Tk pod documents are converted to roff format and
+ installed as part of the perl/Tk "make install" process. If you have a recent
+ verion of perl/Tk try something like man 3 Tk::Tk if this does not work check
+ with you system administrator for the proper MANPATH. (Tk-b9.01 people may be
+ interested in applying Nick's document patch to keep pod2man from complaining
+ too much during make install.) 
+ 
+ The newsgroup
+ -------------
+ 
+ The newsgroup name is comp.lang.perl.tk and this FAQ will be periodically posted to
+ that group. The newsgroup is the appropriate place to post questions - yes even
+ simple ones! (Although answers may be long in coming ... :-( 
+ 
+ The nTk/pTk mailing list
+ ------------------------
+ 
+ The mailing list is a supplement and a complement to the newsgroup 
+ comp.lang.perl.tk. All messages mailed to the list are forwarded to the newsgroup.
+ The nTk/pTk Mailing List Archive remains a useful source of information however,
+ and is accesible at either http://pubweb.bnl.gov/~ptk/, or via ftp at 
+ ftp://ftp.ccd.bnl.gov/pub/ptk/archives/ (both in the USA). You may search the
+ contents of the mailing list archives thanks to a cgi-bin script written by Achim
+ Bohnet in Germany at: 
+ 
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/ptk/
+ 
+ To subscribe to the mailing list you can send mail to majordomo@lists.stanford.edu (
+ i.e. <majordomo@lists.stanford.edu>) with the following command in the body of
+ your e-mail message: 
+ 
+     subscribe ptk joe.user@somewhere (Joe D. User)
+ 
+ To send a message to all recipients of the mailing list send e-mail to 
+ <ptk@lists.stanford.edu>. 
+ 
+ To remove yourself from the mailing list send mail to majordomo@lists.stanford.edu
+ (i.e. <majordomo@lists.stanford.edu>) with the following command in the body of
+ your e-mail message: 
+ 
+     unsubscribe ptk joe.user@somewhere (Joe D. User)
+ 
+ The demo programs
+ -----------------
+ 
+ Examine (and try running) the code in your Tk-b#/, perl5/Tk/demos/, and 
+ perl5/Tk/demos/widget_lib/ directories.
+ In order to determine where on your system the perl5/ directory is located type the
+ following one-line perl command (at your shell prompt - this is not a line from a perl
+ script): 
+ 
+     perl -e 'print join("\n",@INC),"\n";'
+ 
+ If that command does not turn up a perl5/ directory then make sure that you are
+ running perl 5 with the following: perl -v (again this can be entered at the shell
+ prompt). 
+ 
+ The pod documentation
+ ---------------------
+ 
+ As of Tk-b9.01 the various perl/Tk pod documents are converted to roff format and
+ installed as part of the perl/Tk installation process. If you have a recent verion of
+ perl/Tk try something like man 3 Tk::Tk. If this does not work check your man
+ path with 
+ 
+     perl -e 'use Config; print $Config{'man1dir'},"\n",$Config{'man3dir'},"\n"'
+ 
+ And if you still cannot find the manual pages check with your system administrator
+ for the proper MANPATH and/or Tk-# installation version. 
+ 
+ In your perl5/Tk/ directory there should be a number of .pod files including (but
+ not limited to) UserGuide.pod. The files are examples of the perl "plain old
+ documentation" format and are just about human readable as they are (e.g. you may 
+ more, cat, or less them; or send them to a printer). They are intended to be run
+ through a re-formatting program however. Such programs include pod2man, 
+ pod2html, and pod2latex (which get installed when you install perl) or 
+ pod2text which was written by Tom Christiansen. A command line like the
+ following (but subject to local variations) should work for you: 
+ 
+     pod2man perl5/Tk/UserGuide.pod | nroff -man | more
+ 
+ There should even be a perl script to run the above command for you. It is executed
+ as: 
+ 
+     perldoc perl5/Tk/UserGuide
+ 
+ Note that if there is pod like documentation in a perl module you may also execute 
+ perldoc on it as in: 
+ 
+     perldoc ColorEditor.pm
+ 
+ (please note that not all .pm mod files have pod embedded.) If you want that GUI
+ look and feel (like xman) make the appropriate changes to the following script: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     use Tk::Pod;
+     my $m = new MainWindow;
+     $m -> Pod(-file => 'Tk/ColorEditor.pm');
+     MainLoop;
+ 
+ Or better still use the tkpod program that gets installed when you 'make install'
+ Tk. It can be used like this: 
+ 
+     tkpod /usr/local/lib/perl5/pod/perl
+ 
+ The pod conversion to latex proceeds as you might guess, namely: 
+ 
+     pod2latex UserGuide.pod 
+ 
+ (according to the 1.1 version of pod2latex this will automatically generate a 
+ UserGuide.tex file hence you must have write access to the directory in which
+ the above command is carried out.) 
+ 
+ You may also convert the pod pages to HTML (the HyperText Markup Language of
+ World Wide Web documents). For example, command lines like the following (but
+ subject to local variations - is your web_browser configured to allow local access to a
+ file? - if not do this on a web-serving machine) should work for you: 
+ 
+     pod2html perl5/Tk/UserGuide.pod > UserGuide.html
+     web_browser_invocation UserGuide.html
+ 
+ In addition there is, on an experimental basis, a place to view the Tk-b9.01 
+ .pod->.html files from the perl5/Tk directory at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/pod/
+ 
+ (Please note that the perl pod specification does not allow for markup within a
+ verbatim paragraph - yet font changes often seem to be in either the
+ <XMP></XMP> or the <PRE></PRE> HTML environments generated by running
+ many of these .pod files through the latest version of pod2html. Alert browsers
+ are welcome to notify me of any errors in the hand-altered html files.) 
+ 
+ Translators pod2texinfo, pod2fm, etc., also exist. Check a CPAN site for these
+ scripts if you do not already have them. 
+ 
+ Newer versions: In your Tk-b10++/doc directory there should be a number of 
+ .htm files. These were originally Tcl/Tk man pages, but have been converted to Perl
+ syntax in html format. 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/doc/
+ 
+ Older versions: In your Tk-b#/doc directory there should be a number of .ht
+ files. These are conversions of Tcl/Tk man pages to html. (If you wish to browse them
+ at your own site you may wish to look at Mark Elston's cvtht script, or configure your
+ web-server/browser to recognize the .ht extension as a text/html mime.type.) The 
+ .ht are helpful to the perl/Tk programmer trying to remember the name of an
+ optional argument to pass to a given widget primitive. Note that insofar as these pages
+ do specify syntax it pertains to Tcl/Tk not perl/Tk, hence they must be translated.
+ The pages are on the web at: 
+ 
+     http://pubweb.bnl.gov/~ptk/doc/index.html
+     http://w4.lns.cornell.edu/~pvhp/ptk/b9.01-docnpod/doc/
+ 
+ A miscellany of internet perl/Tk resources includes: 
+ 
+ World Wide Web - perl/Tk man pages
+     http://pubweb.bnl.gov/~ptk/doc/index.html
+     http://w4.lns.cornell.edu/~pvhp/ptk/doc/
+     http://w4.lns.cornell.edu/~pvhp/ptk/pod/
+ Newsgroups
+     comp.lang.perl.tk
+     comp.lang.perl.misc
+     comp.lang.perl.anounce
+     comp.lang.tcl
+     comp.lang.tcl.announce
+     comp.answers
+     news.answers
+ Perl/Tk FAQ-Archives (ftp sites) [Note: FAQ may be many separate files]
+  (see also CPAN sites)
+     ftp://rtfm.mit.edu/pub/usenet/comp.lang.perl.tk
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/lang/perl/tk
+     ftp://ftp.uu.net/usenet/news.answers/perl-faq/ptk-faq
+     ftp://ftp.ccd.bnl.gov/pub/ptk/                   130.199.54.188
+     ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt         130.199.54.188
+     ftp://ftp.wpi.edu/perl5/pTk-FAQ                  130.215.24.209
+     ftp://perl.com/pub/perl/doc/ptkFAQ.gz            199.45.129.30
+     ftp://perl.com/pub/perl/doc/ptkFAQ.ps.gz         199.45.129.30
+ WWW-FAQ for perl/Tk
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ World Wide Web - perl/Tk info sites
+     http://pubweb.bnl.gov/~ptk/
+     http://fxfx.com/kgr/compound/ (Perl Tk Compound Widget Page)
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html (FAQ image supplement)
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/
+     http://w4.lns.cornell.edu/~pvhp/ptk/misc/
+     http://w4.lns.cornell.edu/~pvhp/ptk/PNMTYAK/
+     http://www.mirai.com/wks/
+ The Mailing list
+     majordomo@lists.stanford.edu 
+     ptk@lists.stanford.edu 
+ 
+ Perl Specific Documentation
+ ===========================
+ 
+ There are a growing number Perl books available. A more complete
+ Perl-bibliographic discussion than that given here is available in the Perl FAQ at: 
+ 
+     http://www.perl.com/perl/faq/Q2.2.html
+ 
+ The two early Perl books by Schwartz and Wall are very helpful (even if they do
+ pertain to perl 4 and not 5. Beware that perl/Tk makes extensive use of perl 5
+ features.): 
+ 
+  Learning Perl (The Llama)
+  Randal L. Schwartz
+  Copyright (c) 1993 O'Reilly & Associates Inc.
+  ISBN 1-56592-042-2 (English)
+  ISBN 2-84177-005-2 (French)
+  ISBN 3-930673-08-8 (German)
+  ISBN 4-89502-678-1 (Japanese)
+ 
+  Programming Perl (The Camel)
+  Larry Wall and Randal L. Schwartz
+  Copyright (c) 1991 O'Reilly & Associates Inc.
+  ISBN 0-937175-64-1 (English)
+  ISBN 3-446-17257-2 (German) (Programmieren in Perl, translator: Hanser
+  Verlag)
+  ISBN 4-89052-384-7 (Japanese)
+ 
+ For Perl 5 there will be an update to the Camel ("Learning More Perl"? the Alpaca?)
+ in preparation by Randal L. Schwartz, Tom Christiansen, Larry Wall, and Stephen
+ Potter, with a draft due at O'Reilly by the end of April 1996. There is some Perl5
+ (book material) information at: 
+ 
+     http://www.metronet.com/1h/perlinfo/perl5/
+ 
+ Jon Orwant (the organizer of the comp.lang.perl.tk newgroup) will have a book on
+ Perl 5 out in January 1996. (Please note that it is mostly about Perl 5, there is a some
+ discussion of four simple Perl/Tk programs, but it is not a book wholly devoted to
+ Perl/Tk.) The relevant info: 
+ 
+  Perl 5 Interactive
+  Jon Orwant
+  The Waite Group Press
+  ISBN: 1-57169-064-6
+ 
+ The perl 5 Quick Reference Guide (may require LaTeX for installation) can be
+ obtained from any CPAN ftp site. Detailed location information is also available at
+ the author's website: 
+ 
+     http://www.xs4all.nl/~jvromans/perlref.html
+ 
+ The quick reference guide has been turned into a small Nutshell handbook: 
+ 
+  Perl 5 Desktop Reference
+  Johan Vromans
+  Copyright (c) February 1996 O'Reilly & Associates Inc.
+  ISBN: 1-56592-187-9; Order number: 1879
+ 
+ Additional book information may be found at Tom Christiansen's perl & cgi books
+ page. The multi-part perl 5 man pages are available (assuming they have been
+ installed in your MANPATH, type man perl, man perlmod etc.). 
+ 
+ The perl man pages are also available on the web at a number of locations including: 
+ 
+ World Wide Web - perl 5.001m man pages 
+  (the 5.002 pages [listed below] are more useful though)
+   Australia
+     http://www.cs.mu.oz.au/~slf/perl5/perl.html
+     http://bwyan.anu.edu.au/perl.html
+   Austria
+     http://www.cosy.sbg.ac.at/comp/lang/perl/perl5man/perl.html
+   Brazil
+     http://www.lsi.usp.br/perl5/
+   Canada
+     http://csclub.uwaterloo.ca/perldoc/perl.html
+     http://stoner.eps.mcgill.ca/perl/perl.html
+   Germany
+     http://www.t-informatik.ba-stuttgart.de/Perl5/perl.html
+     http://www.dfv.rwth-aachen.de/doc/perl/perl.html
+   Norway
+     http://www.pvv.unit.no/sw/perl5/index.html
+   Slovak Republic
+     http://www.savba.sk/autori/perl/perl.html
+   Slovenia
+     http://www.ijs.si/perl/
+   Taiwan
+     http://www.ccu.edu.tw/perl5/index.html
+   UK
+     http://www.cs.man.ac.uk/~richardd/perl5/perl.html
+     http://ppewww.ph.gla.ac.uk/perl/perl.html
+   USA
+     http://rhine.ece.utexas.edu/~kschu/perlman.html
+     http://duggy.extern.ucsd.edu/perl/perl.html
+     http://tbone.biol.scarolina.edu/~dean/perl/perl.html
+     http://www.mit.edu:8001/perl/perl.html
+     http://icg.stwing.upenn.edu/perl5/perl.html
+     http://w4.lns.cornell.edu/public/compdoc/info/perl/perl.html
+ 
+ World Wide Web - perl 5.002 man pages 
+  (also very useful for previous versions of perl 5)
+   Canada
+     http://dymaxion.ns.ca/www/dv/perl_manual/index.html
+     http://wepil.uwaterloo.ca/~mathers/perl/perl.html
+   Czech Republic
+     http://infog.eunet.cz/~muaddib/perl5/index.html
+   Finland
+     http://www.hut.fi/~jhi/perl5/index.html
+   Germany
+     http://nat-www.uia.ac.be/perl/perl.html
+   Netherlands
+     http://www.cs.ruu.nl/pub/mirrors/CPAN/doc/manual/html/frame_index_long.html
+   USA
+     http://www.metronet.com/0/perlinfo/perl5/manual/perl.html
+     http://www.lafayette.edu/doughera/doughera/perl/manual/perl.html
+     http://www.va.pubnix.com/staff/stripes/perlinfo/
+     http://www.perl.com/perl/manual/
+     http://128.84.219.39/public/perl/manual/
+     http://www.ilap.com/perl/
+     http://saturn.lbcc.cc.or.us/www_root/docs/perl5/PERL.HTML
+ 
+ In addition to the CPAN ftp source sites, a miscellany of internet perl resources
+ includes: 
+ 
+ Newsgroups
+     comp.lang.perl.misc
+     comp.lang.perl.announce
+     comp.lang.perl.modules
+     comp.infosystems.www.authoring.cgi
+     comp.answers
+     news.answers
+ Perl FAQ-Archives (ftp sites) [Note: FAQ may be many separate files]
+     (see also the CPAN sites)
+   North America
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/
+     ftp://ftp.uu.net/usenet/news.answers/perl-faq  192.48.96.9
+     ftp://ftp.khoros.unm.edu/pub/perl/faq.gz       198.59.155.28
+   Europe 
+     ftp://ftp.cs.ruu.nl/pub/NEWS.ANSWERS/perl-faq/ 131.211.80.17
+     ftp://src.doc.ic.ac.uk/packages/perl/FAQ       146.169.2.10
+ Gopher Perl FAQ 
+     gopher://gopher.metronet.com/11/perlinfo/faq
+ WWW-FAQ for Perl
+     http://www.perl.com/perl/faq/
+     http://www.smartpages.com/bngfaqs/comp/lang/perl/top.html
+     http://www.smartpages.com/bngfaqs/comp/lang/perl/misc/top.html
+     http://www.smartpages.com/bngfaqs/comp/lang/perl/announce/top.html
+     http://www.cis.ohio-state.edu/hypertext/faq/usenet/perl-faq/top.html
+ Perl for Win32 FAQ  (discusses Win95)
+     http://www.perl.hip.com/PerlFaq.htm
+ 
+ Perl info sites
+ Gopher (gopher:70)
+   USA
+     gopher://gopher.metronet.com/11h/perlinfo
+ World Wide Web (http:80)
+   USA
+     http://www.yahoo.com/Computers_and_Internet/Languages/Perl/index.html
+     http://www.perl.com/
+     http://www.khoros.unm.edu/staff/neilb/perl/home.html
+     http://www.khoros.unm.edu:80/staff/neilb/perl/metaFAQ/
+     http://www.metronet.com/perlinfo/
+     http://www.metronet.com/perlinfo/perl5.html (Perl 5)
+     http://www.eecs.nwu.edu/perl/perl.html
+     http://128.84.219.39/public/perl/
+     http://www.virtualschool.edu/mon/Perl.html
+     http://www.hermetica.com/technologia/unexec/
+     http://www.oac.uci.edu/indiv/ehood/perlWWW/
+     http://web.sau.edu/~mkruse/www/scripts/
+     http://orwant.www.media.mit.edu/the_perl_journal/
+     http://www.perl.com/Architext/AT-allperl.html
+     http://www.mispress.com/introcgi/
+     http://www.walrus.com/~smithj/webcan/
+     http://web.syr.edu/~chsiao05/cps600_project.html
+     http://www.iftech.com/classes/webdev/webdev_perl.htm
+     http://www.cc.iastate.edu/perlmenu/
+   UK
+     http://pubweb.nexor.co.uk/public/perl/perl.html
+     http://www.bio.cam.ac.uk/web/form.html
+ Web references to Perl mailing lists
+     http://www.perl.com/perl/info/mailing-lists.html
+     http://www.nicoh.com/cgi-bin/lwgate/PERL5-PORTERS/
+     http://www.hut.fi/~jhi/perl5-porters.html
+     http://www.rosat.mpe-garching.mpg.de/mailing-lists/
+ 
+ Tcl/Tk Specific Documentation
+ =============================
+ 
+ The two Tcl/Tk books by Ousterhout and Welch are very good starting points (you
+ must however, translate the tcl-isms to perl in the sample scripts): 
+ 
+  Tcl and the Tk Toolkit
+  John K. Ousterhout
+  Copyright (c) 1994 Addison-Wesley Publishing Company
+  ISBN 0-201-63337-X (alk. paper)
+  LOC QA76.73.T44097 1994; 005.13'3--dc20
+ 
+  Practical Programming in Tcl and Tk
+  Brent Welch
+  Copyright (c) 1995 Prentice Hall
+  ISBN 0-13-182007-9 
+ 
+ Within the tclsh or wish shells your manpath includes the tcl/tk man pages
+ (which may not be in your login manpath). Thus from the % prompt within either
+ shell type commands like: 
+ 
+     % man -k Tk
+ 
+ The Tcl/Tk Reference Guide is also a source of useful information. Although it's Tcl
+ specific most perl/Tk commands can be, more or less, easily derived from it. [As of
+ Tk-b9.01 the names of some functions and some configuration options have changed
+ slightly from their Tcl/Tk counterparts. With Tk-b9.01 (and higher) a great many
+ functions start with an upper case letter and continue with all lower case letters (e.g.
+ there is a perl/Tk Entry widget but no entry widget), and many configuration
+ options are all lower case (e.g. there is a perl/Tk highlightthickness option but
+ no highlightThickness option).] You may fetch the Tcl/Tk Reference Guide
+ (may require LaTeX for installation) from: 
+ 
+     ftp://ftp.slac.stanford.edu/software/TkMail/tkref-4.0.1.tar.gz 134.79.18.30
+     ftp://ftp.aud.alcatel.com/tcl/docs/tkref-4.0.1.tar.gz          198.64.191.10
+ 
+ There are a number of other Tcl/Tk resources on the internet including: 
+ 
+ Newsgroups
+     comp.lang.tcl
+     comp.lang.tcl.announce
+     comp.infosystems.www.authoring.cgi
+     comp.answers
+     news.answers
+ FAQ-Archive (ftp) [Note: Tcl FAQ may be many files, Tk FAQ is one file]
+     ftp://ftp.aud.alcatel.com/tcl/docs/                            198.64.191.10
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/tcl-faq/tk
+ WWW-FAQ for Tcl/Tk
+     http://www.smartpages.com/faqs/tcl-faq/top.html
+     http://www.smartpages.com/bngfaqs/comp/lang/tcl/top.html
+     http://www.cis.ohio-state.edu/hypertext/faq/usenet/tcl-faq/top.html
+     http://www.cis.ohio-state.edu/hypertext/faq/bngusenet/comp/lang/tcl/top.html
+     http://www.sco.com/Technology/tcl/Tcl.html
+ World Wide Web - Tcl/Tk info sites
+   Canada
+     http://web.cs.ualberta.ca/~wade/Auto/Tcl.html
+   UK
+     http://http2.brunel.ac.uk:8080/~csstddm/TCL2/TCL2.html
+     http://www.cis.rl.ac.uk/proj/TclTk/
+   USA
+     http://www.yahoo.com/Computers_and_Internet/Languages/Tcl_Tk/index.html
+     http://www.sunlabs.com/research/tcl/docs.html
+     http://www.sunlabs.com/research/tcl/4.0.html
+     http://www.sco.com/Technology/tcl/Tcl.html
+     http://www.neosoft.com/tcl/
+     http://www.elf.org/tcltk-man-html/contents.html
+ Tcl/Tk - miscellaneous extensions
+     ftp://ftp.cme.nist.gov/pub/expect/
+     http://www.cs.hut.fi/~kjk/porttk.html
+     http://www.cis.upenn.edu/~ioi/tix/tix.html
+     http://www.ece.cmu.edu/afs/ece/usr/svoboda/www/th/homepage.html
+     http://www.tcltk.com/ [incr Tcl]
+     http://www.neosoft.com/tcl/TclX.html
+     http://www.eolas.com/eolas/webrouse/tcl.htm [WebWish]
+     http://www.se.cuhk.hk/~hkng2/big5tk/big5tk.html
+     http://www.cs.uoregon.edu/~jhobbs/work/ [BLT etc.]
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 7. How do I write scripts in perl/Tk? 
+ 
+ Start your script as you would any perl script (e.g. #!/usr/bin/perl, 
+ #!/usr/local/bin/perl, #!/opt/bin/perl, [built static? then 
+ #!/usr/bin/tkperl], whatever, see the perlrun(1) man page for more
+ information).
+ Throwing the -w warning switch is recommended.
+ The use of the statement use strict; is recommended.
+ Use of the statement use Tk; is required.
+ 
+ A simple "Hello World!" widget script could be written as follows: 
+ 
+     #!/usr/local/bin/perl -w
+ 
+     use strict;
+     use Tk;
+ 
+     my $main = new MainWindow;
+     $main->Label(-text => 'Hello World!'
+                  )->pack;
+     $main->Button(-text => 'Quit',
+                   -command => sub{exit}
+                   )->pack;
+     MainLoop;
+ 
+ The MainLoop; statement is the main widget event handler loop and is usually
+ found in perl/Tk scripts (usually near the end of the main procedure after the widgets
+ have been declared and packed). MainLoop; is actually a function call and you
+ may see it written as MainLoop();, &Tk::MainLoop;, &Tk::MainLoop();, 
+ etc. 
+ 
+ Note the use of the -> infix dereference operator. Most things in calls to perl/Tk
+ routines are passed by reference. 
+ 
+ Note also the use of the => operator which is simply a synonym for the comma
+ operator (well it is a bit more than that :-). In other words, the arguments that get
+ passed to Label and Button in the above example are good old perl associative
+ arrays (perl 5 people prefer to call them "hashes" however). Indeed, we might have
+ written the above as: 
+ 
+     #!/usr/local/bin/perl -w
+ 
+     use strict;
+     use Tk;
+ 
+     my $main = new MainWindow;
+     $main->Label(-text , 'Hello World!'
+                  )->pack;
+     $main->Button(-text , 'Quit',
+                   -command , sub{exit}
+                   )->pack;
+     MainLoop;
+ 
+ Or even as: 
+ 
+     #!/usr/local/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+ 
+     my %hello = ('-text','Hello World!');
+     my %quit_com = ('-text' => 'Quit', '-command' => sub{exit});
+ 
+     $main->Label(%hello)->pack;
+     $main->Button(%quit_com)->pack;
+     MainLoop;
+ 
+ Note however, that the use of the => in the first method of writing this script makes
+ it look more "Tcl-ish" :-). 
+ 
+ Lastly, we note the extensive use of the my function in most perl/Tk programs. my is
+ roughly equivalent to local in Perl 4 - but is purported to be "faster and safer" as
+ well as much more strictly local in scope. See perlfunc(1) manpage for more
+ information on my. 
+ 
+ Other examples of code may be found in the perl5/Tk/demos/ directory and in 
+ perl5/Tk/demos/widget_lib/. 
+ 
+ (A variant on this scipt called hello is available in the file 
+ perl5/Tk/demos/hello in your own pTk distribution. Also, Source code for 
+ this and other examples from UserGuide.pod may be found at 
+ http://w4.lns.cornell.edu/~pvhp/ptk/pod/. To load code from the web save as a local 
+ filename, edit the first line to point to your perl interpreter, then: chmod u+x 
+ filename, then execute: filename.) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 8. What widget types are available under perl/Tk? 
+ 
+ The following Tk widget primitives are available under perl/Tk: 
+ 
+  o Button 
+  o Canvas 
+  o Checkbutton 
+  o Entry 
+  o Frame 
+  o Label 
+  o Listbox 
+  o Menu 
+  o Menubutton 
+  o Message 
+  o Radiobutton 
+  o Scale 
+  o Scrollbar 
+  o Text 
+  o Toplevel 
+ 
+ The following are Tix widget primitives available under perl/Tk: 
+ 
+  o HList 
+  o InputOnly 
+ 
+ There are (a lot of) other compound/composite/constructs available too. 
+ 
+ A good introduction to the primitives and how they may be used in conjunction with
+ each other may be found in the widget demo script. Note that all the widget demos
+ have a "Show Code" button. To help figure out what is happening in the script you
+ may, when the window appears, edit the text and instrument the code with print
+ statements and then simply press "Rerun Demo". Another place to see examples of
+ the primitives (on the web) is at the image supplement to this FAQ at the following
+ URL: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9. How do I get widget X to do Y ? 
+ 
+ There are a number of tasks that can be accomplished with perl/Tk widgets,
+ configurations, and bindings (a few that can't and a few that require specific tricks).
+ Beginners are encouraged to work through the examples in UserGuide.pod. Some
+ examples from UserGuide.pod are addressed in this document among those that
+ follow. 
+ 
+ Basically a widget can be "created" by simply calling the sub of the same name: 
+ 
+     my $main = new MainWindow;
+ 
+ will set aside the necessary system memory etc. for a new MainWindow widget (it
+ does not appear until after the MainLoop; call). The object "created" is then
+ callable via the variable $main. So, for example, if you wanted a Button in your 
+ MainWindow, then this: 
+ 
+     $main->Button();
+ 
+ would be a very basic example of a widget command. If you wanted to later call this
+ button widget you would need a "widget tag or ID" to "get a handle on it". Instead of
+ the above call try something like: 
+ 
+     my $button = $main->Button();
+ 
+ The variable $button is how you refer to the Button widget in subsequent calls,
+ such as when we call the pack routine: 
+ 
+     $button -> pack;
+ 
+ A complete script that incorporates these ideas to make a very plain button would
+ look like: 
+ 
+     #!/usr/bin/perl -w
+     use Tk;
+     use strict;
+     my $main = new MainWindow;
+     my $button = $main -> Button();
+     $button -> pack;
+     MainLoop; 
+ 
+ But who wants such a plain looking button? You can provide a number of different
+ widget configurations via calls to the configure routine as in: 
+ 
+     #!/usr/bin/perl -w
+     use Tk;
+     use strict;
+     my $main = new MainWindow;
+     my $button = $main->Button();
+     $button -> configure(-text => 'Press me!');
+     $button -> pack;
+     MainLoop; 
+ 
+ The Perl motto is "there is more than one way to do it." - perl/Tk remains quite true
+ to this motto as well. Note that the above script could have been written quite
+ succinctly without the use of either the $main or $button variables as: 
+ 
+     #!/usr/bin/perl -w
+     use Tk;
+     use strict;
+     new MainWindow -> Button(-text => 'Press me!') -> pack;
+     MainLoop; 
+ 
+ But if you want your widgets to actually do things then you must set up callback
+ procedures as discussed later... 
+ 
+ As of Tk-b9(.01) the - sign in front of options (like -text in the above example)
+ will be optional (hence ->Button(text => 'Press me!')). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.1. How do I get a Button to call a Perl subroutine? 
+ 
+ You may specify the -command option in the call to create & pack the button as in: 
+ 
+     $main->Button(-text => 'Print',
+                    -command => sub{do_print($filename, $font)}
+                    )->pack;
+ 
+ Where sub do_print { } is a subroutine that handles two arguments and is
+ declared elsewhere in the script. A full script example of the use of the above code is
+ presented in the second example(s) in UserGuide.pod 
+ 
+ (Full source code for this and other examples from UserGuide.pod may be found at 
+ http://w4.lns.cornell.edu/~pvhp/ptk/pod/. To load code from the web save as a local
+ file say ex1.pl, edit the first line to point to your perl interpreter, then change
+ permission: %chmod u+x ex1.pl, then execute the script: %ex1.pl.) 
+ 
+ The above method is called the "anonymous subroutine (closure)" method. As
+ discussed in Callback.pod one might have re-written that statement to use the
+ "reference to a sub" method thusly: 
+ 
+     $main->Button(-text => 'Print',
+                    -command => [ \&do_print , $filename, $font ]
+                    )->pack;
+ 
+ Note the backslash in front of \&do_print. This causes perl to generate a reference
+ to sub do_print rather than call it. (thanks Jim Stern :-) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.2. How do I arrange the layout of my widgets? 
+ 
+ To control the layout and appearance of widgets in a window one makes use of a 
+ geometry manager, as well as -padding, -fill, -expand, and -anchor options of
+ individual widgets. 
+ 
+ A geometry manager is any Tk procedure for controlling the arrangement of widgets
+ in your application window. The predominant geometry manager used in both Tcl/Tk
+ and perl/Tk is pack also known informally as the "packer" (other geometry
+ managers are the "placer" and the canvas widget itself but are much less popular.
+ There is also Nick Ing-Simmon's Table widget [discussed in a later question] and 
+ BLT_Table [which made it's way into perl/Tk thanks to Guy Decoux - but is also
+ discussed in a later question]. So far tixForm is for Tcl/Tk only, but a perl/Tk version
+ of Tix is in the works. You can invoke pack at the time of widget creation via calls
+ like: 
+ 
+     $widget->pack;
+ 
+ where widget can be any of the perl/Tk widget primitives. Widget option lists are
+ usually passed as an associative array (hash) in parentheses thusly: 
+ 
+     $widget(-option0 => value0,-option1 => value1)->pack;
+ 
+ pack is often used in conjunction with the frame container widget to arrange your
+ widgets much like a hiearchically arranged set of window panes (ultimately in a
+ rectangular "tiling" fashion of sorts). An example of this would be: 
+ 
+     my $top2 = $main->Toplevel;
+     my $frame = $top2->Frame;
+     $frame->pack;
+     $frame->Label(-text => 'Left2')->pack(-side => 'left');
+     $frame->Label(-text => 'Right2')->pack(-side => 'right');
+     $top2->Label(-text => 'Bottom2')->pack(-side => 'bottom');
+     MainLoop;
+ 
+ Note that pack itself is given parameters in this example. The default behavior for 
+ pack is equivalent to specifying -side => 'top' which can be overridden as in
+ the above example. 
+ 
+ (Full source code for this and other examples from UserGuide.pod may be found at 
+ http://w4.lns.cornell.edu/~pvhp/ptk/pod/. To load code from the web save as a local
+ file say ex2.pl, edit the first line to point to your perl interpreter, change
+ permission using: chmod u+x ex2.pl, then type the name of your script: 
+ ex2.pl.) 
+ 
+ One of the more helpful options to pass to pack when trying to get a given widget
+ layout "just right" is through padding: either -padx or -pady. The details of the
+ use of pad depend on which specific widget you are trying to pack. In fact you can
+ often add the -pad in the call to create the widget rather than in the call to pack. 
+ 
+ There is also the -anchor configuration option for widgets. A good introduction to
+ the 9 possible -anchor (and -overanchor) values is given by the popup demo
+ in your Tk-b#/ directory. 
+ 
+ When setting a widget within a frame next to another widget one may wish to make
+ use of the -fill => 'style' (where style = none | x | y | both) options
+ of either pack or the widget itself. A typical situation where this is used is in setting
+ up the Scrollbar next to a Canvas or Text widget. 
+ 
+ Another aspect to consider when laying out your widgets is their behavior under
+ resize operations (grabbing a part of the window frame and making it bigger or
+ smaller - details depend on your window manager). This may be controlled by the 
+ -expand option of either pack or the widget itself. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.3. How do I get a Popup to popup? 
+ 
+ For things like a simple "are you sure?" dialog box you might want to take a look at 
+ Dialog.pm which is discussed in a later question within this FAQ [15.1]. 
+ 
+ If you don't wish to require Tk::Dialog, you need something more complicated, or you
+ simply want to create your own independent window with widgets; you must first
+ setup a Toplevel in perl/Tk. The fourth example in UserGuide.pod gives a simple
+ example of how to call Toplevel. Quoting from that script: 
+ 
+     my $main = new MainWindow;
+     fill_window($main, 'Main');
+     my $top1 = $main->Toplevel;
+ 
+ Where sub fill_window is declared after the call to MainLoop;. When
+ running that script take careful note of which window pops up first, which window
+ has grabbed the active attention of your input device(s), and which widget within the
+ active window has the keyboard/mouse focus when all three windows are open. 
+ 
+ The use of Toplevels brings up the issue of grab - or which independent window is
+ presently "active" and which are activatable. To make a Toplevel window active
+ call grab thusly: 
+ 
+     $Top_widget->grab(grab_option);
+ 
+ where $Top_widget identifies the desired Toplevel (it would be either $top1 or 
+ $top2 in the sample script referred to above). grab_option could be -global -
+ but this is discouraged as a sign of "desparate programming style". To give a 
+ Toplevel "local grab" you may simply say: 
+ 
+     $Top_widget->grab;
+ 
+ That is, without an argument. 
+ 
+ The use of Toplevels may also bring up the issue of focus - or which window -
+ even which widget within a window - is presently "hot". You may call focus on an
+ entire Toplevel: 
+ 
+     $Top_widget->focus;
+ 
+ However, focus is most often used with individual widgets rather than a whole 
+ Toplevel. 
+ 
+ To de-iconify a widget there is in fact a Popup function that may be called thusly: 
+ 
+     $Top_widget->Popup();
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.4. How do I bind keyboard keys? 
+ 
+ There are many default key bindings built in to the widgets of perl/Tk. Making proper
+ use of them often involves setting up the right callback. (You may wish to consult the
+ examples in BindTable.pod for help with this subject.) 
+ 
+ The basic idea is: 
+ 
+     $widget -> bind('<keyname>' => action);
+ 
+ Where $widget is the tag or ID of the widget for which the bindings are to hold (note
+ for global bindings you have to bind to <All>, for semi-global bindings you need to
+ bind to all the relevant widgets in your application), '<keyname>' can be things like:
+ 
+     <Key> or <KeyPress> or <Any-KeyPress>
+     <KeyRelease>
+     <Button> or <ButtonPress>
+     <ButtonRelease>
+     <Button-1> or <B1> 
+     <Double-1>
+     <Enter>
+     <Leave>
+     <Motion>
+ 
+ To figure out what names perl/Tk uses for such <bindings> use the "binder-finder"
+ on a widget's .pm file. For example, you could find bindings hidden inside of 
+ Button.pm by typing this at your shell prompt: 
+ 
+     perl -ne 'print if s/.*(<[^>]*>).*/$1/g;' Button.pm
+ 
+ while in the directory where Button.pm is located (and if you are not there then
+ simply specify the /path/to/Button.pm). Note that due to inheritance (e.g.the
+ type of script bindings that are being discussed here) what the binder-finder turns up
+ may not be the last word on a given widget's behaviour. This may be especially true
+ for a widget inside of a compound/composite widget. Note also that the binder-finder
+ will turn up things like <FILEHANDLES> as well as honest <Bindings>.
+ Discrimination in its use is called for (and while your at it you could have just as easily
+ used an editor and actually examined the code directly now couldn't you?). 
+ 
+ To get an idea of what the code is for a key that you are interested in try running the 
+ xlib_demo that comes in your Tk-b# directory. Hold your mouse pointer over the
+ window that appears and simply type the key that you are interested in. The code
+ should appear in the window. If you do not have perl/Tk up and running yet try "
+ xmodmap -pk" or look directly at the /usr/include/X11/keysymdef.h file
+ where keysym names are given with an XK_ pre-pended. Do not try things like the
+ Tcl/Tk %k symbols in perl scripts. %Ks will be mis-interpreted as non-existant perl
+ hashes. Instead look at the Xevent function. 
+ 
+ Ali Corbin <corbin@adsw.fteil.ca.boeing.com> recently posted a great little script for
+ determining keyboard key bindings on a MainWindow: 
+ 
+     #!/usr/local/bin/perl -w
+     use Tk;
+     $top = MainWindow->new();
+     $frame = $top->Frame( -height => '6c', -width => '6c',
+                             -background => 'black', -cursor => 'gobbler' );
+     $frame->pack;
+     $top->bind( '<Any-KeyPress>' => sub
+     {
+         my($c) = @_;
+         my $e = $c->XEvent;
+         my( $x, $y, $W, $K, $A ) = ( $e->x, $e->y, $e->K, $e->W, $e->A );
+ 
+         print "A key was pressed:\n";
+         print "  x = $x\n";
+         print "  y = $y\n";
+         print "  W = $K\n";
+         print "  K = $W\n";
+         print "  A = $A\n";
+     } );
+     MainLoop();
+ 
+ To bind the action of one widget to that of another try taking a look at the .pm file
+ for the widget of interest - is there a binding function already defined? If so you may
+ use it. An example would be the use of "Up" & "Down" Buttons for a Listbox:
+ one could bind the Buttons to call Tk::Listbox::UpDown, however, Guy
+ Decoux describes a much more clever way to use the <Up> and <Down> already
+ defined in Listbox.pm (this does not work with Tk-b9.01): 
+ 
+     #!/usr/local/bin/perl
+     use Tk;
+     $top = MainWindow->new;
+     $lb = $top->Listbox(-height => 10);
+     for($i=0; $i < 120; $i++) {
+       $lb->insert('end', $i);
+     }
+     $f = $top->Frame;
+     $up = $f->Button(
+            -text => "Up",
+            -command => [ $lb->bind(ref $lb, '<Up>'), $lb]
+            );
+     $down = $f->Button(
+              -text => "Down",
+              -command =>sub {&{$lb->bind(ref $lb, '<Down>')}($lb)}
+              );
+     $up->pack(-side => 'left');
+     $down->pack;
+     $f->pack;
+     $lb->pack;
+     MainLoop;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.5. How do I add bindings? 
+ 
+ On Fri, 15 Sep 95 10:30:56 BST Nick Ing-Simmons
+ <Nick.Ing-Simmons@tiuk.ti.com> writes: 
+ 
+ 
+ Re: Multiple binds to a single widget?
+ **************************************
+ 
+ On Thu, 14 Sep 1995 14:57:54 -0400
+ Alain St <astdenis@cmc.doe.CA> writes:
+ !In the tcl/tk doc I have, they say that prepending the script 
+ !with '+' appends the new binding to the current one.
+ !
+ !How do I do that in perlTk? 
+ !
+ 
+  You cannot do that that way (yet?) - one issue is what it would mean to prepend
+  '+' to a perl/Tk callback : 
+ 
+     $widget->bind('<A>','+',[\&subname,$arg]); 
+     # did not look right to me
+ 
+  Other issue is that I would need to manage a list-of-callbacks in glue code. 
+ 
+  Bind your new command to a new tag: 
+ 
+     $widget->bind('Extra',....);
+ 
+  And add Extra to the widgets bindtags: 
+ 
+     $widget->bindtags([ref($widget),$widget,'Extra',$widget->toplevel,'all']);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.6. How do I bind the action of a slider (sic) to ... ? 
+ 
+ Technically speaking they are called Scrollbars (not sliders) and one must 
+ configure the action of the desired widget to call the Scrollbars (i.e. bind is
+ not involved here) 
+ 
+ A common task using Scrollbars is to configure things like Canvas, 
+ Listbox, or a Text widgets to be updated (change appearance) when the slider of
+ the acompanying Scrollbar is moved by the user. 
+ 
+ As an example consider the code that sets up a twelve element Listbox and an
+ accompanying vertical Scrollbar: 
+ 
+     my $main = new MainWindow;
+     my $box = $main->Listbox(-relief => 'sunken', 
+                              -width => -1, # Shrink to fit
+                              -height => 5,
+                              -setgrid => 'yes');
+     my @items = qw(One Two Three Four Five Six Seven
+                    Eight Nine Ten Eleven Twelve);
+     foreach (@items) {
+        $box->insert('end', $_);
+     }
+     my $scroll = $main->Scrollbar(-command => ['yview', $box]);
+ 
+ So far so good. But merely setting them up does not mean that the Listbox even
+ knows that the Scrollbar is lying next to it. Note that the scalar variable 
+ $scroll is how we refer to the Scrollbar, thus, hooking the $box up to handle 
+ $scroll events is a matter of configuration: 
+ 
+  
+     $box->configure(-yscrollcommand => ['set', $scroll]);
+ 
+ A complete script that makes use of this code (and adds the necessary calls to pack
+ and MainLoop;) is given as the fifth example in UserGuide.pod (and may be found
+ at http://w4.lns.cornell.edu/~pvhp/ptk/pod/.) 
+ 
+ There was an old Perl/Tk tendency to have a bunch of ScrlFoo widgets (such as 
+ ScrlListbox). The use of such widgets is now deprecated in favor of a new 
+ Scrolled class, as in: 
+ 
+     $w = $patent->Scrolled('Text',...);
+ 
+ The widgets that can be ->Scrolled() include: 
+ 
+  o Canvas (::Axis) 
+  o Entry 
+  o Ghostview 
+  o HList 
+  o HTML (::Web) 
+  o Listbox 
+  o Pod 
+  o Text (::ROText) (::TextUndo) 
+  o Tiler 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.7. How do I configure a Scrollbar to scroll multiple widgets? 
+ 
+ Note that the widget type that you wish to scroll can be important as a scroll "unit" on
+ a Text or Listbox may be a character (several pixels - depending on font)
+ whereas it would be an X "units" on a Canvas (could be pixel - but you may also
+ specify other units). 
+ 
+ A concrete answer for scrolling 3 Listboxes comes courtesy of Frederick L.
+ Wagner <derf@ti.com>: 
+ 
+  From a working example of multi-xscrolling: 
+ 
+     sub multiscrollx
+     {  # multiscrollx
+      my ($sb,$wigs,@args) = @ARG;
+      my $w;
+      foreach $w (@$wigs)
+      {
+        $w->xview(@args);
+      }
+     }  # multiscrollx
+  
+     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+       $sh->configure( -command => [ \&multiscrollx, $sh,
+                          [$scratchrule,$ruleheader,$ruletable]]);
+       $ruletable->configure(  -xscrollcommand => [ 'set', $sh]);
+       $ruleheader->configure( -xscrollcommand => [ 'set', $sh]);
+       $scratchrule->configure(-xscrollcommand => [ 'set', $sh]);
+ 
+  In this case,
+  $sh is a horizontal Scrollbar,
+  $ruletable and $scratchrule are Tables
+  $ruleheader is an Entry
+ 
+  However, this approach is good for any widget with X-scrolling capability, I
+  think. So the Y counterpart should be: 
+ 
+     sub multiscrolly
+     {  # multiscrolly
+      my ($sb,$wigs,@args) = @ARG;
+      my $w;
+      foreach $w (@$wigs)
+      {
+        $w->yview(@args);
+      }
+     }  # multiscrolly
+  
+     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+       $sv->configure( -command => [ \&multiscrolly, $sv,
+                                     [$l1,$l2,$l3]]);
+       $l1->configure( -yscrollcommand => [ 'set', $sv]);
+       $l2->configure( -yscrollcommand => [ 'set', $sv]);
+       $l3->configure( -yscrollcommand => [ 'set', $sv]);
+ 
+  Hope that helps. 
+ 
+ Greg VanSickle <vansickl@bnr.ca> points out that this little script snippet does not
+ provide for the binding of '<Button-2<' that he is accustomed to. He wrote a
+ package called DSListbox to address this binding issue. 
+ 
+ Conversely, Jong Park asked how to setup multiple Scrollbars to scroll the same
+ widget. Nick Ing-Simmon's reply makes use of an anonymous sub and can be
+ summed up in a little script that scrolls a Text widget (to see the scrolling in action
+ type more than 20 lines of text into the widget):
+ 
+     #!/usr/local/bin/perl -w
+     
+     use Tk;
+     my $mw = MainWindow->new();
+     
+     my $s1 = $mw->Scrollbar(-orient => 'vertical');
+     my $s2 = $mw->Scrollbar(-orient => 'vertical');
+     
+     $s1->pack(-side => 'left', -fill => 'y');
+     my $t = $mw->Text(
+         -yscrollcommand =>  sub{$s1->set(@_), $s2->set(@_)},
+         -wrap           => 'word',
+         -width          => 70,
+         -height         => 20, 
+         -font           => $font,
+         -setgrid        => 1,
+     )->pack(-side => 'left');
+     $s2->pack(-side => 'right', -fill => 'y');
+     $s1->configure(-command => [$t => 'yview']);
+     $s2->configure(-command => [$t => 'yview']);
+     
+     MainLoop;
+     
+     __END__
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.8. How do I display a bitmap? 
+ 
+ You can display X bitmaps on your widgets with the -bitmap configuration option.
+ Typically -bitmaps are configured into Label, Frame, Button, etc. widgets (
+ Canvas widgets are another story however see question [10.1] below). In order to
+ emphasize the bitmap option itself let us assume we were specifying a bitmap for a 
+ Label with a call like: 
+ 
+     $main->Label(-bitmap => 'bitmap-name')->pack;
+ 
+ Where bitmap-name could be any of the built in Tk bitmaps: error, gray25, 
+ gray50, hourglass, info, question, questhead, warning (see the 
+ widget demo for a full list). 
+ 
+ In order to use some of the bitmaps in the perl5/Tk/demos/images/ directory
+ you would specify a fuller path name like: 
+ 
+     $main->Label(-bitmap => "\@$tk_library/demos/images/face")->pack;
+ 
+ Note the escaped "\@" on the directory specification (as well as the use of the 
+ $tk_library variable imported by use Tk;). If you wanted to specify a file
+ called foobar.xbm in the directory where you were running the script then either: 
+ 
+     $main->Label(-bitmap => '@foobar.xbm')->pack;
+ #or
+     $main->Label(-bitmap => "\@foobar.xbm")->pack;
+ 
+ should work just fine. In another directory however that would be a problem. So
+ something like: 
+ 
+     $main->Label(-bitmap => "\@$ENV{'HOME'}/img/foobar.xbm")->pack;
+ 
+ will help someone who has an img/foobar.xbm file in their $HOME directory. If
+ you don't mind the non-portability then hard-wiring in the full path name will help
+ as well. (Or if you have write access then put your files in Tk/demos/images/ e.g.)
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.9. How do I display an image? 
+ 
+ You will want to get a "Photo" handle on the file as in the following example where 
+ 'imggif' is the Photo handle for a gif file that is distributed with Tk-b#: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+ 
+     $main ->Label(-text => 'Main')->pack;
+     $main -> Photo('imggif', 
+                    -file => "$Tk::tk_library/demos/images/earth.gif");
+     my $l = $main->Label('-image' => 'imggif')->pack;
+ 
+     $main->Button(-text => 'close',
+                   -command => sub{destroy $main}
+                   )->pack(-side => 'left');
+     $main->Button(-text => 'exit',
+                   -command => [sub{exit}]
+                   )->pack(-side => 'right');
+     MainLoop;
+ 
+ (Canvas widgets are another story however see question a later question within this
+ FAQ). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.10. What Image types are available? 
+ 
+ In addition to the Tk builtin bitmaps there is support for reading images from files
+ in formats such as: X11 Bitmaps (.xbm), X Pixmaps (.xpm), and Graphics Inline
+ Format (.gif). See the CrtPhImgFmt man page for more info (if you have Tk 4.X
+ installed). (In order to support other formats you might also consider running
+ through a netpbm filter.) 
+ 
+ For perl generation of images see the question (later in this FAQ) on graphics
+ modules. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.11. Is there any way to have more than one Listbox contain a selection? 
+ 
+ To allow more than one Listbox to contain a "selection", (or at least a highlighted
+ item - which need not be the actual selection) specify the configuration option: 
+ 
+     -exportselection => 0
+ 
+ which will dis-associate Listbox's selection from X selection (only one window
+ can have X selection at a time). 
+ 
+ Here is a rather simple script that illustrates what happens when only one Listbox
+ has -exportselection => 0 specified: 
+ 
+     #!/usr/bin/perl -w
+     
+     use Tk;
+     
+     my $main = MainWindow->new;
+     
+     my @fruits = ('Apple','Banana','Cherry','Date','Elderberry','Fig');
+     my @nuts   = qw(Almond Brazil Chestnut Doughnut Elmnut Filbert);
+     
+     my $fruit_list = $main->Listbox();
+     for (@fruits) { $fruit_list -> insert('end',$_); }
+     $fruit_list->pack();
+     my $fruitprint_button = $main->Button(
+                               -text => "print selection",
+                               -command => sub{ printthem($fruit_list) }
+                                           )->pack;
+     
+     my $nut_list = $main->Listbox(
+                                   -selectmode => 'multiple',
+                                   -exportselection => 0,
+                                  )->pack;
+     for (@nuts) { $nut_list -> insert('end',$_); }
+     my $nutprint_button = $main->Button(
+                               -text => "print selection(s)",
+                               -command => sub{ printthem($nut_list) }
+                                           )->pack;
+     
+     my $quit_button = $main->Button(-text => "quit program", 
+                                     -command => sub{exit},
+                                     )->pack();
+     
+     MainLoop;
+     
+     sub printthem {
+         my $list = shift;
+         my @entries = $list->curselection;
+         for (@entries) { print $list -> get($_),"\n";}
+     }
+ 
+ For a more extensive example of Listbox usage combined with some perl data
+ structure exploitation see the script at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/lb-constructor
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.12. How do I select a range of tags in a Text widget? 
+ 
+ A question arose concerning getting a range of selections from a Text widget. Nick
+ Ing-Simmons' answer mentions several possibilities including: 
+ 
+  Keyboard Copy/Paste 'is' implemented of course... 
+ 
+ 
+ Subj:   RE: $Text->tag('ranges', 'sel') - does this work?
+ 
+ In <199512291957.OAA02609@ohm.nrl.navy.mil>
+ On Fri, 29 Dec 1995 14:57:42 -0500
+ Charles J Williams <chas@ohm.nrl.navy.mil> writes:
+ !I was writing a little tk perl today, and i decided to try to 
+ !implement a copy/paste using the 'sel' tag
+ !
+ !I enabled exportselection, and then try to probe the select 
+ !region with:
+ !
+ !    $buffer = $text->tag('ranges', 'sel');
+ !
+ !$buffer comes back with one entry, the end of the selection.
+ 
+  That is to be expected - the scalar gets assigned the last element of the list. 
+ 
+ 
+ !I tried:
+ !
+ !    @buffer = $text->tag('ranges', 'sel');
+ !
+ !same difference.
+ 
+  This seems to work for me: 
+ 
+     ($start,$end) = $text->tagRanges('sel');
+ 
+  In perl/Tk ->tagRanges(...) is an alias for ->tag('ranges',...) 
+ 
+  The following subroutine can also probe and print the tagRanges: 
+ 
+     sub showsel  
+     { 
+      my $text = @_;
+      my @info = $text->tagRanges('sel');
+      if (@info)
+       {
+        print "start=$info[0] end=$info[1]\n" 
+       }
+     }
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.13. How do I group Radiobuttons together? 
+ 
+ Specify the -variable option on each one. Here is an example pulled from the 
+ icon.pl demo script: 
+ 
+      $letters = '';
+      my $w_frame_left_b3 = $w_frame_left->Radiobutton(
+          -bitmap   => "\@$tk_library/demos/images/letters",
+          -variable => \$letters,
+          -value    => 'full',
+      );
+      my $w_frame_left_b4 = $w_frame_left->Radiobutton(
+          -bitmap   => "\@$tk_library/demos/images/noletters",
+          -variable => \$letters,
+          -value    => 'empty',
+      );
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.14. How do I specify fonts? 
+ 
+ The quick answer is to specify the font configuration option of your widget as in: 
+ 
+     #!/usr/local/bin/perl -w
+     use Tk;
+     $main = MaiWindow->new();
+     $labl = $main -> Label('-text' => "Foo", '-font' => "fixed");
+     $labl -> pack;
+     MainLoop;
+ 
+ The long answer involves figuring out what fonts you have access to locally. The Unix
+ programs xlsfonts and xfontsel are useful in this regard. 
+ 
+ The perl/Tk version of xfontsel was distributed as the font_test script in the
+ Tk-b9.01 build directory. 
+ 
+ See also the later question (within this FAQ) on international fonts. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.15. How do I get the entry in an Entry? 
+ 
+ You want to call get on the return value of the widget itself. Here is how it may be
+ used in a simplified version of example 1.1 from the Tk::UserGuide where a Button
+ is set up to call a sub where the call to get lies: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+ 
+     my $main = MainWindow -> new();
+     my $entry = $main -> Entry();
+     $entry -> pack;
+     $main->Button(-text => 'Print', 
+                   -command => sub{do_print($entry)}
+                   )->pack;
+     MainLoop;
+ 
+     sub do_print {
+         my ($widget) = @_;
+         my $entered = $widget -> get();
+         print "The string \"$entered\" was entered.\n";
+     }
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.16. How do I hide a password Entry? 
+ 
+ Set the -show option to zero, as in this example: 
+ 
+     $entry = $form->Entry(-textvariable => \$user_entry, 
+                           -show => 0);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.17. How do I obtain Menus that do not tear off? 
+ 
+ Nick Ing-Simmons outlined a couple of ways to achieve this result. The critical
+ feature being the -tearoff => 0 configuration option of the Menu. In Nick's
+ words: 
+ 
+     my $mb = $parent->Menubutton(...);    # The button
+     my $menu = $mb->Menu(-tearoff => 0);  # Create a non-tearoff menu
+     $mb->configure(-menu => $menu);       # Tell button to use it.
+     $mb->command(....);
+ 
+  Above is for clarity - you can loose $menu variable: 
+ 
+     my $mb = $parent->Menubutton(...);  
+     $mb->configure(-menu => $mb->Menu(-tearoff => 0));  
+     $mb->command(....);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10. How do I get a Canvas to ... ? 
+ 
+ The Canvas widget is the most configurable and versatile. With versatility comes
+ complication however, and it is certainly deserving of its own special section within
+ this FAQ... 
+ 
+ You might also see the examples in the widget demo especially the "canvas item
+ types" selection (which runs the items.pl demo script). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.1. Display a bitmap? 
+ 
+ Unlike other widgets the Canvas does not take the -bitmap configuration option.
+ One of the ways to place things - including bitmaps - onto a Canvas is to call 
+ create on it. To emphasize how a Canvas handles bitmaps differently from the
+ configurable widgets let me assume that you wanted to specify the 'hourglass' built in
+ bitmap in the following. (For more on xbm file specification see a previous question
+ [9.8] within this FAQ.) Here is a way to combine the Canvas; and create; calls: 
+ 
+     my($canvar) = $main->Canvas();
+     my($bittag) = $canvar->create('bitmap',10,10, -bitmap=>'hourglass');
+     $canvar->pack;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.2. Erase a display? 
+ 
+ To erase something like a bitmap call delete on the item. Assuming your Canvas
+ tag is $canvar and your item tag it $bittag (as in the previous [10.1] question)
+ then the call proceeds like: 
+ 
+     $canvar -> delete($bittag);
+ 
+ This is of course useful in a callback. For example to configure a Button to do your
+ deletion for you you could say something like: 
+ 
+     $main->Button(-text   => 'clear', 
+                   -command=>sub{$canvar -> delete($bittag)}
+                  )->pack;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.3. Display an Image? 
+ 
+ Just as for the other widget types there is a two step process of first getting a "Photo"
+ handle on the file of interest. For the Canvas (unlike the other widgets) one then
+ makes a call to create an image as in the following example where 'imggif' is
+ the Photo handle for a gif file that is distributed with Tk-b#: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+     my $canvar = $main ->Canvas;
+ 
+     $main->Photo('imggif', 
+                   -file => "$Tk::tk_library/demos/images/earth.gif");
+     $canvar->create(qw(image 5c 5c), '-image' => 'imggif');
+ 
+     $canvar->pack;
+     MainLoop;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.4. What things can be created on a Canvas? 
+ 
+ The following types can be used in $canvar->create calls: 
+ 
+     arc        sections of circle
+     bitmap     for X11 bitmap files/builtins
+     image      for Photo image types (gif, xpm...) 
+     line
+     oval       includes circles
+     polygon    may be -filled
+     text       similar to Text widget primitive
+     window     allows embeddding of other widgets
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.5. How do I use the Canvas as a geometry manager? 
+ 
+ In a call to create a window (or anything) on your Canvas you need to specify its
+ position - this is in part how a Canvas can be used as a geometry manager. e.g.: 
+ 
+     my($bittag) = $canvar->create('bitmap',10,10, -bitmap=>'hourglass');
+ 
+ Specifies the x=10, y=10 screen pixel location (from the upper left). Other possible
+ units are: 
+ 
+ 
+     tag  unit             example
+          pixels           25,50   # i.e. no unit tag at all
+     m    milliimeters     10c,20c
+     c    centimeters      1c,2c
+     p    points (1/72")   35p,70p
+ 
+ There can be a great deal more to it than just units, however. Note the following
+ question posed and answered by Eric J. Bohm. 
+ 
+     Eric J. Bohm <bohm@cs.buffalo.edu> wrote:
+     !I've got a row of entries packed side by side in a frame.  
+     !These frames are packed on top of each other.  
+     !So, when someone deletes a row, the lower ones bubble 
+     !up automatically.  This works just fine and dandy, and let me
+     !extend my thanks to our brave and energetic pTk team.
+     !
+     !The trick here is what widget do I put this in so that 
+     !it will be scrollable when I have too many rows to 
+     !fit on the screen?
+       [details and complaints]
+ 
+  Following up to my own message here. 
+ 
+  All right, after several false leads, I spent 3 hours fighting a canvas widget and
+  pounding my head against the canvas.html doc, until I finally understood how to
+  include my entries in a frame in a window in the canvas and get things to scroll
+  nicely. 
+ 
+  Turns out that the whole thing isn't all that hard to do once I understood how
+  canvas widgets work. 
+ 
+  Not sure if its of general interest, but here's the snippet, which was stolen from
+  the items demo inside the widget_lib and then brutally hacked. 
+ 
+  Perhaps a simpler demo would have been easier to use as a guide, but I got there
+  eventually, so my thanks for the widget demo.
+ 
+     #----------------------------------------
+     my $c = $w_frame->Canvas();
+     $c->configure(
+          -height       => '300',
+          -width        => '600',
+          -relief       => 'sunken',
+          -bd => 2,
+      );
+      my $w_frame_vscroll = $w_frame->Scrollbar(
+                                          -command => ['yview', $c]
+                                               );
+      my $w_frame_hscroll = $w_frame->Scrollbar(
+                                          -orient => 'horiz', 
+                                          -command => ['xview', $c]
+                                                );
+      $c->configure(-xscrollcommand => ['set', $w_frame_hscroll]);
+      $c->configure(-yscrollcommand => ['set', $w_frame_vscroll]);
+      $w_frame_hscroll->pack(-side => 'bottom', -fill => 'x');
+      $w_frame_vscroll->pack(-side => 'right', -fill => 'y');
+      $c->pack(-expand => 'yes', -fill => 'both',-side=>'top');
+      my $entryframe=$c->Frame;
+      my $c_win= create $c 'window','0','0',
+                           -window=>$entryframe,
+                           -anchor=>'nw';
+      #----------------------------------------
+ 
+  Where $c -> configure( -scrollregion => [$top, $left,
+  $right, $bottom]) can be used to size things nicely once you find out how
+  big it'll be. 
+ 
+  And the widgets you want scrolled should be slaves of $entryframe. 
+ 
+  Vastly more robust than anything I had running in the BLT Table. 
+ 
+  EJB 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.6. How do I get a Canvas to output PostScript(c)? 
+ 
+ Many thanks to Tom Oelke <tpo9617@rit.edu> for providing this question, answer
+ & snippet of code: 
+ 
+  The following section of code gets the postscript code for the section of canvas
+  that's top-left corner is at $min_x, $min_y, and has a width and height
+  equivalent to the displayed region. This ps code is then piped out to lpr to be
+  printed. 
+ 
+     my $ps = $canvas->postscript( '-x' => $min_x,
+                                   '-y' => $min_y,
+                                   -width => $canv->Width,
+                                  -height => $canv->Height);
+     open (PS, "| lpr"); # customize with -Pname e.g. 
+     print PS $ps;
+     close (PS);
+ 
+ Whereas you would use something like: 
+ 
+     open (PS, ">file.ps"); # to output to a file
+     print PS $ps;
+     close (PS);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.7. How do I get a PostScript(c) output of a Canvas w/ widgets? 
+ 
+ In general you don't. You can't do it in Tcl/Tk either (if that is any consolation). Nick
+ Ing-Simmons posted an explicit discussion of what is involved: 
+ 
+ 
+ Subj: RE: Canvases and postscript output
+ 
+ On Tue, 28 Nov 95 14:37:09 PST
+ Davis <morry@dsg.tandem.com> writes:
+ ! I have a canvas with text and some entry widgets that I want to create
+ !postscript from. I used the 
+ !widget->postscript( -file => 'ld.ps', -colormode  => 'gray');
+ !the file gets created but its empty. Is there some other options I need?
+ 
+  Core Tk cannot write postscript for embedded windows, the best it could do
+  would be to grab a Pixmap of the window as displayed. This is fine if the window
+  is visible, but if it is scrolled off screen or under another application there is no
+  pixmap. 
+ 
+  Only complete fix is to have a ->postscript method for every possible
+  widget which can render un-mapped widgets. This is non-trivial task. 
+ 
+ 
+ !Also I have a scrollbar for this canvas and when I scroll  the entry widget
+ !actually scroll part way out of the frame the canvas is in. Why does this
+ !happen and can I fix it? 
+ 
+  The Entry widgets need to be descendants of the canvas or they just get
+  clipped to their parent. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.8. How do I get the size of a Canvas? After a re-size? 
+ 
+     $canvas->cget(-width);
+ 
+ simply returns the size of the canvas when it was created, whereas 
+ 
+     $canvas->Width;
+ 
+ will get the answer even after a re-size. Substitute [Hh]eight for [Ww]idth in
+ the above if that is what you want. 
+ 
+ Nick Ing-Simmons points out that if you want to have your Canvas be able to grow
+ to arbitrarily large sizes be sure to specify the -expand or -fill options when you 
+ ->pack the Canvas. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 10.9. How do I bind different actions to different areas of the same Canvas? 
+ 
+ Kobayasi Hiroaki <kobayasi@sowa.is.uec.ac.jp> recently posted an extraordinary
+ little script that addresses this question quite succinctly: 
+ 
+  How about this?
+  ## I don't know whether this is a good solution or not.
+  ## but it works under Tk-b9 + perl5.002b1f.
+ 
+     
+     #!/usr/local/bin/perl -w
+     use Tk;
+     
+     ($c = MainWindow->new->Canvas)->
+        pack(-fill => 'both', -expand => 1);
+     # to survive under Tk-b8. 
+     # You don't need paren before pack in b9.
+     
+     ($pop1 = $c->Menu)->command(-label => "FOO");
+     ($pop2 = $c->Menu)->command(-label => "BAR");
+     
+     $c->create(oval => 0, 0, 100, 100, 
+                -fill => 'black', 
+                -tags => ['popup']);
+     
+     $c->Tk::bind($c, '<3>', [\&PopupOnlyThis, $pop1]);
+     $c->bind('popup', '<3>', [\&PopupOnlyThis, $pop2]);
+     
+     sub PopupOnlyThis {
+         print "@_\n";
+         my($c, $pop) = @_;
+     
+         # to prevent multiple popup.
+         Tk->break if defined $Tk::popup;
+     
+         my $e = $c->XEvent;
+         $pop->Popup($e->X, $e->Y);
+         # Tk::Menu::Popup sets $Tk::popup.
+     
+     }
+     MainLoop;
+     
+     $Tk::popup = undef; # to kill warning.
+     
+     __END__
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11. Common Problems. 
+ 
+ Everything in Tk-land is a reference. When defining callbacks take care to pass
+ variables by reference. Callbacks are closures and to ensure a variable gets its current
+ value, as opposed to its value when the callback is defined, pass by reference, e.g.: 
+ 
+     $frog = 123;
+     $b = $mw->Button(
+         -text    => 'Push Me',
+         -command => [
+             sub {
+                my($widget, $frog) = @ARG;
+                print STDERR "widget=$widget!\n";
+                print STDERR "frog=$$frog!\n";
+             }, $mw, \$frog,
+          ],
+     ); # end Button definition
+ 
+ If $frog is not passed by reference the print statement will always output "123"
+ (actually, the print as it exists will print nothing since it's trying to dereference 
+ $frog, which presumably is now not a reference). Note that by definition all perl/Tk
+ widgets are already references, since they're simply Perl objects, and that's why you
+ do not have to print $$widget! 
+ 
+ A good "reference" for handling references and dereferencing are the perlref(1)
+ and perlobj(1) man pages. A good "reference" for the various data types you will
+ encounter in this kind of perl programming is Tom Christiansen's Perl Data
+ Structures Cookbook which is now available as the perldsc(1) man page. 
+ 
+ Also beware the traps that befall perl4 programmers in making the move to perl 5.
+ References for this include the new perltrap(1) man page as well as William
+ Middleton's perl425 trap document at: 
+ 
+     http://www.perl.com/perl/all_about/perl425.html
+ or
+     http://w4.lns.cornell.edu/~pvhp/ptk/misc/perl425.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.1. What do the ->, => and :: symbols mean? 
+ 
+ The -> is the "infix dereference operator". In other words it is the means by which
+ one calls a sub with a pass by reference (among other things you can do with ->). As
+ stated above most things in calls to perl/Tk routines are passed by reference. The ->
+ is used in perl just as in C or C++. (Most of the widget primitives are elements of the 
+ Tk:: "perl class".) A simple example of dereferencing would be: 
+ 
+     $x = { def => bar };  # $x is a reference to an anon. hash
+     print $x->{def},"\n"; # prints ``bar''
+ 
+ Note that in the case of calling perl/Tk subs there may be more than one way to call
+ by reference. Compare 
+ 
+     my($top) = MainWindow->new;
+ 
+ with 
+ 
+     my($top) = new MainWindow;
+ 
+ But in general you will be making extensive use of calls like: 
+ 
+     $top -> Widge-type;
+ 
+ There is a clear and succint discussion of references, dereferences, and even closures
+ in man perlref(1) or see the perl 5 info page at: 
+ 
+     http://www.metronet.com/perlinfo/perl5.html
+ 
+ The use of the => operator is quite common in perl/Tk scripts. Quoting from man
+ perlop(1): 
+ 
+  The => digraph is simply a synonym for the comma operator. It's useful for
+  documenting arguments that come in pairs. 
+ 
+ You could say that => is used for aesthetic or organizational reasons. Note in the
+ following how hard it is to keep track of whether or not every -option has an 
+ argument: 
+ 
+     $query -> Button(-in,\$reply,-side,'left',-padx,2m,-pady,
+      2m,-ipadx,2m,-ipady,1m)->pack(-side,'bottom');
+ 
+ As opposed to: 
+ 
+     $query ->Button( -in => \$reply,
+                      -side => 'left',
+                      -padx => 2m,
+                      -pady => 2m,
+                      -ipadx => 2m,
+                      -ipady => 1m
+                     )->pack(-side => 'bottom');
+ 
+ By the way if you wanted the numeric "greater than or equal" you would use >= not =>.
+ 
+ While the :: symbol can be thought of as similar to the period in a C struct, it is
+ much more akin to the :: class scope operator in C++: 
+ 
+     a.b.c;       /* something in C */
+     a::b::c();   // function in C++ 
+     $a::b::c;    # a scalar in Perl 5
+     @a::b::c;    # a list in Perl 5
+     %a::b::c;    # an associative array or "hash" in Perl 5
+     &a::b::c;    # a function in Perl 5
+ 
+ It is also analogous to the single forward quotation mark in perl 4: 
+ 
+     $main'foo;   # a $foo scalar in perl 4
+     $main::foo;  # a $foo scalar in Perl 5
+ 
+ For backward compatibility perl 5 allows you to refer to $main'foo but 
+ $main::foo is recommended. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.2. What happened to the ampersands &? 
+ 
+ Perl 4 programmers especially may be surprised to find that as of Perl 5.0 the
+ ampersand & may be omitted in a call to a subroutine if the subroutine has been
+ declared before being used. Actually you can even get around the declare before omit
+ ampersand rule by using the subs.pm pragma, or by pre-declaring (without
+ defining) as in a script like: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+     sub Mysub;  #pre-declare allows calling Mysub()
+ 
+     ...Other main/Tk stuff - 
+             including call to Mysub() sans &...
+ 
+     sub Mysub {
+ 
+         ...Mysub stuff...
+ 
+     }
+ 
+ Note however that one place the \& reference is sometimes used in perl/Tk in the
+ setting up a callback for a widget. Other references are possible: e.g. \$foo is a
+ reference to the scalar variable $foo (this was true even under perl 4). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.3. What happened to the quotation marks? 
+ 
+ Perl 4 programmers especially may be surprised to find a serious dearth of quotation
+ marks around strings in perl 5 scripts such as in perl/Tk. The "rules have been
+ relaxed" somewhat for the use of quotation marks. Basically it is OK to leave them
+ out if the context of the string in question is unambiguous. However, it never hurts to
+ leave them in and may help readability. 
+ 
+ Here is Larry Wall's synopsis of the string situation: 
+ 
+ Newsgroups: 
+    comp.lang.perl.misc 
+ Subject: 
+    Re: To string or not to string... 
+ 
+ In article <4e49fv$j0u@panix3.panix.com>,
+ Andy Finkenstadt <genie@panix.com> wrote:
+ ! Back when I was learning perl (after receiving a review copy of
+ ! learning perl, and buying the real perl book, each from ORA),
+ ! I always got bit by when I needed to use "strings" and when
+ ! I could get away with bare_words within braces for associative
+ ! arrays.  (Yes, this is under 4.036 if it matters.)
+ ! 
+ ! the most typical example would be:
+ ! 
+ ! When must I use $assoc{"trailer"} and when can I get away with
+ ! $assoc{trailer}?   Similarly, $ENV{CONTENT_LENGTH} versus
+ ! $ENV{"CONTENT_LENGTH"}?  Unfortunately sometimes my strings
+ ! end up being numbers in their own right, i.e.:  $message{"0"}
+ ! or $msg=0; $message{$msg}.  Which is more appropriate,
+ ! which are merely stylistic, and which are stricly perl5
+ ! features now that I'm upgrading most of my installations
+ ! of perl.
+ 
+  Perl 4 let you use a "bareword" for a string if it had no other interpretation. It
+  would warn you under -w if you used a word consisting entirely of lower-case
+  characters, since such a word might gain an interpretation someday as a
+  keyword. 
+ 
+  Perl 5 still works the same way, but with several twists. 
+ 
+  1. ) Since you can now call predeclared subroutines as though they were builtins,
+    you have to worry about collisions with subroutine names too. However... 
+  2. ) You can completely disallow the default interpretation of barewords by
+    saying "use strict subs", which requires any such bareword to be a predeclared
+    subroutine. But... 
+  3. ) Overriding all that, Perl 5 (in recent versions) will FORCE string
+    interpretation of any bare identifier used where a single hash subscript is
+    expected, either within curlies or before a =>. (Those are the places you might
+    usually want the old barewords anyway.)
+ 
+  The upshot of these rules is that you can write Perl 5 with much less
+  punctuation than Perl 4, yet also with less ambiguity. If you so choose. 
+ 
+  Larry 
+ 
+ Tcl programmers should note that in Perl the single quotation marks '' act much as
+ the curly brace {} enclosure does in Tcl (no escaping special characters $@\ etc.).
+ Whereas the double quotation marks "" allow for substitution of $variables (the
+ rules are a little different between Tcl and Perl however). 
+ 
+ Note also that a frequently seen short hand in perl5/Tk scripts is the @list returned
+ by qw(): 
+ 
+     @list = qw(zoom schwartz bufigliano);
+ 
+ which is equivalent to: 
+ 
+     @list = split(' ','zoom schwartz bufigliano');
+ 
+ or more simply: 
+ 
+     @list = ('zoom','schwartz','bufigliano');
+ 
+ i.e. the qw/STRING/ @list is not equivalent to the quotation marks provided by 
+ q/STRING/, qq/STRING/, or qq(STRING)... 
+ 
+ There are, ironically enough, situations in perl/Tk where one needs to use quotation
+ marks as in the following by post by <a904209@pluto.tiuk.ti.com>: 
+ 
+ 
+  Paul Wickman wrote in article <4b4o0fINNlu8@CS.UTK.EDU>:
+ !
+ !    Why does the following statement work fine:
+ !
+ !$day->pack(-before => $year, -side => 'left');
+ !
+ !    But the below generates the given error:
+ !
+ !$day->pack(-after => $year, -side => 'left');
+ !
+ !Ambiguous use of after => resolved to "after" => at line 191.
+ !
+ 
+  Because there is a sub after in scope, probably imported from Tk via use
+  Tk;. 
+ 
+  There are two workrounds: 
+ 
+     use Tk qw(MainLoop exit ...); # just ones you use
+ 
+  or 
+ 
+     $day->pack('-after' => $year, -side => 'left');
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.4. Must I use "my" on all my variables? 
+ 
+ If you use strict; (as recommended) the answer is "probably". This confines the
+ variables names to your namespace - so your variable does not conflict with one in
+ the module(s) your are using (you are at the least useing Tk;). my does "lexical
+ scoping" on a variable rather than the "dynamic scoping" done by local (like auto
+ variables in C). The difference between these two is that the scope of my $var is
+ confined to the block (sub, if, foreach, etc.) in which it is declared and used, as
+ opposedto local $iable which can propogate to all blocks called by the block in
+ which it is declared. In general the confined scope of my $var means that its use
+ will proceed quicker and more efficiently than local $iable. 
+ 
+ If you give a fully qualified variable name such as 
+ 
+     $main::var = 1;  # No "my" needed
+ 
+ Then no my $var is needed. However, the lexical scoping of my $var makes it
+ preferable. 
+ 
+ If you choose to use my (as recommended) then beware that you should declare a
+ variable my only at the first use (instantiation) of a variable. Consider yet another
+ way to re-write the "Hello World!" script: 
+ 
+     #!/usr/local/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+     my $label = $main->Label(-text => 'Hello World!');
+     my $button = $main->Button(-text => 'Quit',
+                                -command => sub{exit});
+     $label->pack;  #no "my" necessary here
+     $button->pack; #or here
+     MainLoop;
+ 
+ Considering the finite number of names (in particular the high probability that a
+ variable named $label or $button was used in one or more of the extensions to perl
+ that you may be using) it helps one's programming to use strict; and declare
+ variables yours alone with my. 
+ 
+ James M. Stern points out that redundant my declarations are not simply useless they
+ can be dangerous as in the following script which will not work: 
+ 
+     #!/usr/local/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+     my $label = $main->Label(-text => 'Hello World!');
+     my $main;   #WRONG: this $main overrides previous
+     my $button = $main->Button(-text => 'Quit', #will now fail
+                                -command => sub{exit});
+     $label->pack;  
+     $button->pack; 
+     MainLoop;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.5. Is there a way to find out what is in my perl/Tk "PATH"? 
+ 
+ Presuming this question is asking for a little more than the answer you get when you
+ type: 
+ 
+     ls perl5/Tk/*.pm
+ 
+ there is a way to find out what gets EXPORTED by Tk.pm. Use a script like: 
+ 
+     #!/usr/bin/perl
+     
+     use Tk;
+     require 'dumpvar.pl';
+     
+     dumpvar('Tk');
+ 
+ or more succintly at the shell command prompt: 
+ 
+     perl -e 'use Tk; require "dumpvar.pl"; dumpvar("Tk");'
+ 
+ The advantage of using dumpvar over ls is that it gives you a brief summary of all
+ the arguments your widgets want. Note that the output is many lines and you may
+ wish to pipe through more or less. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.6. What is the difference between use and require? 
+ 
+ The short answer is that something like: 
+ 
+     use Tk;
+ 
+ is equivalent to: 
+ 
+     BEGIN { require "Tk.pm"; import Tk; }
+ 
+ Hence the essential difference is that a mere require Tk; does not achieve the 
+ import of function/method names. The significance of this is that it allows one to
+ call ->Button rather than having to call the fully qualified ->Tk::Button e.g..
+ For further details on this subject see man perlmod(1) or see Tom Christiansen's
+ document at: 
+ 
+     ftp://ftp.perl.com/perl/info/everything_to_know/use_vs_require
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.7. How do I change the cursor/color? 
+ 
+ Nick Ing-Simmons <nik@tiuk.ti.com> and others posted a series of answers to this
+ type of question. In summary what they said was: 
+ 
+  Basically 
+ 
+     $mw->configure(-cursor => ... );
+ 
+  Unless you use one of built-in cursors it gets messy. 
+ 
+  Here copy of what Tk/demos/color_editor does: 
+ 
+     #!/usr/local/bin/perl -w
+     use Tk;
+     my $mw = MainWindow->new;
+     $mw->configure(-cursor => ['@' . Tk->findINC('demos/images/cursor.xbm'), 
+                                     Tk->findINC('demos/images/cursor.mask'),
+                                      'red', 'green']);
+     MainLoop;
+ 
+  That says that argument to -cursor is a list of 4 things: 
+ 
+  1. . Pathname to bitmap with '@' prepended to say it isn't a built in name
+    (Using findINC to locate file relative to Tk install location.) 
+  2. . Pathname to mask bitmap (no @ required) 
+  3. . Foreground colour 
+  4. . Background colour 
+ 
+ 
+ ! I want to remap it for the MainWindow
+ ! and will be using a pixmap.
+ 
+  You won't be using a Pixmap with normal X11. X11 allows *bitmap* with
+  optional mask (another bitmap), and two colours. 
+ 
+  The optional nature of the mask means that a simple call with a list reference
+  like: 
+ 
+     $mw->configure(-cursor => ['watch', 'red', 'blue']);
+ 
+  should work alright. 
+ 
+ You may also obtain the value of the default cursor for a widget using something like 
+ ->optionGet. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.8. How do I ring the bell? 
+ 
+ The short answer is 
+ 
+    $widget -> bell;
+ 
+ A slightly longer answer might include a fully functioning script: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     $main = MainWindow -> new;
+     $butn = $main->Button(-text => 'bell')
+     $butn->configure(-command => sub{ $butn->bell; });
+     $butn->pack();
+     MainLoop;
+ 
+ An even longer answer would be a fully functioning script with a callback: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     $main = MainWindow -> new;
+     $but = $main->Button(-text => 'bell', 
+                          -command => sub{ringit($main)})->pack;
+     MainLoop;
+     
+     sub ringit { 
+         my $m = shift; 
+         $m->bell; 
+     }
+ 
+ Simon Galton <galtons@candu.aecl.ca> reminds us to be careful in that 
+ 
+  some systems remap this [the "console bell"] to anything from a digital sound to
+  a flash on the screen. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.9. How do I determine the version of perl/Tk that I am running? 
+ 
+ Version numbering has changed recently and determining the version of perl/Tk that
+ you are running now depends on what version you are running: 
+ 
+ Tk-b10++:
+ Tk-b10 (and higher) has changed to $Tk::VERSION rather than $Tk:Version
+ to be consistent with other packages. 
+ 
+ Tk-b9.01:
+ The version numbers as of Tk-b9.01 are stored in the following variables: 
+ 
+     Core Tk version : $Tk::version
+     Tk patchLevel :   $Tk::patchLevel
+     library :         $Tk::library
+     perl/Tk Version : $Tk::Version 
+ 
+ At your shell prompt you could say something like the following to determine you
+ perl/Tk Version: 
+ 
+     perl -e 'use Tk; print "$Tk::Version\n";'
+ 
+ The switch to Tk-b9.01 from previous versions included a large number of method
+ name changes. Nick was kind enough to include a b9names script in the distribution
+ that assists with the job of updating your older scripts. See the b9names script for a
+ rather complete discussion of the name changes. Geoffroy Ville also posted a notice
+ of some of the changes. Here is a brief (and very incomplete!) summary: 
+ 
+ 
+ older                         Tk-b9.01++
+ packslaves                    pack('slaves')
+ packpropagate                 pack('propagate')
+ packForget                    pack('forget')
+                               pack('info')
+ 
+ $w->delete if ($w);            $w->destroy if ($w);
+ 
+ Tk-b8(--):
+ A little script (Tk_module) can tell you and return the value: 
+ 
+     #!/usr/bin/perl
+     use Tk;
+     local(*Tk_m) = \$Tk::Tk_module;
+     print "$Tk_m\n";
+ 
+ Or more succintly say something like the following (at your shell prompt): 
+ 
+     perl -e 'use Tk; print "$Tk::Tk_module\n";'
+ 
+ You can obtain the version of Tk in use with the following (at your shell prompt): 
+ 
+     perl -e 'use Tk; print "$Tk::tk_version\n";'
+ 
+ where this command returned "4.0" when the previous one (or Tk_module) returned
+ "b8". 
+ 
+ All Tk versions:
+ Don't forget that you can always determine your Perl version/patchlevel/etc. with: 
+ 
+     perl -v
+ 
+ (at the shell prompt - it's actually a little harder to get as much information from
+ within a #!script.) As of perl 5.002 you can use perl -V to determine your perl 
+ Configuration. 
+ 
+ Ozawa Sakuro <ozawa@prince.pe.u-tokyo.ac.jp> points out some ways to do it in a
+ script: 
+ 
+  1. '$]' holds the version number. 
+  2. In Perl5, 'require NUMBER;' will complain if version is younger than
+    NUMBER. (e.g. require 5.001;) 
+  3. Of course, newly imported (and incompatible) features in newer scripts will
+    bailout before execution if parsed by an old interpreter. 
+ 
+ Note that if you use English; then $PERL_VERSION holds the version
+ number. 
+ 
+ To determine your MakeMaker version number try something like this (5.002): 
+ 
+     perl -MExtUtils::MakeMaker -e 'print "$ExtUtils::MakeMaker::VERSION\n";'
+ 
+ or this (5.001m ok): 
+ 
+     perl -e 'use ExtUtils::MakeMaker; print "$ExtUtils::MakeMaker::VERSION\n";'
+ 
+ or even this (older perls and MakeMakers): 
+ 
+     perl -e 'use ExtUtils::MakeMaker; print "$ExtUtils::MakeMaker::Version\n";'
+ 
+ Please note that thoughout this FAQ document there are references to things like 
+ 
+ Tk-b10(++) or Tk-b10++ which roughly translated to use English; means
+ something like "I think this will work with this version of Tk and (masybe) higher
+ versions...". You might also see Tk-b8(--) which means something like "it worked
+ with that old version and probably worked with prior versions and if you are stuck
+ with an old Tk version you might have to do it this way...". 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.10. How do I call perl from C? 
+ 
+ You need to see a recent copy of the perlembed(1) pod page. By "recent" it needs
+ to be up to date with at least perl5.002. 
+ 
+ Borrowing from Jon Orwant's preamble to that document: 
+ 
+ Do you want to: 
+ 
+ Use C from Perl?
+    Read (at least) the perlcall(1), the perlapi(1), the perlxs(1), the 
+    perlxstut(1), and the perlguts(1) manpages.
+ Use C++ from Perl?
+    Recent changes to MakeMaker will make this easier. Be sure you are familiar
+    with the perlcall(1), the perlapi(1), the perlxs(1), the 
+    perlxstut(1), and the perlguts(1) manpages.
+ Use an executable program from Perl?
+    Read about backquotes ``, system(), and exec() built in perl functions.
+    Try reading the perlfunc(1) manpage.
+ Use Perl from Perl?
+    Read about do, eval, use and require. The perlfunc(1) manpage
+    discusses these. For complete scripts you may also make use of the backquotes ``,
+    system(), or exec() built in perl functions, but you may take a
+    performance hit in doing so (see perlfunc(1) for information).
+ Use C from C?
+    Rethink your design.
+ Use C++ from C++?
+    See previous.
+ Use Perl from C?
+    Read (at least) the perlembed(1) and the perlguts(1) manpages.
+ Use Perl from C++?
+    Read (at least) the perlembed(1) and the perlguts(1) manpages.
+ 
+ There is also an Doug MacEachern's <dougm@osf.org> embedder's development kit
+ on CPAN and at a URL of the following form: 
+ 
+     http://www.osf.org/~dougm/perl/Devel-embed-*.tar.gz
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 11.11. How do I call Tcl code from perl/Tk? 
+ 
+ In general you don't! The whole idea of perl/Tk is that you are programming in perl
+ not Tcl. To glean the possible advantages of doing this you might want to read the
+ opinions of Tom Christiansen (a definite perl proponent) at: 
+ 
+     ftp://mox.perl.com/pub/perl/versus/tcl
+ 
+ It is nevertheless worth noting that you might still have access to a complete Tcl
+ script from perl via the perl system, or `` (backtick), or even exec mechanisms.
+ Just be careful with I/O waits and return values if you try one of these approaches.
+ Further suggestions may be found in the various perlipc files at: 
+ 
+     ftp://ftp.perl.com/perl/info/everything_to_know/
+ 
+ A more satisfactory wish-like behavior can be embedded in perl by making
+ appropriate modifications to Dov Grobgeld's perl script that uses sockets for
+ perl<->wish communication: 
+ 
+ #!/usr/local/bin/perl
+ #####################################################################
+ #  An example of calling wish as a subshell under Perl and
+ #  interactively communicating with it through sockets.
+ #
+ #  The script is directly based on Gustaf Neumann's perlwafe script.
+ #
+ #  Dov Grobgeld dov@menora.weizmann.ac.il
+ #  1993-05-17
+ #####################################################################
+ 
+     $wishbin = "/usr/local/bin/wish";
+ 
+     die "socketpair unsuccessful: $!!\n" unless socketpair(W0,WISH,1,1,0);
+     if ($pid=fork) {
+             select(WISH); $| = 1;
+             select(STDOUT);
+ 
+         # Create some TCL procedures
+             print WISH 'proc echo {s} {puts stdout $s; flush stdout}',"\n";
+ 
+         # Create the widgets
+         print WISH <<TCL;
+         # This is a comment "inside" wish
+ 
+         frame .f -relief raised -border 1 -bg green
+         pack append . .f {top fill expand}
+ 
+         button .f.button-pressme -text "Press me" -command {
+             echo "That's nice."
+         }
+         button .f.button-quit -text quit -command {
+             echo "quit"
+         }
+         pack append .f .f.button-pressme {top fill expand} \\
+                        .f.button-quit {top expand}
+ TCL
+         # Here is the main loop which receives and sends commands
+         # to wish.
+         while (<WISH>) {
+             chop;
+             print "Wish sais: <$_>\n";
+             if (/^quit/) { print WISH "destroy .\n"; last; }
+         }
+             wait;
+     } elsif (defined $pid) {
+         open(STDOUT, ">&W0");
+         open(STDIN, ">&W0");
+         close(W0);
+         select(STDOUT); $| = 1;
+         exec "$wishbin --";
+     } else {
+         die "fork error: $!\n";
+     }
+ 
+ Ilya Zakharevich <ilya@math.ohio-state.edu> has a "ptcl.h" header file for the
+ construction of tcl bindings from pTk (there are limitations to this approach). It was
+ posted to the mailing list archive at: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.11/0057.html
+ 
+ If you absolutely must pass large amounts of pre-parsed data between Tcl and perl
+ then perhaps you should look into Malcolm Beattie's Tcl/Tk extensions to Perl
+ instead. Those modules are distrubuted at CPAN sites. As mentioned above running
+ Tcl/Tk/perl is incompatible with running perl/Tk. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 12. What are some of the primary differences between Tcl/Tk and Perl/Tk? 
+ 
+ Considering that both interpreter/compilers for Tcl and Perl were written in C for use
+ on Unix computers it is not surprising that there are some similarities between the
+ two languages. 
+ 
+ Nevertheless, there are a large number of differences between the Tcl scripting
+ language and the Perl scripting language. Indeed, some of the Tk widget names and
+ options have been modified slightly in the perl/Tk language. With Tk-b9.01 (and
+ higher) a great many functions (methods) start with an upper case letter and continue
+ with all lower case letters (e.g. there is a perl/Tk Entry widget but no entry
+ widget), and many configuration options are all lower case (e.g. there is a perl/Tk 
+ highlightthickness option but no highlightThickness option). Thus if
+ you are having trouble converting a script check your typing. 
+ 
+ While this table does not cover all the differences it is hoped that it will prove useful,
+ especially to those people coming from a primarily Tcl/Tk background. These are
+ some of the common Tcl->Perl stumbling points: 
+ 
+ 
+ what              Tcl/Tk                 Perl/Tk
+ variable          set a 123              $a = 123; or $a = '123';
+  initialization
+ re-assignment     set b $a               $b = $a;
+ 
+ lists/arrays      set a {1 2 fred 7.8}   @a = (1,2,'fred',7.8);
+ re-assignment     list set b $a          @b = @a;
+ 
+ associative       set a(Jan) 456.02      %a = ('Jan',456.02,'Feb',534.96);
+  arrays           set a(Feb) 534.96
+ re-assignment     foreach i \            %b = %a;
+                    [array names a] {
+                    set b($i) = $a($i) }
+ 
+ Note on the above examples:
+ In Tcl the scalar, list, and array variable 'a' will overwrite each 
+ previous assignment.
+ In Perl $a, @a, %a are all distinct (occupy separate namespaces).
+ 
+ expressions       set a [expr $b+$c]     $a = $b+$c;
+ 
+ increment         incr i                 $i++; or ++$i;
+ 
+ declare           proc plus {a b} {      sub plus { my($a,$b) = @_;
+  subroutines       expr $a + $b }         $a+$b; }
+ 
+ variable scope    local default          global default
+                   override w/ "global"   override w/ "my" (or "local")
+ 
+ call              plus 1 2               &plus(1,2); #or
+  subroutines                             plus(1,2);  #OK after sub plus
+ 
+ statement sep     newline or at ";"      ";" required
+ 
+ statement         "\" - newline          none required
+  continuation
+ 
+ verbatim strings  {}                     ''
+  e.g.             {a \ lot@ of $stuff}   'a \ lot@ of $stuff'
+ 
+ escaped strings   ""                     ""
+  e.g.             "Who\nWhat\nIdunno"    "Who\nWhat\nIdunno"
+ 
+ STDOUT            puts "Hello World!"    print "Hello World!\n"
+                   puts stdout "Hello!"   print STDOUT "Hello!\n"
+ 
+ Note also that Tcl/Tk has a built-in abbreviation completion mechanism that lets you
+ specify short hand, e.g. 
+ 
+    canvas .frame.canvas -yscrollcommand ".frame.scroll set" ; #Tcl/Tk OK
+    canvas .frame.canvas -yscroll ".frame.scroll set" ;        #Tcl/Tk also OK
+    $canvas=$main->Canvas(-yscroll => ['set',$scroll]);  #ERROR perl/Tk
+    $canvas=$main->Canvas(-yscrollcommand => ['set',$scroll]); #perl/Tk OK
+ 
+ You may get around this with the perl abbrev.pl package in certain circumstances.
+ For example: 
+ 
+    require 'abbrev.pl';
+    %foo = ();
+    &abbrev(*foo,'-yscrollcommand');
+  ...
+    $canvas=$main->Canvas($foo{'-yscroll'} => ['set',$scroll]); #perl/Tk OK
+ 
+ In Perl you can emulate the Tcl unknown proc (through the perl AUTOLOAD
+ mechanism) as follows: 
+ 
+     use Shell;
+     print($p = man(-k => bitmap));
+ 
+ Which is equivalent to what you would get if you typed: 
+ 
+     man -k bitmap
+ 
+ From within tclsh or wish. (Thanks to Ilya Zakharevich 
+ <ilya@math.ohio-state.edu> for pointing out this feature. ;-) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ How do I install new scripts | modules | extensions? 
+ 
+ (Thanks to Ilya Zakharevich <ilya@math.ohio-state.edu> for pointing out that perl
+ code comes in a variety of flavors and some code requires more work than others to
+ install. Hence I have expanded this topic and will refer to three distinct categories
+ here: Scripts Modules and Extensions:) 
+ 
+ Scripts
+ -------
+ 
+ A "self-contained" script needs little modification (in principle!) to run. It is a good
+ idea to check the #! line at the very top of the file to reflect your local perl setup (e.g. 
+ #!/usr/bin/perl -w (change to) #!/usr/gnu/local/perl -w or what
+ have you). There are allegedly "more portable" ways to invoke the perl interpretor as
+ well - they are more fully documented in the perl FAQ and the perlrun(1) man
+ page, however. 
+ 
+ Other things you do not want to forget when trying to run a perl script include giving
+ yourself permission to do so, e.g.: 
+ 
+     chmod u+x newscriptname
+ 
+ You also want to be sure your DISPLAY environment variable is set up properly
+ when attempting to run a perl/Tk script. You may also need to look at the xhost(1)
+ or the xauth(1) man pages for setting up your X-display properly. 
+ 
+ If you are still experiencing difficulty check to be sure that extraneous
+ /newsgroup|e-mail|HTML headers|footers|markup//; are not in the file and that you
+ have on hand all that is requireed or useed by the script (if not you may need to
+ install a module - or even a perl4 style lib.pl file). 
+ 
+ Modules
+ -------
+ 
+ Check out the module - make sure it is OK and will run on your system - does it
+ require a specific location? For testing purposes (always a good idea) or if you do not
+ have root priveleges set the file in a directory that you do have write access to and try
+ to include it in a test script. Assuming you have a module to test called "Foo.pm"
+ and are simply running the test script in the same directory as the module begin by
+ adding to the @INC array like so: 
+ 
+     #!/usr/bin/perl -w
+      BEGIN { @INC = ("$ENV{'PWD'}",@INC); }
+      use Tk;
+      use Foo;
+ 
+ or 
+ 
+     #!/usr/bin/perl -w
+      use lib $ENV{PWD};
+      use Tk;
+      use Foo;
+ 
+ Another approach is to set either the PERLLIB or PERL5LIB environment variable
+ from your shell. This method allows invoking the test script from within a number of
+ different directories without having to edit a hard coded use lib or 
+ push(@INC,".") kind of statement within the script. Yet another way to do it is
+ with the -I switch on the command line like so: 
+ 
+     perl -Ipath/to/Foo -e fooscriptname
+ 
+ After a successful test; if you are a system administrator, or have root priveleges, or
+ are modifying your own copy of perl; then copy it to the perl5/Tk directory.
+ Depending on how the module was written it should be possible to use it either with
+ the use Tk; statement itself or with an explicit use Tk::Foo; (for module 
+ perl5/Tk/Foo.pm). 
+ 
+ Extensions (Overgrown Modules)
+ ------------------------------
+ 
+ These may come as a multi-file kit (tape archive usually) and may require a C
+ compiler for part of the installation (Tk-b# itself falls into this category). You know
+ you have an Overgrown Module (Extension) when there is one or more files with an
+ .xs extension (perl->C meta code) and a Makefile.PL (perl->make meta code).
+ One invokes the perl MakeMaker on the file called Makefile.PL in order to
+ create a Makefile via: 
+ 
+     perl Makefile.PL
+ 
+ You may now run make on the resultant Makefile - but the details of this process
+ are module dependent and should be documented in a README or an INSTALL file.
+ A very standard perl extension requires 4 (or 5 if making static) standard commands
+ to make and install: 
+ 
+     perl Makefile.PL
+     make
+     make test
+     make install
+ 
+ If you have the appropriate CPAN and FTP modules already installed you can
+ retrieve a module from CPAN and carry out all of the above steps with a perl
+ one-liner like this: 
+ 
+     perl -MCPAN -e 'install "Foo"'
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 14. How do I write new modules? 
+ 
+ You might want to start by poking around your Tk-b# distribution directory. Is there
+ something there that already does what you want? Is there something that is
+ reasonably close - but only requires minor modification? 
+ 
+ Next go through the various perl documents - including the FAQ as well as the
+ various relevant man pages: perlmod(1), perlobj(1), perlbot(1), (and
+ please don't forget: perlpod(1)!) 
+ 
+ Post your idea to comp.lang.perl.tk and discuss it with others - there might very well
+ be someone working on an approach already. A clear explanation of all the stuff that
+ gets put into a module was posted to the mailing list and can be found in the archive
+ at: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.10/0012.html
+ 
+ Also, be sure to check out a recent version of the official Module List that Tim Bunce
+ <Tim.Bunce@ig.co.uk> maintains and posts to comp.lang.perl.announce periodically.
+ The list is also available at any CPAN ftp site as well as: 
+ 
+     ftp://franz.ww.tu-berlin.de/pub/modules/00modlist.long.html <- html!
+     ftp://rtfm.mit.edu/pub/usenet/news.answers/perl-faq/module-list
+     ftp://ftp.demon.co.uk/pub/perl/db/mod/module-list.txt
+     ftp://ftp.wpi.edu/perl5/Modules/module_list.txt
+ 
+ Finally ready to ship? Small (perl/Tk) modules have been posted directly to 
+ comp.lang.perl.tk. Big modules may require ftp distribution (see upload info at one of
+ the CPAN sites) then make your announcement to comp.lang.perl.tk and possibly to 
+ comp.lang.perl.announce. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15. Composite Widgets. 
+ 
+ Composite widgets combine the functions of two or more widget primitives into
+ something that is not quite a stand alone program but is something that may prove
+ very useful for inclusion in your own scripts. A variety of composite widgets have
+ been written and many are still being worked on. Many come bundled with your
+ Tk-b# distribution, and some are simply posted to comp.lang.perl.tk. It is quite
+ common to have composite widgets written in perl modules - usually in terms of the
+ Tk widget primitives. Graphical examples of some of the composites discussed here
+ can be seen by GUI browsers at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15.1. How do I get a Dialog box? 
+ 
+ For things like a simple "are you sure?" dialog box you might want to take a look at 
+ perl5/Tk/Dialog.pm. This module may be invoked with require
+ Tk::Dialog; etc. - there are much more extensive directions inside the comment
+ fields at the top of the Dialog.pm file itself. The module has a lot of options and
+ has a tutorial driver script in perl5/Tk/demos/dialog. Dialog.pm is also used
+ by the perl5/Tk/demos/widget demo. In particular look at 
+ perl5/Tk/demos/widget_lib/dialog1.pl and dialog2.pl for
+ examples of how one makes use of Tk::Dialog. A snippet of a script that uses this
+ module could look like: 
+ 
+     require Tk::Dialog;
+ 
+     my $mw = MainWindow->new;
+     my $D = $mw->Dialog(
+                  -title => 'Are you sure?',
+                  -text  => "You have requested rm \*\nAre you sure?",
+                  -default_button => 'No',
+                  -buttons        => ['No','yes']
+                        );
+     my $choice = $D->Show;  # use Show for Tk-b9.01
+ # if using Tk-b8:    my $choice = $D->show;
+ 
+     print " you chose $choice \n";
+ 
+ A question concerning configuration of the Subwidgets on the Dialogs came up
+ recently: 
+ 
+ <Greg_Cockerham@avanticorp.com> wrote:
+ ! I want to reconfigure the colors of the Dialog and
+ ! ErrorDialog buttons.  How do I do this?
+ ! Thanks in advance.
+ 
+    $dialog_widget->configure(-background => 'purple'); 
+ 
+  Since these two widgets are composites you manage them like any 'ol widget. If
+  the default delegate subwidget(s) aren't to your liking you can always get to
+  individual component widgets of the composite via the ->Subwidget()
+  method. 
+ 
+  I see these subwidgets: 
+ 
+ Dialog
+    'message' is the label subwidget with the dialog text, and 'bitmap' is the label
+    subwidget showing the dialog bitmap
+ ErrorDialog
+    'error_dialog' is Dialog subwidget, 'text' is text subwidget
+ 
+  You can even do things like this: 
+ 
+   $error_dialog->Subwidget('error_dialog')->Subwidget('bitmap')->configure(..);
+ 
+  to "get to" the label widget of the dialog component of the error_dialog
+  widget..... 
+ 
+  Be sure to also check out the "dialog" demo. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15.2. Is there a file selector? 
+ 
+ Yes, there may be several eventually... 
+ 
+ One distributed with the Tk-b# code itself is called FileSelect.pm and was written by
+ Frederick L. Wagner - (based on an original by Klaus Lichtenwalder). 
+ 
+ Another module called SelFile.pm was adapted by Alan Louis Scheinine from
+ Wagner's FileSelect.pm. It is available from: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.11/0122.html
+ or
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/SelFile.pm
+ 
+ A module called FileSave.pm allows one to type in a new (non-existant) filename for
+ "Save as..." type operations. It was posted by Mark Elston on 12 Oct 1995 to the
+ mailing list and is available from: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.10/0093.html
+ or
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/FileSave.pm
+ 
+ A slightly different behaviour is to be had with Brent B. Powers' FileDialog.pm
+ that was posted to the mailing list on 12 Jan 1996 and available from: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.12/0201.html
+ or
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/FileDialog.pm
+ 
+ Harry Bochner chimed in with SaveAs.pm. It is available from: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/SaveAs.pm
+ 
+ In general, if there is a feature that you want missing from one of these, or some
+ behaviour that you would like to see modified then by all means cp the source code to
+ your area and start hacking ;-) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15.3. Is there a color editor? 
+ 
+ There is. Please see 
+ 
+     perldoc ColorEditor.pm
+ 
+ or run the perl5/Tk/demos/color_editor demo script for more
+ information. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15.4. Is there a round Scale? 
+ 
+ It is not quite a "round Scale" but Roy Johnson has written "Dial.pm" for round dial
+ (or speedometer) -like settable widgets. It is available from: 
+ 
+     http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.08/0431.html
+ or
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/Dial.pm
+ 
+ As well as from the /Contrib/ sub-directory of recent releases of perl/Tk build
+ directories (Tk-b9.01/Contrib/ or higher). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15.5. Is there something equivalent to tkerror? 
+ 
+ There is. Please see the Tk/ErrorDialog.pm module for further information. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 15.6. Are there Tables? 
+ 
+ There are least two: 
+ 
+ Nick's Table
+ ------------
+ 
+ Nick Ing-Simmons has distributed his own Table widget package with Tk-b9.01
+ (and higher). It is used through a use TK::Table; and $top->Table(); calls.
+ A rather detailed demo of this widget/geometry manager's capabilities can be found
+ in the table_demo script (in your Tk-b9.01/ build directory). There is also pod
+ in the perl5/Tk/Table.pm file. You may also browse the perl Tk::Table man
+ page on the web at 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/Table.pm.html
+ 
+ Guy Decoux's BLT_Table
+ ----------------------
+ 
+ Guy Decoux <decoux@moulon.inra.fr> has ported the popular BLT_Table Tcl/Tk
+ tabular geometry manager to perl/Tk. It was known to work with Tk-b8. You may
+ obtain the latest version of it either from 
+ 
+     ftp://moulon.inra.fr/pub/pTk/
+ 
+ or from a CPAN site in the authors/id/GUYDX/ directory. You may also browse
+ the perl BLT_Table man page on the web at 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/Table.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 16. Programming/development tools. 
+ 
+ There are a number of tools and methods to help you with your perl/Tk scripting and
+ development. It is worthwhile to note here that the -w switch is recommended as is
+ the use strict; statement near the top of your script/program. If it dies and you
+ still cannot decrypt the error message that these generate take a look though man
+ perldiag(1). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 16.1 Is there a Tcl/Tk to perl/Tk translator? 
+ 
+ Nick Ing-Simmons has written a (rather lengthy) tcl2perl script. It is being
+ distributed with the perl/Tk code as of Tk-b9.01. Please handle carefully! (translation:
+ do not expect it to translate arbitrary tcl code accurately nor even into the most
+ efficient perl/Tk equivalent. Do go over the converted script with care - and do not
+ forget -w and use strict;.) Thanks Nick :-) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 16.2 Is there something equivalent to wish in perl/Tk? 
+ 
+ The answer is yes. 
+ 
+ The idea of wish is that you read from <STDIN> and evaluate each statement. The
+ standard way to do this in perl/Tk is to use the tkpsh script that comes in your 
+ Tk-b#/ distribution. Another elegant way to get wish like behavior in perl/Tk is to
+ use rmt which you can find in perl5/Tk/demos in your Tk-b# distribution.
+ When you run rmt you already have Tk.pm set up for you so you can start typing
+ things like $mmm = new MainWindow; etc. at the rmt: prompt. (This use belies
+ the power of rmt which is derived from Ousterhout's Tcl/Tk version of rmt [see
+ section 27.2 of his book]. rmt is capable of "inserting Tk code" into simultaneously
+ running Tk applications.) 
+ 
+ A cruder way to get wish-like behaviour with perl/Tk is to run a "perl shell" and
+ type in your usual commands, including use Tk; etc. There is a script distributed
+ with perl called perlsh which is written quite simply as: 
+ 
+     #!/usr/bin/perl
+      $/ = '';        # set paragraph mode
+      $SHlinesep = "\n";
+      while ($SHcmd = <>) {
+          $/ = $SHlinesep;
+          eval $SHcmd; print $@ || "\n";
+          $SHlinesep = $/; $/ = ''; 
+      }
+ 
+ You can use this during code development to test out little snippets of code. It helps to
+ be an accurate typist and the use strict; is optional here :-) 
+ 
+ Hiroaki Kobayasi has a more sophisticated wish like perl/Tk "shell" that is called
+ EVA. It is available from: 
+ 
+     ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/eva-*.tar.gz
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 16.3. Is there a debugger specifically for perl/Tk? 
+ 
+ Not for the latest version - but the -w switch and use strict; are always helpful
+ with debugging as they provide informative error messages. You can, of course, run
+ under the regular debugger using: 
+ 
+     perl -d myscript
+ 
+ Gurusamy Sarathy <gsar@engin.umich.edu> has built a PERL5DB file called
+ Tkperldb (which despite the name is for pTk not Tk/perl). One must install an early
+ de-bugger then apply a patch to bring the debugger up to date. The early debugger kit
+ is available from: 
+ 
+     ftp://ftp.perl.com/pub/perl/ext/TK/Tkperldb-a1.tar.gz
+ 
+ And Gurusamy Sarathy notes that the patch to bring the debugger up to date is
+ available at: 
+ 
+  You need a post 5.001m perl that has support for debugging closures. 
+  Or you can simply apply:
+ 
+    http://www-personal.umich.edu/~gsar/perl5.001m-bugs.patch
+ 
+  to 5.001m. (5.002beta includes all the fixes in the above patch).
+ 
+ Note that a perl debugger may be invoked within your script with a line like: 
+ 
+     $ENV{'PERL5DB'} = 'BEGIN { require Tkperldb }';
+ 
+ See man perldebug(1) for more help. 
+ 
+ Keep in mind that you are programming in perl after all. The perl debug line mode is
+ available to you through executing the following from your shell: 
+ 
+     perl -de 0
+ 
+ Whereupon you must enter all the lines of a script including use Tk;. (Fancier file
+ reads & evals are possible - but if you are getting that sophisticated why not create
+ your own custom PERL5DB file?) When using perl -dwe 0 beware of the emacs
+ like line editing under this debugger, and be forewarned that as soon as you type in the
+ MainLoop; statement perl will no longer read from <STDIN>. 
+ 
+ Ilya Zakharevich <ilya@math.ohio-state.edu> points out that very recent perldb
+ versions will allow for simultaneous X and STDIN reads. He also points out: 
+ 
+ Note that you may use 
+ 
+     sub myLoop {
+       if (defined &DB::DB) {
+         while (1) {             # MainWindow->Count
+           Tk::DoOneEvent(0);
+         }
+       } else {
+         MainLoop;
+       }
+     }
+ 
+ (and I hope the analogous provision will be in MainLoop in 
+  tk-b9 - hi, Nick ;-)
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 16.4. Is there a GUI builder in perl/Tk? 
+ 
+ Work has reputedly (January 1996) started on porting a Tcl/Tk GUI builder known as
+ SpecTcl for use with perl/Tk. For the Tcl/Tk SpecTcl kit see: 
+ 
+     ftp://ftp.sunlabs.com/pub/tcl/SpecTcl-*.tar.[gz|Z]
+ 
+ and address questions about SpecTcl to <spectcl@tcl.eng.sun.com>. 
+ 
+ In <news:ANDREAS.96Mar24234521@marvin.berlin.de> Andreas Koschinsky 
+ <marvin@logware.de> announced a perl script for use with SpecTcl that has some
+ interesting capabilies: 
+ 
+  24 Mar 1996 22:45:21 GMT
+  ... So i wrote a perl-script that can convert project-file (.ui-files) which spectcl
+  writes. The script reads the .ui-file and generates an equivalent perl-module. 
+ 
+ The URL for ui2perl should be something like: 
+ 
+     ftp://susan.logware.de/pub/incoming/ui2perl*.tar.gz
+ 
+ Somewhat more removed from SpecTcl there is also SWIG. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 17. Processes & Inter-Process Communication under Perl/Tk. 
+ 
+ Inter-Process Communication (IPC) is the subject of spawning and controlling other
+ programs or "processes" from within perl (sometimes using sockets to do so). The
+ subject is briefly discussed in the perlipc(1) man page, and was addressed
+ towards the end of Chapter 6 of The Camel. The subject is also discussed in the perl
+ FAQ and at Tom Christiansen's ftp site (in the various perlipc* files) at: 
+ 
+     ftp://ftp.perl.com/perl/info/everything_to_know/    199.45.129.30
+ 
+ as well as the web site at: 
+ 
+     http://www.perl.com/perl/everything_to_know/ipc/index.html
+ 
+ In addition to the usual perl IPC routines Tk allows (at least) three more special
+ functions: fileevent (for handling I/O events), send (for inter-widget
+ communication), and after (for time control like a sleep expressly for widgets). 
+ 
+ Remember:
+ 
+  If a packet hits a pocket on a socket on a port,
+  And the bus is interrupted as a very last resort,
+  And the address of the memory makes your floppy disk abort,
+  Then the socket packet pocket has an error to report!
+  -Ken Burchill(?) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 17.1. How does one get Perl/Tk to act on events that are not coming from X? 
+ 
+ On 22 Nov 1995 (Yaniv Bargury) bargury@milcse.cig.mot.com wrote: 
+ 
+  I need to write a GUI monitor, that displays the status and controls a set of
+  processes running in the background. The idea is to have the GUI application
+  start a few child processes, command the children through pipes from the GUI
+  to the children, and display the children status coming on pipes from the
+  children to the GUI in real time. 
+ 
+  The GUI must not be busy waiting, because the CPU resources are limited. This
+  excludes using the Tk_DoWhenIdle as explained in the manual. 
+ 
+  The usual way to do this is to for the GUI process to have one select() in its
+  main loop. That select() should wait for X events or input from the pipes
+  leading from the children. 
+ 
+  How do you do this? 
+ 
+ To which Nick Ing-Simmons <nik@tiuk.ti.com> replied: 
+ 
+  fileevent - it is the hook into the select() in the mainloop. 
+ 
+ In addition Avi Deitcher <avi@morgan.com> replied with: 
+ 
+  I wrote something similar to effectively do a tail -f on multiple hosts,
+  displaying the result on separate text widgets. Do the following: 
+ 
+     parent
+      child
+      child
+      child
+      ..
+ 
+  with a one-way pipe from each child to the parent. Set up the following: 
+ 
+     $main->fileevent(FILEHANDLE,status,subroutine);
+ 
+  for each pipe that you have. This will cause pTk to monitor the FILEHANDLE
+  and call 'subroutine' when an event happens on that handle. In this case: 
+  FILEHANDLE = pipename status = 'readable' or 'writable'
+  or 'exception' and subroutine = any subroutine that you want. 
+ 
+ To provide a concrete example of fileevent usage Stephen O. Lidie wrote a
+ wonderful little GUI tail monitor he calls tktail: 
+ 
+     #!/usr/local/bin/perl -w
+     #
+     # tktail pathname
+     
+     use English;
+     use Tk;
+     
+     open(H, "tail -f -n 25 $ARGV[0]|") or die "Nope: $OS_ERROR";
+     
+     $mw = MainWindow->new;
+     $t = $mw->Text(-width => 80, -height => 25, -wrap => 'none');
+     $t->pack(-expand => 1);
+     $mw->fileevent(H, 'readable', [\&fill_text_widget, $t]);
+     MainLoop;
+     
+     sub fill_text_widget {
+     
+         my($widget) = @ARG;
+     
+         $ARG = <H>;
+         $widget->insert('end', $ARG);
+         $widget->yview('end');
+     
+     } # end fill_text_widget
+ 
+ An example of how one might use such a script would be to create and monitor a file 
+ foo like so: 
+ 
+     echo Hello from foo! > foo
+     tktail foo &
+     echo \"A ship then new they built for him/of mithril and of elven glass\" --Bilbo >> foo
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 17.2. Is there a send and do I need xauth? 
+ 
+ There is a Tk::send, but to use it own must write one's own version of 
+ Tk::receive. An example of this may be found in the rmt program distributed
+ with Tk-b#. 
+ 
+ The Tk::send <-> Tk::receive process will work under xhost +
+ authority. The security this affords comes from the fact that anyone who would want
+ to exploit it would have to know how to write a Tk::receive custom tailored to
+ your application (in addition to all the other protocol hacking). 
+ 
+ Please note that while you may not need xauth authorization it is nevertheless 
+ always a good idea. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 17.3. How can I do animations using after? 
+ 
+ There is a "toggling button" demo script supplied with Tk called after_demo that
+ makes effective use of after(). 
+ 
+ Terry Greenlaw <terry@encompass.is.net> of Encompass Technologies posted a
+ character cell animator for the really bored. Here it is in a slightly modified form that
+ allows string input from the command line (note too the recursive call that doesn't
+ sop up system memory): 
+ 
+ #!/usr/bin/perl
+ 
+ =head1 NAME
+ 
+ From: z50816@mip.lasc.lockheed.com "Terry Greenlaw"  Thu Feb 1 12:02:24 EST 1996
+ To: ptk@guest.WPI.EDU
+ Subj: A code sample for the REALLY bored
+ 
+ For everyone with a case of Browser envy after using Microsoft's Internet
+ Explorer, here's a perl/tk script only slightly more useful than a script
+ to do <BLINK>. Don't know why I wrote it. Don't know why you'd run it.
+ Maybe if you were writing a ticker tape application. Or had a weird thing
+ for Times Square. Anyway....
+ 
+ tog
+ Terry Greenlaw (on-site @ Lockheed Martin)      Encompass Technologies
+ z50816@mip.lasc.lockheed.com                    terry@encompass.is.net
+ 
+ ##################################################################
+ 
+ =cut
+ 
+     #!/usr/bin/perl
+     
+     #use strict;
+     use Tk;
+     
+     $message=join(' ',@ARGV,''); 
+     if (!$message) {
+         $message="THIS IS A VERY LONG SCROLLING MESSAGE...      ";
+         $topmssg="This is the top of the screen";
+         $botmssg="This is the bottom of the screen";
+     }
+     else {
+         $topmssg=$message;
+         $botmssg=$message;
+     }
+     $top = MainWindow->new;
+     $l1 = $top->Label(-fg => 'White', -text => $topmssg);
+     $l1->pack(-fill => 'both', -expand => 1 );
+     $m1 = $top->Label(-fg=>'Red', -bg=>'black',
+                       -textvariable => \$message, 
+                       -width => 15 
+                       );
+     $m1->pack();
+     $m2 = $top->Label(-wrap=>1, 
+                       -fg=>'Green', -bg=>'black',
+                       -textvariable => \$message2, 
+                       -width=>1, -height=>8 
+                       );
+     $m2->pack(-anchor=>'w');
+     $l2 = $top->Label(-fg => 'White', -text => $botmssg);
+     $l2->pack(-fill => 'both', -expand => 1 );
+     
+     after(100, \&scroll_it);
+     
+     $top->MainLoop;
+     
+     sub scroll_it {
+         $message =~ /(.)(.*)/;
+         $message="$2$1";
+         ($message2 = $message) =~ s/ /  /g;
+         after(100, \&scroll_it);
+     }
+     __END__
+ 
+ (Please note that a script like this is now distributed as "TickerTape" in your 
+ Tk-b*/Contrib/ directory.) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 17.4. How do I update widgets while waiting for other processes to complete? 
+ 
+ The short answer is 
+ 
+     $widget -> update;
+ 
+ A longer answer would include a script of this sort where instead of actually doing
+ something useful the "long running process" is simply a call to the perl sleep()
+ function: 
+ 
+     #!/usr/bin/perl -w
+     
+     use Tk;
+     
+     my $m = MainWindow->new();
+     my $l = $m -> Listbox();
+     $l -> bind('<Double-1>' => sub{sleepy($l)} );
+     my @nuts   = qw(Almond Brazil Chestnut Doughnut Elmnut Filbert);
+     for (@nuts) { $l -> insert('end',$_); }
+     $l -> pack;
+     MainLoop;
+     
+     sub sleepy {
+         my $widget = shift;
+         print "before 1st sleep \n";
+         sleep(10);
+         print "after 1st sleep before delete \n";
+         $widget -> delete('active');
+         $widget -> update;                   # try [un]*commenting this
+         print "after delete before 2nd sleep \n";
+         sleep(10);
+         print "after 2nd sleep \n";
+     }
+     __END__
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 17.5. How do you fork on System V (HP)? 
+ 
+ Kraegeloh Martin <mkr@dm-server.cv.com> originally asked: 
+ 
+ 
+ ! Subj: signal handling difference on HP vs. SUN
+ !
+ ! the following code will fork an xterm with vi in it, and it
+ ! will refuse to do so while the first xterm is still running.
+ ! works fine on my sun.
+ ! On HP however, the second time an xterm is started, NO handler
+ ! is called when the child dies.
+ !
+ ! the code:
+ ! ===================== 8< ===============================
+ ! $SIG{CHLD}=\&w;
+ !
+ ! sub w{
+ !    $pid=wait;
+ !    print STDERR "died: $pid\n";
+ !    if ( $have == $pid ) { $have = 0; }
+ ! }
+ 
+ To which a part of Nick Ing-Simmons' response was: 
+ 
+  I suspect HPUX is SysV-ish not BSD or POSIX. So every time a signal fires, it
+  removes the handler - you need to reset it in the handler: 
+ 
+     sub w{
+         $SIG{CHLD}=\&w;
+         $pid=wait;
+         print STDERR "died: $pid\n";
+         if ( $have == $pid ) { $have = 0; }
+      }
+  
+ 
+  Whether you reset it before/after the wait may be very important ... 
+ 
+ Then Bjarne Steinsbo <bjarne@hsr.no> followed up with: 
+ 
+  That's not the whole story... Another problem is that SIGCLD interrupts the
+  read system call on SysV-ish (I like that word! :-) systems. This means that you
+  have to test why "" fails, and act accodingly. A program that works on both Sun
+  and HP is: 
+ 
+     $SIG{CHLD}=\&w;
+     while(1){
+        $_ = ;
+        $! = 0, next if $! =~ /Interrupted/;
+        last if $! or !defined $_;
+        if($have){
+             print STDERR "child still alive\n";
+        }
+        else{
+             if(($pid=fork()) != 0){
+                $have=$pid;
+                print STDERR "forked $pid\n";
+             }
+             else {
+                exec("xterm -e vi") 
+             }
+        }
+     }
+ 
+     sub w{
+        $pid=wait;
+        print STDERR "died: $pid\n";
+        if ( $have == $pid ) { $have = 0; }
+        $SIG{CHLD}=\&w;
+     }
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 18. How do I "clear the screen"? 
+ 
+ What screen are you trying to clear? 
+ 
+ If you are trying to clear a tty (e.g. xterm) screen then try either of the following
+ within your script: 
+ 
+     system "clear";
+ or
+     print `clear`;
+ 
+ (where the choice between these two depends on the rest of the script: the first is fast
+ - but proceeds via fork and may not occur at exactly the time that you want it to in
+ the script). 
+ 
+ David and Rachel Weintraub <davidw@cnj.digex.net> recommend using the old 
+ termcap.pl p4 library. You might also consider the perl 5 equivalents: Term.pm
+ (especially the Term::Control module), Curses.pm, Perlmenu.pm, PV. 
+ 
+ If you are trying to eliminate a TopLevel or a MainWindow then try: 
+ 
+     $main -> destroy;
+ 
+ If you would rather not destroy then try: 
+ 
+     $main->withdraw;    # remove
+ 
+     $main->deiconify;   # put back
+ 
+ If $w is a sub-window (sub-widget) then 
+ 
+     $w->pack('forget'); # remove if packed (newer Tk-b9.01++) 
+     $w->packForget;     # remove if packed (older versions)
+     $w->pack(...);      # put back
+ 
+ There are also ways to call low level C-ish versions: 
+ 
+     $w->UnmapWindow; 
+ 
+ but that is for special purposed only.... 
+ 
+ If you are trying to erase an $item on a Canvas then try: 
+ 
+     delete($item);
+ 
+ (Thanks to the post by <a904209@pluto.tiuk.ti.com> which extended this answer
+ considerably.) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 19. Are there any international font packages for perl/Tk? 
+ 
+ In principle you may specify the -font configuration option on all your Button, 
+ Entry, Label, Message, etc. widgets. In addition to the Unix programs xfontsel
+ and xlsfonts you may find xset useful for determining and/or specifying fonts -
+ especially international ones. 
+ 
+ Kobayasi Hiroaki <kobayasi@sowa.is.uec.ac.jp> has converted the Tcl/Tk
+ "japanization" by <nisinaka@sra.co.jp> so that it may be used with perl/Tk. It is
+ presently available (the current README file is in Japanese) from: 
+ 
+     ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/Tk-b9.jp-a6.gz
+ 
+ From the author's own description: 
+ 
+ Currently, the "japanization patch for perl/Tk" enables:
+ 
+   [1] To show kanji & ASCII (by choosen kanji-font) in every widget.
+   [2] To edit kanji (double width of ASCII) correctly in Text & Entry.
+   [3] To support of Kanji Input method. (tkKinput.c)
+   [4] Automatic kanji-code-detection & conversion with 'insert/get'.
+       Supports: "JIS(Japanese Industrial Standard)", "MS-KANJI", "EUC".
+ 
+ & the patch lacks:
+ 
+   [5] by manual Kanji-code conversion. (JIS <=> MS-KANJI <=> EUC)
+   [6] 'Good' interface to specify kanji-code used in internal. (tkWStr.c)
+   [7] Documentation in English about [1-6].
+       # but, since interface-change is suspected in near future, 
+       # documenting them is ...
+ 
+ I thought that[5-7] was not enough for world-people, but already worth
+ for natives. So I announced it on "fj.lang.perl".
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 20. Are there any other ways to create X interfaces from perl? 
+ 
+ Yes. A short list would have to mention: 
+ 
+ For perl 4: 
+    WAFE, STDWIN
+ For perl 5:
+    Sx (uses Athena & Xlib), Motif (uses Motif & Xt), Fresco (post X11R6)
+ 
+ There is also Malcolm Beattie's Tkperl (which is largely incompatible with perl/Tk). 
+ 
+ Further information on X interfaces to Perl is provided in the perl FAQ. 
+ 
+ SGI folk may be interested in the OpenGL Perl Module (Sun folk too - if you have
+ "mesaGL" installed). 
+ 
+ For perl generation of GIF images see the question in this FAQ on graphics modules.
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 21. Where can I get more information on graphics modules? 
+ 
+ The GD.pm perl module is a perl interface to the C code of a similar name and was
+ written by Lincoln Stein. It allows for the generation of GIF (Graphics Inline
+ Format) images from within a perl script. The module itself is available from any 
+ CPAN ftp site, and Lincoln maintains an informational web page at: 
+ 
+     http://www-genome.wi.mit.edu/ftp/pub/software/WWW/GD.html
+ 
+ The gd/GIF.pm module is similar to GD.pm (generates GIFs using gd.c) and was
+ written by Roberto Cecchini who maintains a web page for his module at: 
+ 
+     http://www.fi.infn.it/pub/perl/GIF/
+ 
+ The JPEG.pm module was written by Nick Ing-Simmons expressly for use with the
+ Tk family of modules. It is distributed on CPAN in the authors/id/NI-S/
+ directories as a Tk-JPEG-*.tar.gz file. 
+ 
+ If you will be interfacing to the pgplot FORTRAN routines you might consider Karl
+ Glazebrook's pgperl which has a web page at: 
+ 
+     http://www.ast.cam.ac.uk/~kgb/pgperl.html
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 22. Are there any major applications written in perl/Tk? 
+ 
+ Yes. In fact, there are some interesting perl/Tk applications already available from: 
+ 
+ Your own Tk-b# distibution:
+ ---------------------------
+ 
+ The following programs may be found in your own Tk-b#/ directory: 
+ 
+ 
+ program        description
+ pfm            perl file manager - cute iconic front to emacs
+ ptknews        a GUI perl newsreader (Tk-b9.01) - a work in progress.
+ tkpsh          perl/Tk equivalent of wish.
+ toyedit        a Text widget editor.
+ 
+ The following programs may be found either in your demos directory (consult the 
+ README file there for fuller descriptions) or in your perl/bin install directory: 
+ 
+ 
+ program        description
+ browse         Simple file browser front end for emacs.
+ color_editor   Front end to Tk::ColorEditor
+                allows RGB, CMY, and HSV color cube manipulation
+                (based on tcolor.tcl).
+ ixset          GUI front end to xset - for terminal settings.
+ pgs            Perl front end to Ghostscript (for viewing PostScript(c) files).
+ rmt            perl/Tk 
+                "development shell/remote control application"
+                You can launch or talk to other perl/Tk apps with rmt.
+ rolodex        Like the Tcl/Tk app of the same name.
+                Requires editing for personal use.
+ timer          Stopwatch - like seconds timer.
+ tkpod          The perl gui pod viewer (like xman).
+ tkweb          The perl gui web browser.
+ 
+ Other perl/Tk application distributors:
+ ---------------------------------------
+ 
+ ptkb.pl
+    an xbiff like mailbox watcher. Available from 
+    ftp://ftp.wpi.edu/perl5/pTk-Modules/ptkb.pl 
+ bioTkperl
+    Was announced by Gregg Helt <gregg@fruitfly.berkeley.edu> recently. See
+    the home page at: http://www.cbil.upenn.edu/~dsearls/bioTk.html. Source at: 
+    ftp://fruitfly.berkeley.edu/pub/bioTk/bioTkperl0.8.tar.gz 
+ EVA
+    Hiroaki Kobayasi's EVA is a sophisticated wish like perl/Tk "shell". It is
+    available from: ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/eva-*.tar.gz 
+ plop
+    Stephen Lidie's very useful arbitrary function Plot Program, was featured in
+    the premier issue of The Perl Journal and is available on the web at: 
+    http://orwant.www.media.mit.edu/the_perl_journal/programs/Vol_1_Issue_1_Tk/plop
+ Workspace
+    Is an integrated front end to the fvwm window manager that makes use of
+    Perl/Tk. See the web page at http://www.mirai.com/wks/ for more information.
+ www
+    The original 8 line wonder by Jon Orwant. Pick it up (and modify it) from: 
+    http://sun20.ccd.bnl.gov/~ptk/archive/ptk.1995.08/0411.html. (Please note:
+    www is for amusement, the more serious perl/Tk browser - tkweb - is
+    distributed with Tk-b# and is "only" 60 lines long!.) 
+ 
+ Be sure to also check the newsgroups comp.lang.perl.tk, comp.lang.perl.announce, 
+ comp.lang.perl.misc, and comp.lang.perl.modules, as well as the mailing list archive
+ for more Perl/Tk program and package announcements. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 23. What is the history of pTk and perl/Tk? 
+ 
+ This list is only slowly coming together. Please forgive any absences. 
+ 
+  o tkperl5a5 is announced Thu, 20 Oct 1994 14:44:23 +0000 (BST) 
+ 
+ NOTE
+ This project is unrelated to the one which is adding usersubs to
+ perl4 to get access to Tk via Tcl. Often, postings on comp.lang.perl
+ just say "tkperl" without saying which one is meant. They are two
+ totally different kettles of fish.
+ 
+ --Malcolm (Beattie)
+ 
+  o Fri, 25 Nov 94 14:29:53 GMT Nick Ing-Simmons is working on what will be
+    known as "nTk" eventually. 
+  o Mon, 12 Dec 94 08:56:36 GMT, Nick Ing-Simmons reports: 
+ 
+ I have a re-port of ext/Tk nearly ready for alpha.
+ It builds its own "pTk" library from sources semi-automatically derived
+ from Tk3.6.  There is no Tcl library at all. 
+ 
+ Would anyone like to assist me in testing it?
+ 
+  o nTk-a2 announced Fri, 16 Dec 1994 10:59:36 -0500 
+  o nTk-a3 announced Mon, 19 Dec 1994 18:03:27 -0500 
+  o nTk-a5 announced Fri, 23 Dec 1994 10:18:16 -0500 (last to use Tk 3.6 ?) 
+  o nTk-a6 first to use Tk 4.0 (?) 
+  o nTk-a7 announced Fri, 13 Jan 1995 10:55:27 -0500 
+  o nTk-a8 has appeared before Tue, 17 Jan 95 09:04:33 GMT 
+  o nTk-a9 has appeared before Wed, 18 Jan 95 19:25:10 GMT 
+  o nTk-a10 announced Tue, 24 Jan 1995 14:32:02 -0500 
+  o nTk-a11 announced Tue, 31 Jan 95 19:05:32 GMT 
+  o Malcolm Beattie suggests the nTk -> Tk name change, Larry Wall concurs 
+  o nTk-a12 announced Thu, 16 Feb 1995 09:12:26 -0500 
+  o Nick Ing-Simmons calls for a new mail list Thu, 16 Feb 95 14:13:55 GMT 
+  o Tk-a13 announced Wed, 1 Mar 1995 11:38:15 -0500 (Name has changed
+    from "nTk") 
+  o Tk-b1 announced Tue, 14 Mar 95 16:58:40 GMT 
+  o Tk-b2 announced Wed, 29 Mar 95 15:52:44 BST 
+  o Tk-b3 announced Fri, 31 Mar 95 16:54:54 BST 
+  o Tk-b4 announced Fri, 12 May 1995 11:45:32 -0400 EST 
+  o Tk-b5 announced Mon, 26 Jun 95 17:14:06 BST 
+  o Tk-b6 announced Fri, 21 Jul 95 15:42:35 BST 
+  o Tk-b7 announced Fri, 28 Jul 95 15:16:02 BST 
+  o Tk-b8 announced Wed, 16 Aug 95 12:34:05 BST 
+  o an RFD (Request For Discussion) for a new usenet group comp.lang.perl.tk is
+    circulated by Jon Orwant Fri, 4 Aug 1995 08:29:46 -0400 
+  o unmoderated newsgroup comp.lang.perl.tk passes by a vote of 352 to 18 with 1
+    abstention in an announcement made Mon, 9 Oct 1995 10:13:17 -0400
+    (EDT). The new group makes its appearance at news-servers roughly 18
+    October 1995. 
+  o Tk-b9.01 announced Wed, 20 Dec 95 10:06:47 GMT. 
+  o Tk-b10 announced Sat, 23 Mar 96 17:16:27 GMT. 
+  o Tk-b11 announced Mon, 1 Apr 96 16:44:48 GMT. 
+  o Tk-b11.01 announced Wed, 3 Apr 96 17:48:09 GMT. 
+  o Tk-b11.02 announced 10 Apr 96 12:52:28 GMT. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 24. What can we expect the future to hold? 
+ 
+ Here is a summary of the Tk-b11.02 announcement: 
+ 
+ Changes in b11.02 
+ 
+  o Fix for K&R 'cc' (e.g. Sun's /bin/cc) compile. 
+  o 'Scrolled' scrollbars now only get packed (dynamically) when required. 
+  o Tweaks for perl5.002_01 
+  o Tidied up basic_credentials stuff to HTML/Web.pm a bit 
+  o Brought Pod viewer up to date. 
+  o Fixed memory leak in Tk::Callback->new, highlighted by recent 'after'
+    changes. 
+ 
+ The gamma release is not far off at all. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 25. How do I obtain the latest version of this FAQ? 
+ 
+ On the world wide web
+ ---------------------
+ 
+ Hypertext (split by question): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+ Hypertext (whole thing - may be too large for some browsers, but is amenable to
+ searching): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ As far as I know any other source may be slightly out of date with respect to those two
+ web URLs. Nevertheless, there are many other places to retrieve this FAQ from, in a
+ variety of formats, such as: 
+ 
+ Plaintext (whole): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ Plaintext (multi-part): 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ0.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ1.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ2.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ3.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ4.txt
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ5.txt
+ or gzipped PostScript(c) (about 60 US 8.5"x11" pages):
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.ps.gz
+ or gzipped PostScript(c) (about 60 A4 pages):
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.A4.ps.gz
+ 
+ For those without WWW access:
+ -----------------------------
+ 
+ usenet newsgroup
+ ~~~~~~~~~~~~~~~~
+ 
+ This FAQ will be posted to the newsgroup comp.lang.perl.tk. This FAQ will also be
+ posted to comp.answers and news.answers, hence, this FAQ is being carried by the
+ big usenet anonymous ftp servers such as 
+ 
+     ftp://rtfm.mit.edu/pub/usenet/
+     ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+     ftp://rtfm.mit.edu/pub/usenet/comp.lang.perl.tk
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/comp/lang/perl/tk
+ 
+     ftp://ftp.uu.net/usenet/news.answers/perl-faq/ptk-faq
+     etc.
+ 
+ For information on usenet please see 
+ 
+     news.software.nntp
+     http://www.academ.com/academ/nntp.html
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/news/answers/usenet/site-setup
+     ftp://rtfm.mit.edu/pub/usenet-by-hierarchy/news/answers/usenet/software/part1
+     http://info.internet.isi.edu/in-notes/rfc/files/rfc977.txt
+     ftp://ftp.academ.com/pub/nntpclnt
+     http://www.w3.org/hypertext/WWW/LineMode/Defaults/AboutNewsServers.html
+ 
+ Note that perl/Tk now comes with a script called ptknews that may help you. Don't
+ forget Larry Wall's rn program either (or derivatives of the *rn form). 
+ 
+ ftp
+ ~~~
+ 
+ This FAQ is available via ftp from: 
+ 
+ USA                                                  IP
+     ftp://ftp.ccd.bnl.gov/pub/ptk/                   130.199.54.188
+     ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt         130.199.54.188
+     ftp://ftp.wpi.edu/perl5/pTk-FAQ                  130.215.24.209
+     ftp://perl.com/pub/perl/doc/ptkFAQ.gz            199.45.129.30
+     ftp://perl.com/pub/perl/doc/ptkFAQ.ps.gz         199.45.129.30
+ 
+ This FAQ is now being carried by the CPAN (Comprehensive Perl Archive
+ Network) ftp sites (thanks Tom ;-). At any of the CPAN locations go into the doc/
+ directory to retrieve either the ptkFAQ.gz file (gzipped plaintext), the 
+ ptkFAQ.html.gz file (gzipped html [with some links relative to
+ "http://w4.lns.cornell.edu/~pvhp/ptk/"]), or the ptkFAQ.ps.gz file (gzipped
+ PostScript(c)). 
+ 
+ See a previous question in this document for a more extensive list of CPAN locations.
+ 
+ e-mail services:
+ ~~~~~~~~~~~~~~~~
+ 
+ Send e-mail (content of message unimportant) to <ptkfaq@pubweb.bnl.gov> and
+ you will receive the text version of this FAQ. (Many thanks to Alan L. Stange at
+ Brookhaven for setting this up!) 
+ 
+ Those without FTP access can get the plaintext version via e-mail from the rtfm
+ archive. For help send e-mail to <mail-server@rtfm.mit.edu> with a message of:
+ 
+     send usenet/news.answers/finding-sources
+ 
+ The mail server at rtfm may be able to e-mail a plaintext version of this faq. Send
+ e-mail to <mail-server@rtfm.mit.edu> containing: 
+ 
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part0
+ 
+ Then send several more (separate) requests, such as: 
+ 
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part1
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part2
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part3
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part4
+     send /pub/usenet/news.answers/perl-faq/ptk-faq/part5
+ 
+ The ptk@lists.stanford.edu mailing list is devoted more to porting and development
+ issues. The URL's to this FAQ will occasionally be posted there, but not the full text
+ (it is simply too big - sorry).
+ 
+ Webmail Gateways:
+ ~~~~~~~~~~~~~~~~~
+ 
+ With e-mail you might try one of the (experimental & not necessarily reliable)
+ http-to-mail services such as either of the following:
+ 
+ When last tested the service at <webmail@www.ucc.ie> reported that the single 
+ ptkFAQ.txt file was too large to send. Hence, you must send several separate
+ e-mail requests to <webmail@www.ucc.ie>
+ A Subject: line is not required but do include the following one line message body
+ in your first e-mail: 
+ 
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ0.txt
+ 
+ Then send several more (separate) requests as follows: 
+ 
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ1.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ2.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ3.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ4.txt
+     GO http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ5.txt
+ 
+ please note: In days gone by this service would take several hours to send back both a
+ plaintext and a uuencoded version of the stated file - both within a single mail
+ message. The service did mention receiving more than 17,000 requests in October
+ 1995 alone and it is not known whether they will continue. 
+ 
+ 
+ Send e-mail to <agora@mail.w3.org>
+ with a one line message body (Subject: line not required) such as: 
+ 
+     SEND http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ 
+ please note: this last method bounced backed a "permanently out of service" message
+ when last attempted. The home page at http://www.w3.org/hypertext/WWW/Agora/
+ mentions "temporarily out of service", caveat netsurfer; the page at 
+ http://www.w3.org/pub/WWW/MailRobot/send.html does not mention being out of
+ service. 
+ System administrator and webmasters are encouraged to visit any of the following
+ pages: 
+ 
+     http://www.w3.org/pub/WWW/MailRobot/Overview.html
+     http://www.w3.org/pub/WWW/MailRobot/send.html
+     http://www.w3.org/hypertext/WWW/Mailing/Form.html
+     http://www.w3.org/hypertext/WWW/Agora/
+ 
+ and decide if they wish to set up a webmail gateway of their own. The agora.pl
+ script is written in perl and makes use of the www line mode browser. It could
+ presumably be re-written to use url-get.pl or any other fine code such as the
+ latest, greatest perl5 module for URL fetching :-) 
+ 
+ gopher
+ ~~~~~~
+ 
+ On a very experimental basis you might try: 
+ 
+     gopher-client 128.84.219.153
+ 
+ or in URL form: 
+ 
+     gopher://128.84.219.153/1
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 26. Acknowledgements & maintainer. 
+ 
+ The Perl/Tk extension to the Perl programming language is copywritten by its author
+ Nick Ing-Simmons <nik@tiuk.ti.com> whose Tk-b11.02/COPYING file reads as
+ follows: 
+ 
+ Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+ This package is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself, with the exception
+ of the files in the pTk sub-directory which have separate terms
+ derived from those of the orignal Tk4.0 sources and/or Tix. 
+ 
+ See pTk/license.terms for details of this Tk license,
+ and pTk/Tix.license for the Tix license.
+ 
+ Especial thanks to:
+ Nick Ing-Simmons for writing perl/Tk.
+ Malcolm Beattie for tkperl.
+ An anonymous comp.lang.perl.tk poster for writing the initial "pseudo-FAQ" that
+ got this started.
+ Larry Wall for writing extensible Perl 5 & John Ousterhout for writing Tk 4.
+ Tom Christiansen and Stephen P. Potter for writing and maintaining excellent perl
+ documentation, and general doc help.
+ Jon Orwant <orwant@media.mit.edu> for organizing the comp.lang.perl.tk Usenet
+ newsgroup.
+ Alan Stange & Tom Schlagel for the hypermail archive, the ftp & e-mail distribution
+ of the FAQ, etc.
+ Achim Bohnet for an excellent searchable hypermail archive.
+ Ilya Zakharevich <ilya@math.ohio-state.edu> for great perl/Tk pod docs.
+ Kobayasi Hiroaki <kobayasi@sowa.is.uec.ac.jp> for great perl/Tk scripts.
+ William J. Middleton <wjm@best.com> for archive help.
+ Ioi Kim Lam for Tix.
+ Larry Virden for cross-posting the Tcl FAQ.
+ 
+ In addition, this FAQ has benefitted from the contributions of many people all over
+ the net to whom I am quite grateful.
+ I am:
+ Peter Prymmer
+ Wilson Synchrotron Laboratory
+ Cornell University
+ Ithaca, NY 14853
+ 
+ pvhp@lns62.lns.cornell.edu
+ 
+ ______________________________________________________________________
+ 
+ 
+ Hypertext whole FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+ Hypertext (split by question) FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+ Plaintext FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+ Plaintext multi-part FAQ: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ[0..3].txt
+ Image-supplement: 
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html

@@ -1,0 +1,25 @@
+COPYING
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/Hardware/UPS/Perl/Connection.pm
+lib/Hardware/UPS/Perl/Connection/Net.pm
+lib/Hardware/UPS/Perl/Connection/Serial.pm
+lib/Hardware/UPS/Perl/Constants.pm
+lib/Hardware/UPS/Perl/Driver.pm
+lib/Hardware/UPS/Perl/Driver/Megatec.pm
+lib/Hardware/UPS/Perl/General.pm
+lib/Hardware/UPS/Perl/Logging.pm
+lib/Hardware/UPS/Perl/PID.pm
+lib/Hardware/UPS/Perl/Utils.pm
+suse/upsperld.sh
+suse/upsperld.sysconfig
+t/simple.t
+upsagent.pl
+upsadm.pl
+upsperl.spec
+upsstat.pl
+upswatch.pl
+META.yml                                 Module meta-data (added by MakeMaker)

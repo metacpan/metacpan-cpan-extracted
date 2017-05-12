@@ -1,0 +1,34 @@
+perfSONAR_PS::Services::MA::SNMP README File
+============================================
+
+Description
+-----------
+
+The perfSONAR_PS::Services::MA::SNMP module allows one to make SNMP data
+available in SQL or RRD files using the perfSONAR SNMP MA protocols.
+
+Installation
+------------
+
+ Prerequisites
+ -----------------
+
+    RRDTool (http://oss.oetiker.ch/rrdtool/)
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Services::MA::SNMP'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2008, Internet2 and the University of Delaware
+
+All rights reserved.

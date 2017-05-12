@@ -1,0 +1,17 @@
+Revision history for perltugues
+
+0.16
+		Condicionais e laços não precisam mais envolver condição avaliada entre parêntesis.
+		"a não ser que" (com til) adicionado.
+		Adicionada palavra chave "escreve" como sinônimo para a forma imperativa "escreva"
+		Adicionada opção de acento em palavras-chave "próximo", "refaça" e "vá para"
+		Adicionada palavras-chave "início", "inicio" (com ":" opcional no final) como um sinônimo para início de bloco ( além do abre-chaves "{" )
+		Adicionada palavra-chave "fim" como um sinônimo para fim de bloco ( além do fecha-chaves "}" )
+		Adicionada palavra-chave "função" (e "funcao") como sinônimo para "sub"
+
+0.2..0.15
+		Changes to avoid failing tests.	
+
+0.1    
+       First version!
+

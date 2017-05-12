@@ -1,0 +1,93 @@
+
+#!start included /Users/schwern/perl5/perlbrew/perls/perl-5.14.1/lib/5.14.1/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+
+# Avoid MYMETA files
+^MYMETA\.
+#!end included /Users/schwern/perl5/perlbrew/perls/perl-5.14.1/lib/5.14.1/ExtUtils/MANIFEST.SKIP
+
+
+# Avoid Devel::NYTProf files
+^nytprof
+
+# Don't ship perl5i
+^bin/perl5i$
+^bin/perl5i.c$
+^bin/perl5i.bat$
+
+# Ignore C object files
+\.o$
+^MYMETA.yml$
+
+# Ignore emacs temp files
+^\.#
+
+# Ignore our own dist dir
+^perl5i-
+
+# Don't ship admin scripts
+^admin/
+
+# Don't ship our motivational images
+^img/
+
+# Don't ship patch files
+\.patch$
+\.diff$
+
+# Don't ship the test template
+t/00_TEST_TEMPLATE.t
+
+# Don't ship Travis-CI config
+^\.travis\.yml

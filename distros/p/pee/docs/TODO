@@ -1,0 +1,2 @@
+- report syntax error with line number display (can be turned on or off)
+- Apache Request handler for mod_perl.

@@ -1,0 +1,137 @@
+Revision history for perlfaq
+
+5.021011    20162016-03-04 20:04:08Z
+  * update info on Perl 6
+  * fix LICENSE address and update prereq for its content
+  * excluded README.pod from the shipped tarball distribution
+
+5.021010    20152015-07-28 18:30:48Z
+  * Fix typo (Douglas L. Jenkins)
+  * Fix Time::Seconds example (Niko Tyni)
+  * Basic README.pod (Shlomi Fish)
+
+5.021009    20152015-01-25 22:36:24Z
+  * many updates to vendor and tool details in perlfaq3 (Michiel Beijen)
+  * distribution version bumped to match the first blead version it will be
+    included in (5.021009)
+
+5.0150046   20142014-10-19 02:04:58Z
+  * refer to Marpa::R2 instead of Marpa::XS (Jeffrey Kegler)
+  * misc spelling and grammar fixes (darfich)
+  * avoid bareword filehandles (Shlomi Fish, perl RT#122923)
+  * reference Path::Tiny instead of File::Slurp (RT#83126)
+  * some dist building cleanup (Karen Etheridge)
+
+5.0150045   2014-08-03 17:16:06Z
+  * Improve example, use File::Spec (Brian Fraser)
+  * Typo in perlfaq7 (Rares Aioanei, via shlomif)
+  * Typo in perlfaq1 (Xaerxess)
+
+5.0150044   2013-09-12 19:51:52Z
+  * avoid gensym in examples (Karen Etheridge)
+  * Cleanup of perltoot/boot etc (Smylers)
+  * Perl release schedule (Alex Beamish)
+  * Module search path (Alex Beamish)
+  * XS recompiling modules (Alex Beamish)
+  * clarify &foo() ignores prototype (mauke)
+
+5.0150043   2013-05-12 18:40:17Z
+  * Various typos and URL fixes (dsteinbrunner)
+  * Typo (argrath)
+
+5.0150042   2013-03-06 13:37:08Z
+  * Fix dodgy link as reports in #114260 of cpan RT (ranguard)
+  * Hex typo (Martin Becker)
+  * Typo (joaquinferrero)
+
+5.0150041   2012-08-15 21:00:37Z
+  * Kephra added as an editor (lichtkind)
+  * Fixes array operation typos in perlfaq4 (oalders)
+  * fixed misleading use of an array to store (Martin Becker)
+
+5.0150040   2012-06-09 11:02:27Z
+  * perlglossary provided by Tom C. from Camel 4
+  * remove prototypes and & for subroutine (mauke)
+  * Grammar from patch [RT #113492]
+  * utf8 in Email::MIME (wchristian)
+
+5.0150039   2012-02-18 14:33:17Z
+  * Rewrite "How do I create a module?" (ranguard)
+  * Remove more old questions (ranguard)
+  * Improve Email::MIME example (madsen)
+  * Fix to regex (RT #74215)
+
+5.0150038   2012-01-19 20:10:06Z
+  * Marpa::XS updated (Jeffrey Kegler)
+  * Frameworks (wchristian, ranguard, bigpresh, kraih)
+  * Cleanup (wchristian)
+  * Users email (apeiron, ranguard)
+
+5.0150037   2012-01-08 20:24:39Z
+  * Better XML parsing recommendations (apeiron)
+  * Remove various old questions & update a few (ranguard)
+  * Change auto generate of questions a bit (ranguard)
+  * Autogenerate question index in perlfaq.pod (doherty)
+  * Cleanups / typos, updating nested expressions (dami, reviewed by schwern)
+
+5.0150036   2011-10-22 15:20:34Z
+  * Web site moved from faq.perl.org -> learn.perl.org (ranguard)
+  * Delete some questions/cleanup copy (ranguard)
+  * Make perlfaq.pod shorter/cleaner (kablamo)
+  * Many cleanups and corrections (shlomif)
+
+5.0150035   2011-09-26 19:44:20Z
+  * Import perlglossary from blead
+
+5.0150034   2011-09-12 17:41:25Z
+  * Copy edit Perl 6 a bit more (ranguard)
+  * Add blog section (ranguard)
+  * Update much of the copy about emails in perlfaq9 (apeiron)
+  * Many small changes (bigpresh)
+  * Add descriptions to doc list (bigpresh)
+  * Start moving away from global file handles (shlomif)
+  * Typos, clarity and other cleanups (shlomif)
+  * Cleanup copy (ranguard)
+  * Start to add "my" to variables (shlomif)
+  * Remove verbose/history copy (ranguard)
+  * Switch to L<> around URLs (ranguard)
+
+5.0150033   2011-08-30 20:46:25Z
+  * Perl 6 changes (apeiron)
+  * Replace tabs with spaces (ranguard)
+  * Link to www.cpan.org/ports/ for binary (ranguard)
+  * Switch C<> over to L<> for any module on CPAN (ranguard)
+  * Change brace stype (apeiron)
+  * Extra dzil tests (rafl)
+  * Changes so more semantic, and better rendered HTML (ranguard)
+  * Point to repo for how to update perlfaq (ranguard)
+
+5.0150032   2011-08-30 18:51:59Z
+  * Version number fix only
+
+5.01500302  2011-08-29 09:53:08Z
+  * Update "How to contribute to the perlfaq"
+
+5.01500301  2011-08-29 09:08:17Z
+  * Cause the 'perlfaq' package to be indexed by PAUSE so we can make use
+    of its permission system.
+
+5.015003    2011-08-26 12:37:47Z
+  * Replace old bookmarks.cpan link with www.perl.org and learn.perl.org
+    (Leo Lapworth).
+  * Fix or remove many broken links (Leo Lapworth).
+  * Correct some POD markup (Father Chrysostomos).
+  * Add a note on searching perlfaq (Matthew Horsfall).
+
+5.015000    2011-07-08 09:37:58Z
+  * First stand-alone release to CPAN. This release is identical to
+    the version of perlfaq included with the perl code as of 5.15.0.
+
+-----
+
+For prior history please see the Perl repository:
+
+git clone git://perl5.git.perl.org/perl.git
+cd perl
+git co a2afbef4476f724afce78f808244bff05314ad11
+git log pod/perlfaq*

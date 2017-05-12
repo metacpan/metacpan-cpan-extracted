@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use MIO::TCP;
+use Poros::Query;
+use Vulcan::OptConf;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 cluster [--no-lookup] \
+ [--mincnt number] [--sample lines] [--period seconds]
+
+=cut
+
+my ( $option, %seco );
+BEGIN { $option = Vulcan::OptConf->load(); %seco = $option->dump( 'seco' ); }
+
+use lib $seco{lib};
+use SECO::Conf::Auto;
+
+$Vulcan::OptConf::ARGC = 1;
+
+my ( $port, %miss ) = 12345;
+my %argv = $option->get( qw( mincnt=i sample=i period=i no-lookup ) )->dump();
+my $range = Hermes->new( $option->dump( 'range' ) );
+my @host = SECO::Conf::Auto->new( $seco{conf} )->list( host => shift );
+
+$argv{lookup} = ! delete $argv{'no-lookup'};
+
+my %query = ( code => "nrid", user => 'search', argv => [ %argv ] );
+my %result = MIO::TCP->new( map { join ':', $_, $port } @host )
+    ->run( input => Poros::Query->dump( \%query ), max => 500 );
+
+while ( my ( $type, $mesg ) = each %result )
+{
+    while ( my ( $mesg, $node ) = each %$mesg )
+    {
+        $mesg = $mesg =~ s/--- \d+\n$//
+            ? eval { YAML::XS::Load( $mesg ) } || 'invalid response'
+            : 'no response';
+
+        $mesg = @$mesg
+            ? sprintf '[ %d ]: %s', @$mesg + 0, $range->load( $mesg )->dump
+            : next if ref $mesg eq 'ARRAY';
+
+        map { $_ =~ s/:\d+$//; $_ } @$node;
+        $miss{$mesg} = $range->load( $node )->dump;
+    }
+}
+
+print YAML::XS::Dump \%miss if %miss;
+exit 0;
+

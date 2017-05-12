@@ -1,0 +1,83 @@
+<h3>Monitored Domains (will be stored in the landmarks config file)</h3>
+<div class="menu">
+<ul>   
+<TMPL_LOOP NAME=Domains>
+       <li class="sub"><a href="#nogo"><TMPL_VAR NAME=domain_name> &#183;<!--[if IE 7]><!--></a><!--<![endif]-->
+         <!--[if lte IE 6]><table><tr><td><![endif]-->    
+          <ul>  
+               <li class="smver_1">Domain Name: 
+	           <input   type="text" size="30"  
+		      name="update_domain_<TMPL_VAR NAME=domain_name>"  
+		      id="update_domain_<TMPL_VAR NAME=domain_name>"
+                      onmouseover="return overlib('Change the  name of the Domain. Please check the configuration  of the Domain to make sure that Node names are correct');" 
+	              onmouseout="return nd();" 
+                      onChange="updateGlobal([{args:'update_domainname'},{args:'<TMPL_VAR ESCAPE=HTML NAME=urn>'},
+		                'update_domain_<TMPL_VAR NAME=domain_name>', 'NO_CACHE'],['domain_table', 'LastActionResult', 'domainPage']);"
+                      value="<TMPL_VAR  ESCAPE=HTML NAME=domain_name>">
+	       </li>                     
+               <TMPL_LOOP NAME=Nodes>
+		<li class="sub"><a href="#nogo"><TMPL_VAR NAME=node_name>  &#183;<!--[if IE 7]><!--></a><!--<![endif]--> 
+		        <!--[if lte IE 6]><table><tr><td><![endif]-->    
+        		 <ul>         
+        		     <li>
+			       <input type="button" class="buttons"  
+			        name="ConfigureNode<TMPL_VAR ESCAPE=HTML NAME=urn>"   
+			        id="ConfigureNode<TMPL_VAR ESCAPE=HTML NAME=urn>"
+                                onmouseover="return overlib('Configure this Node');" 
+				onmouseout="return nd();" 
+                                onClick="configureNode([{args:'ConfigureNode<TMPL_VAR ESCAPE=HTML NAME=urn>'},  {args:'<TMPL_VAR ESCAPE=HTML NAME=urn>'}, 'ConfigureNode<TMPL_VAR ESCAPE=HTML NAME=urn>', 'NO_CACHE'], ['domainPage', 'LastActionResult' ]);" 
+                                value="Configure Node"> 
+			      
+	        		  <input type="button" class="buttons" 
+				     name="remove_node_<TMPL_VAR ESCAPE=HTML NAME=urn>"  
+				     id="remove_node_<TMPL_VAR ESCAPE=HTML NAME=urn>"
+                		     onmouseover="return overlib('Remove this Node');" 
+				     onmouseout="return nd();" 
+                		     onClick="updateGlobal([{args:'remove_node'},{args:'<TMPL_VAR ESCAPE=HTML NAME=urn>'},'remove_node_<TMPL_VAR ESCAPE=HTML NAME=urn>', 'NO_CACHE'],['domain_table', 'LastActionResult', 'domainPage']);" 
+                		     value="Remove">
+			      </li>  
+		          </ul>
+	                  <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+		   </li>
+		   </TMPL_LOOP>  
+		   <li>Add and Configure new Domain Node
+		       <input type="text" 
+		              name="add_node<TMPL_VAR ESCAPE=HTML NAME=urn>"     class="fc_st"  
+			      id="add_node<TMPL_VAR ESCAPE=HTML NAME=urn>"
+			       onmouseover="return overlib('Add new Domain Node');" 
+                               onmouseout="return nd();"
+        		       onChange="updateGlobal([{args:'add_node<TMPL_VAR ESCAPE=HTML NAME=urn>'}, {args:'<TMPL_VAR ESCAPE=HTML NAME=urn>'}, 'add_node<TMPL_VAR ESCAPE=HTML NAME=urn>', 'NO_CACHE'],
+			                ['domain_table', 'LastActionResult', 'domainPage']);"
+			      value="">	
+	           </li>  
+	       	             
+                  <li>
+	           <input type="button" class="buttons" 
+		      name="remove_domain_<TMPL_VAR ESCAPE=HTML NAME=urn>"  
+		      id="remove_domain_<TMPL_VAR ESCAPE=HTML NAME=urn>"
+                      onmouseover="return overlib('Remove this Domain');" 
+		      onmouseout="return nd();" 
+                      onClick="updateGlobal([{args:'remove_domain_<TMPL_VAR ESCAPE=HTML NAME=urn>'},{args:'<TMPL_VAR ESCAPE=HTML NAME=urn>'},'remove_domain_<TMPL_VAR ESCAPE=HTML NAME=urn>', 'NO_CACHE'],['domain_table', 'LastActionResult', 'domainPage']);" 
+                      value="Remove">
+	           </li> 
+	    </ul>
+          <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>    
+  </TMPL_LOOP>  
+ </ul>
+ <h3>Add new Domain</h3>
+       <input type="text" 
+            name="add_domain"  size="60" class="fc_st"  
+	    id="add_domain" 
+            onmouseover="return overlib('Add new Domain Name and id will be created as &quot;urn:ogf:network:domain=&lt;Domain Name&gt;&quot;');" 
+             onmouseout="return nd();"
+            onChange="updateGlobal([{args:'add_domain'},  'add_domain',  'add_domain', 'NO_CACHE'],['domain_table', 'LastActionResult', 'domainPage']);" 
+	    value="">
+</div>  
+  
+  <p>
+  <input type="button" class="buttons"  name="saveXML"  id="saveXML" 
+            onClick="saveConfigs([ 'saveXML',  'NO_CACHE'],['domain_table','LastActionResult', 'domainPage']);"  value="Save MP landmarks XML">
+  <p>
+  <input type="button" class="buttons"  name="Reset"  id="Reset" 
+            onClick="resetit([ 'Reset',  'NO_CACHE'],['domain_table','LastActionResult', 'domainPage']);"  value="Reset">

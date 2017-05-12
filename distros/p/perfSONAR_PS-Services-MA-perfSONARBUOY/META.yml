@@ -1,0 +1,51 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         perfSONAR_PS-Services-MA-perfSONARBUOY
+version:      0.09
+version_from: lib/perfSONAR_PS/Services/MA/perfSONARBUOY.pm
+installdirs:  site
+requires:
+    base:                          0
+    Carp:                          0
+    CGI::Carp:                     0
+    Date::Manip:                   0
+    DBI:                           0
+    Digest::MD5:                   2.33
+    English:                       0
+    Error:                         0
+    Exporter:                      0
+    Fcntl:                         0
+    fields:                        0
+    File::Basename:                0
+    File::Path:                    0
+    FileHandle:                    0
+    FindBin:                       0
+    IO::File:                      1
+    Log::Dispatch::FileRotate:     1
+    Log::Dispatch::Screen:         1
+    Log::Dispatch::Syslog:         1
+    Log::Log4perl:                 1
+    Math::BigFloat:                0
+    Math::BigInt:                  0
+    Module::Load:                  0.1
+    Params::Validate:              0.64
+    perfSONAR_PS::Client::LS::Remote: 0.09
+    perfSONAR_PS::Common:          0.09
+    perfSONAR_PS::DB::File:        0.09
+    perfSONAR_PS::DB::SQL:         0.09
+    perfSONAR_PS::DB::XMLDB:       0.09
+    perfSONAR_PS::Error_compat:    0.09
+    perfSONAR_PS::Messages:        0.09
+    perfSONAR_PS::Services::Base:  0.09
+    perfSONAR_PS::Services::MA::General: 0.09
+    POSIX:                         0
+    strict:                        0
+    Sys::Hostname:                 0
+    Sys::Syslog:                   0
+    Term::ReadKey:                 0
+    Time::HiRes:                   1.85
+    warnings:                      0
+    XML::LibXML:                   1.58
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

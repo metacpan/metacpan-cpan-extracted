@@ -1,0 +1,31 @@
+<HTML>
+<HEAD><TITLE> 11.6. What is the difference between use and require?</TITLE></HEAD>
+<BODY><a name="A11.6"> 11.6. What is the difference between <KBD>use</KBD> and <KBD>require</KBD>?</a>
+
+<hr>
+</p><p>
+The short answer is that something like:
+<pre>
+    use Tk;
+</pre>
+is equivalent to:
+<pre>
+    BEGIN { require "Tk.pm"; import Tk; }
+</pre>
+Hence the essential difference is that a mere <kbd>require Tk;</kbd> does not 
+achieve the <kbd>import</kbd> of function/method names. The significance of
+this is that it allows one to call <kbd>-&gt;Button</kbd> rather than having 
+to call the fully qualified <kbd>-&gt;Tk::Button</kbd> <i>e.g.</i>. For 
+further details on this subject see 
+<a href="http://www.metronet.com/perlinfo/perl5/manual/perlmod.html">
+<kbd>man perlmod(1)</kbd></a> or see <a href="mailto:tchrist@mox.perl.com">Tom Christiansen's</a> document at:
+<pre>
+    <a href="ftp://ftp.perl.com/perl/info/everything_to_know/use_vs_require">ftp://ftp.perl.com/perl/info/everything_to_know/use_vs_require</a>
+</pre>
+
+
+<hr>
+	<p><a href="qna11.5.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.6">table of contents</a> | <a href="qna11.7.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

@@ -1,0 +1,32 @@
+perfSONAR_PS::Client::Topology::MA README File
+==============================================
+
+Description
+-----------
+
+perfSONAR_PS::Client::Topology::MA is a module that provides an OO interface
+for performing queries against and storing data in a perfSONAR_PS Topology
+Measurement Archive. This client is meant to provide a similar API to the
+perfSONAR_PS::Client::Topology::XMLDB module so that clients can easily be
+written that support local or remote access.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Client::Topology::MA'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

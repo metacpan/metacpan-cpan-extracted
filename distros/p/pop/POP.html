@@ -1,0 +1,536 @@
+<HTML>
+  <HEAD>
+    <TITLE>POP: Perl Object Persistence</TITLE>
+  </HEAD>
+  <BODY BGCOLOR=white>
+    <H1>POP: Perl Object Persistence</H1>
+    <H4>Benjamin Holzman<br>
+    bholzman@earthlink.net</H4>
+    <hr>
+    <h3><a name="toc">Table of Contents</a></h3>
+    <ul>
+      <li><a href="#intro">Introduction</a></li>
+      <li><a href="#pox">POX</a></li>
+      <li><a href="#parser">Parser & Translators</a>
+        <ul>
+          <li><a href="#poxdb">POXDB</a></li>
+          <li><a href="#poxperl">POXPERL</a></li>
+          <li><a href="#poxother">Other Translators</a></li>
+        </ul>
+      </li>
+      <li><a href="#runtime">Runtime Persistence Engine</a></li>
+      <li><a href="#delete">I Object To This Object, Yer Honor</a></li>
+      <li><a href="#all">Finding The Object Of Your Dreams</a></li>
+      <li><a href="#link">Link Classes</a></li>
+      <li><a href="#trans">Transactions</a></li>
+      <li><a href="#avail">Availability</a></li>
+      <li><a href="#fn">Footnotes</a></li>
+    </ul>
+    <hr>
+    <h3><a name="intro" href="#toc">Introduction</a></h3>
+    <P>
+One of the stated goals of object-oriented programming is to closely associate
+the knowledge about a particular piece of data with that data itself. This
+leads to better localization of knowledge, which improves maintenance,
+organization, and reusability. The abstraction of a class, with attributes and
+methods, goes a long way towards this goal. But it doesn't address the issue of
+where the data lives when the program stops running.
+    </P>
+    <P>
+If every system consisted of a single process with a single memory image, there
+would be no persistence issue, but that's not very realistic. Most systems
+nowadays consist of multiple dæmons running on multiple machines, and if these
+systems are to be written in the object-oriented paradigm, some mechanism must
+be used to allow the same object to be instantiated in multiple processes, and
+still maintain consistency within and amongst objects.
+    </P>
+    <P>
+Existing mechanisms for persistence in Perl fall roughly into two categories;
+stream-based and database-based. Stream-based persistence involves transforming
+objects in memory into a stream (essentially a string), which can then be stored
+in, say, a file on disk. Both <code>Data::Dumper</code> and <code>Storable</code>
+<a href="#fn1" name="fr1"><sup>1</sup></a> fall into this category.
+A database-based persistence scheme transforms objects in memory into a form
+that can be directly inserted into a database management system. In the case of
+the ObjectStore interface module,<a href="#fn2" name="fr2"><sup>2</sup></a>
+that database management system is the object
+database ObjectStore.<a href="#fn3" name="fr3"><sup>3</sup></a>
+Other schemes represent objects in tables in a relational
+database, such as Tangram,<a href="#fn4" name="fr4"><sup>4</sup></a> the
+persistence scheme I presented last year, and POP, the subject of this paper.
+    </P>
+    <P>
+One of the problems with stream-based persistence is that one generally must 
+store and restore all the objects in the system in one shot. If you wish to 
+change just one attribute of just one object, you have to load up the whole 
+shebang, make the change, and then write back the changes. This gets even 
+trickier if you wish to have two separate processes access the objects at the 
+same time.
+    </P>
+    <P>
+Another issue is dealing with transactions; often, one would like a change to 
+one object to happen if and only if some other object is changed. The canonical 
+example is a transfer of money from one bank account to another. If the program 
+has deducted money from the first account, but before it can credit the second 
+account, a comet destroys the computer that was running the program, you 
+wouldn't want the initial deduction still to be applied when the system is 
+eventually reconstructed. Similarly, a second program running simultaneously 
+shouldn't see the initial deduction until the deposit is made, or it might 
+think that the person has less money than they really do.
+    </P>
+    <P>
+This type of transactional control is very difficult with a stream-
+based model, but is exactly the sort of problem which has already been solved 
+in relational databases. Object databases offer similar services, but 
+they can be prohibitively expensive.
+    </P>
+    <P>
+So POP stores objects in tables in a relational database. The tables closely 
+mirror the logical structure of the object (see <a href="fig1.gif">figure 1</a>),
+which enables the 
+persistence engine to be quite smart about reflecting changes in objects in the 
+database. There are three basic components to the system. The first is a markup 
+language based on XML (called POX, for Persistent Object eXoskeleton) which 
+describes the structure of persistent classes, one class per file. These files 
+(collectively called poxen) are fed through translators that can generate a 
+database schema, skeletal Perl classes, documentation, or even a rudimentary 
+user interface. The poxen are also used at runtime by the persistence base 
+class, which actually stores and restores objects from the database.
+    </P>
+    <P>
+Persistent classes built using POP look almost exactly like regular classes, 
+and the detailed structural information in the poxen allow the persistence 
+engine to be smart about what gets sent and received from the database. The 
+indexing features of the database are used to make querying efficient. The 
+auto-generation of the database schema is both necessary because of its 
+complexity and a boon because it speeds development.
+    </P>
+    <h3><a name="pox" href="#toc">POX</a></h3>
+    <P>
+Each persistent class requires a POX, specifically to define the structure and 
+type of the attributes of that class. The top-level tag, <code>&lt;class></code>, contains,
+as attributes of the tag, the Perl-level name for the class, an optional 
+abbreviation of the class name for use in the database,
+<a href="#fn5" name="fr5"><sup>5</sup></a> an optional list of 
+super-classes, an optional indication that this is an abstract class, and an 
+optional indication that this is a link class (a special type of class used to 
+connect other objects together in a relationship). For example,
+    </P>
+    <P>
+<pre>
+&lt;class	name='Person'
+        abbr='pers'
+        abstract='1' >
+...
+&lt;/class>
+or
+&lt;class	name='Employee'
+        abbr='emp'
+        isa='Person' >
+...
+&lt;/class>
+</pre>
+    </P>
+    <P>
+Multiple inheritance can be specified by supplying a comma-separated list of 
+classes for the <code>isa</code> attribute.
+    </P>
+    <P>
+Within the class tag, each persistent attribute is specified with either an 
+<code>&lt;attribute></code> or a <code>&lt;participant></code> tag. A participant is a special type of 
+attribute used in link classes, and is described below. The <code>&lt;attribute></code> tag takes 
+a Perl-level name, an optional abbreviation for use in the database, and data 
+type and arity (either scalar, array or hash) values. For example,
+    </P>
+    <P>
+<pre>
+&lt;attribute 	name='name'
+                type='char(30)' />
+</pre>    
+    </P>
+    <P>
+or
+    </P>
+    <P>
+<pre>
+&lt;attribute 	name='address'
+                abbr='addr'
+                type='varchar(255)'
+                list='1' />
+</pre>    
+    </P>
+    <P>
+or
+    </P>
+    <P>
+<pre>
+&lt;attribute 	name='meetings'
+                abbr='mtgs'
+	        hash='1'
+                key_type='numeric(11,0)'
+                val_type='Schedule::Meeting' >
+Hash of meetings; key is meeting time in
+epoch seconds; value is a Schedule::Meeting object
+&lt;/attribute>
+</pre>    
+    </P>
+    <P>
+This is the only structure that is required for persistence. There's also a 
+(fetal) facility for specifying object methods, class methods and constructors,
+which would be rendered as stubs in the skeletal Perl class generated by POP. 
+There's a synchronization problem which comes up in doing this though, because 
+the Perl module is likely to diverge from the POX, so until POP turns into a 
+full-fledged CASE tool, I'd recommend against trying to use this feature.
+    </P>
+    <P>
+As you can tell from the above examples, POP supports object attributes with 
+scalar, list/array or hash arities. A scalar may be either a simple data type 
+like a number or a string or an embedded object. Arrays are similarly typed, 
+but note that there is no support for heterogeneous arrays; every element of 
+the array must be of the same type. This will hopefully change at some point. 
+There are two data types for hashes; the type of the key and the type of the 
+value. The type of the value may be any valid scalar type, but the key may not 
+be an embedded object.
+    </P>
+    <P>
+Embedded objects are handled specially; only the unique id of the object
+(called the pid, or persistence id<a href="#fn6" name="fr6"><sup>6</sup></a>) is stored in 
+the database, and the actually restoring of the object is delayed until the 
+corresponding attribute is actually used. In the case of scalar attributes 
+containing embedded objects, when the parent object is restored, a special tied 
+scalar is created which contains the necessary information to restore the 
+embedded object (specifically, the class and the pid), and is entered into the 
+parent object. The tied scalar also contains a reference to itself (not to its 
+internal implementation, mind), so that when it is read (i.e., when <code>FETCH</code> is 
+called), it restores the embedded object, and unties itself, and sets itself to 
+this object. Arrays and hashes of embedded objects are handled in a somewhat 
+more straightforward fashion by tied array and tied hash classes.
+    </P>
+    <h3>
+    <h3><a name="parser" href="#toc">Parser & Translators</a></h3>
+    </h3>
+    <P>
+The poxen are converted to a Perl data structure by a <code>POX_parser</code> object, which 
+embeds an <code>XML::Parser</code>. A <code>->parse</code> method takes the path to a POX, parses it, and 
+returns a nested-hash data structure. For example, there's a top-level key of 
+the returned hash for the scalar attributes of the class; the value is a (reference 
+to a) hash whose keys are the names of each scalar attribute and whose values 
+are themselves (references to) hashes, representing the attributes (like the name, 
+data type, etc.) of that attribute.
+    </P>
+    <P>
+These parsed classes are used both by the persistent base class at run-time and 
+by the translators; <code>poxdb</code>, <code>poxperl</code>, <code>poxhtml</code> and <code>poxui</code>.
+    </P>
+    <h4><a name="poxdb" href="#toc">POXDB</a></h4>
+    <P>
+<code>poxdb</code> reads all the poxen for the current set of classes and generates a file 
+containing SQL statements which will create the tables, indexes and stored 
+procedures in the database to store and retrieve objects in those classes. This 
+file is referred to as a schema file. Each <code>create table</code>, <code>create index</code> or <code>create procedure</code> statement is tagged with the class which requires it, which 
+allows the database manipulation programs, <code>schema_load</code>, <code>schema_drop</code> and <code>schema_trunc</code> to operate on a per-class basis if desired. <code>schema_load</code> reads the 
+schema file and executes the statements in it in a database (which database to 
+connect to, and the connection parameters of that database, are configured by 
+environment variables), optionally for one or more specific classes, but by 
+default for all the classes. <code>schema_drop</code>, as the name suggests, undoes the 
+actions of <code>schema_load</code>, dropping tables, indices and stored procedures. 
+<code>schema_trunc</code> truncates the tables referenced in the schema file, which is very 
+useful in development and certification.
+    </P>
+    <h4><a name="poxperl" href="#toc">POXPERL</a></h4>    
+    <P>
+<code>poxperl</code> creates a skeletal Perl module implementing the persistent class, 
+including get/set accessors for all of the attributes. The persistence of the 
+class is almost completely transparent; the only difference
+<a href="#fn7" name="fr7"><sup>7</sup></a> from a typical Perl 
+class is the following:
+    </P>
+    <P>
+    <pre>
+	use POP::Persistent;
+	use vars qw/@ISA/;
+	@ISA = qw/POP::Persistent/;
+    </pre>
+    </P>
+    <h4><a name="poxother" href="#toc">Other Translators</a></h4>
+    <P>
+<code>poxhtml</code> uses the comments in the POX (you did put comments in your POX, didn't 
+you?) to create HTML documentation for the class. This is of limited utility if 
+only the attributes are defined in the POX, but it looks pretty slick. It even 
+color-codes inherited methods and attributes by base class. <code>poxui</code>, which is 
+still in a development stage, creates a CGI interface to allow maintenance of 
+persistent objects. It will never be sufficient to be a real GUI, but it can be 
+quite handy for debugging and testing. In lieu of such an interface, however, 
+the Perl debugger is quite useful for creating test objects.
+    </P>
+    <h3><a name="runtime" href="#toc">Runtime Persistence Engine</a></h3>
+    <P>
+<code>POP::Persistent</code> is the base class for persistent objects. It contains the 
+default constructor for persistent objects, which creates a self-tied hash (an 
+object which is a reference to a hash which is tied into the same package as 
+the object). If the constructor is called with no arguments,
+it supplies a new pid (persistence id), and attempts to call an <code>->initialize</code> method before the 
+underlying hash is tied, which allows default values for attributes to be set.
+    </P>
+    <P>
+An existing object can be retrieved by supplying the pid to the constructor, 
+but in general, pids will almost never be seen in application code. Usually, an 
+object is restored by being embedded in another object, by participating in a 
+link with another object, or through some alternate constructor, from a user-
+based key (e.g., <code>Person->new_from_empid</code>).
+    </P>
+    <P>
+Once a persistent object has been constructed in memory, any and all accesses 
+to attributes are intercepted by the <code>STORE</code> and <code>FETCH</code> methods in the persistent 
+base class. <code>FETCH</code> ensures that the in-memory representation is up-to-date with 
+the database, reading updated attribute information if necessary. <code>STORE</code> ensures 
+that any changes to the object are reflected in the database. There are a 
+number of optimizations that make this scheme feasible.
+    </P>
+    <P>
+All pre-computable queries and updates are created as stored procedures, which 
+allows the database to pre-compute the query plan. Normally, I shy away from 
+using stored procedures because they can become a maintenance nightmare, but in 
+this case, they are automatically generated, which removes most of the 
+maintenance concerns.
+    </P>
+    <P>
+In the database, there's a global table with one row for every object 
+containing that object's pid and a version number. Whenever an object is 
+changed in the database, this version number is updated. This allows the <code>->FETCH</code> 
+method to initially check just this version number to know if it needs to 
+refresh the data in the object. If the process that attempted to read the 
+attribute is in a transaction and has already modified the object in question, 
+it doesn't even have to check the version number; no other process could have 
+modified the object. Similarly, <code>STORE</code> only has to update the version number 
+once per object during a transaction, even if it makes many modifications. 
+Actually, <code>STORE</code> doesn't even have to replicate changes until the end of a 
+transaction, but the current implementation does not do that, since that would 
+cause commit to take longer. Choosing between these two behaviors should be an 
+option, however.
+    </P>
+    <P>
+The lazy object loading discussed earlier is another performance enhancement. 
+A per-process memory cache of persistent objects allows the same object to be 
+used multiple times in the same process with only one copy of the object in 
+memory. This cache is maintained using weak references (currently the <code>Devel::WeakRef</code> 
+module is used, but the built-in weak refs coming in 5.006 should work just 
+fine for that purpose).
+    </P>
+    <P>
+Since an object with multi-valued attributes (arrays and hashes) could have a 
+potentially huge amount of data, some effort is made to optimize access to 
+multi-valued attributes. A version number is kept for each multi-valued 
+attribute, which allows <code>STORE</code> to avoid writing unchanged data back to the 
+database, and also to allow <code>FETCH</code> to avoid reading lots of unchanged data from 
+the database.
+    </P>
+    <h3><a name="delete" href="#toc">I Object To This Object, Yer Honor</a></h3>
+    <P>
+Object deletion is supported, and pains are taken to ensure that no object can 
+be deleted while it is referenced by another object. The <code>->delete</code> method in the 
+persistent base class throws an exception if the object is referenced by any 
+other object (i.e., it occurs as an embedded object in some other object), and 
+actually implements the deletion otherwise. Class implementers should define 
+their own <code>->delete</code> method, which can implement specific semantics with regard 
+to deletion, such as removing the object from referencing objects, or 
+disallowing deletion of special instances (like an administrative user). This 
+is left up to the class, since desired semantics can vary greatly from class to 
+class.
+    </P>
+    <h3><a name="all" href="#toc">Finding The Object Of Your Dreams</a></h3>
+    <P>
+A (poorly named) class method <code>->all</code> (defined in the base class) is used to 
+enumerate all the objects of a class. By default, it returns a list of all the 
+pids belonging to that class.
+<a href="#fn8" name="fr8"><sup>8</sup></a>
+You can supply a list of one or more attribute 
+names to have those attributes returned for each object instead of (or as well 
+as) the pid. If more than one attribute is specified, <code>->all</code> will return a list 
+of array references, with each array containing the values of those attributes for 
+each object. This is immensely useful for, say, populating drop-downs in user 
+interfaces. For example, consider an HTML popup menu where you want the value 
+of each option to be the pid of the object, so the agent receiving the post of 
+the form can easily restore the selected object, but the label to be some other 
+attribute of the object, like its name.
+    </P>
+    <P>
+    <pre>
+my $q = new CGI;
+...
+print $q->popup_menu(
+                -name => 'who',
+                -values => Person->all,
+                -labels =>
+        { map {@$_} Person->all('pid', 'name') }
+);
+</pre>    
+    </P>
+    <P>
+By supplying options in an optional hash reference as the first argument to <code>->all</code>, 
+the behavior can be further refined. For instance, the returned values can be 
+sorted by any particular scalar attribute of the object, even if that attribute 
+is not among the selection set, by using a <code>'sort'</code> key. There's also a <code>'where'</code> 
+key whose value is something like a SQL where clause, but already parsed. The 
+syntax for this is extremely rudimentary, and definitely in need of improvement;
+the Tangram module has a very nice way of dealing with this, which I hope to 
+adapt.
+    </P>
+    <h3><a name="link" href="#toc">Link Classes</a><a href="#fn9" name="fr9"><sup>9</sup></a></h3>
+    <P>
+Often, embedding one object inside another to represent a relationship between 
+the two objects can get very messy. Embedding generally implies a parent-child 
+relationship and not all object-to-object relationships fit that model. Often, 
+the semantics of the relationship imply that the "child" object should have a 
+link back to the parent. This can make certain operations, such as deletion, 
+cumbersome. Furthermore, many relationships logically involve more than two 
+objects. For example, consider a marriage. You might think that marriage 
+involves just two <code>Person</code> objects, one playing the role of husband and the other 
+playing the role of wife.
+<a href="#fn10" name="fr10"><sup>10</sup></a>
+However, one could reasonably extend the relationship 
+to include such entities as the official who legalized the marriage, the time 
+of the marriage, its location, etc.
+    </P>
+    <P>
+For these reasons, we'll represent a marriage as an object. Here's the POX for 
+our <code>Marriage</code> class:
+    </P>
+    <P>
+    <pre>
+&lt;class	name='Marriage'
+	abbr='marr'
+	type='link'>
+&lt;participant	name='husband'
+		abbr='husb'
+		type='System::Person' />
+&lt;participant	name='wife'
+		type='System::Person' />
+&lt;participant	name='official'
+		type='System::Person' />
+&lt;attribute	name='datetime'
+		abbr='dt'
+		type='numeric(11,0)' />
+&lt;attribute	name='location'
+		abbr='loc'
+		type='varchar(255)' />
+&lt;/class>
+    </pre>
+    </P>
+    <P>
+Participants are really glorified attributes, whose type must be a persistent 
+class. When the schema file is generated from this POX, indices are added for 
+each participant column. Poxperl will create a class method of Marriage for 
+each participant that takes an object of the type of that participant and 
+returns all the Marriage objects containing that object in that role. For 
+example:
+    </P>
+    <P>
+    <pre>
+package Person;
+...
+sub husband {
+  my $this = shift;
+  my @marriages = 
+    System::Marriage->all_with_wife($this);
+  if (@marriages > 1) {
+    croak $this->name, " is polyandrous";
+  }
+  return $marriages[0]->husband;
+}
+...
+    </pre>
+    </P>
+    <P>
+Dealing with relationships in link classes sometimes takes a bit more work 
+than with embedded objects, but the advantage is that they're more flexible, 
+and different semantics can be implemented for different types of 
+relationships.
+    </P>
+    <h3><a name="trans" href="#toc">Transactions</a></h3>
+    <P>
+One of the advantages of representing objects in a relational database is that 
+the built-in transactional support can be leveraged. POP supports two 
+transactional models, an ANSI mode and an auto-commit mode. Under the ANSI 
+mode, every process is implicitly in a transaction, and every transaction must 
+be explicitly ended with a commit or rollback. Under auto-commit, every 
+modification of an attribute is immediately reflected in the database. A 
+program can switch between the two modes at runtime, so the simpler auto-commit 
+mode can be used for most of a program, and the more efficient ANSI mode can 
+be used where necessary.
+    </P>
+    <P>
+Long-running transactions carry their own performance problems, however, when 
+more than one process is involved. This happens because the database system 
+must use locks to prohibit other processes from changing the data until the end 
+of the transaction. By default, other processes are also blocked from reading 
+data that has been changed by the transaction, to guarantee the property that 
+the same row can be read from the database multiple times in a transaction and 
+it will always have the same value. However, most databases support different 
+isolation levels, that is, different degrees by which one transaction is 
+isolated from the changes occurring in another transaction. Often, for 
+performance reasons, you want to read whatever data exists in the database, 
+even if it might be in an inconsistent state. This is referred to as "dirty 
+read". POP supports whatever isolation levels are supported by the database, 
+and allows the level to be changed for the process at runtime. Furthermore, 
+<code>->all</code> operates by default at a dirty read isolation level, but it is 
+configurable.
+    </P>
+    <h3><a name="avail" href="#toc">Availability</a></h3>
+    <P>
+POP is available on the CPAN, at 
+<a href="http://www.perl.com/CPAN/authors/id/B/BH/BHOLZMAN/pop-0.06.tar.gz">
+$CPAN/authors/id/B/BH/BHOLZMAN/pop-0.06.tar.gz</a>. It has only been tested on 
+Solaris, with Sybase as the relational database back-end. It should be fairly 
+trivially portable to any operating system that Perl runs on. With a bit of 
+work, it should be possible to port it to Oracle and Informix, but less 
+full-featured database systems like mySQL pose more of a problem.
+    </P>
+  <hr>
+  <h3><a name="fn" href="#toc">Footnotes</a></h3>
+  <a name="fn1" href="#fr1"><sup>1</sup> </a>
+  <a href="http://www.perl.com/CPAN/modules/by-module/Storable">
+  $CPAN/modules/by-module/Storable</a>
+  <hr>
+  <a name="fn2" href="#fr2"><sup>2</sup> </a>
+  <a href="http://www.perl.com/CPAN/modules/by-module/ObjStore">
+  $CPAN/modules/by-module/ObjStore</a>
+  <hr>
+  <a name="fn3" href="#fr3"><sup>3</sup> </a>
+  <a href="http://www.odi.com">http://www.odi.com</a>
+  <hr>
+  <a name="fn4" href="#fr4"><sup>4</sup> </a>  
+  <a href="http://www.perl.com/CPAN/modules/by-module/Tangram">
+  $CPAN/modules/by-module/Tangram</a>
+  <hr> 
+  <a name="fn5" href="#fr5"><sup>5</sup> </a>
+  Most relational database management systems (RDBMS) have fairly stingy limitations on the length of identifiers, 
+  and POP will use the supplied class name in the database as a component of 
+  certain identifiers, so it is important to supply a short abbreviation for 
+  each name which is more than about 8 characters.
+  <hr>
+  <a name="fn6" href="#fr6"><sup>6</sup> </a>  
+  These unique ids are generally referred to as object ids, but "oid" is 
+  difficult (and embarrassing) to pronounce.
+  <hr>  
+  <a name="fn7" href="#fr7"><sup>7</sup> </a>  
+  Well, that's a bit of a lie; the current implementation requires that 
+  certain types of attributes have some specific initialization code (for 
+  instance, embedded objects need to be initialized as scalar references), but 
+  that's just a by-product of the specific implementation, and will eventually 
+  be fixed.
+  <hr>  
+  <a name="fn8" href="#fr8"><sup>8</sup> </a>  
+  Okay, so this contradicts what I said earlier about pids not finding their 
+  way up to application code, but in this case the pids can be thought of as 
+  opaque ids, and an application would have no reason to actually look at the 
+  <em>value</em>, which is the real point.
+  <hr>  
+  <a name="fn9" href="#fr9"><sup>9</sup> </a>    
+  Thanks to <a href="mailto:tburzesi@bender.com">Thomas Burzesi</a> for
+  designing this functionality.
+  <hr>  
+  <a name="fn10" href="#fr10"><sup>10</sup> </a>    
+  For the purposes of this example, we'll ignore more exotic combinations.
+  </BODY>
+</HTML>

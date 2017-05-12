@@ -1,0 +1,25 @@
+---
+DocOptions:
+  Title:  Test
+  Author: me
+  TexOut: t/conf/out.tex
+  UserPostamble: |
+    \cleardoublepage
+    \addcontentsline{toc}{chapter}{\numberline{}Index}
+    \printindex
+    \end{document}
+  AddPreamble: 1
+  Head1Level:  0
+  LevelNoNum:  4
+DocStructure:
+  - Section:
+      Level: part
+      Title: Catalyst
+  - Input:
+      FileOrPod: Catalyst::Manual::Intro
+  - Section:
+      Level: chapter
+      Title: Test
+  - Input:
+      FileOrPod: t/conf/test.tex
+

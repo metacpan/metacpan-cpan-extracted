@@ -1,0 +1,191 @@
+<HTML>
+<HEAD>
+<BASE HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html">
+<TITLE>comp.lang.perl.tk FAQ</TITLE>
+</HEAD><BODY>
+From: <A HREF="mailto:pvhp@lns62.lns.cornell.edu">pvhp@lns62.lns.cornell.edu</A> (Peter Prymmer)<BR>
+Newsgroups: <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>,<A HREF="news:comp.lang.perl.announce">comp.lang.perl.announce</A>,<A HREF="news:comp.answers">comp.answers</A>,<A HREF="news:news.answers">news.answers</A><BR>
+Subject: <A HREF="ptkFAQ.html">comp.lang.perl.tk FAQ</A><BR>
+Followup-To: <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A><BR>
+Date: Wed May 15 22:26:55 EDT 1996<BR>
+Approved: news-answers-request@MIT.EDU<BR>
+Summary: comp.lang.perl.tk Frequently Asked Questions.<BR><!-- BR -->
+Archive-name: perl-faq/ptk-faq<BR>
+Posting-Frequency: monthly<BR>
+Last-modified: Wed May 15 22:26:55 EDT 1996<BR>
+URL: <A HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html">
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html</A><BR>
+Version: 0.03<BR>
+<BR>
+URL (Hypertext-split): <A HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html">
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html</A><BR>
+URL (Plaintext): <A HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt">
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt</A><BR>
+Image-supplement: <A HREF="http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html">
+ http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html</A><BR>
+ftp-Archive: <a href="ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt">
+ ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt</a><BR>
+ftp-Archive: <a href="ftp://ftp.wpi.edu/perl5/pTk-FAQ">
+ ftp://ftp.wpi.edu/perl5/pTk-FAQ</a><BR>
+ftp-Archive: <a href="ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/">
+ ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/</a><BR>
+e-mail-Archive: <a href="mailto:ptkfaq@pubweb.bnl.gov">ptkfaq@pubweb.bnl.gov</a><BR>
+gopher-Archive: <a href="gopher://128.84.219.153/1">128.84.219.153</a><BR>
+<BR>
+<H1>Perl/Tk FAQ</H1>
+<P>
+<IMG SRC="img/T_pTk.gif" ALT="ntk-&gt;ptk"></P>
+The Perl/Tk extension to the Perl programming language is copywritten by its
+author Nick Ing-Simmons <a href="mailto:nik@tiuk.ti.com">&lt;nik@tiuk.ti.com&gt;</a>
+whose <kbd>Tk-b11.02/COPYING</kbd> file reads as follows:
+<pre>
+Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, with the exception
+of the files in the pTk sub-directory which have separate terms
+derived from those of the orignal Tk4.0 sources and/or Tix. 
+
+See pTk/<a href="misc/license.terms">license.terms</a> for details of this Tk license, 
+and pTk/<a href="misc/Tix.license">Tix.license</a> for the Tix license.
+</pre>
+
+<HR>
+<p>
+This compilation of Frequently Asked Questions &amp; answers (FAQ) is 
+intended to answer several of the first (and mostly more basic) questions 
+posted to the <a href="news:comp.lang.perl.tk">comp.lang.perl.tk</a> newsgroup.
+<p>
+This document concerns itself with the Perl/Tk programming language (or, if you
+prefer, the Tk extension to Perl). Please beware that this is not the 
+<a href="http://www.perl.com/perl/faq/">Perl FAQ</a>, this is not the 
+<a href="http://www.smartpages.com/faqs/tcl-faq/top.html">Tcl FAQ</a>, nor is
+this the <a href="http://www.smartpages.com/faqs/tcl-faq/tk/top.html">Tcl/Tk
+FAQ</a>. Each of those other documents are useful sources of information for 
+Perl/Tk programmers but are completely different from this one.
+<p>
+This is a dynamic document and contributions, clarifications, and 
+corrections are <a href="mailto:pvhp@lns62.lns.cornell.edu">most welcome!</a> 
+Please send e-mail to 
+<a href="mailto:pvhp@lns62.lns.cornell.edu">&lt;pvhp@lns62.lns.cornell.edu&gt;</a>.
+With your help this document will get better (-:</p>
+
+<P><a name="TOC">perl/Tk FAQ</a></P>
+
+<ol>
+
+<!-- part 0/5 Introduction -->
+
+<li><a href="qna1.html" name="TOC1"> What is perl/Tk?</a>
+<li><a href="qna2.html" name="TOC2"> What is the difference between perl/Tk and Tkperl?</a>
+<li><a href="qna3.html" name="TOC3"> Where is it?</a>
+<li><a href="qna4.html" name="TOC4"> What/Where is CPAN?</a>
+
+<!-- part 1/5 Getting Started -->
+
+<li><a href="qna5.html" name="TOC5"> How do I build it?</a>
+<li><a href="qna6.html" name="TOC6"> Where is the Documentation?</a>
+<li><a href="qna7.html" name="TOC7"> How do I write scripts in perl/Tk?</a>
+<li><a href="qna8.html" name="TOC8"> What widget types are available under perl/Tk?</a>
+
+<!-- part 2/5 Programming -->
+
+<li><a href="qna9.html" name="TOC9"> How do I get widget <I>X</I> to do <I>Y</I> ?</a>
+ <ol>
+ <li><a href="qna9.1.html" name="TOC9.1"> How do I get a <KBD>Button</KBD> to call a Perl subroutine?</a>
+ <li><a href="qna9.2.html" name="TOC9.2"> How do I arrange the layout of my widgets?</a>
+ <li><a href="qna9.3.html" name="TOC9.3"> How do I get a Popup to popup?</a>
+ <li><a href="qna9.4.html" name="TOC9.4"> How do I <KBD>bind</KBD> keyboard keys?</a>
+ <li><a href="qna9.5.html" name="TOC9.5"> How do I add <KBD>bind</KBD>ings?</a>
+ <li><a href="qna9.6.html" name="TOC9.6"> How do I bind the action of a slider (<i>sic</i>) to ... ?</a>
+ <li><a href="qna9.7.html" name="TOC9.7"> How do I <KBD>configure</KBD> a <KBD>Scrollbar</KBD> to scroll multiple widgets?</a>
+ <li><a href="qna9.8.html" name="TOC9.8"> How do I display a bitmap?</a>
+ <li><a href="qna9.9.html" name="TOC9.9"> How do I display an image?</a>
+ <li><a href="qna9.10.html" name="TOC9.10"> What Image types are available?</a>
+ <li><a href="qna9.11.html" name="TOC9.11"> Is there any way to have more than one <KBD>Listbox</KBD> contain a selection?</a>
+ <li><a href="qna9.12.html" name="TOC9.12"> How do I select a range of tags in a <KBD>Text</KBD> widget?</a>
+ <li><a href="qna9.13.html" name="TOC9.13"> How do I group <KBD>Radiobutton</KBD>s together?</a>
+ <li><a href="qna9.14.html" name="TOC9.14"> How do I specify fonts?</a>
+ <li><a href="qna9.15.html" name="TOC9.15"> How do I <kbd>get</kbd> the entry in an <kbd>Entry</kbd>?</a>
+ <li><a href="qna9.16.html" name="TOC9.16"> How do I hide a password <kbd>Entry</kbd>?</a>
+ <li><a href="qna9.17.html" name="TOC9.17"> How do I obtain <kbd>Menu</kbd>s that do not tear off?</a>
+ </ol>
+<li><a href="qna10.html" name="TOC10"> How do I get a <KBD>Canvas</KBD> to ... ?</a>
+ <ol>
+ <li><a href="qna10.1.html" name="TOC10.1"> Display a bitmap?</a>
+ <li><a href="qna10.2.html" name="TOC10.2"> Erase a display?</a>
+ <li><a href="qna10.3.html" name="TOC10.3"> Display an Image?</a>
+ <li><a href="qna10.4.html" name="TOC10.4"> What things can be <KBD>create</KBD>d on a <KBD>Canvas</KBD>?</a>
+ <li><a href="qna10.5.html" name="TOC10.5"> How do I use the <KBD>Canvas</KBD> as a geometry manager?</a>
+ <li><a href="qna10.6.html" name="TOC10.6"> How do I get a <KBD>Canvas</KBD> to output PostScript(c)?</a>
+ <li><a href="qna10.7.html" name="TOC10.7"> How do I get a PostScript(c) output of a <KBD>Canvas</KBD> w/ widgets?</a>
+ <li><a href="qna10.8.html" name="TOC10.8"> How do I get the size of a <KBD>Canvas</KBD>? After a re-size?</a>
+ <li><a href="qna10.9.html" name="TOC10.9"> How do I <KBD>bind</KBD> different actions to different areas of the same <KBD>Canvas</KBD>?</a>
+ </ol>
+
+<!-- part 3/5 More Programming -->
+
+<li><a href="qna11.html" name="TOC11"> Common Problems.</a>
+ <ol>
+ <li><a href="qna11.1.html" name="TOC11.1"> What do the <KBD>-&gt;</KBD>, <KBD>=&gt;</KBD> and <KBD>::</KBD> symbols mean?</a>
+ <li><a href="qna11.2.html" name="TOC11.2"> What happened to the ampersands <KBD>&amp;</KBD>?</a>
+ <li><a href="qna11.3.html" name="TOC11.3"> What happened to the quotation marks?</a>
+ <li><a href="qna11.4.html" name="TOC11.4"> Must I use &quot;<KBD>my</KBD>&quot; on all my variables?</a>
+ <li><a href="qna11.5.html" name="TOC11.5"> Is there a way to find out what is in my perl/Tk &quot;PATH&quot;?</a>
+ <li><a href="qna11.6.html" name="TOC11.6"> What is the difference between <KBD>use</KBD> and <KBD>require</KBD>?</a>
+ <li><a href="qna11.7.html" name="TOC11.7"> How do I change the cursor/color?</a>
+ <li><a href="qna11.8.html" name="TOC11.8"> How do I ring the bell?</a>
+ <li><a href="qna11.9.html" name="TOC11.9"> How do I determine the version of perl/Tk that I am running?</a>
+ <li><a href="qna11.10.html" name="TOC11.10"> How do I call perl from C?</a>
+ <li><a href="qna11.11.html" name="TOC11.11"> How do I call Tcl code from perl/Tk?</a>
+ </ol>
+
+<!-- part 4/5 More Perl/Tk -->
+
+<li><a href="qna12.html" name="TOC12"> What are some of the primary differences between Tcl/Tk and Perl/Tk?</a>
+<li><a href="qna13.html" name="TOC13"> How do I install new scripts | modules | extensions?</a>
+<li><a href="qna14.html" name="TOC14"> How do I write new modules?</a>
+<li><a href="qna15.html" name="TOC15"> Composite Widgets.</a>
+ <ol>
+ <li><a href="qna15.1.html" name="TOC15.1"> How do I get a <kbd>Dialog</kbd> box?</a>
+ <li><a href="qna15.2.html" name="TOC15.2"> Is there a file selector?</a>
+ <li><a href="qna15.3.html" name="TOC15.3"> Is there a color editor?</a>
+ <li><a href="qna15.4.html" name="TOC15.4"> Is there a round Scale?</a>
+ <li><a href="qna15.5.html" name="TOC15.5"> Is there something equivalent to <KBD>tkerror</KBD>?</a>
+ <li><a href="qna15.6.html" name="TOC15.6"> Are there <KBD>Table</KBD>s?</a>
+ </ol>
+<li><a href="qna16.html" name="TOC16"> Programming/development tools.</a>
+ <ol>
+ <li><a href="qna16.1.html" name="TOC16.1"> Is there a Tcl/Tk to perl/Tk translator?</a>
+ <li><a href="qna16.2.html" name="TOC16.2"> Is there something equivalent to <CODE>wish</CODE> in perl/Tk?</a>
+ <li><a href="qna16.3.html" name="TOC16.3"> Is there a debugger specifically for perl/Tk?</a>
+ <li><a href="qna16.4.html" name="TOC16.4"> Is there a GUI builder in perl/Tk?</a>
+ </ol>
+<li><a href="qna17.html" name="TOC17"> Processes &amp; Inter-Process Communication under Perl/Tk.</a>
+ <ol>
+ <li><a href="qna17.1.html" name="TOC17.1"> How does one get Perl/Tk to act on events that are not coming from X?</a>
+ <li><a href="qna17.2.html" name="TOC17.2"> Is there a <KBD>send</KBD> and do I need <KBD>xauth</KBD>?</a>
+ <li><a href="qna17.3.html" name="TOC17.3"> How can I do animations using <KBD>after</KBD>?</a>
+ <li><a href="qna17.4.html" name="TOC17.4"> How do I <KBD>update</KBD> widgets while waiting for other processes to complete?</a>
+ <li><a href="qna17.5.html" name="TOC17.5"> How do you <KBD>fork</KBD> on System V (HP)?</a>
+ </ol>
+
+<!-- part 5/5 Miscellany -->
+
+<li><a href="qna18.html" name="TOC18"> How do I &quot;clear the screen&quot;?</a>
+<li><a href="qna19.html" name="TOC19"> Are there any international font packages for perl/Tk?</a>
+<li><a href="qna20.html" name="TOC20"> Are there any other ways to create X interfaces from perl?</a>
+<li><a href="qna21.html" name="TOC21"> Where can I get more information on graphics modules?</a>
+<li><a href="qna22.html" name="TOC22"> Are there any major applications written in perl/Tk?</a>
+<li><a href="qna23.html" name="TOC23"> What is the history of pTk and perl/Tk?</a>
+<li><a href="qna24.html" name="TOC24"> What can we expect the future to hold?</a>
+<li><a href="qna25.html" name="TOC25"> How do I obtain the latest version of this FAQ?</a>
+<li><a href="qna26.html" name="TOC26"> Acknowledgements &amp; maintainer.</a>
+
+</ol>
+
+
+<hr>
+	<p>Return to <a href="ptkTOC.html#TOC">table of contents</a> | <a href="qna1.html">Next</a>
+
+<hr><p>
+</BODY></HTML>

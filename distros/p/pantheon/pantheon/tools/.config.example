@@ -1,0 +1,50 @@
+---
+hermes:
+  root: $ROOT/hermes/data
+  cache: $ROOT/hermes/cache
+
+range:
+  cache: $ROOT/hermes/cache/current
+  callback: $ROOT/hermes/callback
+
+janus:
+  lib: $ROOT/janus/lib
+  path: $ROOT/janus/main/path
+  conf: $ROOT/janus/main/conf 
+
+argos:
+  lib: $ROOT/argos/lib
+  path: $ROOT/argos/main/path
+  map: $ROOT/argos/main/map
+  reduce: $ROOT/argos/main/reduce
+
+daemon:
+  path: $ROOT/daemon/path
+
+poros:
+  path: $ROOT/poros/path
+  argv: $ROOT/poros/argv
+  port: 12345
+
+seco:
+  conf: $ROOT/seco/conf
+  lib: $ROOT/seco/lib
+
+backup:
+  conf: $ROOT/.backup
+
+ntpsync:
+  conf: $ROOT/tools/conf/ntpsync # all ntp service servers address
+  
+decruft:
+  conf: $ROOT/tools/conf/decruft
+  
+symlink:
+  conf: $ROOT/tools/conf/symlink
+
+cronos:
+  conf: $ROOT/cronos/conf
+  data: $ROOT/cronos/data
+
+go:
+  conf: $ROOT/tools/conf/go

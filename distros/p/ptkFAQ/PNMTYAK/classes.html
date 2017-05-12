@@ -1,0 +1,42 @@
+<H2><A HREF="r1xloj1n9nr.fsf@hpsdly.sdd.hp.com">[PREV]</A>  [NEXT]  <A HREF="4mqnin$5o6@news.service.uci.edu">[PREV Thread]</A>  <A HREF="4mqq4a$n44@ns.mad.servicom.es">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2><HR><ADDRESS> roehrich@cray.com (Dean Roehrich)
+</ADDRESS>
+<TITLE> Re: searching the @ISA tree</TITLE>
+<ADDRESS><H1> Re: searching the @ISA tree</H1>
+</ADDRESS>
+<ADDRESS> Cray Research, Inc.
+ 10 May 96 14:39:54 CDT
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.misc">comp.lang.perl.misc</A>
+<DT> References:
+<DD> <A HREF="news:<r1xloj3t4ss.fsf@hpsdly.sdd.hp.com"><r1xloj3t4ss.fsf@hpsdly.sdd.hp.com> </A><A HREF="news:<4mr8p2$kmk@csnews.cs.colorado.edu"><4mr8p2$kmk@csnews.cs.colorado.edu> </A><A HREF="news:<r1xloj1n9nr.fsf@hpsdly.sdd.hp.com"><r1xloj1n9nr.fsf@hpsdly.sdd.hp.com></A>
+</DL>
+<HR>
+<PRE>In article <r1xloj1n9nr.fsf@hpsdly.sdd.hp.com>,
+Dave Disser  <disser@hpsdly.sdd.hp.com> wrote:
+
+&gt;Hum.  Ok, here's how this came up.  I've written class A which expects
+&gt;all of the values in its hash to be of class B.  When I make class C a
+&gt;superclass of class A, it adds scalar values to the instance.  What do
+&gt;the o-o gurus say about dealing with stuffing everything into the same
+&gt;name space?
+
+This isn't called namespace stuffing.  This is called making a class.
+
+When you create class C as a subclass of class A you do not end up with a
+class C: you end up with a class C which is a subclass of class A.  When you
+instantiate class C you get something which has the state and behavior
+described by both class C and class A (basically).  So if A has instance
+variables Z and Y and methods Eat and Sleep, and C has instance varables X
+and W and methods Run and Play, then an instance of class C (which is a
+subclass of A) will have state of Z, Y, X, and W and behavior of Eat, Sleep,
+Run, and Play.
+
+
+Dean
+roehrich@cray.com
+</PRE>
+<HR><H2><A HREF="r1xloj1n9nr.fsf@hpsdly.sdd.hp.com">[PREV]</A>  [NEXT]  <A HREF="4mqnin$5o6@news.service.uci.edu">[PREV Thread]</A>  <A HREF="4mqq4a$n44@ns.mad.servicom.es">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.misc">[Index]</A>  </H2>

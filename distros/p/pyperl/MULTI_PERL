@@ -1,0 +1,8 @@
+The existence of this file is used as a configuration flag for the
+"perl for python" build.  A -DMULTI_PERL build give you separate perl
+interpreters per thread.
+
+For -DMULTI_PERL builds you need to configure & build perl with the
+-Dusethreads option.
+
+

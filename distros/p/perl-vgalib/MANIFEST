@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+README.v03
+test.pl
+vga.pm
+vga.xs

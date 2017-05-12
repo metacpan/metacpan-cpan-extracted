@@ -1,0 +1,73 @@
+
+        Here's my current understanding of Tk-b5 composite widgets:
+
+        Base class Composite.pm is used to build the initial
+containing widget, which currently can be a Frame or Toplevel, but can
+be expanded as need arises.  Examples are LabeledWidget.pm,
+Scrolled.pm, Dialog.pm, ErrorDialog.pm, ColorEditor.pm, and good old
+demos/LabeledEntryLabeledRadiobutton.pm.  Note that @ISA has changed
+from Composite 1.4; e.g. for a Frame composite:
+
+  package Tk::LabeledWidget;
+  use English;
+  require Tk::Composite::Frame;
+  @ISA = qw(Tk::Composite::Frame);
+
+Here is a sample `new' call:
+
+  my $cw = Tk::Composite::Frame->new($parent, %args);
+
+This method automatically advertises the containing widget, in this case a
+Frame by the name of "frame" (class name with first letter lowered).
+
+        Composite widgets have available to them several other
+methods.  Typically Component would be called next to make component
+widgets, which must be the immediate children of the composite widget:
+ 
+  my $l = $cw->Component(Label => 'label', -text => $cw->{Configure}{'-text'});
+
+The first two arguments are order-dependent: #1 is the widget type
+(class) to create and #2 is the name to advertise the widget by.
+Remaining arguments are passed to the widget creation command, in this
+case Label.  If a component widget is not to be advertised use "undef"
+as its name.  Note that $cw has a hash key {Configure} which points to
+another hash whose keys are the command arguments (and of course
+values).
+
+        If a (component) widget is not a child of the composite widget
+$cw, you must create it in the normal fashion and optionally advertise
+it manually; e.g.
+
+  my $slice  = $cw->Component('Frame' => "slice");
+  my $corner = $slice->Frame('-relief' => 'raised', '-width' => 20);
+  $cw->Advertise("corner" => $corner);
+
+This is really all that Component does.
+
+        As before you can "get at" any advertised subwidget using the
+`subwidget' method.
+
+        Here are the remaining methods which I haven't gotten to yet:
+
+  $cw->subconfigure($opt);
+  $cw->configure(%args);
+  $cw->delegates($cw);
+  $cw->ConfigSpecs($cw);
+
+New methods available to all widgets:
+
+  $w->walk(\&code, @args); # travel widget hierarchy executing subroutine
+  $w->descendants($class); # return list of kids of class $class, or all
+                           # widgets if $class not specified
+
+
+Questions:
+
+. Would it be better for Composite::new to automatically advertise the
+  containing widget with a name something like "CompositeFrame" rather
+  than "frame"?
+
+. Should methods like `Advertise' really be capitalized?  I wish someone
+  would explain this mess about when caps go where (-: 
+
+Steve

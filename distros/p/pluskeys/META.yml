@@ -1,0 +1,28 @@
+---
+abstract: 'pragma to declare class- and typo-safe keys to use in objects'
+author:
+  - 'Tom Christiansen <tchrist@perl.com>'
+build_requires:
+  Test::CheckManifest: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.5503'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: pluskeys
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  constant: '0'
+  perl: '5.008'
+version: '2.4'

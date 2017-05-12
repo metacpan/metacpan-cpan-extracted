@@ -1,0 +1,308 @@
+#!/usr/bin/perl
+use strict;
+use POP::POX_parser;
+use Fcntl;
+use Carp;
+
+use vars qw/$OUT_EXT @IN @OUT/;
+
+$OUT_EXT = 'pm';
+
+require 'poxargs.pl';
+
+my $domain = $ENV{POP_SYSTEM} or
+  croak "Set POP_SYSTEM.";
+my $pkg = "${domain}::";
+
+my $p = new POP::POX_parser;
+
+for (my $i; $i < @IN; $i++) {
+  unless (sysopen(OUT, $OUT[$i], O_WRONLY|O_CREAT|O_TRUNC, 0660)) {
+    croak "Couldn't open [$OUT[$i]] for writing: $!";
+  }
+  print STDERR "Converting $IN[$i] to $OUT[$i]\n";
+  my $c;
+  eval {
+    $c = $p->parse($IN[$i]);
+  };
+  if ($@) {
+    print STDERR $@;
+    next;
+  }
+  &strip_space($c->{'comments'});
+  print OUT <<QQ_PM_QQ;
+=head1 CLASS
+Title:	$c->{'name'}
+Desc:	$c->{'comments'}
+XML:	$c->{'version'}
+=cut
+
+package $pkg$c->{'name'};
+
+QQ_PM_QQ
+  print OUT q|$VERSION = do{my(@r)=q$|.
+	    q|Revision: 1.1.1.1 $=~/\d+/g;sprintf '%d.'.'%02d'x$#r,@r};|;
+  print OUT<<'Q_PM_Q';
+
+use strict;
+use vars qw/@ISA $VERSION/;
+use Carp;
+use POP::Persistent;
+Q_PM_Q
+  my @isa = map { s/^(?!$pkg)/$pkg/o; $_ } split /\s*,\s*/, $c->{'isa'};
+  foreach (@isa) {
+    print OUT "use $_;\n";
+  }
+  print OUT "\n\@ISA = qw/", (join ' ', 'POP::Persistent', @isa), "/;\n\n";
+  print OUT "# PUBLIC METHODS\n";
+
+  print OUT<<'Q_PM_Q';
+
+sub initialize {
+  my $this = shift;
+Q_PM_Q
+  foreach my $p_name (sort keys %{$c->{'participants'}}) {
+    my $part = $c->{'participants'}{$p_name};
+    print OUT "  \$this->{'$p_name'} = \\do{my \$a};\n";
+  }
+  foreach my $a_name (sort keys %{$c->{'attributes'}}) {
+    my $attribute = $c->{'attributes'}{$a_name};
+    if ($attribute->{'hash'}) {
+      print OUT "  \$this->{'$a_name'} = \$this->".
+		"_POP__Persistent_hash_from_db(\n\t'$attribute->{'val_type'}',".
+		" '$a_name', {});\n";
+    } elsif ($attribute->{'list'}) {
+      # XXX - OK, this isn't good; we shouldn't be calling this private
+      # method, and it has the wrong name anyway.  But it does the Right Thing.
+      print OUT "  \$this->{'$a_name'} = \$this->".
+		"_POP__Persistent_list_from_db(\n\t'$attribute->{'type'}',".
+		" '$a_name');\n";
+    } else {
+      print OUT "  \$this->{'$a_name'} = ",
+		$attribute->{'default'} ||
+		   ($attribute->{'type'} =~ /::/ ?
+			'\do{my $a}' :
+			"''"),
+		";\n";
+    }
+  }
+  print OUT "}\n";
+
+  foreach my $c_name (sort keys %{$c->{'constructors'}}) {
+    my $constructor = $c->{'constructors'}{$c_name};
+    &strip_space($constructor->{'comments'});
+    print OUT<<QQ_PM_QQ;
+
+=head2 CONSTRUCTOR
+Title:	$pkg$c->{'name'}::$c_name
+Desc:	Constructor - $constructor->{'comments'}
+=cut
+
+sub $c_name {
+  my \$type = shift;
+  \$type = ref(\$type) || \$type;
+QQ_PM_QQ
+    print OUT &param_list(values %{$constructor->{'params'}})."\n";
+    print OUT "\n}\n";
+  }
+
+  foreach my $cm_name (sort keys %{$c->{'class-methods'}}) {
+    my $class_method = $c->{'class-methods'}{$cm_name};
+    &strip_space($class_method->{'comments'});
+    print OUT<<QQ_PM_QQ;
+
+=head2 CLASS METHOD
+Title:	$pkg$c->{'name'}::$cm_name
+Desc:	$class_method->{'comments'}
+=cut
+
+sub $cm_name {
+  my \$type = shift;
+  \$type = ref(\$type) || \$type;
+QQ_PM_QQ
+    print OUT &param_list(values %{$class_method->{'params'}})."\n";
+    print OUT "\n}\n";
+  }
+
+  foreach my $p_name (sort keys %{$c->{'participants'}}) {
+    my $part = $c->{'participants'}{$p_name};
+    &strip_space($part->{'comments'});
+    print OUT <<QQ_PM_QQ;
+
+=head2 CLASS METHOD
+Title:  $pkg$c->{'name'}::all_with_$p_name
+Desc:	Returns list of $c->{'name'} objects that have the given
+	$part->{'type'} as a $p_name
+=cut
+
+sub all_with_$p_name {
+  my(\$type, \$obj) = \@_;
+  return map {\$type->new(\$_)}
+	 \$type->all({'where' => [['$p_name', '=', \$obj]]});
+}
+
+=head2 PARTICIPANT
+Title:	$pkg$c->{'name'}::$p_name
+Desc:	$part->{'comments'}
+=cut
+
+sub $p_name {
+  my \$this = shift;
+  if (\@_) {
+    my \$obj = shift;
+    unless (ref(\$obj) && \$obj->isa('$part->{'type'}')) {
+      croak "[\$obj] is not a $part->{'type'}";
+    }
+    \$this->{'$p_name'} = \\\$obj;
+  }
+  \${\$this->{'$p_name'}};
+}
+QQ_PM_QQ
+  }
+
+  foreach my $a_name (sort keys %{$c->{'attributes'}}) {
+    my $attr = $c->{'attributes'}{$a_name};
+    &strip_space($attr->{'comments'});
+    print OUT<<QQ_PM_QQ;
+
+=head2 ACCESSOR
+Title:	$pkg$c->{'name'}::$a_name
+Desc:	$attr->{'comments'}
+=cut
+
+sub $a_name {
+  my \$this = shift;
+  if (\@_) {
+QQ_PM_QQ
+    if ($attr->{'hash'}) {
+      print OUT '    my %hash = @_;',"\n";
+      if ($attr->{'val_type'} =~ /::/) { # Holds objects
+	print OUT '    while (my($k,$v) = %hash) {',"\n",
+		 '      unless (ref($v) && $v->isa(\'',$attr->{'val_type'},
+		 '\')) {',"\n",
+		 '        croak "[$v] is not a ',$attr->{'val_type'},'";',"\n",
+		 '      }',"\n",
+		 '    }',"\n";
+      }
+      print OUT "    \$this->{'$a_name'} = \\\%hash;\n";
+      print OUT<<QQ_PM_QQ;
+  }
+  wantarray ? \%{\$this->{'$a_name'}} : \$this->{'$a_name'};
+}
+QQ_PM_QQ
+    } elsif ($attr->{'list'}) {
+      if ($attr->{'type'} =~ /::/) { # Holds objects
+	print OUT '    foreach (@_) {',"\n",
+		 '      unless (ref($_) && $_->isa(\'',$attr->{'type'},
+		 '\')) {',"\n",
+		 '        croak "[$_] is not a ',$attr->{'type'},'";',"\n",
+		 '      }',"\n",
+		 '    }',"\n";
+      }
+      print OUT "    \$this->{'$a_name'} = [\@_];\n";
+      print OUT<<QQ_PM_QQ;
+  }
+  wantarray ? \@{\$this->{'$a_name'}} : \$this->{'$a_name'};
+}
+QQ_PM_QQ
+    } else {
+      print OUT '    my $obj = shift;',"\n";
+      if ($attr->{'type'} =~ /::/) { # Holds an object
+	print OUT '    unless (ref($obj) && $obj->isa(\'',$attr->{'type'},
+		 '\')) {',"\n",
+		 '      croak "[$obj] is not a ',$attr->{'type'},'";',"\n",
+		 '    }',"\n";
+        print OUT "    \$this->{'$a_name'} = \\\$obj\n";
+        print OUT<<QQ_PM_QQ;
+  }
+  \${\$this->{'$a_name'}};
+}
+QQ_PM_QQ
+      } else {
+        print OUT<<QQ_PM_QQ;
+     \$this->{'$a_name'} = \$obj;
+  }
+  \$this->{'$a_name'};
+}
+QQ_PM_QQ
+      }
+    }
+  }
+
+  foreach my $m_name (sort keys %{$c->{'methods'}}) {
+    my $method = $c->{'methods'}{$m_name};
+    &strip_space($method->{'comments'});
+    print OUT<<QQ_PM_QQ;
+
+=head2 METHOD
+Title:	$pkg$c->{'name'}::$m_name
+Desc:	$method->{'comments'}
+=cut
+
+sub $m_name {
+  my \$this = shift;
+QQ_PM_QQ
+
+    print OUT &param_list(values %{$method->{'params'}});
+    print OUT "\n}\n";
+  }
+  print OUT "\n\$VERSION = \$VERSION;\n";
+}
+
+sub param_list {
+  my @params = sort {$a->{'pos'} <=> $b->{'pos'}} @_;
+  my $param = '  my(';
+  my $scalar_param_sel;
+  my $scalar_param_cnt;
+  my $scalar_param_idx;
+  my $all_params_are_scalars = 1;
+  for (my $i=0; $i < @params; $i++) {
+    if ($params[$i]->{'type'} ne 'array') {
+      $param .= "\$$params[$i]->{'name'}, ";
+      vec($scalar_param_sel, $i, 1) = 1;
+      $scalar_param_cnt++;
+      $scalar_param_idx = $i; # Save the last one
+    } else {
+      $all_params_are_scalars = 0;
+    }
+  }
+  if ($scalar_param_cnt && $all_params_are_scalars) {
+    substr($param, -2) = ") = \@_;\n";
+    return $param;
+  }
+  if ($scalar_param_cnt == 1) {
+    substr($param, -2) = ') = $_['.$scalar_param_idx."];\n";
+  } elsif ($scalar_param_cnt) {
+    # Eeek.  We have to convert a bit vector into a list-slice-selector
+    # (E.g., "01001100" --> "1,4-5")
+    # Just for ease of maintenance, this should perhaps be replaced with
+    # calls to Set::IntSpan.
+    my($i, $j) = (0, 0);
+    substr($param, -2) = ') = @_['.
+      join(',', grep {$_}
+	      map {$i=$j;$j+=length();
+		   if ($_+0) {
+		     "$i".($j>$i+1 ? "-".($j-1) : "")
+		   }}
+	      split /(0+)/,
+	      unpack("b*", $scalar_param_sel))."];\n";
+  } else { # no params
+    $param = '';
+  }
+  # Now the non-scalar params
+  for (my $i=0; $i < @params; $i++) {
+    if ($params[$i]->{'list'}) {
+      $param .= "  my \$$params[$i]->{'name'}__ref = \$_[$i]\n".
+		"  my \@$params[$i]->{'name'} = \@\$$params[$i]->{'name'}__ref;\n";
+		#  my  @foo		      =  @$foo__ref;
+    }
+  }
+  return $param;
+}
+
+sub strip_space {
+  $_[0] =~ s/^\s+//;
+  $_[0] =~ s/\s+$//;
+  $_[0] =~ s/\s{4,}/\n\t/g;
+}
+

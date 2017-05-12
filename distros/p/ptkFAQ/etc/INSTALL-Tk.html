@@ -1,0 +1,195 @@
+	    <!-- \$RCSfile\$\$Revision\$\$Date\$ -->
+	    <!-- \$Log\$ -->
+	    <HTML>
+	    <TITLE>INSTALL-TK</TITLE>
+<p><hr>
+
+<H1> 
+<A NAME="INSTALL-Tk_name_0">
+NAME</A>
+</H1>
+
+INSTALL file for Perl/Tk
+<p><p><hr>
+
+<H1> 
+<A NAME="INSTALL-Tk_synopsis_0">
+SYNOPSIS</A>
+</H1>
+
+Unpack the tar file *outside* the perl source tree for preference.
+<p>To install this (Tk-b9.01) package you need perl5.002beta1 and unoffical 
+patches to 'f'.
+<p>Best place to get perl5.002b1f is via 'CPAN' site nearest you - the CPAN
+sitelist at time of writing is appended.
+<p>
+<XMP>
+  ftp any-CPAN-site - see below:
+  cd CPAN/authors/id/ANDYD/
+  binary
+  get perl5.002b1d.tar.gz
+  get perl5.002beta1.patch.2b1e.gz
+  get perl5.002beta1.patch.2b1f.gz
+
+</XMP>
+<p>When patch.2.b1g shows up it should be safe to apply as well, as 
+Andy plans to make it a documentation patch.
+<p>Latest MakeMaker from CPAN may help too.
+<p>See README.osname for further hints/warnings
+<p>If you have perl5.002b1f installed in the normal way you proceed to build Tk.
+<p>It is much simpler to install perl than to try and use an uninstalled
+private copy. If you have a private copy you should 'Configure' it to 
+'install' somewhere you have write access to, and install it there,
+then use that perl to build Tk.
+<p>When you have an up-to-date perl5.002 installed:
+<p>cd to the directory distribution unpacks to.
+<p>
+<H2> 
+<A NAME="INSTALL-Tk_dynamic_0">
+DYNAMIC LINK VERSION</A>
+</H2>
+
+Then if you have dynamic linking :
+<p>
+<XMP>
+  perl Makefile.PL
+  make 
+
+</XMP>
+<p>Now built locally - if you have dynamic loading you can now say
+<p>
+<XMP>
+  perl ./basic_demo 
+  make install
+
+</XMP>
+<p>You can now run the converted Tk4.0 demos:
+<p>
+<XMP>
+  ./demos/widget
+
+</XMP>
+<p>
+<H2> 
+<A NAME="INSTALL-Tk_static_0">
+STATIC LINK VERSION</A>
+</H2>
+
+For static linking the following is how it is supposed to work 
+(I think, but I don't use static linking normally, this scheme 
+ worked as far as this on one trial under SunOS4.)
+<p>
+<XMP>
+  perl Makefile.PL
+  make 
+  make tkperl 
+
+</XMP>
+<p>This builds a perl with Tk statically linked in the Tk directory
+thus:
+<p>
+<XMP>
+  ./tkperl ./basic_demo 
+
+</XMP>
+<p>should now work.
+<p>It is unclear to me whether 'make install' works and I don't want 
+to try it on my system in case it breaks the dynamic version.
+<p>
+<H2> 
+<A NAME="INSTALL-Tk_specifying_0">
+SPECIFYING X11 LIBRARIES </A>
+</H2>
+
+If Makefile.PL reports that it cannot find X, or chooses a version
+you don't like you can specify a version on the command line:
+<p>
+<XMP>
+  perl Makefile.PL X11=/usr/local/X11R5  
+
+</XMP>
+<p>If X's include and lib are not under a common parent they can be specified
+separately:
+<p>
+<XMP>
+  perl Makefile.PL X11INC=/usr/local/share/X11R5/include X11LIB=/usr/local/arch/X11R5/lib  
+
+</XMP>
+<p><p><hr>
+
+<H1> 
+<A NAME="INSTALL-Tk_cpan_0">
+CPAN</A>
+</H1>
+
+Welcome to the CPAN, the Comprehensive Perl Archive Network.
+<p>This document describes the CPAN itself, the Network.
+<p>---
+<p>Network
+<p>The master CPAN site is at ftp://ftp.funet.fi/
+(Finland, Europe).
+<p>The list of the registered CPAN sites follows.
+Please note that the sorting order is alphabetical on fields:
+<p>
+<XMP>
+        continent - country/state - ftp-url
+
+</XMP>
+<p>and thus the North American servers happen to be listed last (for the
+moment, anyway, no Oceanian or South American sites volunteered, yet).
+<p>Registered CPAN sites
+<p>
+<XMP>
+  Africa
+    South Africa    ftp://ftp.is.co.za/programming/perl/CPAN/
+  Asia
+    Japan           ftp://ftp.lab.kdd.co.jp/lang/perl/CPAN/
+    Taiwan          ftp://dongpo.math.ncu.edu.tw/perl/CPAN/
+  Australasia
+    Australia       ftp://coombs.anu.edu.au/pub/perl/
+                    ftp://ftp.mame.mu.oz.au/pub/perl/CPAN/
+    New Zealand     ftp://ftp.tekotago.ac.nz/pub/perl/CPAN/
+  Europe
+    Finland         ftp://ftp.funet.fi/pub/languages/perl/CPAN/
+    France          ftp://ftp.ibp.fr/pub/perl/CPAN/
+                    ftp://ftp.pasteur.fr/pub/computing/unix/perl/CPAN/
+    Germany         ftp://ftp.leo.org/pub/comp/programming/languages/perl/CPAN/
+                    ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN/
+    the Netherlands ftp://ftp.cs.ruu.nl/pub/PERL/CPAN/
+    Portugal        ftp://ftp.ci.uminho.pt/pub/lang/perl/
+    Slovenia        ftp://ftp.arnes.si/software/perl/CPAN/
+    Sweden          ftp://ftp.sunet.se/pub/lang/perl/CPAN/
+    Switzerland     ftp://ftp.switch.ch/mirror/CPAN/
+    UK              ftp://ftp.demon.co.uk/pub/mirrors/perl/CPAN/
+                    ftp://unix.hensa.ac.uk/mirrors/perl-CPAN/
+  North America
+    Florida         ftp://ftp.cis.ufl.edu/pub/perl/CPAN/
+    Illinois        ftp://uiarchive.cso.uiuc.edu/pub/lang/perl/CPAN/
+    Massachusetts   ftp://ftp.delphi.com/pub/mirrors/packages/perl/CPAN/
+    Oklahoma        ftp://ftp.uoknor.edu/mirrors/CPAN/
+    Texas           ftp://ftp.sedl.org/pub/mirrors/CPAN/
+                    ftp://ftp.sterling.com/programming/languages/perl/
+
+</XMP>
+<p>We apologise for the diversity of the CPAN path names but
+having identical and hopefully as short as possible path names
+across several separate ftp sites is well nigh impossible.
+<p>Feedback
+<p>You can send email
+to the CPAN administrators, cpan-adm<STRONG>@ftp</STRONG>.funet.fi.
+<p><p><hr>
+
+<H1> 
+<A NAME="INSTALL-Tk_author_0">
+AUTHOR</A>
+</H1>
+
+Copyright (c) 1995 Nick Ing-Simmons. All rights reserved.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, with the exception
+of all the files in the pTk sub-directory which have separate terms
+derived from those of the orignal Tk4.0 sources. See pTk/license.terms 
+for details of this license.
+<p>
+<a href="INSTALL-Tk.pod">INSTALL-Tk.pod</a>
+</HTML>

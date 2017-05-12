@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Temp;
+use Sys::Hostname;
+
+use Vulcan::Sudo;
+use Vulcan::OptConf;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 [--up|--down|--reload]
+
+=cut
+my ( $option, %seco );
+BEGIN { $option = Vulcan::OptConf->load(); %seco = $option->dump( 'seco' ) }
+
+use lib $seco{lib}; use SECO::Conf::Auto;
+
+my %o = $option->get( qw( up down reload ) )->dump;
+my $conf = SECO::Conf::Auto->new( $seco{conf} );
+my $host = Sys::Hostname::hostname();
+my $info = $conf->search( $host );
+
+die "no seco config!" unless my ( $tier, $dc, $replica ) = @{ $info->{$host} };
+
+my $seco = $conf->{$tier}{$dc};
+my ( $script, $vlan, @conf, @device ) = '/etc/sysconfig/network-scripts/ifcfg';
+
+$info = $seco->dump( vips => $replica );
+
+while ( my ( $ipv4, $conf ) = each %{ $info->{$host} } )
+{
+    next if ( @conf = split ':', $conf ) < 3;
+    $vlan = shift @conf if $conf[0] =~ /^vlan/;
+
+    my ( $mask, $iface, $id ) = @conf;
+    my $device = $vlan ? "$vlan:$id" : "$iface:$id";
+    my $temp = File::Temp->new( UNLINK => 0, SUFFIX => '.vips' );
+
+    push @device, $device;
+    print $temp <<CONF;
+IPADDR=$ipv4
+NETMASK=$mask
+DEVICE=$device
+BOOTPROTO=static
+TYPE=Ethernet
+ONBOOT=yes
+CONF
+    close $temp; chmod 0644, $temp; system "mv $temp $script-$device";
+}
+
+@device = sort @device;
+
+if ( $vlan )
+{
+    my $temp = File::Temp->new( UNLINK => 0, SUFFIX => '.vips' );
+
+    unshift @device, $vlan;
+    print $temp <<CONF;
+VLAN=yes
+VLAN_NAME_TYPE=VLAN_PLUS_VID_NO_PAD
+PHYSDEV=$conf[1]
+DEVICE=$vlan
+BOOTPROTO=static
+TYPE=Ethernet
+ONBOOT=yes
+CONF
+    close $temp; chmod 0644, $temp; system "mv $temp $script-$vlan";
+}
+
+$o{down} = $o{up} = 1 if $o{reload};
+map { system "/sbin/ifdown $_" } @device if $o{down};
+map { system "/sbin/ifup $_" } @device if $o{up};
+
+exit 0;

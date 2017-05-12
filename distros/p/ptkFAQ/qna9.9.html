@@ -1,0 +1,38 @@
+<HTML>
+<HEAD><TITLE> 9.9. How do I display an image?</TITLE></HEAD>
+<BODY><a name="A9.9"> 9.9. How do I display an image?</a>
+
+<hr>
+</p><p>
+You will want to get a &quot;<KBD>Photo</KBD>&quot; handle on the file as in 
+the following example where <kbd>'imggif'</kbd> is the Photo handle for a gif 
+file that is distributed with Tk-b&#35;:
+<pre>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+    my $main = new MainWindow;
+
+    $main -&gt;Label(-text =&gt; 'Main')-&gt;pack;
+    $main -&gt; Photo('imggif', 
+                   -file =&gt; "$Tk::tk_library/demos/images/earth.gif");
+    my $l = $main-&gt;Label('-image' =&gt; 'imggif')-&gt;pack;
+
+    $main-&gt;Button(-text =&gt; 'close',
+                  -command =&gt; sub{destroy $main}
+                  )-&gt;pack(-side =&gt; 'left');
+    $main-&gt;Button(-text =&gt; 'exit',
+                  -command =&gt; [sub{exit}]
+                  )-&gt;pack(-side =&gt; 'right');
+    MainLoop;
+</pre>
+(<KBD>Canvas</KBD> widgets are another story however 
+<a href="qna10.3.html">see question a later question within this FAQ</a>). 
+
+
+
+<hr>
+	<p><a href="qna9.8.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.9">table of contents</a> | <a href="qna9.10.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

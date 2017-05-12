@@ -1,0 +1,463 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Ponfish::Config;
+use Ponfish::News::Decoder;
+use Ponfish::Utilities;
+use threads;
+use Thread::Queue;
+use Getopt::Long;
+
+my $MIN_FREE_SPACE	= 200 * 1024 * 1024;	# 200 MB... 19 * 1024 * 1024 * 1024;
+my $MIN_QUEUE		= 160; #4000;	#160;
+my $CHECK_TIME		= 10; #410;	#10;
+my $MY_MIN_QUEUE	= 1;			# Specifying 1 means no local queue.
+my $THREAD_TIMEOUT	= 60 * 2;		# 2 min timeout for activities...
+my $SPACER		= "SPACER";
+my $NUM_THREADS		= 5;
+my $preview_only	= "";
+my $kill_lock		= "";
+GetOptions( "queue_size=i"	=> \$MIN_QUEUE,
+	    "check_time=i"	=> \$CHECK_TIME,
+	    "connections=i"	=> \$NUM_THREADS,
+	    "log_file=s"	=> \$global::log_file,
+	    "l"			=> \$global::logging,
+	    "p"			=> \$preview_only,
+	    "kill_lock"		=> \$kill_lock,
+	  );
+$global::log_print	= 1;
+$global::logging	= 1;
+##################################################################
+# LOCK CODE
+##################################################################
+my $LOCK_FILE		= create_valid_filepath( DECODE_DIR, ".decode_lock" );
+# Kill lock?
+if( $kill_lock ) {
+  # Attempt to kill the PID in the lock file:
+  if( -f $LOCK_FILE ) {
+    if( ! WINDOWS ) {
+      my $pid		= read_file( $LOCK_FILE );
+      system "kill", $pid;		# Try to kill the PID
+      print "Attempted to kill pid '$pid'.\n";
+    }
+    unlink $LOCK_FILE;
+    print "Lock file '$LOCK_FILE' removed.\n";
+  }
+  print "You may now re-start the daemon without the -kill_lock option.\n\n";
+  exit 0;
+}
+
+# Make sure only one instance runs at a time via a lock file:
+if( -f $LOCK_FILE ) {
+  print <<EOT
+The lock file '$LOCK_FILE' exists.  If you are sure another decoder is not
+running, you have two options:
+
+1. Remove the lock file and re-run the decoder.
+2. Run the decoder again with the argument "-kill_lock".  It will attempt
+   to kill the PID specified in the lock file, then execute as if the lock
+   file did not exist.
+
+To avoid serious errors, only one instance of the decoder is permitted to
+run at any time.
+EOT
+;
+  exit 1;
+}
+overwrite_file( $$, $LOCK_FILE );	# Create Lock file
+
+# Code to remove lock file when the daemon is killed.
+sub remove_lock {
+  unlink $LOCK_FILE;
+  exit 0;
+}
+for( qw/__DIE__ KILL INT HUP/  ) {
+  $SIG{$_}	= \&remove_lock;
+}
+##################################################################
+# End lock code
+##################################################################
+
+chdir DECODE_DIR;
+my $garbage_folder	= create_valid_filepath( DECODE_DIR, "junk" );
+my $problems_folder	= create_valid_filepath( DECODE_DIR, "problems" );
+ensure_file_path_exists $garbage_folder;
+ensure_dir_exists $garbage_folder;
+ensure_dir_exists $problems_folder;
+
+sub my_print {
+  my $str	= join "", @_;
+  print $str;
+#  print @_;
+}
+
+my $ACTIVE_Q		= Thread::Queue->new;	# The queue for the threads...
+my $ACTIVITY_Q		= Thread::Queue->new;	# Responses back fromt the decode threads...
+my $COMPLETE_Q		= Thread::Queue->new;	# Thread that has exited...
+
+my $decodes_dir	= create_valid_filepath( DECODE_DIR );
+log "Decode dir: '$decodes_dir'\n";
+
+
+# Create the threads:
+#sleep 10;
+my %threads		= ();
+for( 1 .. $NUM_THREADS ) {
+  $threads{$_}	= threads->new( \&start_decode_thread, $ACTIVE_Q, $_ );
+}
+
+sub start_decode_thread {
+  my $ACTIVE_Q		= shift;
+  my $tid		= shift;
+
+  my($command_file,$Decoder)	= (undef)x2;
+
+  while( 1 ) {
+    $command_file	= $ACTIVE_Q->dequeue;		# Wait for a file to be queued!
+
+    # Once a file is available, start decoding!
+    do {
+      # Create a Decoder if not already available...
+      if( ! $Decoder ) {
+	$Decoder		= Ponfish::News::Decoder->new( $tid );
+      }
+      # Process the file
+
+      my($time, $date);
+      if( $command_file =~ /^(\d+)/ ) {
+	$time	= $1;
+      }
+      $date		= "High Priority :'$time'";
+      if( $time > 0 ) {
+	$date		= localtime( substr( $command_file, 0, 10 ) );
+      }
+      my_print "($tid): Processing file: '$command_file' ($date)\n";
+      if( $Decoder->process_file( $command_file ) ) {
+	# move the file to the 'junk' directory:
+	my_print "($tid): Completed file: '$command_file'\n";
+
+	# This ensures a garbage folder exists - if it has
+	# been removed while the program is running.
+	if( -f $garbage_folder ) {
+	  unlink $garbage_folder;
+	}
+	ensure_dir_exists $garbage_folder;
+	if( ! portable_mv( $command_file, $garbage_folder ) ) {
+	  die "Could not move: '$command_file' to '$garbage_folder'!  Killing thread.";
+	}
+      }
+      else {
+	my_print "($tid): !!!!!!!! Failed file: '$command_file'\n";
+      }
+      # Get a new file... or not.  If there is a file, we loop again,
+      # otherwise, fall off (waiting state)
+      $command_file	= $ACTIVE_Q->dequeue_nb;
+    } while( defined $command_file );
+
+    # Destroy the Decoder / NNTP connection.
+    $Decoder->disconnect;
+    $Decoder->destroy;
+    $Decoder		= undef;
+  }
+}
+
+##################################################################
+my %seen		= ();	# Holds all seen decode items
+my @undispatched	= ();	# Any items waiting to be dispatched to a queue
+my $last_largest_file	= "";	# Holds the last file in the decode queue...
+while( 1 ) {
+
+  # Load up new files:
+  my @files	= <*>;					# Pick up any files...
+  my $field_sep	= FILENAME_FIELD_SEP;
+
+  my @new_com_files	= ();
+  foreach my $fn ( @files ) {
+    if( ! $seen{$fn} ) {
+      next	if( ! is_valid_command_file( $fn ) );	# Reject non-command files
+
+      # Next, if we're previewing only, ignore anything that's not a preview
+      # file.  (Must begin with zeroes)
+      if( $preview_only ) {
+	next	if( $fn !~ /^000/ );
+      }
+      push @new_com_files, $fn;		#@undispatched, $fn;
+      $seen{$fn}	= 1;
+    }
+  }
+  if( scalar @new_com_files ) {
+    # Add the new files to the undispatched list:
+    if ( ! scalar @undispatched ) {
+      @undispatched	= @new_com_files;
+    } else {
+      push @undispatched, @new_com_files;
+    }
+
+    # Sort list...
+    @undispatched		= sort @undispatched;
+
+    # If there are 'younger' new files, then rebuild the decode queue:
+    if ( ($last_largest_file cmp $undispatched[0]) > 0 ) {
+      # Clear the queue:
+      while ( $ACTIVE_Q->pending ) {
+	my $cmd_file	= $ACTIVE_Q->dequeue_nb;
+	if ( defined $cmd_file ) {
+	  push @undispatched, $cmd_file;
+	}
+      }
+      # Re-sort the undispatched list:
+      @undispatched	= sort @undispatched;
+    }
+  }
+
+  # Manage the queue:
+  if ( $ACTIVE_Q->pending < $MIN_QUEUE ) {
+    for ( $ACTIVE_Q->pending .. $MIN_QUEUE ) {
+      last if( ! scalar @undispatched ); # abort if nothing in queue
+      my_print "Queued: $undispatched[0]\n";
+      $last_largest_file	= $undispatched[0];
+      $ACTIVE_Q->enqueue( shift @undispatched );
+    }
+  }
+
+  sleep $CHECK_TIME;
+
+#  print get_decode_dir_free_space(), ", $MIN_FREE_SPACE\n";
+  # Check free space:
+  if( get_decode_dir_free_space() < $MIN_FREE_SPACE ) {
+    # If we're running out of space, remove everything from the
+    # queue and alert the user!
+    while( $ACTIVE_Q->pending ) {
+      unshift @undispatched, $ACTIVE_Q->dequeue_nb;
+    }
+    @undispatched = sort @undispatched;
+    my $df_mb		= sprintf( "%2.2d", get_decode_dir_free_space() / 1024 / 1024 );
+    print "#"x66,"\n";
+    print "#"x66,"\n";
+    print "\nDisk space running low: $df_mb MB free!\n\n";
+    print "#"x66,"\n";
+    print "#"x66,"\n";
+    print "\n";
+    print "Press any key to resume decoding... ";
+    my $t	= <STDIN>;
+  }
+}
+
+#use Data::Dumper;
+#print Dumper( \@files );
+
+=head1 NAME
+
+ponfishd - The Ponfish command daemon
+
+=head1 USAGE
+
+  ponfishd [-p]
+           [-queue_size NUM_COMMANDS]
+           [-check_time SECONDS]
+           [-connections NUM_THREADS]
+           [-l] [-log_file LOG_FILE]
+           [-kill_lock]
+
+=head1 OVERVIEW
+
+Ponfishd is the Usenet daemon for ponfishr.  It's job is to read and execute
+commands issued by ponfishr.
+
+Ponfishd creates multiple threads and dispatches commands to these threads,
+allowing multiple commands to be executed at the same time.
+
+=head1 Options
+
+Z< >
+
+=item B<-p>
+
+=over 8
+
+Preview mode - only execute "sync" and "preview" commands.  This allows
+the user to more easily preview files.
+
+Note that sync and preview command filenames all begin with "00000000",
+the highest priority.  While these would normally be executed first,
+if the daemon is busy executing normal commands, the normal command(s)
+would need to complete before a thread could execute the higher priority
+one.  This prevents normal commands from executing, thus allowing
+previews and syncs to execute quickly.
+
+=back
+
+=item B<-connections> I<NUM_THREADS>
+
+=over 8
+
+The number of threads to spawn - the threads all execute different
+commands simultaneously.  B<Recommended value:> 3 to 5.  You might find
+higher numbers to be more efficient if you have a very fast network
+connection.
+
+=back
+
+=item B<-check_time> I<SECONDS>
+
+=over 8
+
+The number of seconds to wait between checking for new commands.
+Each command is created as a file on the disk.  This file contains
+command information.  For example, a "decode" command would create
+a file instructing ponfishd what to grab from the news server,
+what sequence to process the command in, and the target directory
+for the file decoded, among other things.
+
+Checking for new commands can take time, depending on disk speed
+and the number of commands there are pending.  I recommend 10
+seconds (the default) as a minimum.
+
+=back
+
+=item B<-queue_size> I<NUM_COMMANDS>
+
+=over 8
+
+The number of commands to put into the queue at a time.
+The threads all take commands from the queue, and the queue
+is replenished every B<-check_time> seconds.  This option is here
+only for flexibility purposes.
+
+One example may be that you have 100_000 commands pending,
+and you do not want to check the filesystem every 10 seconds,
+so you might do something like this:
+
+> ponfishd -check_time 1000000 -queue_size 100000
+
+This will load the queue up with every command, and then never
+again check for new commands.
+
+Also, if you have a particularly fast network connection, it is
+possible that your threads can empty the queue before it can be
+replenished.  To remedy this you can increase the queue_size.
+(or decrease the check_time, but it's not recommended)
+
+The B<-connections>, B<-check_time>, and B<-queue_size> options
+are all interrelated.
+
+=back
+
+=item B<-kill_lock>
+
+=over 8
+
+If a lock exists, this will remove the lock file.  It will also
+try to kill the PID that's in the lock file.  The program will
+exit after removing the lock file, and you will have to run it
+again normally.
+
+=back
+
+=item B<-l>
+
+=over 8
+
+Enable file logging.
+
+=back
+
+=item B<-log_file> I<FILENAME>
+
+=over 8
+
+Log to file FILENAME
+
+=back
+
+=head1 The Anatomy of a Command File Filename
+
+The filename consists of four parts separated by a space:
+
+B<DATE ARTICLE_ID NEWSGROUP SERVER>
+
+=over 4
+
+=item B<DATE:>
+
+Perl's numeric equivalent of the date of the post.  The commands
+are queued up for execution in order of the B<DATE>, allowing the oldest
+ones to be decoded first.  This ensures that we do not decode
+newer posts while the old posts potentially expire from the
+news server.
+
+In the case of B<sync> and B<preview> commands, the B<DATE> will
+be "00000000", forcing them to the top of the queue to be executed
+first.
+
+=item B<ARTICLE_ID:>
+
+This is required to ensure each command has a unique filename.
+B<ARTICLE_ID> is the first article in the post.  Each post in a
+particular newsgroup has a unique sequentially assigned article id.
+Multiple posts may have the same post B<DATE>
+
+=item B<NEWSGROUP:>
+
+The name of the newsgroup.
+
+=item B<SERVER:>
+
+The server name.
+
+=back
+
+Ponfishd uses the B<SERVER> field from the filename, and possibly
+the B<NEWSGROUP> as well, so do not rename any part of the command
+file other than the B<DATE>.
+
+=head1 COMMAND FILE / DOWNLOAD MANAGEMENT
+
+Decodes and saves are ordered by date such that the oldest posts get
+executed first.  This ensures the posts in danger of expiring from the
+news server get downloaded first.
+
+In actuality, the queue is ordered by command filename.  The command
+filename begins with a numeric date, or 00000000 for high-priority
+commands, which ensures they go to the head of the queue.
+
+
+=head1 THE ANATOMY OF A COMMAND FILE
+
+The command file is simply a text file which contains a command and
+any arguments that the command might use.
+
+Take, for example, a B<decode> command.  The command would be "decode",
+the arguments would be a list of one or more article IDs that comprise
+the post, an optional destination directory, and the subject line and
+newsgroup.
+
+A B<sync> command would only require a newsgroup and server name as
+arguments.
+
+=head1 BUGS
+
+None.  (Just kidding)
+
+=head1 TO DO
+
+* The decoder converts some special characters to underscore, I should
+prevent this behavior.
+
+* Would like to be able to switch to and from preview mode without
+restarting.
+
+* Would like option of all threads tackling one download at a time.
+
+* It could use better messaging - the output as the daemon runs is
+informational, but not nice or easy to look at.
+
+=head1 SEE ALSO
+
+The ponfishr man page
+
+=head1 AUTHOR
+
+Desmond Lee <gmail: desimus.prime>
+
+=cut

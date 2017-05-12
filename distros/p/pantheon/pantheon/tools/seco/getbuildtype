@@ -1,0 +1,118 @@
+#!/da1/s/ops/perl/bin/perl
+
+use strict;
+use warnings;
+
+use Carp;
+use Tie::File;
+use Sys::Hostname;
+
+use Vulcan::Sudo;
+use Vulcan::OptConf;
+
+my %seco;
+
+BEGIN
+{
+    $Vulcan::OptConf::THIS = 'seco';
+    %seco = Vulcan::OptConf->load()->get( qw( daemon interval=i sudo=s general ) )->dump();
+    Vulcan::Sudo->sudo( $seco{sudo} || 'search' );
+}
+
+use lib $seco{lib};
+use SECO::Index;
+use SECO::Index::Incr;
+use SECO::Conf::Auto;
+use SECO::Engine;
+
+our %FILE = %SECO::Index::FILE;
+our %TYPE = %SECO::Index::TYPE;
+
+confess "invalid config file!" unless $seco{index};
+
+my $engine = SECO::Engine->new();
+my $user = $engine->{user};
+exit 1 unless $user eq ( getpwuid $< )[0];
+
+my $hdfs = $engine->{env}{PECTL}{hdfs} || $seco{index}{hdfs};
+my $repo = $seco{index}{repo};
+
+$repo =~ s/\$RUNUSER/$user/;
+my $version = $engine->{env}{PECTL}{version} || $engine->{env}{VERSION}{version};
+
+my $host = Sys::Hostname::hostname();
+my $conf = SECO::Conf::Auto->new( $seco{conf} );
+my $info = $conf->search( $host );
+my ( $tier, $dc, $replica ) = @{ $info->{$host} };
+my $seco = $conf->{$tier}{$dc};
+
+my @hosts = $seco->list( host => $replica );
+
+$seco{interval} ||= 5;
+my $indexer = SECO::Index->new( version => $version, dc => $dc,
+        hdfs => $seco{index}{fuse} . "/$hdfs", repo => $repo, env => $engine->{env} );
+
+my $link = $indexer->{link};
+
+my @full = grep{ $_ !~ /tmp$/ } glob "$repo/*.$TYPE{data}.*";
+
+unless ( -l $link )
+{
+    print @full ? $seco{general} ? 'data': 'full' : 'nodata';
+    print "\n"; exit 0;
+}
+elsif ( @full > 1 )
+{
+    my $curr = readlink $link;
+    if ( $full[-1] gt $curr ) 
+    { 
+        print $seco{general} ? 'data': 'full';
+        print "\n"; exit 0;
+    }
+}
+
+my ( $curr, @data ) = readlink $link if -l $link;
+my $mark = "$curr/.$FILE{mark}";
+my ( $id, %id );
+
+if ( -f $mark )
+{
+    eval { $id = YAML::XS::LoadFile $mark; $id = $id->[-1] if ref $id; };
+    confess "invalid id" if $@ || $id !~ /^\d{4}$/;
+}
+else { confess "nofulldata"; }
+
+for my $path ( glob "$repo/*.$TYPE{rank}.*" )
+{
+    my @name = File::Basename::fileparse( $path, ".$FILE{tmp}" );
+    push @data, [ $path ] unless pop @name
+        || ( $id{$path} = $indexer->id( $name[0] ) ) <= $id;
+}
+
+# sort incr by rank
+for my $path ( glob "$repo/*.$TYPE{inc}.*" )
+{
+    my @name = File::Basename::fileparse( $path, ".$FILE{tmp}" );
+    next if pop @name || ( $id{$path} = $indexer->id( $name[0] ) ) < $id;
+
+    for my $data ( @data )
+    {
+        next if $id{$path} > $id{ $data->[0] };
+        push @$data, $path; last;
+    }
+}
+
+unless( @data ){ print "nodata\n"; exit 0;  }
+if( $seco{general} ){ print "data\n";exit 0;}
+
+# check
+map { push @$_, shift @$_ } @data;
+map { confess "incontiguous id!" if ++$id != $id{$_} } map { @$_ } @data;
+
+my $data = shift @data;
+
+my $type = 'inc';
+map { $type = 'pack' if -d "$_/pack" } @$data;
+print $type, "\n";
+
+exit 0;

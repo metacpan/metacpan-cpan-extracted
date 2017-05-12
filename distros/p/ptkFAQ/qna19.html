@@ -1,0 +1,47 @@
+<HTML>
+<HEAD><TITLE>19. Are there any international font packages for perl/Tk?</TITLE></HEAD>
+<BODY><a name="A19">19. Are there any international font packages for perl/Tk?</a>
+
+<hr>
+</p><p>
+In principle you may specify the <kbd>-font</kbd> configuration option on all
+your <kbd>Button</kbd>, <kbd>Entry</kbd>, <kbd>Label</kbd>, <kbd>Message</kbd>, 
+<i>etc.</i> widgets. In addition to the Unix programs <i>xfontsel</i> and 
+<i>xlsfonts</i> you may find <i>xset</i> useful for determining and/or
+specifying fonts - especially international ones.
+<p>
+Kobayasi Hiroaki &lt;kobayasi@sowa.is.uec.ac.jp&gt; has converted 
+the Tcl/Tk "japanization" by &lt;nisinaka@sra.co.jp&gt; so that it may be
+used with perl/Tk. It is presently available (the current README file 
+is in Japanese) from:
+<pre>
+    <a href="ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/Tk-b9.jp-a6.gz">ftp://ftp.sowa.is.uec.ac.jp/pub/Lang/perl5/Tk/Tk-b9.jp-a6.gz</a>
+</pre>
+From the author's own description:
+<pre>
+Currently, the "japanization patch for perl/Tk" enables:
+
+  [1] To show kanji & ASCII (by choosen kanji-font) in every widget.
+  [2] To edit kanji (double width of ASCII) correctly in Text & Entry.
+  [3] To support of Kanji Input method. (tkKinput.c)
+  [4] Automatic kanji-code-detection & conversion with 'insert/get'.
+      Supports: "JIS(Japanese Industrial Standard)", "MS-KANJI", "EUC".
+
+&amp; the patch lacks:
+
+  [5] by manual Kanji-code conversion. (JIS &lt;=&gt; MS-KANJI &lt;=&gt; EUC)
+  [6] 'Good' interface to specify kanji-code used in internal. (tkWStr.c)
+  [7] Documentation in English about [1-6].
+      # but, since interface-change is suspected in near future, 
+      # documenting them is ...
+
+I thought that[5-7] was not enough for world-people, but already worth
+for natives. So I announced it on <a href="news:fj.lang.perl">"fj.lang.perl"</a>.
+</pre>
+
+
+<hr>
+	<p><a href="qna18.html">Previous</a> | Return to <a href="ptkTOC.html#TOC19">table of contents</a> | <a href="qna20.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

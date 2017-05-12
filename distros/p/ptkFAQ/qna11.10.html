@@ -1,0 +1,87 @@
+<HTML>
+<HEAD><TITLE> 11.10. How do I call perl from C?</TITLE></HEAD>
+<BODY><a name="A11.10"> 11.10. How do I call perl from C?</a>
+
+<hr>
+</p><p>
+You need to see a recent copy of the 
+<a href="etc/perlembed.html"><kbd>perlembed(1)</kbd></a> pod page. By 
+&quot;recent&quot; it needs to be up to date with at least perl5.002.
+<p>
+Borrowing from Jon Orwant's preamble to that document:
+<p>
+Do you want to:
+<p>
+<DL>
+<DT>Use C from Perl?</DT>
+<DD>
+Read (at least)
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlcall.html">
+<KBD>perlcall(1)</KBD></a>, 
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlapi.html">
+<KBD>perlapi(1)</KBD></a>, 
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlxs.html">
+<KBD>perlxs(1)</KBD></a>,
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlxstut.html">
+<KBD>perlxstut(1)</KBD></a>,
+ and the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlguts.html">
+<KBD>perlguts(1)</KBD></a>  manpages.</DD>
+<DT>Use C++ from Perl?</DT>
+<DD>Recent changes to MakeMaker will make this easier. Be sure you are familiar
+with 
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlcall.html">
+<KBD>perlcall(1)</KBD></a>, 
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlapi.html">
+<KBD>perlapi(1)</KBD></a>, 
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlxs.html">
+<KBD>perlxs(1)</KBD></a>,
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlxstut.html">
+<KBD>perlxstut(1)</KBD></a>,
+ and the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlguts.html">
+<KBD>perlguts(1)</KBD></a>  manpages.</DD>
+<DT>Use an executable program from Perl?</DT>
+<DD>
+Read about backquotes <KBD>``</KBD>, <KBD>system()</KBD>, and 
+<KBD>exec()</KBD> built in perl functions. Try reading 
+     the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlfunc.html">
+<KBD>perlfunc(1)</KBD></a> manpage.</DD>
+<DT>Use Perl from Perl?</DT>
+<DD>
+Read about <KBD>do</KBD>, <KBD>eval</KBD>, <KBD>use</KBD> and <KBD>require</KBD>.
+     The <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlfunc.html">
+<KBD>perlfunc(1)</KBD></a> manpage discusses these. For complete scripts you 
+may also make use of the backquotes <KBD>``</KBD>, <KBD>system()</KBD>, or 
+<KBD>exec()</KBD> built in perl functions, but you may take a performance hit
+in doing so (see 
+     <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlfunc.html">
+<KBD>perlfunc(1)</KBD></a> for information).</DD>
+<DT>Use C from C?</DT>
+<DD>Rethink your design.</DD>
+<DT>Use C++ from C++?</DT>
+<DD>See previous.</DD>
+<DT>Use Perl from C?</DT>
+<DD>
+Read (at least)
+     the <a href="etc/perlembed.html"><KBD>perlembed(1)</KBD></a>
+ and the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlguts.html">
+<KBD>perlguts(1)</KBD></a>  manpages.</DD>
+<DT>Use Perl from C++?</DT>
+<DD>
+Read (at least)
+     the <a href="etc/perlembed.html"><KBD>perlembed(1)</KBD></a>
+ and the <a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlguts.html">
+<KBD>perlguts(1)</KBD></a>  manpages.</DD>
+</DL>
+There is also an Doug MacEachern's  
+<a href="mailto:dougm@osf.org">&lt;dougm@osf.org&gt;</a> embedder's development kit 
+on CPAN and at a URL of the following form:
+<pre>
+    <a href="http://www.osf.org/~dougm/perl/">http://www.osf.org/~dougm/perl/Devel-embed-*.tar.gz</a>
+</pre>
+
+
+<hr>
+	<p><a href="qna11.9.html">Previous</a> | Return to <a href="ptkTOC.html#TOC11.10">table of contents</a> | <a href="qna11.11.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

@@ -1,0 +1,374 @@
+#!/usr/bin/perl
+use strict;
+use POP::POX_parser;
+#use Fcntl;
+use Carp;
+use POP::Environment;
+
+#use vars qw/$OUT_EXT @IN @OUT/;
+
+#$OUT_EXT = 'schema';
+
+#require 'poxargs.pl';
+
+my $p = new POP::POX_parser;
+my $lc_name;
+my @pox;
+my %references;
+my %classes;
+
+for my $dir (@ARGV) {
+  unless (opendir(DIR, $dir)) {
+    croak "Couldn't open directory [$dir]: $!";
+  }
+  for (readdir DIR) {
+    next unless /\.pox$/;
+    print STDERR "Reading $_\n";
+    my $c;
+    eval {
+      $c = $p->parse("$dir/$_");
+    };
+    if ($@) {
+      print STDERR $@;
+      next;
+    }
+    next if $c->{'abstract'};
+    $classes{$c->{'name'}} = $c;
+  }
+  closedir DIR;
+}
+
+print STDERR "Generating reference counting code\n";
+
+&gen_refs();
+
+print "--MISC CLASS=[INIT]\nsp_addtype pid_type, int\n\n",
+	"--MISC CLASS=[INIT]\nsp_addtype seq_type, smallint\n\n",
+	"--MISC CLASS=[INIT]\nsp_addtype ver_type, smallint\n\n";
+
+print "--TABLE CLASS=[INIT]\n",
+      "create table OBJECTS\n",
+      "  (pid pid_type not null primary key,\n",
+      "   ver int default 0)\n\n";
+print "--PROC CLASS=[INIT]\n",	
+      "create proc OBJECTS#VER\n",
+	"  \@pid pid_type\n",
+	"as\n",
+	"  select ver\n",
+	"  from OBJECTS where pid = \@pid\n\n";
+print "--PROC CLASS=[INIT]\n",	
+      "create proc OBJECTS#UPD\n",
+	"  \@pid pid_type\n",
+	"as\n",
+	"  update OBJECTS set ver = ver + 1 where pid = \@pid\n",
+	"  select ver from OBJECTS where pid = \@pid\n\n";
+print "--PROC CLASS=[INIT]\n",	
+      "create proc OBJECTS#NEW\n",
+	"  \@pid pid_type\n",
+	"as\n",
+	"  insert into OBJECTS (pid, ver) values (\@pid, 1)\n\n";
+
+while (my($class, $c) = each %classes) {
+  print STDERR "Converting $class\n";
+  $lc_name = $c->{'dbname'};
+  print	"--TABLE CLASS=[$class]\n",
+	"create table $lc_name\n",
+	"  (pid pid_type not null primary key,\n",
+	join(",\n", map {"   ".&conv_scalar_att($_)}
+			values %{$c->{'participants'}},
+			values %{$c->{'scalar_attributes'}}, # This order
+			values %{$c->{'list_attributes'}},   # is important!
+			values %{$c->{'hash_attributes'}}),
+	")\n\n",
+	join("\n\n", map {&conv_list_att($class,$_)}
+			 values %{$c->{'list_attributes'}}),
+	join("\n\n", map {&conv_hash_att($class,$_)}
+			 values %{$c->{'hash_attributes'}}),
+	"\n\n";
+  print $references{$c->{'name'}};
+  for (values %{$c->{'participants'}}) {
+    print "--INDEX CLASS=[$class]\n",
+	  "create index i_$_->{'dbname'} on $lc_name ($_->{'dbname'})\n\n";
+  }
+  print "--PROC CLASS=[$class]\n",
+	"create proc ${lc_name}#DEL\n",
+		"  \@pid pid_type\n",
+		"as\n",
+		"  declare \@count int\n",
+		"  exec ${lc_name}#CNT \@pid, \@count output\n",
+		"  if \@count > 0\n",
+		"    return 1\n",
+		"  else\n",
+		"    begin\n",
+		"      delete from OBJECTS where pid = \@pid\n",
+		"      delete from ${lc_name} where pid = \@pid\n",
+		join('',
+		  map {
+		    "      delete from ${lc_name}\@$_->{'dbname'}\n".
+		    "        where ${lc_name}_pid = \@pid\n"
+		  } values %{$c->{'list_attributes'}},
+		    values %{$c->{'hash_attributes'}}).
+		"    end\n\n";
+  if (keys %{$c->{'attributes'}} || keys %{$c->{'participants'}}) {
+    print "--PROC CLASS=[$class]\n",
+	  "create proc ${lc_name}#GET\n",
+		  "  \@pid pid_type\n",
+		  "as\n",
+		  "  select ",
+		  join(', ', map {$_->{'dbname'}}
+			  values %{$c->{'participants'}},
+			  values %{$c->{'scalar_attributes'}},
+			  values %{$c->{'list_attributes'}},
+			  values %{$c->{'hash_attributes'}}),"\n",
+		  "    from $lc_name\n",
+		  "    where pid = \@pid\n\n";
+  }
+  foreach (values %{$c->{'list_attributes'}}) {
+    my $lc_att_name = $_->{'dbname'};
+    print "--PROC CLASS=[$class]\n",
+	  "create proc ${lc_name}#GET\@$lc_att_name\n",
+		 "  \@pid pid_type\n",
+		 "as\n",
+		 "  select $lc_att_name\n",
+		 "    from ${lc_name}\@$lc_att_name\n",
+		 "    where ${lc_name}_pid = \@pid\n",
+		 "    order by seq\n\n";
+  }
+  foreach (values %{$c->{'hash_attributes'}}) {
+    my $lc_att_name = $_->{'dbname'};
+    print "--PROC CLASS=[$class]\n",
+	  "create proc ${lc_name}#GET\@$lc_att_name\n",
+		 "  \@pid pid_type\n",
+		 "as\n",
+		 "  select hkey, value\n",
+		 "    from ${lc_name}\@$lc_att_name\n",
+		 "    where ${lc_name}_pid = \@pid\n\n";
+  }
+  # This is used to store all the scalar attributes at once, for performance
+  print "--PROC CLASS=[$class]\n",
+	"create proc ${lc_name}#SET\n",
+		join(",\n",
+		     (map {'  @'.lc($_->{'name'})." ".&sp_type($_->{'type'})}
+		          {'name'=>'pid', 'type'=>'pid_type'},
+			  values %{$c->{'participants'}},
+			  values %{$c->{'scalar_attributes'}}),
+		     map {'  @'.lc($_).'#ver ver_type'}
+			 keys %{$c->{'list_attributes'}},
+			 keys %{$c->{'hash_attributes'}}),"\n",
+		"as\n",
+		"  delete from $lc_name where pid=\@pid\n",
+		"  insert into ${lc_name}\n",
+		"    (",
+		 join(', ', 'pid',
+		   (map {$_->{'dbname'}}
+			values %{$c->{'participants'}},
+			values %{$c->{'scalar_attributes'}},
+			values %{$c->{'list_attributes'}},
+			values %{$c->{'hash_attributes'}})
+		 ),
+		    ")\n",
+		"    values (",
+		 join(', ', '@pid',
+		   (map {'@'.lc($_)} keys %{$c->{'participants'}}, keys %{$c->{'scalar_attributes'}}),
+		   (map {'@'.lc($_).'#ver'} keys %{$c->{'list_attributes'}},
+					    keys %{$c->{'hash_attributes'}})
+		     ),
+		           ")\n\n";
+  foreach (values %{$c->{'participants'}}, values %{$c->{'scalar_attributes'}}) {
+    my $lc_att_name = $_->{'dbname'};
+    print "--PROC CLASS=[$class]\n",
+	  "create proc ${lc_name}#SET\$$lc_att_name\n",
+		 "  \@pid pid_type,\n",	
+		 "  \@value ",&sp_type($_->{'type'}),"\n",
+		 "as\n",
+		 "  update $lc_name\n",
+		 "    set $lc_att_name = \@value\n",
+		 "    where pid = \@pid\n\n";
+  }
+  foreach (values %{$c->{'list_attributes'}},
+	   values %{$c->{'hash_attributes'}}) {
+    my $lc_att_name = $_->{'dbname'};
+    if ($_->{'key_type'}) { # hash
+      print "--PROC CLASS=[$class]\n",
+	    "create proc ${lc_name}#DEL\@$lc_att_name\n",
+		 "  \@pid pid_type,\n",
+		 "  \@hkey ",&sp_type($_->{'key_type'})," = null\n",
+		 "as\n",
+		 "  if (\@hkey is null)\n",
+		 "    delete from ${lc_name}\@$lc_att_name\n",
+		 "      where ${lc_name}_pid = \@pid\n",
+		 "  else\n",
+		 "    delete from ${lc_name}\@$lc_att_name\n",
+		 "      where ${lc_name}_pid = \@pid and\n",
+		 "            hkey = \@hkey\n\n";
+      print "--PROC CLASS=[$class]\n",
+	    "create proc ${lc_name}#SET\@$lc_att_name\n",
+		 "  \@pid pid_type,\n",
+		 "  \@key ",&sp_type($_->{'key_type'}),",\n",
+		 "  \@value ",&sp_type($_->{'val_type'}),"\n",
+		 "as\n",
+		 "  insert into ${lc_name}\@$lc_att_name\n",
+		 "    (${lc_name}_pid, hkey, value)\n",
+		 "    values (\@pid, \@key, \@value)\n\n";
+    } else {
+      print "--PROC CLASS=[$class]\n",
+	    "create proc ${lc_name}#DEL\@$lc_att_name\n",
+		"  \@pid pid_type,\n",
+		 "  \@seq seq_type = null\n",
+		 "as\n",
+		 "  if (\@seq is null)\n",
+		 "    delete from ${lc_name}\@$lc_att_name\n",
+		 "      where ${lc_name}_pid = \@pid\n",
+		 "  else\n",
+		 "    delete from ${lc_name}\@$lc_att_name\n",
+		 "      where ${lc_name}_pid = \@pid and\n",
+		 "            seq = \@seq\n\n";
+      print "--PROC CLASS=[$class]\n",
+		"create proc ${lc_name}#SET\@$lc_att_name\n",
+		 "  \@pid pid_type,\n",
+		 "  \@value ",&sp_type($_->{'type'}),",\n",
+		 "  \@seq seq_type\n",
+		 "as\n",
+		 "  insert into ${lc_name}\@$lc_att_name\n",
+		 "    (${lc_name}_pid, $lc_att_name, seq)\n",
+		 "    values (\@pid, \@value, \@seq)\n\n";
+    }
+    print "--PROC CLASS=[$class]\n",
+		"create proc ${lc_name}#VER\@$lc_att_name\n",
+		 "  \@pid pid_type\n",
+		 "as\n",
+		 "  declare \@ver ver_type\n",
+		 "  select \@ver=$lc_att_name from $lc_name\n",
+		 "  if \@ver = 9999\n",
+		 "    select \@ver = 0\n",
+		 "  else\n",
+		 "    select \@ver = \@ver + 1\n",
+		 "  update ${lc_name} set $lc_att_name=\@ver\n",
+		 "  select \@ver\n\n";
+  }
+}
+
+sub sp_type {
+  my $type = shift;
+  if ($type =~ /::/) {
+    return "pid_type";
+  } else {
+    return $type;
+  }
+}
+
+sub conv_scalar_att {
+  my $att = shift;
+  my $lc_att_name = $att->{'dbname'};
+  if ($att->{'list'} || $att->{'hash'}) {
+    return "$lc_att_name ver_type";
+  } elsif ($att->{'type'} =~ /::/) {
+    return "$lc_att_name pid_type";
+  } elsif ($att->{'type'} eq 'bit') {
+    return "$lc_att_name $att->{'type'}";
+  } else {
+    return "$lc_att_name $att->{'type'} null";
+  }
+}
+
+sub conv_list_att {
+  my($class, $att) = @_;
+  return unless $att->{'list'};
+  my $is_object;
+  if ($att->{'type'} =~ /::(.*)/) {
+    $is_object = $1;
+  }
+  my $lc_att_name = $att->{'dbname'};
+  return "--TABLE CLASS=[$class]\n".
+	 "create table ${lc_name}\@$lc_att_name\n".
+	 "  (${lc_name}_pid pid_type not null,\n".
+	 "   seq seq_type,\n".
+	 ($is_object ?
+	 "   $lc_att_name pid_type)" :
+	 "   $lc_att_name $att->{'type'})")."\n\n".
+	 "--INDEX CLASS=[$class]\n".
+	 "create clustered index i_$lc_att_name\n".
+	 "on ${lc_name}\@$lc_att_name (${lc_name}_pid)\n\n";
+}
+
+sub conv_hash_att {
+  my($class, $att) = @_;
+  return unless $att->{'hash'};
+  my $is_object;
+  if ($att->{'type'} =~ /::(.*)/) {
+    $is_object = $1;
+  }
+  my $lc_att_name = $att->{'dbname'};
+  return "--TABLE CLASS=[$class]\n".
+	 "create table $lc_name\@$lc_att_name\n".
+	 "  (${lc_name}_pid pid_type not null,\n".
+	 "   hkey $att->{'key_type'},\n".
+	 ($is_object ?
+	 "   value pid_type)" :
+	 "   value $att->{'val_type'})")."\n\n".
+	 "--INDEX CLASS=[$class]\n".
+	 "create clustered index i_$lc_att_name\n".
+	 "on ${lc_name}\@$lc_att_name (${lc_name}_pid, hkey)\n\n";
+}
+
+sub gen_refs {
+
+  my %xref;
+  my %missing;
+
+  for my $c (values %classes) {
+    foreach (values %{$c->{'scalar_attributes'}}) {
+      if ($_->{'type'} =~ /::/) {
+	push (@{$xref{$_->{'type'}}}, {
+	  'table' => $c->{'dbname'},
+	  'column' => $_->{'dbname'} });
+      }
+    }
+    foreach (values %{$c->{'list_attributes'}}) {
+      if ($_->{'type'} =~ /::/) {
+	push (@{$xref{$_->{'type'}}}, {
+	  'table' => "$c->{'dbname'}\@$_->{'dbname'}",
+	  'column' => "$_->{'dbname'}" });
+      }
+    }
+    foreach (values %{$c->{'hash_attributes'}}) {
+      if ($_->{'val_type'} =~ /::/) {
+	push (@{$xref{$_->{'val_type'}}}, {
+	  'table' => "$c->{'dbname'}\@$_->{'dbname'}",
+	  'column' => 'value' });
+      }
+    }
+    $missing{$c->{'name'}} = 1;
+  }
+
+  while (my($class,$refs) = each %xref) {
+    $class =~ /^$POP_SYSTEM\::(.*)/ or croak "[$class] not in $POP_SYSTEM";
+    my $c = $classes{$1};
+    delete $missing{$1};
+    croak "POX for [$1] not specified.\n" unless $c;
+    $references{$c->{'name'}} =
+      "--PROC CLASS=[$c->{'name'}]\n".
+	"create proc $c->{'dbname'}#CNT\n".
+	  "  \@pid pid_type,\n".
+	  "  \@count int output\n".
+	  "as\n".
+	  "  declare \@cnt int\n".
+	  "  select \@count = 0\n".
+	  join("", map {
+	    "  select \@cnt = count(*) from $_->{'table'} where $_->{'column'} = \@pid\n".
+	    "  select \@count = \@count + \@cnt\n"
+		       } @$refs).
+	  "  select \@count\n\n";
+  }
+
+  for my $class (keys %missing) {
+    my $c = $classes{$class};
+    $references{$c->{'name'}} =
+	"--PROC CLASS=[$c->{'name'}]\n".
+	 "create proc $c->{'dbname'}#CNT\n".
+	  "  \@pid pid_type,\n".
+	  "  \@count int output\n".
+	  "as\n".
+	  "  select \@count = 0\n\n";
+  }
+}

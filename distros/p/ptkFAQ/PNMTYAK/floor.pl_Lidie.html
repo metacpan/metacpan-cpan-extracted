@@ -1,0 +1,172 @@
+<H2><A HREF="9603150603.AA23741@susanoo.sbi.com">[PREV]</A>  [NEXT]  <A HREF="4i9bku$5bk@frmug.fr.net">[PREV Thread]</A>  <A HREF="0099F5AC.4B8318F0@lns62.lns.cornell.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> lusol@Turkey.CC.Lehigh.EDU (Stephen O. Lidie)
+</ADDRESS>
+<TITLE> Re: floor.pl example in tk-demos</TITLE>
+<ADDRESS><H1> Re: floor.pl example in tk-demos</H1>
+</ADDRESS>
+<ADDRESS> 15 Mar 96 21:22:46 GMT
+ ptk@guest.wpi.edu mailing list gateway
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<9603150603.AA23741@susanoo.sbi.com"><9603150603.AA23741@susanoo.sbi.com></A>
+</DL>
+<HR>
+<PRE>&gt; 
+&gt; 
+&gt; Hello,
+&gt; 
+&gt; Could someone please give help me understanding the following lines
+&gt; of code from floor.pl code in Tk-demos directory.
+&gt; 
+&gt; 
+&gt; sub floor {
+&gt; ...
+&gt; ..                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&gt; 
+&gt; 
+&gt; $c-&gt;bind('room', '<Enter>' => [sub {
+&gt;         my($c, @args) = @ARG;
+&gt;         my $id = $c-&gt;find('withtag' =&gt; 'current');
+
+	This stores in $id the canvas item number, assigned when the
+	item was created, of the canvas item under the cursor.  This
+	callback is executed when the cursor enters an item.
+
+&gt;         $floor::currentRoom  = $floor::floorLabels{$c-&gt;find('withtag',
+&gt;             'current')} if defined $id;
+
+	The hash %floor::floorLabels, indexed by canvas item number, contains
+	that items text label, in this case a room number.  (The global has
+	been qualified within package 'floor' to prevent name clashes, since
+	this routine is one of 25 or so that all "belong" to the main
+	program "widget".)
+
+	$floor::current_room is the Entry widget's -textvariable, so whenever
+	its value changes the Entry is updated.  So as you move the cursor
+	across the floorplan the changing room numbers are displayed.
+
+&gt;         $c-&gt;idletasks;}]);
+&gt; 
+&gt; I cannot understand this 
+
+
+&gt; 
+&gt;      ......
+&gt;     ......
+&gt;     $c-&gt;Tk::bind('<Enter>', => [sub {shift; shift->focus}, $floor::c_entry]);
+&gt;                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&gt;     Is some subroutine being called here what is the shift doing, what
+&gt;     is the value of ARG being passed to it ?
+
+That can now be better written as:
+
+    $c-&gt;Tk::bind('<Enter>', => [$c_entry => 'focus']);
+
+The first shift is really a shift(), the Perl builtin, which removes the
+implicit widget reference supplied by bind, $c.  The second shift() returns
+$floor::c_entry which is sent a focus message.
+
+
+&gt;                    
+&gt; tie($floor::currentRoom, 'floor', $floor::currentRoom, $c); # trace currentRoom
+&gt; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&gt; 
+&gt; Could some one explain this, I want to implement 'tracing' functionality
+&gt; and need to understand this a little more.
+&gt; 
+&gt; 
+&gt; sub TIESCALAR {
+&gt;     $canvas = $_[2];
+&gt;     bless \($_[1]);
+&gt; }
+&gt; 
+&gt; 
+&gt; sub FETCH {
+&gt; }
+&gt; 
+&gt; 
+&gt; sub STORE {
+&gt;     &main::roomChanged($canvas);
+&gt; }
+&gt; 
+
+Here it is in Tk-b10-tobe, take 2:
+
+    tie $floor::current_room, 'floor', $c, \%floor_items, \%cinfo;
+
+This says bind $floor::current_room to package 'floor' which will provide
+creation, fetch, store and destruction methods.  The remaining parameters,
+$c, \%floor_items, \%cinfo are supplied to the "new" method because I need
+them (;
+
+Here is the package/class code, yell if you need more help:
+
+package floor;
+
+# $current_room is tied to package "floor" for tracing purposes, thus, when
+# characters are typed in the Entry widget we can call floor_room_changed()
+# at every keystroke, and when a valid room number is found light the room up.
+#
+# All other global variables are also "floor" qualified.
+
+use English;;
+
+my($class, $current_room, $canvas, $floor_items, $cinfo);
+
+sub TIESCALAR {
+
+    # "new" method for scalars.  Save reference to the floorplan canvas,
+    # item descriptions and canvas info hash in this package's namespace.
+    #
+    # Return a blessed reference, which is what FETCH and STORE will get.
+
+    ($class, $canvas, $floor_items, $cinfo) = @ARG;
+    my $self;
+    bless \$self, $class;
+
+}
+
+sub FETCH {
+
+    # Method to handle reads of the tied variable:  simply return it's value.
+   
+    my($current_room) = @ARG;
+    return $$current_room;
+
+}
+
+sub STORE {
+
+    # Method to handle writes to the tied variable:  simply store it's value.
+    # Call floor_room_changed() to highlight a room, if possible.
+
+    my($current_room, $value) = @ARG;
+    $$current_room = $value;
+    &::floor_room_changed($canvas, $floor_items, $cinfo);
+
+}
+
+sub DESTROY {			# class destructor (unused)
+}
+
+1;
+
+
+
+Oh, and don't forget to untie() the blasted beast or the strangest things
+can happen, as I've just spent the last few hours learning ... ggrrrr!
+
+    my $w_dismiss = $w_buttons-&gt;Button(
+        -text    =&gt; 'Dismiss',
+        -command =&gt; sub {untie $floor::current_room; $w-&gt;destroy},
+    );
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+</PRE>
+<HR><H2><A HREF="9603150603.AA23741@susanoo.sbi.com">[PREV]</A>  [NEXT]  <A HREF="4i9bku$5bk@frmug.fr.net">[PREV Thread]</A>  <A HREF="0099F5AC.4B8318F0@lns62.lns.cornell.edu">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

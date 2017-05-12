@@ -1,0 +1,37 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         perfSONAR_PS-Services-MA-SNMP
+version:      0.09
+version_from: lib/perfSONAR_PS/Services/MA/SNMP.pm
+installdirs:  site
+requires:
+    base:                          0
+    Digest::MD5:                   2.33
+    English:                       0
+    Error:                         0
+    Exporter:                      0
+    fields:                        0
+    IO::File:                      1
+    Log::Dispatch::FileRotate:     1
+    Log::Dispatch::Screen:         1
+    Log::Dispatch::Syslog:         1
+    Log::Log4perl:                 1
+    Module::Load:                  0.1
+    Params::Validate:              0.64
+    perfSONAR_PS::Client::LS::Remote: 0.09
+    perfSONAR_PS::Common:          0.09
+    perfSONAR_PS::DB::File:        0.09
+    perfSONAR_PS::DB::RRD:         0.09
+    perfSONAR_PS::DB::SQL:         0.09
+    perfSONAR_PS::DB::XMLDB:       0.09
+    perfSONAR_PS::Error_compat:    0.09
+    perfSONAR_PS::Messages:        0.09
+    perfSONAR_PS::Services::Base:  0.09
+    perfSONAR_PS::Services::MA::General: 0.09
+    strict:                        0
+    Time::HiRes:                   1.85
+    warnings:                      0
+    XML::LibXML:                   1.58
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

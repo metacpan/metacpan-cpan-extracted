@@ -1,0 +1,21 @@
+.cvsignore
+Changes
+lib/perltugues.pm
+lib/perltugues/caracter.pm
+lib/perltugues/inteiro.pm
+lib/perltugues/real.pm
+lib/perltugues/texto.pm
+lib/perltugues/tipo.pm
+Makefile
+Makefile.old
+Makefile.PL
+MANIFEST
+MANIFEST.bak
+MANIFEST.SKIP
+META_new.yml
+README
+t/alg.t
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

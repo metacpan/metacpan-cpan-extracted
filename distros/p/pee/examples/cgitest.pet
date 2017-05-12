@@ -1,0 +1,60 @@
+<?
+#
+# This is a "code block", it may contain any valid perl code.
+#
+
+# let's see if we were called with any parameter
+require 'cgiutils.pl';
+%QUERY = &parse_form;
+
+# Let's print the "Content-type" header, this is a HTML document
+print "Content-type: text/html\n\n";
+
+?>
+
+<!-- this is actual HTML -->
+<html>
+
+<body>
+
+<?
+# this is another code block, but it won't produce any output
+
+my $greeting = $QUERY{'greeting'} || "hello";
+$greeting .= " ".($QUERY{'name'} or "")."!\n";
+?>
+
+<h1>
+<!-- the following is an "expression block", it may contain an expression
+that can be evaluated and the value printed out in-place -->
+<?=$greeting?>
+</h1>
+
+
+<!-- Let's try and access a CGI environment variable -->
+You are using "<b><?=$ENV{HTTP_USER_AGENT}?></b>" to access this page.
+
+
+<!-- Create a POST and a GET link -->
+
+<br><br>
+Try with POST
+<form method=POST>
+<input type=hidden name="name" value="<?= $QUERY{'name'} or "" ?>">
+Your name : <input type=text name="name" value="<?= $QUERY{'name'} or "" ?>">
+<input type=submit>
+</form>
+
+Try with GET
+<form method=GET>
+<input type=hidden name="name" value="<?= $QUERY{'name'} or "" ?>">
+<input type=submit name="greeting" value="Bye bye">
+</form>
+
+<br>
+
+</body>
+</html>
+
+<?-- this is a comment.  Unlike HTML comments, they will not even
+get generated! ?>

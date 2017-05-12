@@ -1,0 +1,14 @@
+
+A very quick documentation on how to buld the wrapper for Mac OS X.
+
+- run Makefile_OSX.pl
+	# ./Makefile_OSX.pl
+- type make
+	# make
+
+The wrapper should then build nicely. If you run one of the test scripts,
+it should work.
+
+"make install" has not been tested yet!!!
+
+

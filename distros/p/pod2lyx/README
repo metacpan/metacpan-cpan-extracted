@@ -1,0 +1,95 @@
+Howdy! ( thats Texan for Hi for those that don't know )
+
+################################################################################
+# The software in this package is copyrighted 2000 (c) by Richard D. Jackson
+#
+# The software in this package is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+################################################################################
+
+
+This package contains two things a perl class called Pod::Lyx and a wraper for
+that class called pod2lyx. As the name implies this package will convert perl
+pod documentation into a format readable by LyX ( see http://www.lyx.org for
+information on LyX ).
+
+Why did I write this?
+
+I really wanted a good way to print pod documentation where I could control
+certin aspects of the process. I'm sure some of you are saying that their are
+already ways of doing this. True there are, but they didn't produce the results
+I wanted. And I have used LyX for various things in the past and thought to
+myself that I could get what I wanted out of LyX if I could just get the pod
+documentation into LyX. So I created this package to do the pod to LyX
+conversion stuff. Now I can use LyX to get the results I want. So I'm happy
+for now that is. This converter as it stands is lacking many things but
+it will do 95% of the work for me or you if you decide to use it. I do hope I
+will be able to get the converter to do more of the work later thus reducing
+the amount of time I/you have to spend tweeking little bits here and their to
+get the results I/we want.
+
+
+How to install the package?
+
+perl Makefile.PL
+make
+make install
+
+Thats it you are ready to go.
+
+How do I use this thing?
+
+1) You have a pod file in the current directory that you want to convert.
+
+pod2lyx podfile.pod
+pod2lxy perlwithpod.pl
+pod2lyx perlmodule.pm
+
+2) You have a pod file in some directory that you want to convert.
+
+pod2lyx somedir/podfile.[whatever]
+
+3) You want to convert a pod file shipped with Perl.
+
+pod2lyx perlpod         # don't put an extention on pod documentation that
+                        # is distributed with perl.
+
+4) You want to extract the pod documentation from an installed module or script.
+
+pod2lyx Pod::Lyx    # note this will not produce any thing at this time because
+                    # Pod::Lyx does not contain any pod documentation yet :(
+
+pod2lyx open        # this will extract the pod documentation out of the first
+                    # open.* match. Other wise if you have installed a open.pl
+                    # and a open.pm and they both contain pod data the first
+                    # one found will be converted. NOTE: If you were to have
+                    # something like File/open.pm installed this will not match
+                    # because it is not at the same level in the module tree.
+
+5) To get a list of the availible options.
+
+pod2lyx -help           # brief help screen
+pod2lyx -man            # more in depth help screen.
+
+
+Things that eather are not implemented or don't work as expected:
+
+1) E<escapecode> is not converted.
+2) C< soemthing B<something> something > does not work correctly. The output
+      will contain one to many spaces.
+
+Also there are some pod's that just don't quite look right when conveted to the
+LyX format but with each release this is getting better.
+
+
+Bugs:
+1) I'm sure there are some of them but I ran out of Raid so I'll just have to
+    deal with them as they come up.
+
+Contact:
+
+For now use my main mail account richardj@1gig.net. I do monitor the lyx-users
+list so if you post something there I will mostlikly find it. When sending me
+something please put pod2lyx in the header so I don't just delete it when I
+clean out my mail box. Also if you don't mind drop me a note if you find this
+usfull.

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Pokemon Go Server Status",
+   "author" : [
+      "Ayrat <Ayrat.Salavatovich@analyst.mx>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "pokemon_go_server_status",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "WWW::Mechanize::Timed" : "0.44"
+         }
+      }
+   },
+   "provides" : {
+      "pokemon_go_server_status" : {
+         "file" : "lib/pokemon_go_server_status.pm",
+         "version" : "1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Ayrat-Salavatovich/pokemon-go-server-status"
+      }
+   },
+   "version" : "1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

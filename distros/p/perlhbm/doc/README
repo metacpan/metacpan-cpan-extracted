@@ -1,0 +1,46 @@
+
+
+
+
+                               PERL HBM
+			       --------
+
+
+           The Perl extension to HB and the Perl HB Module
+
+                            Documentation
+
+
+
+
+
+
+
+1. METAINFORMATION
+
+   In this directory you will find the documentation for the Perl HBM
+   package.
+
+   The current version of the documentation is not complete and you will
+   hit dead ends.
+
+
+2. INSTRUCTIONS
+
+   To see the documentation you will need to configure your HB daemon,
+   authorizing it to parse the files in this directory.
+
+   You can also use the perlhbm.cgi script to run HB via CGI. You'll
+   probably want to edit the first line in that file to have it point
+   to the place where your HB binary can be found.
+
+   Finally, you may also check the online version of the documentation
+   at the following URL:
+
+       <http://bachue.com/hb/perl>
+
+3. CREDITS
+
+   The documentation for the Perl HBM was written by Alejandro Forero
+   Cuervo <bachue@bachue.com>. No contributions have been received from
+   other parties.

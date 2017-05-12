@@ -1,0 +1,46 @@
+<HTML>
+<HEAD><TITLE> 17.4. How do I update widgets while waiting for other processes to complete?</TITLE></HEAD>
+<BODY><a name="A17.4"> 17.4. How do I <KBD>update</KBD> widgets while waiting for other processes to complete?</a>
+
+<hr>
+</p><p>
+The short answer is
+<pre>
+    $widget -&gt; update;
+</pre>
+A longer answer would include a script of this sort where instead of actually
+doing something useful the "long running process" is simply a call to the perl
+<kbd>sleep()</kbd> function:
+<pre>
+    #!/usr/bin/perl -w
+    
+    use Tk;
+    
+    my $m = MainWindow-&gt;new();
+    my $l = $m -&gt; Listbox();
+    $l -&gt; bind('&lt;Double-1&gt;' =&gt; sub{sleepy($l)} );
+    my @nuts   = qw(Almond Brazil Chestnut Doughnut Elmnut Filbert);
+    for (@nuts) { $l -&gt; insert('end',$_); }
+    $l -&gt; pack;
+    MainLoop;
+    
+    sub sleepy {
+        my $widget = shift;
+        print "before 1st sleep \n";
+        sleep(10);
+        print "after 1st sleep before delete \n";
+        $widget -&gt; delete('active');
+        $widget -&gt; update;                   # try [un]*commenting this
+        print "after delete before 2nd sleep \n";
+        sleep(10);
+        print "after 2nd sleep \n";
+    }
+    __END__
+</pre>
+
+
+<hr>
+	<p><a href="qna17.3.html">Previous</a> | Return to <a href="ptkTOC.html#TOC17.4">table of contents</a> | <a href="qna17.5.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

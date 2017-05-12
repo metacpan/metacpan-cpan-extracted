@@ -1,0 +1,469 @@
+#!/usr/bin/perl -w
+
+# $Id: perlbench-run,v 1.28 2005/12/19 15:19:09 gisle Exp $
+
+require 5.002;
+use strict;
+$| = 1;
+
+use Getopt::Std;
+use vars qw($opt_c $opt_t $opt_d $opt_s);
+getopts("c:t:d:s") or usage();
+
+use Sys::Hostname qw(hostname);
+use File::Basename qw(dirname);
+use File::Path qw(mkpath);
+use Cwd qw(abs_path);
+
+my @perls;
+for (@ARGV) {
+    eval {
+	push(@perls, Perl->new($_));
+    };
+    if ($@) {
+	$@ =~ s/ at (.*) line (\d+).*\n//;
+	warn "$@, skipping...\n";
+    }
+}
+
+usage() unless @perls;
+my $HOSTNAME_HTML = htmlesc(hostname());
+
+# result directory
+my $dir = $opt_d;
+unless ($dir) {
+    my $cnt = 1;
+    while (1) {
+	$dir = sprintf "benchres-%03d", $cnt;
+	last unless -e $dir;
+	$cnt++;
+    }
+}
+mkdir($dir, 0755) || die "Can't mkdir(\"$dir\"): $!";
+
+open(INDEX, ">$dir/index.html") || die "Can't create $dir/index.html: $!";
+print INDEX "<html>\n";
+print INDEX "<head>\n";
+print INDEX " <title>PerlBench $HOSTNAME_HTML " . time2iso() . "</title>\n";
+print INDEX qq( <link rel="stylesheet" href="style.css" type="text/css">\n);
+link_or_copy("style.css");
+my $use_overlib;
+if (link_or_copy("overlib.js")) {
+    $use_overlib++;
+    print INDEX qq( <script type="text/javascript" src="overlib.js"></script>\n);
+}
+
+print INDEX "</head>\n";
+print INDEX "<body>\n";
+print INDEX qq(<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>\n);
+print INDEX qq(<h1>PerlBench results from $HOSTNAME_HTML at ) . time2iso() . qq(</h1>\n);
+
+# Show perl configurations
+my %config_summary;
+{
+    my %cnf;
+    my $keymax = length("version");
+    for my $p (@perls) {
+	while (my($k,$v) = each %{$p->{config} || {}}) {
+	    $cnf{$k}{$v}++;
+	    $keymax = length($k) if length($k) > $keymax;
+	}
+    }
+
+    for my $p (@perls) {
+	my $label = $p->{label};
+	print "$label) $p->{name}\n";
+	printf "\t%-*s = %s\n", $keymax, "version", $p->{version};
+	printf "\t%-*s = %s\n", $keymax, "path", $p->{path};
+	for my $k (sort keys %{$p->{config} || {}}) {
+	    next if $cnf{$k}{$p->{config}{$k}} == @perls;
+	    printf "\t%-*s = %s\n", $keymax, $k, $p->{config}{$k};
+	    $config_summary{$k}{$label} = $p->{config}{$k};
+	}
+	print "\n";
+
+	open(RES, ">$dir/CONFIG-$p->{label}.txt") || die;
+	$p->run_cmd(*V, "-V") || die "Can't run $p->{path}: $?";
+	while (<V>) {
+	    print RES $_;
+	}
+	close(V);
+	close(RES) || die "Can't write: $!";
+    }
+}
+
+my $factor = $opt_c;
+unless ($factor) {
+    $factor = `$^X cpu_factor`;
+    chomp($factor);
+    die "Can't calculate cpu speed factor" unless $factor;
+}
+
+file("$dir/CPU_FACTOR", "$factor\n");
+
+# Try to run tests
+die "No test directory found" unless -d 't';
+
+my @tests;
+
+use File::Find;
+find(sub { /\.t$/ && push(@tests, $File::Find::name) }, "benchmarks");
+if ($opt_t) {
+    @tests = grep /$opt_t/o, @tests;
+}
+@tests = sort @tests;
+
+# Try to run the empty test in order to time the loop
+my %empty_cycles;
+for my $p (@perls) {
+    $p->{empty_cycles} = ($empty_cycles{$p->{path}} ||= do {
+        my $empty_cycles;
+        $p->run_cmd(*P, "empty.t", $factor);
+	while (<P>) {
+            next unless /^Cycles-Per-Sec:\s*(\S+)/;
+            $empty_cycles = int($1);
+	    last;
+        }
+        close(P);
+        die "Could not determine empty test speed for $p->{path}"
+            unless  $empty_cycles;
+        $empty_cycles;
+    });
+    $p->{point_sum} = 0;
+}
+
+# heading
+print INDEX "<table border=1>\n";
+print INDEX " <tr>\n  <th>&nbsp;</th>\n";
+
+print "\n";
+print " " x 20;
+for my $p (@perls) {
+    printf "%8s", $p->{label};
+    my $h = htmlesc($p->{label});
+    my $overlib_attr = "";
+    if ($use_overlib && $p->{name}) {
+	$overlib_attr = qq( onmouseover="return overlib('$p->{name}');" onmouseout="return nd();");
+    }
+    print INDEX qq(  <th><a href="CONFIG-$h.txt"$overlib_attr>$h</a></th>\n);
+}
+print "\n";
+print INDEX " </tr>\n";
+
+print " " x 20;
+for my $p (@perls) {
+    printf "%8s", ("-" x max(3, length($p->{label})));
+}
+print "\n";
+
+
+my $test;
+for $test (@tests) {
+    unless (open(T, $test)) {
+	warn "Can't open $test: $!";
+	next;
+    }
+
+    my $name = $test;
+    $name =~ s,^benchmarks/,,;
+    $name =~ s,\.t$,,;
+
+    my $save_file = "$dir/$name/test.txt";
+    mkpath(dirname($save_file), 0, 0755);
+    open(SAVE, ">$save_file") || die "Can't create $save_file: $!";
+    (my $save_file_link = $save_file) =~ s,^\Q$dir\E/,,;
+    $save_file_link = htmlesc($save_file_link);
+
+    my %prop;
+    while (<T>) {
+	print SAVE $_;
+	next unless /^\#\s*(\w+)\s*:\s*(.*)/;
+	my($k,$v) = (lc($1), $2);
+
+	if (defined $prop{$k}) {
+	    $prop{$k} .= "\n$v";
+	} else {
+	    $prop{$k} = $v;
+	}
+    }
+    close(T);
+    close(SAVE) || die "Can't write $save_file: $!";
+
+    printf "%-20s", $name;
+    my $overlib_attr = "";
+    if ($use_overlib && $prop{name}) {
+	$overlib_attr = qq( onmouseover="return overlib('$prop{name}');" onmouseout="return nd();");
+    }
+    print INDEX qq( <tr>\n  <th align=left><a href="$save_file_link"$overlib_attr>) . htmlesc($name) . "</a></th>\n";
+
+    my $scale;
+    my $p;
+    for my $p (@perls) {
+	if ($p->{version} < $prop{'require'}) {
+	    # Can't run test
+	    printf "%8s", "N/A";
+	    print INDEX "  <td>N/A</td>\n";
+	    next;
+	}
+
+	my $res_file = "$dir/$name/" . $p->{label} . ".txt";
+	mkpath(dirname($res_file), 0, 0755);
+	open(RES, ">$res_file") || die "Can't create $res_file: $!";
+	(my $res_file_link = $res_file) =~ s,^\Q$dir\E/,,;
+	$res_file_link = htmlesc($res_file_link);
+
+	my $points;
+	my $popup_text = "";
+	$p->run_cmd(*P, $test, $factor, $p->{empty_cycles});
+	while (<P>) {
+	    print RES $_;
+	    if (/^Bench-Points:\s+(\S+)/) {
+		$points = $1;
+	    }
+	    if (/^(?:\w+-Time|CPU|Cycles-Per-Sec|Loop-Overhead):/) {
+		$popup_text .= "<br>" if length($popup_text);
+		$popup_text .= $_;
+		chomp($popup_text);
+	    }
+	}
+	close(P);
+	close(RES);
+
+	my $overlib_attr = "";
+	if ($use_overlib) {
+	    $overlib_attr = qq( onmouseover="return overlib('$popup_text');" onmouseout="return nd();");
+	}
+
+	# present results
+	unless (defined $points) {
+	    printf "%8s", "-";
+	    print INDEX qq(  <td><a href="$res_file_link"$overlib_attr>??</a></td>\n);
+	    next;
+	}
+	unless ($opt_s) {
+	    unless (defined $scale) {
+		$scale = 100 / $points;
+	    }
+	    $points *= $scale;
+	}
+	printf "%8.0f", $points;
+	printf INDEX qq(  <td align=right><a href="%s"%s>%.0f</a></td>\n), $res_file_link, $overlib_attr, $points;
+	$p->{point_sum} += $points;
+	$p->{no_tests}++;
+    }
+    print INDEX " </tr>\n";
+    print "\n";
+}
+
+print "\n";
+printf "%-20s", "AVERAGE";
+for my $p (@perls) {
+    printf "%8.0f", $p->{point_sum} / $p->{no_tests};
+}
+print INDEX "</table>\n";
+print INDEX "<p><small>Higer numbers are better. 200 is twice as fast as 100.</small></p>\n";
+
+print INDEX "<h2>Configuration summary</h2>\n";
+print INDEX "<p>Test ran on a $^O machine";
+if ($^O ne "MSWin32") {
+    my $uname = `uname -a`;
+    if ($uname) {
+	print INDEX qq( that reports its uname as ") . htmlesc($uname) . qq(");
+    }
+}
+print INDEX ".\n";
+print INDEX " Test run completed at " . substr(time2iso(), 11) . ".\n";
+print INDEX "</p>\n";
+
+print INDEX "<table border=1>\n";
+print INDEX " <tr>\n  <th>&nbsp</th>\n";
+for my $p (@perls) {
+    my $h = htmlesc($p->{label});
+    print INDEX qq(  <th><a href="CONFIG-$h.txt">$h</a></th>\n);
+}
+for my $k ("name", "version", "path") {
+    print INDEX " <tr>\n  <th>$k</th>\n";
+    for my $p (@perls) {
+	print INDEX "  <td>" . htmlesc($p->{$k}) . "</td>\n";
+    }
+    print INDEX " </tr>\n";
+}
+print INDEX " </tr>\n";
+for my $k (sort keys %config_summary) {
+    print INDEX " <tr>\n  <th>" . htmlesc($k) . "</th>\n";
+    for my $lab (map $_->{label}, @perls) {
+	my $v = $config_summary{$k}{$lab};
+	$v = "" unless defined($v);
+	my $len = length($v);
+	$v = $len ? htmlesc($v) : "&nbsp;";
+	$v = "<small>$v</small>" if $len > 40;
+	print INDEX " <td align=left>$v</td>\n";
+    }
+
+    print INDEX " </tr>\n";
+}
+print INDEX "</table>\n";
+
+print INDEX "</body>\n</html>\n";
+close(INDEX) || die "Can't write $dir/index.html\n";
+
+
+my $index_url = abs_path($dir);
+if ($^O eq "MSWin32") {
+    $index_url =~ s,\\,/,g;
+    $index_url =~ s,^([A-Za-z]):,/$1|,;
+}
+$index_url = "file://$index_url/index.html";
+
+print "\n\nResults saved in $index_url\n";
+
+
+sub usage
+{
+    $0 =~ s,.*/,,;
+    die "Usage: $0 [options] [lab1=]<perl1> [lab2=]<perl2>...
+
+Recognized options:
+  -s               don't scale numbers (so that first perl is always 100)
+  -t <filter>      only tests that match <filter> regex are timed
+  -c <cpu-factor>  use this factor to scale tests instead of running the
+                   'cpu_factor' program to determine it.
+  -d <dirname>     where to save results
+";
+}
+
+sub max
+{
+    my $max = shift;
+    while (@_) {
+	my $n = shift;
+	$max = $n if $n > $max;
+    }
+    return $max;
+}
+
+sub file {
+    my $name = shift;
+    if (@_) {
+        my $content = shift;
+        open(my $f, ">", $name) || die "Can't create '$name': $!";
+        binmode($f);
+        print $f $content;
+        close($f) || die "Can't write to '$name': $!";
+        if (@_) {
+            my $mode = shift;
+            change_mode($mode, $name);
+        }
+    }
+    else {
+        open(my $f, "<", $name) || return undef;
+        binmode($f);
+        local $/;
+        return scalar <$f>;
+    }
+}
+
+sub link_or_copy {
+    my $f = shift;
+    link($f, "$dir/$f") || do {
+	require File::Copy;
+	File::Copy::copy($f, $f);
+    }
+}
+sub htmlesc {
+    my $str = shift;
+    $str =~ s/&/&amp;/g;
+    $str =~ s/</&lt;/g;
+    $str;
+}
+
+sub time2iso
+{
+    my $time = shift;
+    $time = time unless defined $time;
+    my($sec,$min,$hour,$mday,$mon,$year) = localtime($time);
+    return sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+            $year+1900, $mon+1, $mday, $hour, $min, $sec);
+}
+
+BEGIN {
+package Perl;
+
+my $NEXT_LABEL = "A";
+
+sub new
+{
+    my($class, $path) = @_;
+    my $label;
+    if ($path =~ s/^(\S+)=//) {
+	$label = $1;
+    }
+    else {
+	$label = $NEXT_LABEL++;
+    }
+    unless (-x $path) {
+	die "$path is not executable";
+	next;
+    }
+    my $self = bless { path => $path, label => $label }, $class;
+    $self->run_cmd(*V, '-e', 'print qq(This is perl ), $]+0, qq(\n)');
+    my $version = <V>;
+    close V or die "closing pipe from perl: exit code $?";
+    chomp $version;
+    unless ($version =~ /^This is perl (\d+.\d+)/) {
+	die "$path does not appear to be a working perl";
+    }
+    $self->{version} = $1;
+    $self->run_cmd(*V, '-v');
+    while (<V>) {
+	if (/^This is perl, v(\S+)/) {
+	    $self->{name} = "perl-$1";
+	}
+	if (/^Binary build (\d+.*) provided by ActiveState/) {
+	    $self->{name} .= " build $1";
+	    $self->{name} =~ s/^perl/ActivePerl/;
+	}
+    }
+    close(V);
+
+    if ($self->{version} >= 5) {
+	# The perl should have Configure support.  Try to extract
+	# some key settings
+	my $prog = 'use Config; Config::config_vars(qw(cc ccversion gccversion optimize ccflags usethreads use64bitint use64bitall usemymalloc))';
+	$self->run_cmd(*CONFIG, '-e', $prog);
+	while (<CONFIG>) {
+	   next unless /^(\w+)='([^']+)'/;  #' #
+           $self->{config}{$1} = $2;
+        }
+	close(CONFIG);
+    }
+    return $self;
+}
+
+my $ld_path = Cwd::extLibpath()	 if $^O eq 'os2';
+$ld_path .= ';'			 if $ld_path and $^O eq 'os2';
+
+sub cmd
+{
+    my $self = shift;
+    my $path = $self->{path};
+    (my $pdir = $path) =~ s,[/\\][^/\\]+$,/,;
+    if (-d "$pdir/lib") {
+        # uninstalled perl
+        Cwd::extLibpath_set("$ld_path$pdir") if $^O eq 'os2'; # Find DLL
+	($path, '-I', "$pdir/lib");
+    } else {
+	$path;
+    }
+}
+
+sub run_cmd
+{
+    my $self = shift;
+    my @cmd = $self->cmd;
+    my $fh = shift;
+    my @args = map {/\s/ ? "'$_'" : $_} @_;
+    open($fh, "@cmd @args |") or die "Cannot pipe from '@cmd @args': $!";
+}
+
+}

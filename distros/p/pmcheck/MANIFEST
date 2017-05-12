@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/App/pmcheck.pm
+Makefile.PL
+MANIFEST
+META.yml
+META.json
+README
+script/pmcheck
+t/perlcritic.t
+t/perlcriticrc
+t/pmcheck.t
+t/pod-coverage.t
+t/pod.t

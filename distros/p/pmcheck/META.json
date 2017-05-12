@@ -1,0 +1,52 @@
+{
+   "abstract" : "show all Perl packages provided or required",
+   "author" : [
+      "Andrew Pam <andrew.pam@strategicdata.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "pmcheck",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Module::Used" : 0,
+            "Term::Activity" : 0
+         },
+         "requires" : {
+            "PPI::Document" : 0,
+            "perl" : "v5.10.0",
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "App::pmcheck" : {
+         "file" : "lib/App/pmcheck.pm",
+         "version" : "v1.1.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.1.11"
+}

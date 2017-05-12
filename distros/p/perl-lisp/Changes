@@ -1,0 +1,82 @@
+2004-11-19   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.06
+
+   Fixed a documentation typo.
+
+
+
+1997-10-24   Gisle Aas <aas@sn.no>
+
+   Release 0.05
+
+   The 'dump-lisp' utility use options in the same way as 'eval-lisp'
+
+   Removed "_eld" from the Gnus::Newsrc module name.
+
+   Added documentation to Gnus::Newsrc alist_hash() method.
+
+
+
+1997-10-19   Gisle Aas <aas@sn.no>
+
+   Release 0.04
+
+   Lisp::Interpreter provide lisp_read_eval_print()
+
+   The 'eval-lisp' utility can read from <STDIN>
+
+   Gnus::Newsrc_eld works again.
+
+   Lisp::Special provide make_special() and specialp()
+
+   Lisp::Reader update:
+       - nil and () now represented as undef, unless $NIL_AS_SYMBOL
+         is true.
+
+       - More complete recognition of characters ?\015 ?\M-\C-X
+
+       - Escaped characters in strings
+
+   $symbol->as_string;
+
+   Lisp::Symbols::dump_symbols()
+
+   $VERSION variable in most modules
+
+   More tests
+
+
+
+1997-10-17   Gisle Aas <aas@sn.no>
+
+   Release 0.03
+
+   Reader recognize more float numbers and symbols with escaped chars
+
+   Implemented the following subrs:
+
+       car cdr
+       if cond not null and or while
+       floatp integerp numberp zerop
+       = /? < <= > >= 1+ 1- / % min max
+
+
+
+1997-10-17   Gisle Aas <aas@sn.no>
+
+   Release 0.02
+
+   Comment parsing fix from <Erik.Assum@tech.scandinaviaonline.se>
+
+   Main functions renamed as lisp_read(), lisp_print() and lisp_eval()
+
+   (perl-eval "some perl expression")
+
+   New options to 'dump-lisp' and 'eval-lisp'
+
+
+
+1997-10-16   Gisle Aas <aas@sn.no>
+
+   Release 0.01

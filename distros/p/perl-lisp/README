@@ -1,0 +1,22 @@
+I just wanted to be able to extract the information that Gnus write to
+its ~/.newsrc.eld file.  In order to do this I ended up writing a
+general Lisp reader.  It reads textual lisp and returns a perl
+structure that represents the Lisp objects.  For instance
+
+  ; this is a comment
+  (foo "foo" (+ 42))
+
+Ends up as the following perl structure.
+
+ [symbol("foo"), "foo", [symbol("+") 42]]
+
+Once I had this I just had to produce a Lisp printer, i.e. something
+that takes structure like the one above and returns the textual lisp
+representation of it.  And then it was just a matter of a little
+programming to turn on evaluation of these objects and a minimal Lisp
+environment was born.
+
+All code in this package is experimental and the interfaces can change
+at any time.
+
+Copyright 1997 Gisle Aas.  <gisle@aas.no>

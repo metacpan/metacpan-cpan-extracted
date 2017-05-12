@@ -1,0 +1,37 @@
+<HTML>
+<HEAD><TITLE> 10.6. How do I get a Canvas to output PostScript(c)?</TITLE></HEAD>
+<BODY><a name="A10.6"> 10.6. How do I get a <KBD>Canvas</KBD> to output PostScript(c)?</a>
+
+<hr>
+</p><p>
+Many thanks to Tom Oelke 
+<a href="mailto:tpo9617@rit.edu">&lt;tpo9617@rit.edu&gt;</a> for providing this
+question, answer &amp; snippet of code:
+<p><BLOCKQUOTE>
+The following section of code gets the postscript code
+for the section of canvas that's top-left corner is at
+$min_x, $min_y, and has a width and height equivalent
+to the displayed region.  This ps code is then piped out to
+lpr to be printed.
+</BLOCKQUOTE><PRE>
+    my $ps = $canvas-&gt;postscript( '-x' =&gt; $min_x,
+                                  '-y' =&gt; $min_y,
+                                  -width =&gt; $canv-&gt;Width,
+                                 -height =&gt; $canv-&gt;Height);
+    open (PS, "| lpr"); # customize with -P<i>name</i> <i>e.g.</i> 
+    print PS $ps;
+    close (PS);
+</PRE>
+Whereas you would use something like:
+<PRE>
+    open (PS, "&gt;file.ps"); # to output to a file
+    print PS $ps;
+    close (PS);
+</PRE>
+
+
+<hr>
+	<p><a href="qna10.5.html">Previous</a> | Return to <a href="ptkTOC.html#TOC10.6">table of contents</a> | <a href="qna10.7.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

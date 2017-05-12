@@ -1,0 +1,67 @@
+<HTML>
+<HEAD><TITLE> 9.3. How do I get a Popup to popup?</TITLE></HEAD>
+<BODY><a name="A9.3"> 9.3. How do I get a Popup to popup?</a>
+
+<hr>
+</p><p>
+For things like a simple &quot;are you sure?&quot; dialog box you might want to
+take a look at <KBD>Dialog.pm</KBD> which is discussed in a 
+<a href="qna15.1.html">later question within this FAQ [15.1]</a>.
+<p>
+If you don't wish to require Tk::Dialog, you need something more complicated, 
+or you simply want to create your own independent window with widgets; you 
+must first setup a 
+<KBD>Toplevel</KBD> in perl/Tk. The fourth example in 
+<a href="pod/UserGuide.html">UserGuide.pod</a> gives a simple example of how 
+to call <KBD>Toplevel</KBD>. Quoting from <a href="pod/ex3.pl">that script</a>:
+<pre>
+    my $main = new MainWindow;
+    fill_window($main, 'Main');
+    my $top1 = $main-&gt;Toplevel;
+</pre>
+Where <KBD>sub fill_window</KBD> is declared after the call to 
+<KBD>MainLoop;</KBD>. When running <a href="pod/ex3.pl">that script</a> take
+careful note of which window pops up first, which window has <i>grab</i>bed 
+the active attention of your input device(s), and which widget within the 
+active window has the keyboard/mouse <i>focus</i> when all three windows are 
+open.
+<p>
+The use of <KBD>Toplevel</KBD>s brings up the issue of <i>grab</i> - or which
+independent window is presently &quot;active&quot; and which are activatable.
+To make a <KBD>Toplevel</KBD> window active call <KBD>grab</KBD> thusly:
+<pre>
+    $<i>Top_widget</i>-&gt;grab(<i>grab_option</i>);
+</pre>
+where <kbd>$<i>Top_widget</i></kbd> identifies the desired <KBD>Toplevel</KBD>
+(it would be either <KBD>$top1</KBD> or <KBD>$top2</KBD> in the 
+<a href="pod/ex3.pl">sample script</a> referred to above).
+<KBD><i>grab_option</i></KBD> could be <KBD>-global</KBD> - but this is
+discouraged as a sign of &quot;desparate programming style&quot;. To give a
+<KBD>Toplevel</KBD> &quot;local grab&quot; you may simply say:
+<pre>
+    $<i>Top_widget</i>-&gt;grab;
+</pre>
+That is, without an argument.
+<p>
+The use of <KBD>Toplevel</KBD>s may also bring up the issue of <i>focus</i> - 
+or which window - even which widget within a window - is presently 
+&quot;hot&quot;. You may call <KBD>focus</KBD> on an entire
+<KBD>Toplevel</KBD>:
+<pre>
+    $<i>Top_widget</i>-&gt;focus;
+</pre>
+However, <KBD>focus</KBD> is most often used with individual widgets rather
+than a whole <KBD>Toplevel</KBD>.
+<p>
+To <i>de-iconify</i> a widget there is in fact a <KBD>Popup</KBD> function 
+that may be called thusly:
+<pre>
+    $<i>Top_widget</i>-&gt;Popup();
+</pre>
+
+
+<hr>
+	<p><a href="qna9.2.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.3">table of contents</a> | <a href="qna9.4.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

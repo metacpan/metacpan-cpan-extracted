@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Hermes;
+use Janus::Path;
+use Janus::Conf;
+use Vulcan::OptConf;
+use Vulcan::ProcLock;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+
+$Vulcan::OptConf::THIS = 'janus';
+
+our @OPTION = ( number => 5, interval => 2 );
+
+=head1 SYNOPSIS
+
+Tail janus log. If no names are given, tail all logs.
+
+$0 [names ..] [--number I<num>] [--interval I<num>]
+
+=cut
+my $option = Vulcan::OptConf->load();
+my %o = $option->set( @OPTION )->get( map { "$_=i" } @OPTION[0,2] )->dump();
+
+my $path = Janus::Path->new( $o{path} );
+my $conf = Janus::Conf->new( $o{conf} );
+
+my $range = Hermes->new( $option->dump( 'range' ) );
+my @name = grep { $conf->dump( $_ ) } map { $range->load( $_ )->list() } @ARGV;
+
+my $mtime = 0;
+my ( $number, $interval ) = @o{ @OPTION[0,2] };
+
+while ( $number && $interval )
+{
+    @name = Janus::Conf->new( $o{conf} )->names()
+        unless @ARGV || $mtime == ( stat $o{conf} )[9];
+
+    system( 'clear' );
+    for my $name ( @name )
+    {
+        my ( $lock, $log ) = map { $path->path( run => "$name.$_" ) }
+            qw( lock log );
+
+        next unless Vulcan::ProcLock->check( $lock );
+        next unless $log = readlink $log;
+
+        print timestamp( $log );
+        system( "tail -n $number $log" );
+        print "\n";
+    }
+
+    sleep $interval;
+}
+
+exit 0;
+
+sub timestamp
+{
+    my ( $log, @time ) = shift;
+
+    for ( my $time = time - ( stat $log )[9]; @time < 3; $time /= 60 )
+    {
+        unshift @time, $time % 60;
+    }
+
+    sprintf "$log\t%s\n", join ':', @time;
+}

@@ -1,0 +1,39 @@
+WWW-iTunesConnect
+==============================
+
+The WWW::iTunesConnect module is an interface to Apple's iTunes Connect service.
+This initial release can fetch Sales/Trends Daily Summary reports provided by
+Apple to developers selling on the iTunes/App store. For an example nightly
+script that makes use of WWW::iTunesConnect please see
+http://github.com/bfoz/itunesconnect-tools.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+FreeBSD users can install from the ports system:
+
+    cd /usr/ports/www/p5-WWW-iTunesConnect
+    make install clean
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    LWP
+    HTML::Form
+    HTML::Tree
+    IO::Uncompress::Gunzip
+    Net::SSLeay
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2010 by Brandon Fosdick
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the BSD License.

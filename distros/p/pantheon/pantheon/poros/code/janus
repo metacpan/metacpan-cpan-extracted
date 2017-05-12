@@ -1,0 +1,14 @@
+### perl: poros/code/janus
+
+use strict;
+use warnings;
+
+return sub
+{
+    my %param = @_;
+    my @argv = @{ $param{argv} };
+    my $bin = File::Spec->join( @param{ qw( pdir code ) } );
+
+    unshift @argv, File::Spec->join( $bin, @argv ? 'ctrl' : 'stat' );
+    return system( @argv );
+};

@@ -1,0 +1,173 @@
+Revision history for Perl extension pler
+
+1.06 Thu 10 Jun 2010
+	- Apply rel2abs to the PERL5LIB additions so that path-changing
+	  tests can still load modules properly.
+
+1.05 Sun 24 Jan 2010
+	- When executing the test script, enable RELEASE_TESTING
+
+1.04 Wed 20 Jan 2010
+	- Use a -I to PERL5LIB conversion trick similar to the it is done
+	  by TAP::Parser::Source::Perl.
+	- Add the inc directory to the -I list, as MakeMaker does.
+
+1.03 Tue 19 Jan 2010
+	- Removing the destructive Carp 0 dependency
+
+1.02 Tue  5 Jan 2010
+	- Make the integer shortcut more flexible, so it can handle
+	  more than just an underscore after the numbers.
+
+1.01 Sun  3 Jan 2010
+	- Fixed a silly typo
+
+1.00 Sun  3 Jan 2010
+	- Switching to a production version
+	- Upgraded to Module::Install::DSL 0.91
+	- Added support for the xt directory
+	- Added support for specialised integer filter
+	- Added some actual tests for the filter logic
+
+0.34 Mon 30 Jun 2008
+	- Optimising file search to half the number of stat
+	  calls that need to be made to the system.
+
+0.33 Fri 18 Apr 2008
+	- Enable HARNESS_ACTIVE when calling scripts
+
+0.32 Tue  1 Jan 2008
+	- Replacing the use of $^X with Probe::Perl
+
+0.31 Thu 27 Sep 2007
+	- Fixing multiple filters
+	- Incrementing to get new author tests
+	- Upgrading to Module::Install 0.68
+
+0.30 Thu  6 Sep 2007
+	- Adding support for multiple filters
+	- Detect the distroot correctly from multiple
+	  levels down subdirectories.
+
+0.29 Fri 14 Sep 2007
+	- Bug in multiple filters would cause an infinite loop, fixed
+	- Fix a mistake in the version mismatch error message
+
+0.28 Fri 14 Sep 2007
+	- Added support for multiple filters, to make life easier in big test suites
+	  (So stuff like "pler db 4" will match t/db-tests/04_foo.t but not t/04_static.t)
+	- All pattern filters are now case-insensitive
+	- Bug Fix: Stopped needlessly running ./Build every time
+	  (A typo meant I was statting the wrong file in the shortcutting test)
+	- Script now tests that it loads the module with matching version
+	- Adding explicit dependencies for core modules (just in case)
+
+0.27 Mon 27 Aug 2007
+	- Added a first experimental attempt at Module::Build support
+
+0.26 Mon 27 Aug 2007
+	- Adding a -V option for the version
+	- Adding a --help option for help/usage
+	- Adding -w which will be passed through to the underlying perl call
+
+0.25 Tue 21 Aug 2007
+	- When inside the t directory and the user uses tab-completion to specify the
+	  filename, call the file they meant even after we chdir up to the root.
+	- If the root has a Makefile, but NOT a Makefile.PL, don't run it and risk
+	  causing some unknown functionality to run.
+
+0.24 Tue 21 Aug 2007
+	- I am an idiot, and didn't actually USE the Cwd::chdir in the below release
+	  (this fixes that)
+
+0.23 Tue 21 Aug 2007
+	- Use Cwd::chdir instead of the core chdir so that $ENV{PWD} is kept up to date
+	  (This prevents pler breaking code which uses $ENV{PWD})
+	- Adding a more recent dependency on 3.00 Pathtools to make sure we have Cwd
+
+0.22 Tue 21 Aug 2007
+	- If no Makefile.PL, intuit the dist root by looking for a "lib" and "t" dir
+
+0.21 Mon 20 Aug 2007
+	- dumb is spelled with a "b", not a "p". Oh the irony :(
+
+0.20 Thu  2 Aug 2007
+	- Moving bin/pler to the more standard script/pler
+	- Collapse Devel::Pler into pler.pm
+	- Adding support for regenerating the Makefile from Makefile.PL
+	  (only on Win32, because the Makefile is not capable of regenerating)
+	- Set TERM=dumb if no TERM value is set
+	  (prevents a noisy error when the debugger starts up)
+
+0.19 skipped
+
+0.18 Wed 16 May 2007
+        - Adding the ability to run scripts from the t directory
+        - Moving pler.pm to Devel::Pler
+        - Moving bin/pler to pler.pm
+        - Added a stubbed launch script as bin/pler
+
+0.17 Fri 11 May 2007
+        - Fixing a path bug that breaks Test::Files
+	- Updated Test::Script dependency to 1.02
+
+0.16 Tue  2 Jan 2007
+	- Fixed a test bug I thought I'd fixed already
+
+0.15 Mon  1 Jan 2007
+	- Converted from Devel::Pler to just pler.pm to allow
+	  for better installation and documentation on search.cpan.
+	- You can now "cpan -i pler"
+
+0.14 Fri 15 Sep 2006
+	- exec() does not work on Win32 (and we assume cygwin).
+	  Instead, use system() which uses more memory, but
+	  does at least work.
+
+0.13 Thu  3 Aug 2006
+	- Bug fixes
+	  (I honestly don't know his this crap gets out to CPAN)
+
+0.12 Thu 25 Jul 2006
+	- Show the list of scripts with no params, or run script
+	  if there is only one in the t directory.
+	- When verbose is off, comment on the script name for clarity
+	- Copying the POD in the Devel::Pler for better toolchain
+	  compatibility.
+
+0.11 missing
+
+0.10 Fri 21 Jul 2006
+	- Added support for refering to scripts by a unique substring
+
+0.09 Thu 20 Jul 2006
+	- Left an ADAMK::Debug reference in 01_compile.t
+
+0.08 Wed 19 Jul 2006
+	- Bug fix to remove remaining ADAMK::Debug references
+	- Fix some other grammar/spelling errors.
+
+0.07 Wed 19 Jul 2006
+	- Renaming apld script to pler :)
+	- Renaming ADAMK::Debug to Devel::Pler
+	- Renaming distribution from ADAMK-Debug to Devel-Pler
+
+0.06 Wed 19 Jul 2006
+	- Add lib to @INC if there is not blib but there is an inc
+
+0.05 Tue 18 Jul 2006
+	- Bug fix
+
+0.04 Tue 18 Jul 2006
+	- This time, make ADAMK::Debug an actual Exporter
+
+0.03 Tue 18 Jul 2006
+	- Call perl -d with -Mblib if needed
+	- Enable warnings in apld by default
+
+0.02 Tue 18 Jul 2006
+	- Run make if needed
+	- Shifted support functions out to the module
+
+0.01 Tue 18 Jul 2006
+	- Created the initial implementation

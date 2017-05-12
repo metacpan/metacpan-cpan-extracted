@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use Vulcan::OptConf;
+use File::Spec;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 app [offline|stop|initENV|setENV|loadpack|deploy|rollback|start|restart|status|check|online] [--verbose]
+  
+ ex: foo offline restart online
+
+=cut
+
+use constant SWITCHDIR => '/home/s/var/hdp/home/cloudops/service';
+
+my ( $option, %seco );
+BEGIN { $option = Vulcan::OptConf->load(); %seco = $option->dump( 'seco' ) }
+use lib $seco{lib};
+use Service;
+
+my %o = $option->get( 'verbose' )->dump;
+my $service = Service->new( File::Spec->join( SWITCHDIR, shift ) );
+
+$Service::VERBOSE = $o{verbose};
+YAML::XS::DumpFile \*STDOUT, @$service unless @ARGV;
+map{$service->ctrl( $_ );}@ARGV;

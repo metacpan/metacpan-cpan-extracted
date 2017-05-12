@@ -1,0 +1,99 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Carp;
+$SIG{__DIE__}	= sub { confess };
+
+$|	= 1;
+use Ponfish::Menu::Servers;
+use Ponfish::ThreadHandler;
+$global::logging	= 1;
+
+Ponfish::Menu::Servers->new()->take_control;
+
+=pod
+
+=head1 NAME
+
+B<ponfishr>: Binary Newsreader and Decoder
+
+=head1 USAGE
+
+ponfishr
+
+(There are no options!)
+
+See the ponfish manual.
+
+=head1 DESCRIPTION
+
+Ponfishr is the user interface component of Ponfish.  Ponfish
+is a newsreader consisting of a client program (ponfishr) and
+a command executing daemon (ponfishd).
+
+In order to decode binaries, you will need to install a third-party
+yenc or uu decoder.  See I<REQUIREMENTS> below.
+
+=head1 WHAT IS PONFISH?
+
+Ponfish is a binary newsreader that runs in a terminal and
+more importantly, runs in Unix.
+
+It is written in Perl.
+
+It can decode binaries (with some help).
+
+It is very efficient.
+
+It is very hard to use.
+
+=head1 REQUIREMENTS
+
+In order to decode binaries, the program "uudeview" must be
+installed and in the path.  Uudeview is freely available for
+both *nix and Windows.  If you are a Windows user, make sure
+you download and install the command-line version into your PATH.
+
+=head1 TO DO
+
+* Manually setting download priorities.
+
+* It would be nice if it could automatically repair downloaded
+files - detect errors and the download PAR files as necessary,
+do the repair, and finally extract the contents, if it is an
+archive.  Note: Doing this would not be overly difficult, but
+also not overly easy - a separate thread could run that does
+the check periodically, generating PAR download command files
+when necessary.
+
+* Curses support to make the interface more intuitive.
+
+* Catch-up and/or tracking of decoded articles or articles
+marked as having been read.
+
+* Embedded shell commands in the command files.
+
+* Gathering and displaying of statistics of numbers of posts made
+in newsgroups.
+
+* Cleaning out of the junk directory.  Currently completed
+commands are moved to this directory.  Should periodically empty
+the directory out.
+
+=head1 SEE ALSO
+
+The "user manual" can be accessed by typing:
+
+  > man ponfish
+
+The ponfishd manpage has some related information.
+
+
+=head1 AUTHOR
+
+Des Lee <gmail: desimus.prime>
+
+
+=cut
+
+

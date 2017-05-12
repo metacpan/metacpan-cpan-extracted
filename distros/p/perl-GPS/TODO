@@ -1,0 +1,15 @@
+- Allow Trk,rte,alm,wpt uploads
+- Better docs
+- Do tests
+- NMEA Protocol
+- Magellan Protocol
+
+- reformat everything (strip ending whitespace, indent everything to 2
+  or 4, insert local variables information for emacs)
+- change upload to upload2
+- introduce new stty interface (instead of Serial.pm)
+- change protocol handlers according to product id
+- merge all other changes
+
+- use garmin_protocols.tcl from gpsman as a reference for a
+  complete Garmin/Handler.pm implementation

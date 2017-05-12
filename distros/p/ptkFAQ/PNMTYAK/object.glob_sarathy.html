@@ -1,0 +1,92 @@
+<H2>[PREV]  <A HREF="199604141802.OAA09116@aatma.engin.umich.edu">[NEXT]</A>  <A HREF="Pine.LNX.3.92.960414040539.154D-100000@kjahds.com">[PREV Thread]</A>  <A HREF="199604141940.WAA28334@alpha.hut.fi">[NEXT Thread]</A>  <A HREF="news:perl.porters-gw">[Index]</A>  </H2><HR><ADDRESS></ADDRESS>
+<TITLE> bug in 5.002... *SYM{THING} syntax is not documented</TITLE>
+<ADDRESS><H1> bug in 5.002... *SYM{THING} syntax is not documented</H1>
+</ADDRESS>
+<ADDRESS> "Randal L. Schwartz" <merlyn@teleport.com>
+ Sun, 14 Apr 1996 09:49:12 -0700
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:perl.porters-gw">perl.porters-gw</A>
+</DL>
+<HR>
+<PRE>I'm just hacking up the object section for the new camel, and recalled
+this nifty *SYM{THING} feature, so I wanted to write about it.
+
+Durn it.  It's not documented.  I guess we didn't leave the Salzenberg
+on long enough, or whomever hacked this in.
+
+I can't even figure out where it lives in the source code.
+
+Could someone please forward me the blurb that came out with the patch,
+at least, or point me to the source that does it?
+
+Name: Randal L. Schwartz / Stonehenge Consulting Services (503)777-0095
+Keywords: Perl training, UNIX[tm] consulting, video production, skiing, flying
+Email: <merlyn@stonehenge.com> Snail: (Call) PGP-Key: (finger merlyn@ora.com)
+Web: <A HREF="http://www.teleport.com/~merlyn/">My Home Page!</A>
+Quote: "I'm telling you, if I could have five lines in my .sig, I would!" -- me
+
+</PRE>
+<HR><H2>[PREV]  <A HREF="199604141802.OAA09116@aatma.engin.umich.edu">[NEXT]</A>  <A HREF="Pine.LNX.3.92.960414040539.154D-100000@kjahds.com">[PREV Thread]</A>  <A HREF="199604141940.WAA28334@alpha.hut.fi">[NEXT Thread]</A>  <A HREF="news:perl.porters-gw">[Index]</A>  </H2><H2><A HREF="199604141649.JAA06070@desiree.teleport.com">[PREV]</A>  [NEXT]  <A HREF="Pine.LNX.3.92.960414040539.154D-100000@kjahds.com">[PREV Thread]</A>  <A HREF="199604141940.WAA28334@alpha.hut.fi">[NEXT Thread]</A>  <A HREF="news:perl.porters-gw">[Index]</A>  </H2><HR><ADDRESS></ADDRESS>
+<ADDRESS><H1> Re: bug in 5.002... *SYM{THING} syntax is not documented</H1>
+</ADDRESS>
+<ADDRESS> Gurusamy Sarathy <gsar@engin.umich.edu>
+ Sun, 14 Apr 1996 14:02:40 -0400
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:perl.porters-gw">perl.porters-gw</A>
+<DT> References:
+<DD> <A HREF="news:<199604141649.JAA06070@desiree.teleport.com"><199604141649.JAA06070@desiree.teleport.com></A>
+</DL>
+<HR>
+<PRE>On Sun, 14 Apr 1996 09:49:12 PDT, "Randal L. Schwartz" wrote:
+&gt;
+&gt;Could someone please forward me the blurb that came out with the patch,
+&gt;at least, or point me to the source that does it?
+
+Look in pp_hot.c, line 79, pp_gelem().  Here's what I quickly came up with:
+
+   The syntax C<*SYM{THING}> can be used to get a reference to a particular
+   element of type "THING" within a typeglob (where "THING", as of 5.002,
+   is one of the following perl basic type names: C<ARRAY>, C<CODE>, 
+   C<FILEHANDLE>, C<GLOB>, C<HASH>, C<SCALAR>).  For example, 
+   C<@{*foo{ARRAY}}> is equivalent to the dynamic array variable C<@foo>, 
+   and C<*FOO{FILEHANDLE}> is a reference to the filehandle C<FOO>.  
+   Notice how this is the only syntax available to create references 
+   to filehandles.
+
+   As a special case, "THING" could also be one of C<NAME> or C<PACKAGE> 
+   to get at the actual name and package of a typeglob.  This is useful 
+   in situations where you need to identify precisely what kind of 
+   typeglob you have on your hands.  For example:
+
+       package Wierd;
+       @foo = (1,2,3);
+       my $buz = *foo;
+       package main;
+       print *{$buz}{NAME}, "\n";
+       print *{$buz}{PACKAGE}, "\n";
+       __END__
+       foo
+       Wierd
+
+   Notice the result is a plain string (not a reference, as for basic 
+   types).
+
+   This syntax is intended to be perl's extensible mechanism to refer
+   to some of the current basic types like FILEHANDLE, and other more 
+   exotic ones that may get added in future, without having to 
+   resort to the use of more of those endangered prefix characters.
+
+Is that sufficient?
+
+ - Sarathy.
+   gsar@engin.umich.edu
+</PRE>
+<HR><H2><A HREF="199604141649.JAA06070@desiree.teleport.com">[PREV]</A>  [NEXT]  <A HREF="Pine.LNX.3.92.960414040539.154D-100000@kjahds.com">[PREV Thread]</A>  <A HREF="199604141940.WAA28334@alpha.hut.fi">[NEXT Thread]</A>  <A HREF="news:perl.porters-gw">[Index]</A>  </H2>

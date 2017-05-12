@@ -1,0 +1,70 @@
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
+
+This file is part of PodLinkCheck.
+
+PodLinkCheck is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+PodLinkCheck is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with PodLinkCheck.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 15, May 2017
+    - exit non-zero on any reports
+
+Version 14, March 2016
+    - correction to linenum:column location when X<> codes
+    - quieten CPAN messages down to --verbose
+    - document -I option
+
+Version 13, February 2016
+    - check module existence in App::cpanminus copy of
+      02packages.details.txt per Ben Bullock RT 112111.
+
+Version 12, February 2013
+    - recommend Pod::Simple 3.24 for parsing of man-page names with
+      dots such as L<login.conf(5), as reported by Dave Rolsky RT 82972
+
+Version 11, December 2012
+    - tests avoid No::Such::Module which did in fact exist for a time!
+
+Version 10, November 2012
+    - tests add some diagnostics
+
+Version 9, June 2012
+    - avoid warnings from dangling symlinks
+    - document $plc->check_tree()
+
+Version 8, June 2011
+    - fix stray Sort::Key::Natural meant to be only optional
+
+Version 7, February 2011
+    - fix Makefile.PL for perl 5.6
+
+Version 6, October 2010
+    - more eval protection on CPAN::SQLite, mainly for cpantesters probably
+
+Version 5, September 2010
+    - test manifest only as an author test
+
+Version 4, May 2010
+    - allow refs to bullet and number items
+    - check manpages by plain man run if --location not available
+
+Version 3, May 2010
+    - trap dodgy CPANPLUS errors possibly relating to sqlite
+
+Version 2, May 2010
+    - trap CPAN.pm errors like unwritable ~/.cpan
+    - tests don't fail on spurious CPANPLUS warnings
+
+Version 1, April 2010
+    - the first version

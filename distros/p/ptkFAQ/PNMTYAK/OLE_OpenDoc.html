@@ -1,0 +1,52 @@
+<H2>[PREV]  <A HREF="31966a62.892815@news.uni-linz.ac.at">[NEXT]</A>  <A HREF="4n078n$2je@client3.news.psi.net">[PREV Thread]</A>  <A HREF="319111A3.2ED9@mbox.kyoto-inet.or.jp">[NEXT Thread]</A>  <A HREF="news:comp.lang.java">[Index]</A>  </H2><HR><ADDRESS> Graham Stalker-Wilde <gstalker@csfbg.csfb.com>
+</ADDRESS>
+<TITLE> Re: Integrating OpenDoc/OLE and HTML/Java</TITLE>
+<ADDRESS><H1> Re: Integrating OpenDoc/OLE and HTML/Java</H1>
+</ADDRESS>
+<ADDRESS> Fri, 10 May 1996 15:43:38 -0400
+ CS First Boston Corporation
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.soft-sys.middleware.opendoc">comp.soft-sys.middleware.opendoc,</A><A HREF="news:comp.infosystems.www.misc">comp.infosystems.www.misc,</A><A HREF="news:comp.infosystems.www.browsers.misc">comp.infosystems.www.browsers.misc,</A><A HREF="news:comp.infosystems.www.authoring.misc">comp.infosystems.www.authoring.misc,</A><A HREF="news:comp.lang.java">comp.lang.java</A>
+<DT> References:
+<DD> <A HREF="news:<31869CAC.41C6@physics.uq.edu.au"><31869CAC.41C6@physics.uq.edu.au> </A><A HREF="news:<nagleDqrDs1.D3v@netcom.com"><nagleDqrDs1.D3v@netcom.com> </A><A HREF="news:<4maca5$avd@si-nic.hrz.uni-siegen.de"><4maca5$avd@si-nic.hrz.uni-siegen.de> </A><A HREF="news:<fms-0305960953470001@blv-pm2-ip22.halcyon.com"><fms-0305960953470001@blv-pm2-ip22.halcyon.com> </A><A HREF="news:<318E2D15.20FB@sdu.com"><318E2D15.20FB@sdu.com> </A><A HREF="news:<3191a99e.3670639@news.uni-linz.ac.at"><3191a99e.3670639@news.uni-linz.ac.at></A>
+</DL>
+<HR>
+<PRE>!!!Religious Issue Alert!!!
+
+Werner Punz <werpu@inflab.uni-linz.ac> wrote:
+&gt; From the technical aspects point of view OpenDoc is by far superior to
+&gt; OLE. OLE is one of these typically huge complicated  Microsoft API's.
+&gt; It takes thousands of lines of code in OLE to do what can be done with
+&gt; a few hunderd in OpenDoc. OLE doesn't support inheritance which is one
+&gt; of the main causes why OLE apps consist of so many lines of code (80 %
+&gt; of OLE code is inheritance simulation). OpenDoc does. OLE has no
+&gt; standardized interfaces for apps. Opendoc has. 
+<snip>
+
+
+OLE (COM) doesn't have inheritance because inheritance is a risky strategy
+of code reuse unless the code is being developed under one roof. (or using
+known libraries/frameworks) 
+
+That's what Stroustrup said anyway... 
+ 
+"80% of OLE is inheritance simulation" do you mean delegation? Where does that 
+figure come from - delegation is a one liner!
+
+OLE has tons of interface specs - remember that huge API you complained about?
+And why should COM decide what interface apps should use? That's for the 
+app writers. COM provides an absolutely standard way for apps to discover 
+what interfaces are being exposed. Isn't that more useful?
+
+OLE is certainly huge, but any decent framework should free the developer from 
+rewriting those "thousands of lines" hey - I didn't say inheritance wasn't
+cool, I just said it wasn't safe for massively distributed systems.
+
+COM's implementation has a lot of problems (efficiency, thread safety)
+but the architecture is very sound.
+</PRE>
+<HR><H2>[PREV]  <A HREF="31966a62.892815@news.uni-linz.ac.at">[NEXT]</A>  <A HREF="4n078n$2je@client3.news.psi.net">[PREV Thread]</A>  <A HREF="319111A3.2ED9@mbox.kyoto-inet.or.jp">[NEXT Thread]</A>  <A HREF="news:comp.lang.java">[Index]</A>  </H2>

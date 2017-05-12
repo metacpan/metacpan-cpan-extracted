@@ -1,0 +1,29 @@
+perfSONAR_PS::Services::MA::CircuitStatus README File
+==============================================
+
+Description
+-----------
+
+The perfSONAR_PS::Services::MA::CircuitStatus module allows one to make link status
+data available in a format compatible with E2EMon.
+
+Installation
+------------
+
+ CPAN installation
+ -----------------
+
+    perl -MCPAN -e 'install perfSONAR_PS::Services::MA::CircuitStatus'
+
+ Standard installation
+ ---------------------
+
+    Prerequisites:
+
+    perl Makefile.PL
+    make
+    make install
+
+Copyright (c) 2004-2007, Internet2 and the University of Delaware
+
+All rights reserved.

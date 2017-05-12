@@ -1,0 +1,26 @@
+To use PEE with FastCGI, an engine is provided: 'examples/fcgi-pee.fpl'.
+It runs under FastCGI, and caches compiled templates.
+
+You may configure this in place of the engine.pl in the INSTALL file.
+Just make sure that fcgi-pee.fpl is configured to be handled by FastCGI
+as static, dynamic, or external application.
+
+
+Here's a sample httpd.conf:
+
+  # this directory should contain 'fcgi-pee.fpl' and 'cgiutils.pl'
+  # found in the 'examples/' directory of the Pee distribution
+  # it'll be used as a dynamic app, since I didn't specifically configure
+  # it as static or external
+
+  Alias /fcgi "/www/fcgi"
+  <Directory "/www/fcgi">
+    Options +ExecCGI
+    SetHandler fastcgi-script
+  </Directory>
+
+  # A new type of Handler, pet-file, is created for ".pet" extensions
+  AddHandler pet-file pet
+  # Call the URL '/fcgi/fcgi-pee.fpl' everytime a PET file is requested
+  Action pet-file /fcgi/fcgi-pee.fpl
+

@@ -1,0 +1,70 @@
+From PVHP@LNS62.LNS.CORNELL.EDU Mon Feb 12 21:16:31 1996
+Received: from lns61.tn.cornell.edu (LNS61.TN.CORNELL.EDU [128.84.219.61]) by lns598.lns.cornell.edu (8.6.11/8.6.11)
+	with ESMTP id VAA15662 for <pvhp@LNS598.LNS.CORNELL.EDU>; Mon, 12 Feb 1996 21:16:29 -0500
+From: PVHP@LNS62.LNS.CORNELL.EDU
+Received: from LNS62.LNS.CORNELL.EDU by lns61.tn.cornell.edu
+ (PMDF V4.3-10 #13710) id <01I151XA4EZK8ZEWCE@lns61.tn.cornell.edu>; Mon,
+ 12 Feb 1996 21:16:14 -0400 (EDT)
+Received: from LNS62.LNS.CORNELL.EDU by LNS62.LNS.CORNELL.EDU
+ (PMDF V4.3-13 #13710) id <01I151WTTYX88WYXHF@LNS62.LNS.CORNELL.EDU>; Mon,
+ 12 Feb 1996 21:15:57 -0500 (EST)
+Date: Mon, 12 Feb 1996 21:15:57 -0500 (EST)
+Subject: more history
+To: pvhp@lns598.lns.cornell.edu
+Message-id: <01I151WTTYXA8WYXHF@LNS62.LNS.CORNELL.EDU>
+X-VMS-To: IN%"pvhp@cesr20.lns.cornell.edu"
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; CHARSET=US-ASCII
+Content-transfer-encoding: 7BIT
+Status: R
+
+From:	IN%"doughera@fractal.phys.lafayette.edu"  "Andy Dougherty" 12-FEB-1996 20:13:41.34
+To:	IN%"perl5-porters@africa.nicoh.com"
+CC:	
+Subj:	RE: non-#! scripts do not use absolute perl-pathname
+
+Return-path: <owner-perl5-porters@nicoh.com>
+Received: from africa.nicoh.com by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I14ZQAP31C8WYX43@LNS62.LNS.CORNELL.EDU>; Mon,
+ 12 Feb 1996 20:13:23 -0500 (EST)
+Received: from localhost by africa.nicoh.com with SMTP (1.37.109.15/16.2)
+ id AA184426142; Mon, 12 Feb 1996 18:02:22 -0500
+Received: by africa.nicoh.com (1.37.109.15/16.2) id AA183926132; Mon,
+ 12 Feb 1996 18:02:12 -0500
+Received: from lafvax (lafvax.lafayette.edu) by africa.nicoh.com with ESMTP
+ (1.37.109.15/16.2) id AA183846129; Mon, 12 Feb 1996 16:02:09 -0700
+Received: from fractal (fractal.phys.lafayette.edu)
+ by lafvax.lafayette.edu (PMDF V5.0-4 #6834)
+ id <01I14LQXESCG005C1V@lafvax.lafayette.edu> for
+ perl5-porters@africa.nicoh.com; Mon, 12 Feb 1996 13:32:59 -0500 (EST)
+Received: by fractal (SMI-8.6/SMI-SVR4) id NAA02962; Mon,
+ 12 Feb 1996 13:29:40 -0500
+Date: Mon, 12 Feb 1996 13:29:40 -0500 (EST)
+From: Andy Dougherty <doughera@fractal.phys.lafayette.edu>
+Subject: Re: non-#! scripts do not use absolute perl-pathname
+In-reply-to: <24098.824148806@mox.lafayette.edu>
+Sender: owner-perl5-porters@nicoh.com
+X-Sender: doughera@fractal
+To: perl5-porters@africa.nicoh.com
+Message-id: <Pine.SOL.3.91.960212132656.280F-100000@fractal.lafayette.edu>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+List-Name: perl5-porters
+Precedence: bulk
+
+On Mon, 12 Feb 1996, Tom Christiansen wrote:
+
+> hm.... corrected timeline is more like
+> 
+>     92	perl4.036
+>     93	perl5 alpha/beta
+
+Only the very earliest alpha's were in '93.  
+perl5alpha7 came out on March 25, 1994; 5.000 came out on October 17, 1994. 
+
+    Andy Dougherty		doughera@lafcol.lafayette.edu
+
+
+
+

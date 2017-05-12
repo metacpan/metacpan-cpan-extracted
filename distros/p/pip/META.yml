@@ -1,0 +1,46 @@
+---
+abstract: 'The Perl Installation Program, for scripted and third-party'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  LWP::Online: 1.06
+  Test::More: 0.42
+  Test::Script: 1.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: pip
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Tar: 0
+  Archive::Zip: 1.29
+  CPAN: 1.76
+  CPAN::Inject: 0.07
+  Carp: 0
+  File::Basename: 0
+  File::Spec: 0.80
+  File::Temp: 0.14
+  File::Which: 1.08
+  File::pushd: 0.32
+  Getopt::Long: 0
+  IO::Zlib: 0
+  LWP::Simple: 0
+  PAR::Dist: 0.25
+  Params::Util: 1.00
+  URI: 0
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/pip
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/pip
+version: 1.19

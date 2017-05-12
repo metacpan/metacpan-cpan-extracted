@@ -1,0 +1,46 @@
+<H2><A HREF="4nmjd7$6pv@nz12.rz.uni-karlsruhe.de">[PREV]</A>  [NEXT]  <A HREF="01I4U31US5768XC7SA@LNS62.LNS.CORNELL.EDU">[PREV Thread]</A>  <A HREF="199605181933.MAA10356@duke.loc251.tandem.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> lusol@Turkey.CC.Lehigh.EDU
+</ADDRESS>
+<TITLE> Re: scrolling multiple widgets</TITLE>
+<ADDRESS><H1> Re: scrolling multiple widgets</H1>
+</ADDRESS>
+<ADDRESS> 20 May 1996 12:52:08 GMT
+ Lehigh University Computing Center
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+<DT> References:
+<DD> <A HREF="news:<4nkumr$f9q@nz12.rz.uni-karlsruhe.de"><4nkumr$f9q@nz12.rz.uni-karlsruhe.de> </A><A HREF="news:<4nmjd7$6pv@nz12.rz.uni-karlsruhe.de"><4nmjd7$6pv@nz12.rz.uni-karlsruhe.de></A>
+</DL>
+<HR>
+<PRE>     Joerg Obermiller <joerg.obermiller@mach.uni-karlsruhe.de> wrote in article <4nmjd7$6pv@nz12.rz.uni-karlsruhe.de> :
+&gt;
+&gt;hi,
+&gt;I found my problem :-)
+&gt;
+&gt;&gt;I want to have two or more widgets scrolled by one scrollbar. Yes I read
+&gt;&gt;the FAQ :-) and tried that little example and it happens just nothing.
+&gt;&gt;......
+&gt;&gt;sub multiscrollx {
+&gt;&gt;      my ($sb,$wigs,@args) = @ARG;
+&gt;
+&gt;I wondered why perl didn't know @ARG. (I still do because it should be
+&gt;the command-line parameters.
+&gt;
+&gt;but if I use @_ instead, it works perfect!
+
+Sorry about that, it's probably all my fault! (;  You see, I always have a:
+
+	use English;
+
+statement at the start of my programs.  The English module equates legible
+variable names with the standard Perl variables.
+
+	$_	$ARG
+	@_	@ARG
+
+etcetera.
+</PRE>
+<HR><H2><A HREF="4nmjd7$6pv@nz12.rz.uni-karlsruhe.de">[PREV]</A>  [NEXT]  <A HREF="01I4U31US5768XC7SA@LNS62.LNS.CORNELL.EDU">[PREV Thread]</A>  <A HREF="199605181933.MAA10356@duke.loc251.tandem.com">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>

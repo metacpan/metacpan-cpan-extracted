@@ -1,0 +1,112 @@
+<HTML>
+<HEAD><TITLE>12. What are some of the primary differences between Tcl/Tk and Perl/Tk?</TITLE></HEAD>
+<BODY><a name="A12">12. What are some of the primary differences between Tcl/Tk and Perl/Tk?</a>
+
+<hr>
+</p><p>
+
+Considering that both interpreter/compilers for Tcl and Perl were written in C
+for use on Unix computers it is not surprising that there are some
+similarities between the two languages.
+<p> 
+Nevertheless, there are a large number of differences between 
+the Tcl scripting language and the Perl scripting language. 
+Indeed, some of the Tk widget names and options have been modified slightly in
+the perl/Tk language.
+With Tk-b9.01 (and higher) a great many functions (methods) start with an upper 
+case letter and continue with all lower case letters 
+(<i>e.g.</i> there is a perl/Tk <kbd>Entry</kbd> widget but no <kbd>entry</kbd> 
+widget), and many configuration options are all lower case 
+(<i>e.g.</i> there is a perl/Tk <kbd>highlightthickness</kbd> option 
+but no <kbd>highlightThickness</kbd> option).
+Thus if you are having trouble converting a script check your typing.
+<p>
+While this table does not cover all the differences it is hoped that it will
+prove useful, especially to those people coming from a primarily Tcl/Tk
+background. These are some of the common Tcl-&gt;Perl stumbling points:
+<pre>
+<b>
+what              Tcl/Tk                 Perl/Tk</b>
+variable          set a 123              $a = 123; <i>or</i> $a = '123';
+ initialization
+re-assignment     set b $a               $b = $a;
+
+lists/arrays      set a {1 2 fred 7.8}   @a = (1,2,'fred',7.8);
+re-assignment     list set b $a          @b = @a;
+
+associative       set a(Jan) 456.02      %a = ('Jan',456.02,'Feb',534.96);
+ arrays           set a(Feb) 534.96
+re-assignment     foreach i \            %b = %a;
+                   [array names a] {
+                   set b($i) = $a($i) }
+
+Note on the above examples:
+In Tcl the scalar, list, and array variable 'a' will overwrite each 
+previous assignment.
+In Perl $a, @a, %a are all distinct (occupy separate namespaces).
+
+expressions       set a [expr $b+$c]     $a = $b+$c;
+
+increment         incr i                 $i++; <i>or</i> ++$i;
+
+declare           proc plus {a b} {      sub plus { my($a,$b) = @_;
+ subroutines       expr $a + $b }         $a+$b; }
+
+variable scope    local default          global default
+                  override w/ "global"   override w/ "my" (or "local")
+
+call              plus 1 2               &amp;plus(1,2); #<i>or</i>
+ subroutines                             plus(1,2);  #OK after sub plus
+
+statement sep     newline or at ";"      ";" required
+
+statement         "\" - newline          none required
+ continuation
+
+verbatim strings  {}                     ''
+ e.g.             {a \ lot@ of $stuff}   'a \ lot@ of $stuff'
+
+escaped strings   ""                     ""
+ e.g.             "Who\nWhat\nIdunno"    "Who\nWhat\nIdunno"
+
+STDOUT            puts "Hello World!"    print "Hello World!\n"
+                  puts stdout "Hello!"   print STDOUT "Hello!\n"
+</pre>
+Note also that Tcl/Tk has a built-in abbreviation completion mechanism that
+lets you specify short hand, <i>e.g.</i>
+<pre>
+   canvas .frame.canvas -yscrollcommand ".frame.scroll set" ; #Tcl/Tk OK
+   canvas .frame.canvas -yscroll ".frame.scroll set" ;        #Tcl/Tk also OK
+   $canvas=$main-&gt;Canvas(-yscroll =&gt; ['set',$scroll]);  #ERROR perl/Tk
+   $canvas=$main-&gt;Canvas(-yscrollcommand =&gt; ['set',$scroll]); #perl/Tk OK
+</pre>
+You may get around this with the perl <KBD>abbrev.pl</KBD> package in certain
+circumstances. For example:
+<pre>
+   require 'abbrev.pl';
+   %foo = ();
+   &amp;abbrev(*foo,'-yscrollcommand');
+ ...
+   $canvas=$main-&gt;Canvas($foo{'-yscroll'} =&gt; ['set',$scroll]); #perl/Tk OK
+</pre>
+In Perl you can emulate the Tcl <KBD>unknown</KBD> proc (through the perl 
+<kbd>AUTOLOAD</kbd> mechanism) as follows:
+<pre>
+    use Shell;
+    print($p = man(-k =&gt; bitmap));
+</pre>
+Which is equivalent to what you would get if you typed:
+<pre>
+    man -k bitmap
+</pre>
+From within <kbd>tclsh</kbd> or <kbd>wish</kbd>. (Thanks to 
+Ilya Zakharevich 
+<a href="mailto:ilya@math.ohio-state.edu">&lt;ilya@math.ohio-state.edu&gt;</a>
+for pointing out this feature. ;-)
+
+
+<hr>
+	<p><a href="qna11.11.html">Previous</a> | Return to <a href="ptkTOC.html#TOC12">table of contents</a> | <a href="qna13.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

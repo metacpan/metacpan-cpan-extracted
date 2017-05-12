@@ -1,0 +1,97 @@
+<HTML>
+<HEAD><TITLE> 17.1. How does one get Perl/Tk to act on events that are not coming from X?</TITLE></HEAD>
+<BODY><a name="A17.1"> 17.1. How does one get Perl/Tk to act on events that are not coming from X?</a>
+
+<hr>
+</p><p>
+On 22 Nov 1995 (Yaniv Bargury) bargury@milcse.cig.mot.com wrote:
+<p>
+<BLOCKQUOTE><i>
+I need to write a GUI monitor, that displays the status and controls a
+set of processes running in the background. The idea is to have the
+GUI application start a few child processes, command the children
+through pipes from the GUI to the children, and display the children
+status coming on pipes from the children to the GUI in real time.</i>
+<p><i>
+The GUI must not be busy waiting, because the CPU resources are
+limited. This excludes using the <KBD>Tk_DoWhenIdle</KBD> as explained in the
+manual.</i>
+<p><i>
+The usual way to do this is to for the GUI process to have one
+<KBD>select()</KBD> in its main loop. That <KBD>select()</KBD> should wait for X events or
+input from the pipes leading from the children.</i>
+<p><i>
+How do you do this?
+</i></BLOCKQUOTE>
+To which  Nick Ing-Simmons &lt;nik@tiuk.ti.com&gt; replied:
+<p><BLOCKQUOTE>
+<KBD>fileevent</KBD> - it is the hook into the <KBD>select()</KBD> in the mainloop.
+</BLOCKQUOTE><p>
+In addition Avi Deitcher &lt;avi@morgan.com&gt; replied with:
+<p><BLOCKQUOTE>
+I wrote something similar to effectively do a <KBD>tail -f</KBD>  on
+multiple hosts, displaying the result on separate text widgets. Do the
+following:
+</BLOCKQUOTE><PRE>
+    parent
+     child
+     child
+     child
+     ..
+</PRE><BLOCKQUOTE>
+with a one-way pipe from each child to the parent. Set up the
+following:
+</BLOCKQUOTE><PRE>
+    $main-&gt;fileevent(FILEHANDLE,status,subroutine);
+</PRE><BLOCKQUOTE>
+for each pipe that you have. This will cause pTk to monitor the
+<KBD>FILEHANDLE</KBD> and call <KBD>'subroutine'</KBD> when an event happens on that
+handle. In this case:
+<KBD>FILEHANDLE = pipename</KBD>
+<KBD>status = 'readable'</KBD> or <KBD>'writable'</KBD> or
+<KBD>'exception'</KBD>
+and <KBD>subroutine</KBD> = any subroutine that you want.
+</BLOCKQUOTE>
+<P>To provide a concrete example of <KBD>fileevent</KBD> usage 
+Stephen O. Lidie wrote a wonderful little GUI tail monitor he
+calls <KBD>tktail</KBD>:
+<PRE>
+    #!/usr/local/bin/perl -w
+    #
+    # tktail pathname
+    
+    use English;
+    use Tk;
+    
+    open(H, "tail -f -n 25 $ARGV[0]|") or die "Nope: $OS_ERROR";
+    
+    $mw = MainWindow-&gt;new;
+    $t = $mw-&gt;Text(-width =&gt; 80, -height =&gt; 25, -wrap =&gt; 'none');
+    $t-&gt;pack(-expand =&gt; 1);
+    $mw-&gt;fileevent(H, 'readable', [\&amp;fill_text_widget, $t]);
+    MainLoop;
+    
+    sub fill_text_widget {
+    
+        my($widget) = @ARG;
+    
+        $ARG = &lt;H&gt;;
+        $widget-&gt;insert('end', $ARG);
+        $widget-&gt;yview('end');
+    
+    } # end fill_text_widget
+</PRE>
+An example of how one might use such a script would be to create and monitor a 
+file <KBD>foo</KBD> like so:
+<PRE>
+    echo Hello from foo! &gt; foo
+    tktail foo &amp;
+    echo \"A ship then new they built for him/of mithril and of elven glass\" --Bilbo &gt;&gt; foo
+</PRE>
+
+
+<hr>
+	<p><a href="qna17.html">Previous</a> | Return to <a href="ptkTOC.html#TOC17.1">table of contents</a> | <a href="qna17.2.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

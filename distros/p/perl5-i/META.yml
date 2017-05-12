@@ -1,0 +1,30 @@
+---
+abstract: 'perl5 plugin for perl5i'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: perl5-i
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Time::y2038: '20100403'
+  perl: v5.8.1
+  perl5: '0.10'
+  perl5i: v2.6.1
+resources:
+  bugtracker: https://github.com/ingydotnet/perl5-i-pm/issues
+  homepage: https://github.com/ingydotnet/perl5-i-pm
+  repository: https://github.com/ingydotnet/perl5-i-pm.git
+version: '0.12'

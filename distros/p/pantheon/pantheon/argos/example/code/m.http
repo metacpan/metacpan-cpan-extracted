@@ -1,0 +1,64 @@
+### perl: argos/code/m.http
+use strict;
+use Socket;
+use LWP::UserAgent;
+
+use Vulcan::Grep;
+
+our %PARAM =
+(
+    timeout => 10, port => 80, code => [ 200 ],
+    grep => [], uri => '/', proto => 'http',
+);
+
+our %ERROR =
+(
+    down => 'web service down', null => 'no content',
+    cont => 'invalid response', code => 'invalid code',
+);
+
+return sub
+{
+    my ( %param, %mesg ) = @_;
+    my ( $batch, $param, $cache ) = @param{ qw( batch param cache ) };
+    my ( $proto, $port, $uri, $code, $grep, $timeout, $debug, $resolve ) =
+        map { $param->{$_} || $PARAM{$_} }
+        qw( proto port uri code grep timeout debug resolve );
+
+    map { $_ = [ $_ ] if ref $_ ne 'ARRAY' } $code, $grep;
+
+    my $ua = LWP::UserAgent->new();
+
+    $ua->timeout( $timeout );
+    $ua->env_proxy;
+
+    for my $node ( @$batch )
+    {  
+        my ( $n, $p ) = split ':', $node;
+
+        $p ||= $port;
+        $n = inet_ntoa( scalar gethostbyname( $n ) )
+            if $resolve && $n !~ /\d+\.\d+\.\d+\.\d+/;
+
+        $node = "$n:$p";
+
+        my $url = "$proto://$node$uri";
+        my $re = $ua->get( $url );
+        my $rc = $re->code();
+
+        print "$url\n" if $debug;
+
+        my $err = ( ! $re->is_success() ) ? 'down'
+            : ( ! grep { $_ == $rc } @$code ) ? 'code'
+            : ( ! @$grep ) ? next
+            : ( ! ( $url = $re->decoded_content() ) ) ? 'null'
+            : ( ! Vulcan::Grep->new( input => $url, rule => $grep )->eval )
+            ? 'cont' : next;
+
+        push @{ $mesg{error}{ $ERROR{$err} } }, $param->{seco}
+            ? $cache->{seco}{$n} : $param->{hermes}
+            ? [ $n, $cache->{hermes}{$node} ] : $n;
+    }
+
+    return \%mesg;
+};

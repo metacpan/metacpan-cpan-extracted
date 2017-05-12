@@ -1,0 +1,10 @@
+Revision history for pluskeys
+
+2.4    Mon Mar 21 08:14:27 MDT 2016
+       Work around bareword bug in v5.22 by skipping tests;
+       the module still works fine, but 5.22 won't catch typos
+       correctly.
+
+2.3    Sat May  2 16:25:30 MDT 2015
+       First CPAN release of old tchrist module
+

@@ -1,0 +1,107 @@
+<HTML>
+<HEAD><TITLE>7. How do I write scripts in perl/Tk?</TITLE></HEAD>
+<BODY><a name="A7">7. How do I write scripts in perl/Tk?</a>
+
+<hr>
+</p><p>
+Start your script as you would any perl script (<I>e.g.</I> 
+<KBD>#!/usr/bin/perl</KBD>, <KBD>#!/usr/local/bin/perl</KBD>, 
+<KBD>#!/opt/bin/perl</KBD>, [built static? then
+<KBD>#!/usr/bin/tkperl</KBD>],  <I>whatever</I>, see the 
+<a href="http://www.metronet.com/perlinfo/perl5/manual/perlrun.html">
+<KBD>perlrun(1)</KBD></a> man page for more information).<br>
+Throwing the <KBD>-w</KBD> warning switch is recommended.<br>
+The use of the statement <KBD>use strict;</KBD> is recommended.<br>
+Use of the statement <KBD>use Tk;</KBD> is required.<br>
+</p><p>
+A simple &quot;Hello World!&quot; widget script could be written as follows:
+<PRE>
+    #!/usr/local/bin/perl -w
+
+    use strict;
+    use Tk;
+
+    my $main = new MainWindow;
+    $main-&gt;Label(-text =&gt; 'Hello World!'
+                 )-&gt;pack;
+    $main-&gt;Button(-text =&gt; 'Quit',
+                  -command =&gt; sub{exit}
+                  )-&gt;pack;
+    MainLoop;
+</PRE>
+The <KBD>MainLoop;</KBD> statement is the main widget event handler 
+loop and is usually found in perl/Tk scripts (usually near the end of
+the main procedure after the widgets have been declared and
+<KBD>pack</KBD>ed). <KBD>MainLoop;</KBD> is actually a function call and you 
+may see it written as <KBD>MainLoop();</KBD>, <KBD>&amp;Tk::MainLoop;</KBD>, 
+<KBD>&amp;Tk::MainLoop();</KBD>, <I>etc.</I> 
+<p>
+Note the use of the <KBD>-&gt;</KBD> infix dereference operator.
+Most things in calls to perl/Tk routines are passed by reference.
+<p>
+Note also the use of the <KBD>=&gt;</KBD> operator which is simply a 
+synonym for the comma operator (well it is a bit more than that :-).
+In other words, the arguments that get passed to <KBD>Label</KBD> and 
+<KBD>Button</KBD> in the above example are good old perl 
+<EM>associative arrays</EM> (perl 5 people prefer to call them
+&quot;hashes&quot; however).  Indeed, we might have written the above
+as:
+<PRE>
+    #!/usr/local/bin/perl -w
+
+    use strict;
+    use Tk;
+
+    my $main = new MainWindow;
+    $main-&gt;Label(-text , 'Hello World!'
+                 )-&gt;pack;
+    $main-&gt;Button(-text , 'Quit',
+                  -command , sub{exit}
+                  )-&gt;pack;
+    MainLoop;
+</PRE>
+Or even as:
+<PRE>
+    #!/usr/local/bin/perl -w
+    use strict;
+    use Tk;
+    my $main = new MainWindow;
+
+    my %hello = ('-text','Hello World!');
+    my %quit_com = ('-text' =&gt; 'Quit', '-command' =&gt; sub{exit});
+
+    $main-&gt;Label(%hello)-&gt;pack;
+    $main-&gt;Button(%quit_com)-&gt;pack;
+    MainLoop;
+</PRE>
+Note however, that the use of the <KBD>=&gt;</KBD> in the first 
+method of writing this script makes it look more 
+&quot;Tcl-ish&quot; :-).
+<p>
+Lastly, we note the extensive use of the <KBD>my</KBD> function in
+most perl/Tk programs. <KBD>my</KBD> is roughly equivalent to 
+<KBD>local</KBD> in Perl 4 - but is purported to be 
+&quot;faster and safer&quot; as well as much more strictly local in 
+scope. See 
+<a href="http://www.metronet.com/0/perlinfo/perl5/manual/perlfunc.html">
+<KBD>perlfunc(1)</KBD> manpage</a> for more information on <KBD>my</KBD>. 
+<p>
+Other examples of code may be found in the <KBD>perl5/Tk/demos/</KBD> 
+directory and in <KBD>perl5/Tk/demos/widget_lib/</KBD>.
+<p>
+(A variant on this scipt called <CODE>hello</CODE> is available in the 
+file <KBD>perl5/Tk/demos/hello</KBD> in your own pTk distribution.
+Also, Source code for <a href="pod/ex0.pl">this</a> and other examples 
+from <a href="pod/UserGuide.html">UserGuide.pod</a> may be
+found at <a href="pod/">http://w4.lns.cornell.edu/~pvhp/ptk/pod/</a>.
+To load code from the web save as a local <I>filename</I>, 
+edit the first line to point to your perl interpreter, then: 
+<KBD>chmod u+x</KBD> <I>filename</I>, then execute: 
+<I>filename</I>.)
+
+
+<hr>
+	<p><a href="qna6.html">Previous</a> | Return to <a href="ptkTOC.html#TOC7">table of contents</a> | <a href="qna8.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

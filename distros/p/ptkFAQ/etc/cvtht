@@ -1,0 +1,92 @@
+#!/usr/bin/perl -w
+########################################################
+#Mark Elston (elston@cave.arc.nasa.gov)
+#Thu, 21 Sep 1995 08:33:08 -0700 
+#
+#> From: wgh@fns.com (Bill Hertzing)
+#> I have built/installed Tk-b8, and have spent a few days poking around
+#> the system and documentation. One comment and one question spring to
+#> mind: 
+#> 
+#> 1) It has taken two days and I'm still trying to figure out how to turn
+#> the doc/*ht files into html files. I would humbly suggest that the
+#> procedure to get html from the files in the doc directory should be in
+#> the README or INSTALL files.
+#
+#Program to convert .ht files to .html files and change all references
+#from blah.ht to blah.html.
+#
+#Run as:
+#cvtht *.ht
+#
+# !/packages/gnu/perl/bin/perl -w # -*-Perl-*-
+# cvtht
+#
+# $Log$
+########################################################
+
+require 5.001;
+use Getopt::Long;
+
+sub fsort;
+
+foreach $fileName (@ARGV) {
+
+($newFileName = $fileName) =~ s/\.ht/\.html/;
+print " $fileName -> $newFileName\n";
+
+open(INFILE, "$fileName") || 
+die ("Unable to open $fileName for input\n");
+
+open(OUTFILE, ">$newFileName") || 
+die ("Unable to open $newFileName for output\n");
+
+#
+# all references we want to change are in lines like:
+# See the <A HREF="options.ht">
+# (from the 'canvas.ht' file)
+#
+# Therefore look for all occurences of .ht\" and replace them 
+# with .html\"
+#
+
+while ($line = <INFILE>) {
+$line =~ s/\.ht\"/\.html\"/g;
+print OUTFILE $line;
+}
+}
+
+##########################################################################
+# PLEASE NOTE: that as of Tk-b8 (Summer/Fall 1995) Jim Stern's following
+# objection does not pertain to the *.ht files that come bundled with
+# Tk-b8.tar.gz (they do not use the <a href="file#section>links</a>.
+# I have left this comment in merely to let folks know about the work
+# that needs to be done to get a good html parser in perl ? - pvhp
+##########################################################################
+
+#James M. Stern (jstern@world.nad.northrop.com)
+#Thu, 21 Sep 1995 10:05:58 -0700 (PDT) 
+#
+#On Thu, 21 Sep 1995, Mark Elston wrote:
+#
+#> [Most of code deleted. ...]
+#> #
+#> # all references we want to change are in lines like:
+#> # See the <A HREF="options.ht">
+#> # [...]
+#> while ($line = <INFILE>) {
+#> $line =~ s/\.ht\"/\.html\"/g;
+#> print OUTFILE $line;
+#> }
+#> }
+#
+#There's one more case:
+#<A HREF="FILENAME#OTHERNAME">whatever</A>
+#where FILENAME contains:
+#<A NAME="OTHERNAME">some text</A>
+#
+#If Tk-b8 doesn't use this form of HREF your code should work. But a
+#more general solution would allow the "#" form. Of course, a
+#completely general solution would ignore HREF="filename" outside of a
+#<A ...> tag but this is probably overkill.
+#

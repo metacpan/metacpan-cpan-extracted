@@ -1,0 +1,70 @@
+<HTML>
+<HEAD><TITLE> 9.11. Is there any way to have more than one Listbox contain a selection?</TITLE></HEAD>
+<BODY><a name="A9.11"> 9.11. Is there any way to have more than one <KBD>Listbox</KBD> contain a selection?</a>
+
+<hr>
+</p><p>
+To allow more than one <KBD>Listbox</KBD> to contain a 
+&quot;selection&quot;, (or at least a highlighted item  - which need not be the
+actual selection) specify the configuration option:
+<pre>
+    -exportselection =&gt; 0
+</pre>
+which will dis-associate <KBD>Listbox</KBD>'s selection from X selection 
+(only one window can have X selection at a time).
+<p>
+<a href="etc/lb-basic">Here</a> is a rather simple script that illustrates 
+what happens when only one <kbd>Listbox</kbd> has 
+<kbd>-exportselection =&gt; 0</kbd> specified:
+<pre>
+    #!/usr/bin/perl -w
+    
+    use Tk;
+    
+    my $main = MainWindow-&gt;new;
+    
+    my @fruits = ('Apple','Banana','Cherry','Date','Elderberry','Fig');
+    my @nuts   = qw(Almond Brazil Chestnut Doughnut Elmnut Filbert);
+    
+    my $fruit_list = $main-&gt;Listbox();
+    for (@fruits) { $fruit_list -&gt; insert('end',$_); }
+    $fruit_list-&gt;pack();
+    my $fruitprint_button = $main-&gt;Button(
+                              -text =&gt; "print selection",
+                              -command =&gt; sub{ printthem($fruit_list) }
+                                          )-&gt;pack;
+    
+    my $nut_list = $main-&gt;Listbox(
+                                  -selectmode =&gt; 'multiple',
+                                  -exportselection =&gt; 0,
+                                 )-&gt;pack;
+    for (@nuts) { $nut_list -&gt; insert('end',$_); }
+    my $nutprint_button = $main-&gt;Button(
+                              -text =&gt; "print selection(s)",
+                              -command =&gt; sub{ printthem($nut_list) }
+                                          )-&gt;pack;
+    
+    my $quit_button = $main-&gt;Button(-text =&gt; "quit program", 
+                                    -command =&gt; sub{exit},
+                                    )-&gt;pack();
+    
+    MainLoop;
+    
+    sub printthem {
+        my $list = shift;
+        my @entries = $list-&gt;curselection;
+        for (@entries) { print $list -&gt; get($_),"\n";}
+    }
+</pre>
+For a more extensive example of <kbd>Listbox</kbd> usage combined with some
+perl data structure exploitation see the script at:
+<pre>
+    <a href="etc/lb-constructor">http://w4.lns.cornell.edu/~pvhp/ptk/etc/lb-constructor</a>
+</pre>
+
+
+<hr>
+	<p><a href="qna9.10.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.11">table of contents</a> | <a href="qna9.12.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

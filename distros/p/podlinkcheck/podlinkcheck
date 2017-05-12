@@ -1,0 +1,292 @@
+#!perl -w
+
+# Copyright 2010, 2011, 2012, 2013, 2016, 2017 Kevin Ryde
+
+# This file is part of PodLinkCheck.
+
+# PodLinkCheck is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# PodLinkCheck is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PodLinkCheck.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.006;
+use strict;
+use warnings;
+use App::PodLinkCheck;
+
+use vars '$VERSION';
+$VERSION = 15;
+
+my $plc = App::PodLinkCheck->new;
+exit $plc->command_line;
+
+__END__
+
+=for stopwords podlinkcheck Ryde subdirs cpan Manpage manpage whitespace eg mis-interpreted SQLite bsearch lookups recognises
+
+=head1 NAME
+
+podlinkcheck -- check Perl pod LE<lt>E<gt> link references
+
+=head1 SYNOPSIS
+
+ podlinkcheck [--options] file-or-dir...
+
+=head1 OPTIONS
+
+The command line options are
+
+=over 4
+
+=item --help
+
+Print a command line summary.
+
+=item -I dir
+
+Add an extra directory to look for target modules.  
+
+=item --verbose
+
+Print more about program operation (including CPAN loading).
+
+=item --version
+
+Print the program version number and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+PodLinkCheck parses Perl POD from a script, module or documentation and
+checks that C<LE<lt>E<gt>> links within it refer to a known program, module,
+or man page.
+
+=for ProhibitVerbatimMarkup allow next
+
+    L<foo>          check module, pod or program "foo"
+    L<foo/section>    and check section within the pod
+    L<bar(1)>       check man page "bar(1)"
+
+The command line is either individual files or whole directories.  For a
+directory all the F<.pl>, F<.pm> and F<.pod> files under it are checked.  So
+for example to churn through all installed add-on modules,
+
+    podlinkcheck /usr/share/perl5
+
+Bad links are usually typos in the module name or section name, or sometimes
+C<LE<lt>display|targetE<gt>> parts the wrong way around.  Occasionally there
+may be an C<LE<lt>fooE<gt>> used where just markup C<CE<lt>E<gt>> or
+C<IE<lt>E<gt>> was intended.
+
+=head2 Checks
+
+External links are checked by seeking the target F<.pm> module or F<.pod>
+documentation in the C<@INC> path (per L<Pod::Find>), or seeking a script
+(no file extension) in the usual executable C<PATH>.  A section name in a
+link is checked by parsing the POD in the target file.
+
+If a module is not installed in C<@INC> or extra C<-I> directories then its
+existence is also checked in the CPAN indexes with C<App::cpanminus>,
+C<CPAN::SQLite>, C<CPAN> or C<CPANPLUS>.  Nothing is downloaded, just
+current data consulted.  A warning is given if a section name in a link goes
+unchecked because it's on CPAN but not available locally.
+
+If checking your own work then most likely you will have copies of
+cross-referenced modules installed (having compared or tried them).  In that
+sense the CPAN index lookups are a fallback.
+
+Manpage links are checked by asking the C<man> program if it recognises the
+name, including any number part like C<chmod(2)>.  A manpage can also
+satisfy what otherwise appears to be a POD link with no sub-section, since
+there's often some confusion between the two.
+
+=head2 Internal Links
+
+Internal links are sometimes written
+
+    L<SYNOPSIS>                     # may be ambiguous
+
+but the Perl 5.10 C<perlpodspec> advice is to avoid ambiguity between an
+external module and a one-word internal section by writing a section with /
+or quotes,
+
+=for ProhibitVerbatimMarkup allow next 2
+
+    See L</SYNOPSIS> above.         # good
+
+    See L<"SYNOPSIS"> above.        # good
+
+C<podlinkcheck> warns about C<LE<lt>SYNOPSISE<gt>> section links.  But not
+if it's both an valid external module and internal section -- because it's
+not uncommon to have a module name as a heading or item and an
+C<LE<lt>E<gt>> link still meaning the external one.
+
+=head2 Section Name Matching
+
+An C<LE<lt>E<gt>> section name can use just the first word of an item or
+heading.  This is how C<Pod::Checker> behaves and it's good for C<perlfunc>
+cross references where just the function name can be given without the full
+argument list of the C<=item>.  Eg.
+
+=for ProhibitVerbatimMarkup allow next
+
+    L<perlfunc/split>
+
+The first word is everything up to the first whitespace.  This doesn't come
+out very well on a target like C<=item somefun( ARG )>, but it's how
+C<Pod::Checker> 1.45 behaves.  If the targets are your own then you might
+make the first word or full item something sensible to appear in an
+C<LE<lt>E<gt>>.
+
+If a target section is not found then C<podlinkcheck> will try to suggest
+something close, eg. differing only in punctuation or upper/lower case.
+Some of the POD translators may ignore upper/lower case anyway, but it's
+good to write an C<LE<lt>E<gt>> the same as the actual target.
+
+    foo.pl:130:31: no section "constructor" in "CHI"
+      (file /usr/share/perl5/CHI.pm)
+      perhaps it should be "CONSTRUCTOR"
+
+For reference, numbered C<=item> section names go in an C<LE<lt>E<gt>>
+without the number.  This is good since the numbering might change.  If
+C<podlinkcheck> suggests a number in a target then it may be a mistake in
+the target document.  A numbered item should have the number alone on the
+C<=item> and the section name as the next paragraph.
+
+    =item 1.                        # good
+
+    The First Thing                 # the section name
+
+    Paragraph about this thing.
+
+    =item 2. The Second Thing       # bad
+
+    Paragraph about this next thing.
+
+The second item "2. The Second Thing" is not a numbered item for POD
+purposes, but rather text that happens to start with a number.  Of course
+sometimes that's what you want, eg.
+
+    =item 64 Bit Support
+
+C<podlinkcheck> uses C<Pod::Simple> for parsing and so follows its
+interpretation of the various hairy C<LE<lt>E<gt>> link forms.  If an
+C<LE<lt>E<gt>> appears to be mis-interpreted you might rewrite or add some
+escapes (like EE<lt>solE<gt>) for the benefit of all translators which use
+C<Pod::Simple>.  In Perl 5.10 that includes the basic C<pod2man>.
+
+=head2 Other Ways to Do It
+
+C<podchecker> (the C<Pod::Checker> module) checks internal links, but it
+doesn't check external links.
+
+C<Test::Pod::LinkCheck> is similar in a F<.t> test framework.  It uses some
+of PodLinkCheck but different reporting and a stricter approach to dubious
+POD.
+
+=head1 EXIT STATUS
+
+Exit is 0 for no problems found, or non-zero for problems.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item C<PATH>
+
+The search path for installed scripts.
+
+=item C<HOME>
+
+Used by the various C<CPAN> modules for C<~/.cpan> etc directories.
+
+=item C<PERL5LIB>
+
+The usual extra Perl module directories (see L<perlrun/ENVIRONMENT>), which
+become C<@INC> where link targets are sought.
+
+=back
+
+=head1 BUGS
+
+C<App::cpanminus> is checked first since it's a bsearch of
+F<02packages.details.txt>, and C<CPAN::SQLite> second since it's a database
+lookup.  But if a target is not found there then the full C<CPAN> and
+C<CPANPLUS> caches are loaded and checked.  This might use a fair bit of
+memory for a non-existent target, but it's also possible they're more
+up-to-date.
+
+No attempt is made to tell which of the indexes is the most up-to-date.  If
+a module has been renamed (bad) then it may still exist in an old index.
+The suggestion is to avoid having old stuff lying around (including old
+mirror files in C<App::cpanminus>).
+
+The code consulting C<CPAN.pm> may need a tolerably new version of that
+module, maybe 1.61 circa Perl 5.8.0.  On earlier versions its index is not
+used.
+
+The line:column number reported for an offending C<LE<lt>E<gt>> is found by
+some gambits extending what C<Pod::Simple> normally records.  There's a
+chance it could be a little off within the paragraph.
+
+C<Pod::Simple> prior to version 3.24 didn't allow dots "." in man-page
+names, resulting in for example L<login.conf(5)> being treated as a Perl
+module name not a man page name.  If you have such links then use
+C<Pod::Simple> 3.24 up.
+
+Directories are currently traversed using L<File::Find::Iterator>.  It
+follows symlinks but neither its version 0.4 nor PodLinkCheck guard against
+infinite descent into symlink cycles.  The intention perhaps would be follow
+all symlinks to files, but follow to a directory just once as protection
+against cycles.
+
+=head1 FILES
+
+F<~/.cpanm/sources/*/02packages.details.txt> files from C<App::cpanminus>
+
+F<~/.cpan/cpandb.sql> used by C<CPAN::SQLite>
+
+F<~/.cpan/Metadata> used by C<CPAN>
+
+F<~/.cpanplus/*> variously used by C<CPANPLUS>
+
+=head1 SEE ALSO
+
+L<podchecker>, L<podlint>
+
+L<Pod::Simple>, L<Pod::Find>, L<CPAN>, L<CPAN::SQLite>,
+L<CPANPLUS>, L<cpanm>
+
+L<Test::Pod::LinkCheck>, L<Pod::Checker>, L<Test::Pod>
+
+=head1 HOME PAGE
+
+http://user42.tuxfamily.org/podlinkcheck/index.html
+
+=head1 LICENSE
+
+Copyright 2010, 2011, 2012, 2013, 2016, 2017 Kevin Ryde
+
+PodLinkCheck is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+PodLinkCheck is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+PodLinkCheck.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

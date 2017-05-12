@@ -1,0 +1,36 @@
+<HTML>
+<HEAD><TITLE> 9.15. How do I get the entry in an Entry?</TITLE></HEAD>
+<BODY><a name="A9.15"> 9.15. How do I <kbd>get</kbd> the entry in an <kbd>Entry</kbd>?</a>
+
+<hr>
+</p><p>
+You want to call <kbd>get</kbd> on the return value of the widget itself. 
+Here is how it may be used in a simplified version of example 1.1 from the 
+<a href="pod/UserGuide.html">Tk::UserGuide</a> where a <kbd>Button</kbd> is set
+up to call a <kbd>sub</kbd> where the call to <kbd>get</kbd> lies:
+<pre>
+    #!/usr/bin/perl -w
+    use strict;
+    use Tk;
+
+    my $main = MainWindow -&gt; new();
+    my $entry = $main -&gt; Entry();
+    $entry -&gt; pack;
+    $main-&gt;Button(-text =&gt; 'Print', 
+                  -command =&gt; sub{do_print($entry)}
+                  )-&gt;pack;
+    MainLoop;
+
+    sub do_print {
+        my ($widget) = @_;
+        my $entered = $widget -&gt; get();
+        print "The string \"$entered\" was entered.\n";
+    }
+</pre>
+
+
+<hr>
+	<p><a href="qna9.14.html">Previous</a> | Return to <a href="ptkTOC.html#TOC9.15">table of contents</a> | <a href="qna9.16.html">Next</a>
+
+</p><hr><p>
+</BODY></HTML>

@@ -1,0 +1,45 @@
+pmcheck version 1.1
+
+Recursively extract package information from all readable non-empty regular
+text files in the source tree.  The current directory is used if no directory
+or file is specified.  All dot-files and directories are ignored.
+
+If the --provided option is given, shows all packages provided by .pm files
+in the source tree.  Otherwise shows all packages required by .cgi, .pl, .pm
+and .t files that are not provided anywhere in the source tree (and also
+nowhere in @INC if the --missing option is given).  Files with no dot in the
+name are also checked if they start with a perl shebang line.
+
+NOTE: Packages required by the 'use base' and 'use parent' pragmas and by the
+Moose 'extends' and 'with' functions will only be included if Module::Used is
+available.  Will display an activity indicator if run interactively and
+Term::Activity is available.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+PPI::Document
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2011-2012, Andrew Pam
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

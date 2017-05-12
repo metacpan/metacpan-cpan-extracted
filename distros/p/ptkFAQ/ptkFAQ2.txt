@@ -1,0 +1,844 @@
+Archive-name: perl-faq/ptk-faq/part2
+Posting-Frequency: monthly
+Last-modified: Wed May 15 22:26:55 EDT 1996
+URL: http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.html
+Version: 0.03
+
+URL (Hypertext-split): http://w4.lns.cornell.edu/~pvhp/ptk/ptkTOC.html
+URL (Plaintext): http://w4.lns.cornell.edu/~pvhp/ptk/ptkFAQ.txt
+Image-supplement: http://w4.lns.cornell.edu/~pvhp/ptk/ptkIMG.html
+ftp-Archive: ftp://ftp.ccd.bnl.gov/pub/ptk/ptkFAQ.txt
+ftp-Archive: ftp://ftp.wpi.edu/perl5/pTk-FAQ
+ftp-Archive: ftp://rtfm.mit.edu/pub/usenet/perl-faq/ptk-faq/
+e-mail-Archive: ptkfaq@pubweb.bnl.gov
+gopher-Archive: 128.84.219.153
+
+Perl/Tk FAQ part 2 of 5 - Programming      
+************************************* 
+
+
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9. How do I get widget X to do Y ? 
+ 
+ There are a number of tasks that can be accomplished with perl/Tk widgets,
+ configurations, and bindings (a few that can't and a few that require specific tricks).
+ Beginners are encouraged to work through the examples in UserGuide.pod. Some
+ examples from UserGuide.pod are addressed in this document among those that
+ follow. 
+ 
+ Basically a widget can be "created" by simply calling the sub of the same name: 
+ 
+     my $main = new MainWindow;
+ 
+ will set aside the necessary system memory etc. for a new MainWindow widget (it
+ does not appear until after the MainLoop; call). The object "created" is then
+ callable via the variable $main. So, for example, if you wanted a Button in your 
+ MainWindow, then this: 
+ 
+     $main->Button();
+ 
+ would be a very basic example of a widget command. If you wanted to later call this
+ button widget you would need a "widget tag or ID" to "get a handle on it". Instead of
+ the above call try something like: 
+ 
+     my $button = $main->Button();
+ 
+ The variable $button is how you refer to the Button widget in subsequent calls,
+ such as when we call the pack routine: 
+ 
+     $button -> pack;
+ 
+ A complete script that incorporates these ideas to make a very plain button would
+ look like: 
+ 
+     #!/usr/bin/perl -w
+     use Tk;
+     use strict;
+     my $main = new MainWindow;
+     my $button = $main -> Button();
+     $button -> pack;
+     MainLoop; 
+ 
+ But who wants such a plain looking button? You can provide a number of different
+ widget configurations via calls to the configure routine as in: 
+ 
+     #!/usr/bin/perl -w
+     use Tk;
+     use strict;
+     my $main = new MainWindow;
+     my $button = $main->Button();
+     $button -> configure(-text => 'Press me!');
+     $button -> pack;
+     MainLoop; 
+ 
+ The Perl motto is "there is more than one way to do it." - perl/Tk remains quite true
+ to this motto as well. Note that the above script could have been written quite
+ succinctly without the use of either the $main or $button variables as: 
+ 
+     #!/usr/bin/perl -w
+     use Tk;
+     use strict;
+     new MainWindow -> Button(-text => 'Press me!') -> pack;
+     MainLoop; 
+ 
+ But if you want your widgets to actually do things then you must set up callback
+ procedures as discussed later... 
+ 
+ As of Tk-b9(.01) the - sign in front of options (like -text in the above example)
+ will be optional (hence ->Button(text => 'Press me!')). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.1. How do I get a Button to call a Perl subroutine? 
+ 
+ You may specify the -command option in the call to create & pack the button as in: 
+ 
+     $main->Button(-text => 'Print',
+                    -command => sub{do_print($filename, $font)}
+                    )->pack;
+ 
+ Where sub do_print { } is a subroutine that handles two arguments and is
+ declared elsewhere in the script. A full script example of the use of the above code is
+ presented in the second example(s) in UserGuide.pod 
+ 
+ (Full source code for this and other examples from UserGuide.pod may be found at 
+ http://w4.lns.cornell.edu/~pvhp/ptk/pod/. To load code from the web save as a local
+ file say ex1.pl, edit the first line to point to your perl interpreter, then change
+ permission: %chmod u+x ex1.pl, then execute the script: %ex1.pl.) 
+ 
+ The above method is called the "anonymous subroutine (closure)" method. As
+ discussed in Callback.pod one might have re-written that statement to use the
+ "reference to a sub" method thusly: 
+ 
+     $main->Button(-text => 'Print',
+                    -command => [ \&do_print , $filename, $font ]
+                    )->pack;
+ 
+ Note the backslash in front of \&do_print. This causes perl to generate a reference
+ to sub do_print rather than call it. (thanks Jim Stern :-) 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.2. How do I arrange the layout of my widgets? 
+ 
+ To control the layout and appearance of widgets in a window one makes use of a 
+ geometry manager, as well as -padding, -fill, -expand, and -anchor options of
+ individual widgets. 
+ 
+ A geometry manager is any Tk procedure for controlling the arrangement of widgets
+ in your application window. The predominant geometry manager used in both Tcl/Tk
+ and perl/Tk is pack also known informally as the "packer" (other geometry
+ managers are the "placer" and the canvas widget itself but are much less popular.
+ There is also Nick Ing-Simmon's Table widget [discussed in a later question] and 
+ BLT_Table [which made it's way into perl/Tk thanks to Guy Decoux - but is also
+ discussed in a later question]. So far tixForm is for Tcl/Tk only, but a perl/Tk version
+ of Tix is in the works. You can invoke pack at the time of widget creation via calls
+ like: 
+ 
+     $widget->pack;
+ 
+ where widget can be any of the perl/Tk widget primitives. Widget option lists are
+ usually passed as an associative array (hash) in parentheses thusly: 
+ 
+     $widget(-option0 => value0,-option1 => value1)->pack;
+ 
+ pack is often used in conjunction with the frame container widget to arrange your
+ widgets much like a hiearchically arranged set of window panes (ultimately in a
+ rectangular "tiling" fashion of sorts). An example of this would be: 
+ 
+     my $top2 = $main->Toplevel;
+     my $frame = $top2->Frame;
+     $frame->pack;
+     $frame->Label(-text => 'Left2')->pack(-side => 'left');
+     $frame->Label(-text => 'Right2')->pack(-side => 'right');
+     $top2->Label(-text => 'Bottom2')->pack(-side => 'bottom');
+     MainLoop;
+ 
+ Note that pack itself is given parameters in this example. The default behavior for 
+ pack is equivalent to specifying -side => 'top' which can be overridden as in
+ the above example. 
+ 
+ (Full source code for this and other examples from UserGuide.pod may be found at 
+ http://w4.lns.cornell.edu/~pvhp/ptk/pod/. To load code from the web save as a local
+ file say ex2.pl, edit the first line to point to your perl interpreter, change
+ permission using: chmod u+x ex2.pl, then type the name of your script: 
+ ex2.pl.) 
+ 
+ One of the more helpful options to pass to pack when trying to get a given widget
+ layout "just right" is through padding: either -padx or -pady. The details of the
+ use of pad depend on which specific widget you are trying to pack. In fact you can
+ often add the -pad in the call to create the widget rather than in the call to pack. 
+ 
+ There is also the -anchor configuration option for widgets. A good introduction to
+ the 9 possible -anchor (and -overanchor) values is given by the popup demo
+ in your Tk-b#/ directory. 
+ 
+ When setting a widget within a frame next to another widget one may wish to make
+ use of the -fill => 'style' (where style = none | x | y | both) options
+ of either pack or the widget itself. A typical situation where this is used is in setting
+ up the Scrollbar next to a Canvas or Text widget. 
+ 
+ Another aspect to consider when laying out your widgets is their behavior under
+ resize operations (grabbing a part of the window frame and making it bigger or
+ smaller - details depend on your window manager). This may be controlled by the 
+ -expand option of either pack or the widget itself. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.3. How do I get a Popup to popup? 
+ 
+ For things like a simple "are you sure?" dialog box you might want to take a look at 
+ Dialog.pm which is discussed in a later question within this FAQ [15.1]. 
+ 
+ If you don't wish to require Tk::Dialog, you need something more complicated, or you
+ simply want to create your own independent window with widgets; you must first
+ setup a Toplevel in perl/Tk. The fourth example in UserGuide.pod gives a simple
+ example of how to call Toplevel. Quoting from that script: 
+ 
+     my $main = new MainWindow;
+     fill_window($main, 'Main');
+     my $top1 = $main->Toplevel;
+ 
+ Where sub fill_window is declared after the call to MainLoop;. When
+ running that script take careful note of which window pops up first, which window
+ has grabbed the active attention of your input device(s), and which widget within the
+ active window has the keyboard/mouse focus when all three windows are open. 
+ 
+ The use of Toplevels brings up the issue of grab - or which independent window is
+ presently "active" and which are activatable. To make a Toplevel window active
+ call grab thusly: 
+ 
+     $Top_widget->grab(grab_option);
+ 
+ where $Top_widget identifies the desired Toplevel (it would be either $top1 or 
+ $top2 in the sample script referred to above). grab_option could be -global -
+ but this is discouraged as a sign of "desparate programming style". To give a 
+ Toplevel "local grab" you may simply say: 
+ 
+     $Top_widget->grab;
+ 
+ That is, without an argument. 
+ 
+ The use of Toplevels may also bring up the issue of focus - or which window -
+ even which widget within a window - is presently "hot". You may call focus on an
+ entire Toplevel: 
+ 
+     $Top_widget->focus;
+ 
+ However, focus is most often used with individual widgets rather than a whole 
+ Toplevel. 
+ 
+ To de-iconify a widget there is in fact a Popup function that may be called thusly: 
+ 
+     $Top_widget->Popup();
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.4. How do I bind keyboard keys? 
+ 
+ There are many default key bindings built in to the widgets of perl/Tk. Making proper
+ use of them often involves setting up the right callback. (You may wish to consult the
+ examples in BindTable.pod for help with this subject.) 
+ 
+ The basic idea is: 
+ 
+     $widget -> bind('<keyname>' => action);
+ 
+ Where $widget is the tag or ID of the widget for which the bindings are to hold (note
+ for global bindings you have to bind to <All>, for semi-global bindings you need to
+ bind to all the relevant widgets in your application), '<keyname>' can be things like:
+ 
+     <Key> or <KeyPress> or <Any-KeyPress>
+     <KeyRelease>
+     <Button> or <ButtonPress>
+     <ButtonRelease>
+     <Button-1> or <B1> 
+     <Double-1>
+     <Enter>
+     <Leave>
+     <Motion>
+ 
+ To figure out what names perl/Tk uses for such <bindings> use the "binder-finder"
+ on a widget's .pm file. For example, you could find bindings hidden inside of 
+ Button.pm by typing this at your shell prompt: 
+ 
+     perl -ne 'print if s/.*(<[^>]*>).*/$1/g;' Button.pm
+ 
+ while in the directory where Button.pm is located (and if you are not there then
+ simply specify the /path/to/Button.pm). Note that due to inheritance (e.g.the
+ type of script bindings that are being discussed here) what the binder-finder turns up
+ may not be the last word on a given widget's behaviour. This may be especially true
+ for a widget inside of a compound/composite widget. Note also that the binder-finder
+ will turn up things like <FILEHANDLES> as well as honest <Bindings>.
+ Discrimination in its use is called for (and while your at it you could have just as easily
+ used an editor and actually examined the code directly now couldn't you?). 
+ 
+ To get an idea of what the code is for a key that you are interested in try running the 
+ xlib_demo that comes in your Tk-b# directory. Hold your mouse pointer over the
+ window that appears and simply type the key that you are interested in. The code
+ should appear in the window. If you do not have perl/Tk up and running yet try "
+ xmodmap -pk" or look directly at the /usr/include/X11/keysymdef.h file
+ where keysym names are given with an XK_ pre-pended. Do not try things like the
+ Tcl/Tk %k symbols in perl scripts. %Ks will be mis-interpreted as non-existant perl
+ hashes. Instead look at the Xevent function. 
+ 
+ Ali Corbin <corbin@adsw.fteil.ca.boeing.com> recently posted a great little script for
+ determining keyboard key bindings on a MainWindow: 
+ 
+     #!/usr/local/bin/perl -w
+     use Tk;
+     $top = MainWindow->new();
+     $frame = $top->Frame( -height => '6c', -width => '6c',
+                             -background => 'black', -cursor => 'gobbler' );
+     $frame->pack;
+     $top->bind( '<Any-KeyPress>' => sub
+     {
+         my($c) = @_;
+         my $e = $c->XEvent;
+         my( $x, $y, $W, $K, $A ) = ( $e->x, $e->y, $e->K, $e->W, $e->A );
+ 
+         print "A key was pressed:\n";
+         print "  x = $x\n";
+         print "  y = $y\n";
+         print "  W = $K\n";
+         print "  K = $W\n";
+         print "  A = $A\n";
+     } );
+     MainLoop();
+ 
+ To bind the action of one widget to that of another try taking a look at the .pm file
+ for the widget of interest - is there a binding function already defined? If so you may
+ use it. An example would be the use of "Up" & "Down" Buttons for a Listbox:
+ one could bind the Buttons to call Tk::Listbox::UpDown, however, Guy
+ Decoux describes a much more clever way to use the <Up> and <Down> already
+ defined in Listbox.pm (this does not work with Tk-b9.01): 
+ 
+     #!/usr/local/bin/perl
+     use Tk;
+     $top = MainWindow->new;
+     $lb = $top->Listbox(-height => 10);
+     for($i=0; $i < 120; $i++) {
+       $lb->insert('end', $i);
+     }
+     $f = $top->Frame;
+     $up = $f->Button(
+            -text => "Up",
+            -command => [ $lb->bind(ref $lb, '<Up>'), $lb]
+            );
+     $down = $f->Button(
+              -text => "Down",
+              -command =>sub {&{$lb->bind(ref $lb, '<Down>')}($lb)}
+              );
+     $up->pack(-side => 'left');
+     $down->pack;
+     $f->pack;
+     $lb->pack;
+     MainLoop;
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.5. How do I add bindings? 
+ 
+ On Fri, 15 Sep 95 10:30:56 BST Nick Ing-Simmons
+ <Nick.Ing-Simmons@tiuk.ti.com> writes: 
+ 
+ 
+ Re: Multiple binds to a single widget?
+ **************************************
+ 
+ On Thu, 14 Sep 1995 14:57:54 -0400
+ Alain St <astdenis@cmc.doe.CA> writes:
+ !In the tcl/tk doc I have, they say that prepending the script 
+ !with '+' appends the new binding to the current one.
+ !
+ !How do I do that in perlTk? 
+ !
+ 
+  You cannot do that that way (yet?) - one issue is what it would mean to prepend
+  '+' to a perl/Tk callback : 
+ 
+     $widget->bind('<A>','+',[\&subname,$arg]); 
+     # did not look right to me
+ 
+  Other issue is that I would need to manage a list-of-callbacks in glue code. 
+ 
+  Bind your new command to a new tag: 
+ 
+     $widget->bind('Extra',....);
+ 
+  And add Extra to the widgets bindtags: 
+ 
+     $widget->bindtags([ref($widget),$widget,'Extra',$widget->toplevel,'all']);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.6. How do I bind the action of a slider (sic) to ... ? 
+ 
+ Technically speaking they are called Scrollbars (not sliders) and one must 
+ configure the action of the desired widget to call the Scrollbars (i.e. bind is
+ not involved here) 
+ 
+ A common task using Scrollbars is to configure things like Canvas, 
+ Listbox, or a Text widgets to be updated (change appearance) when the slider of
+ the acompanying Scrollbar is moved by the user. 
+ 
+ As an example consider the code that sets up a twelve element Listbox and an
+ accompanying vertical Scrollbar: 
+ 
+     my $main = new MainWindow;
+     my $box = $main->Listbox(-relief => 'sunken', 
+                              -width => -1, # Shrink to fit
+                              -height => 5,
+                              -setgrid => 'yes');
+     my @items = qw(One Two Three Four Five Six Seven
+                    Eight Nine Ten Eleven Twelve);
+     foreach (@items) {
+        $box->insert('end', $_);
+     }
+     my $scroll = $main->Scrollbar(-command => ['yview', $box]);
+ 
+ So far so good. But merely setting them up does not mean that the Listbox even
+ knows that the Scrollbar is lying next to it. Note that the scalar variable 
+ $scroll is how we refer to the Scrollbar, thus, hooking the $box up to handle 
+ $scroll events is a matter of configuration: 
+ 
+  
+     $box->configure(-yscrollcommand => ['set', $scroll]);
+ 
+ A complete script that makes use of this code (and adds the necessary calls to pack
+ and MainLoop;) is given as the fifth example in UserGuide.pod (and may be found
+ at http://w4.lns.cornell.edu/~pvhp/ptk/pod/.) 
+ 
+ There was an old Perl/Tk tendency to have a bunch of ScrlFoo widgets (such as 
+ ScrlListbox). The use of such widgets is now deprecated in favor of a new 
+ Scrolled class, as in: 
+ 
+     $w = $patent->Scrolled('Text',...);
+ 
+ The widgets that can be ->Scrolled() include: 
+ 
+  o Canvas (::Axis) 
+  o Entry 
+  o Ghostview 
+  o HList 
+  o HTML (::Web) 
+  o Listbox 
+  o Pod 
+  o Text (::ROText) (::TextUndo) 
+  o Tiler 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.7. How do I configure a Scrollbar to scroll multiple widgets? 
+ 
+ Note that the widget type that you wish to scroll can be important as a scroll "unit" on
+ a Text or Listbox may be a character (several pixels - depending on font)
+ whereas it would be an X "units" on a Canvas (could be pixel - but you may also
+ specify other units). 
+ 
+ A concrete answer for scrolling 3 Listboxes comes courtesy of Frederick L.
+ Wagner <derf@ti.com>: 
+ 
+  From a working example of multi-xscrolling: 
+ 
+     sub multiscrollx
+     {  # multiscrollx
+      my ($sb,$wigs,@args) = @ARG;
+      my $w;
+      foreach $w (@$wigs)
+      {
+        $w->xview(@args);
+      }
+     }  # multiscrollx
+  
+     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+       $sh->configure( -command => [ \&multiscrollx, $sh,
+                          [$scratchrule,$ruleheader,$ruletable]]);
+       $ruletable->configure(  -xscrollcommand => [ 'set', $sh]);
+       $ruleheader->configure( -xscrollcommand => [ 'set', $sh]);
+       $scratchrule->configure(-xscrollcommand => [ 'set', $sh]);
+ 
+  In this case,
+  $sh is a horizontal Scrollbar,
+  $ruletable and $scratchrule are Tables
+  $ruleheader is an Entry
+ 
+  However, this approach is good for any widget with X-scrolling capability, I
+  think. So the Y counterpart should be: 
+ 
+     sub multiscrolly
+     {  # multiscrolly
+      my ($sb,$wigs,@args) = @ARG;
+      my $w;
+      foreach $w (@$wigs)
+      {
+        $w->yview(@args);
+      }
+     }  # multiscrolly
+  
+     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+       $sv->configure( -command => [ \&multiscrolly, $sv,
+                                     [$l1,$l2,$l3]]);
+       $l1->configure( -yscrollcommand => [ 'set', $sv]);
+       $l2->configure( -yscrollcommand => [ 'set', $sv]);
+       $l3->configure( -yscrollcommand => [ 'set', $sv]);
+ 
+  Hope that helps. 
+ 
+ Greg VanSickle <vansickl@bnr.ca> points out that this little script snippet does not
+ provide for the binding of '<Button-2<' that he is accustomed to. He wrote a
+ package called DSListbox to address this binding issue. 
+ 
+ Conversely, Jong Park asked how to setup multiple Scrollbars to scroll the same
+ widget. Nick Ing-Simmon's reply makes use of an anonymous sub and can be
+ summed up in a little script that scrolls a Text widget (to see the scrolling in action
+ type more than 20 lines of text into the widget):
+ 
+     #!/usr/local/bin/perl -w
+     
+     use Tk;
+     my $mw = MainWindow->new();
+     
+     my $s1 = $mw->Scrollbar(-orient => 'vertical');
+     my $s2 = $mw->Scrollbar(-orient => 'vertical');
+     
+     $s1->pack(-side => 'left', -fill => 'y');
+     my $t = $mw->Text(
+         -yscrollcommand =>  sub{$s1->set(@_), $s2->set(@_)},
+         -wrap           => 'word',
+         -width          => 70,
+         -height         => 20, 
+         -font           => $font,
+         -setgrid        => 1,
+     )->pack(-side => 'left');
+     $s2->pack(-side => 'right', -fill => 'y');
+     $s1->configure(-command => [$t => 'yview']);
+     $s2->configure(-command => [$t => 'yview']);
+     
+     MainLoop;
+     
+     __END__
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.8. How do I display a bitmap? 
+ 
+ You can display X bitmaps on your widgets with the -bitmap configuration option.
+ Typically -bitmaps are configured into Label, Frame, Button, etc. widgets (
+ Canvas widgets are another story however see question [10.1] below). In order to
+ emphasize the bitmap option itself let us assume we were specifying a bitmap for a 
+ Label with a call like: 
+ 
+     $main->Label(-bitmap => 'bitmap-name')->pack;
+ 
+ Where bitmap-name could be any of the built in Tk bitmaps: error, gray25, 
+ gray50, hourglass, info, question, questhead, warning (see the 
+ widget demo for a full list). 
+ 
+ In order to use some of the bitmaps in the perl5/Tk/demos/images/ directory
+ you would specify a fuller path name like: 
+ 
+     $main->Label(-bitmap => "\@$tk_library/demos/images/face")->pack;
+ 
+ Note the escaped "\@" on the directory specification (as well as the use of the 
+ $tk_library variable imported by use Tk;). If you wanted to specify a file
+ called foobar.xbm in the directory where you were running the script then either: 
+ 
+     $main->Label(-bitmap => '@foobar.xbm')->pack;
+ #or
+     $main->Label(-bitmap => "\@foobar.xbm")->pack;
+ 
+ should work just fine. In another directory however that would be a problem. So
+ something like: 
+ 
+     $main->Label(-bitmap => "\@$ENV{'HOME'}/img/foobar.xbm")->pack;
+ 
+ will help someone who has an img/foobar.xbm file in their $HOME directory. If
+ you don't mind the non-portability then hard-wiring in the full path name will help
+ as well. (Or if you have write access then put your files in Tk/demos/images/ e.g.)
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.9. How do I display an image? 
+ 
+ You will want to get a "Photo" handle on the file as in the following example where 
+ 'imggif' is the Photo handle for a gif file that is distributed with Tk-b#: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+     my $main = new MainWindow;
+ 
+     $main ->Label(-text => 'Main')->pack;
+     $main -> Photo('imggif', 
+                    -file => "$Tk::tk_library/demos/images/earth.gif");
+     my $l = $main->Label('-image' => 'imggif')->pack;
+ 
+     $main->Button(-text => 'close',
+                   -command => sub{destroy $main}
+                   )->pack(-side => 'left');
+     $main->Button(-text => 'exit',
+                   -command => [sub{exit}]
+                   )->pack(-side => 'right');
+     MainLoop;
+ 
+ (Canvas widgets are another story however see question a later question within this
+ FAQ). 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.10. What Image types are available? 
+ 
+ In addition to the Tk builtin bitmaps there is support for reading images from files
+ in formats such as: X11 Bitmaps (.xbm), X Pixmaps (.xpm), and Graphics Inline
+ Format (.gif). See the CrtPhImgFmt man page for more info (if you have Tk 4.X
+ installed). (In order to support other formats you might also consider running
+ through a netpbm filter.) 
+ 
+ For perl generation of images see the question (later in this FAQ) on graphics
+ modules. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.11. Is there any way to have more than one Listbox contain a selection? 
+ 
+ To allow more than one Listbox to contain a "selection", (or at least a highlighted
+ item - which need not be the actual selection) specify the configuration option: 
+ 
+     -exportselection => 0
+ 
+ which will dis-associate Listbox's selection from X selection (only one window
+ can have X selection at a time). 
+ 
+ Here is a rather simple script that illustrates what happens when only one Listbox
+ has -exportselection => 0 specified: 
+ 
+     #!/usr/bin/perl -w
+     
+     use Tk;
+     
+     my $main = MainWindow->new;
+     
+     my @fruits = ('Apple','Banana','Cherry','Date','Elderberry','Fig');
+     my @nuts   = qw(Almond Brazil Chestnut Doughnut Elmnut Filbert);
+     
+     my $fruit_list = $main->Listbox();
+     for (@fruits) { $fruit_list -> insert('end',$_); }
+     $fruit_list->pack();
+     my $fruitprint_button = $main->Button(
+                               -text => "print selection",
+                               -command => sub{ printthem($fruit_list) }
+                                           )->pack;
+     
+     my $nut_list = $main->Listbox(
+                                   -selectmode => 'multiple',
+                                   -exportselection => 0,
+                                  )->pack;
+     for (@nuts) { $nut_list -> insert('end',$_); }
+     my $nutprint_button = $main->Button(
+                               -text => "print selection(s)",
+                               -command => sub{ printthem($nut_list) }
+                                           )->pack;
+     
+     my $quit_button = $main->Button(-text => "quit program", 
+                                     -command => sub{exit},
+                                     )->pack();
+     
+     MainLoop;
+     
+     sub printthem {
+         my $list = shift;
+         my @entries = $list->curselection;
+         for (@entries) { print $list -> get($_),"\n";}
+     }
+ 
+ For a more extensive example of Listbox usage combined with some perl data
+ structure exploitation see the script at: 
+ 
+     http://w4.lns.cornell.edu/~pvhp/ptk/etc/lb-constructor
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.12. How do I select a range of tags in a Text widget? 
+ 
+ A question arose concerning getting a range of selections from a Text widget. Nick
+ Ing-Simmons' answer mentions several possibilities including: 
+ 
+  Keyboard Copy/Paste 'is' implemented of course... 
+ 
+ 
+ Subj:   RE: $Text->tag('ranges', 'sel') - does this work?
+ 
+ In <199512291957.OAA02609@ohm.nrl.navy.mil>
+ On Fri, 29 Dec 1995 14:57:42 -0500
+ Charles J Williams <chas@ohm.nrl.navy.mil> writes:
+ !I was writing a little tk perl today, and i decided to try to 
+ !implement a copy/paste using the 'sel' tag
+ !
+ !I enabled exportselection, and then try to probe the select 
+ !region with:
+ !
+ !    $buffer = $text->tag('ranges', 'sel');
+ !
+ !$buffer comes back with one entry, the end of the selection.
+ 
+  That is to be expected - the scalar gets assigned the last element of the list. 
+ 
+ 
+ !I tried:
+ !
+ !    @buffer = $text->tag('ranges', 'sel');
+ !
+ !same difference.
+ 
+  This seems to work for me: 
+ 
+     ($start,$end) = $text->tagRanges('sel');
+ 
+  In perl/Tk ->tagRanges(...) is an alias for ->tag('ranges',...) 
+ 
+  The following subroutine can also probe and print the tagRanges: 
+ 
+     sub showsel  
+     { 
+      my $text = @_;
+      my @info = $text->tagRanges('sel');
+      if (@info)
+       {
+        print "start=$info[0] end=$info[1]\n" 
+       }
+     }
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.13. How do I group Radiobuttons together? 
+ 
+ Specify the -variable option on each one. Here is an example pulled from the 
+ icon.pl demo script: 
+ 
+      $letters = '';
+      my $w_frame_left_b3 = $w_frame_left->Radiobutton(
+          -bitmap   => "\@$tk_library/demos/images/letters",
+          -variable => \$letters,
+          -value    => 'full',
+      );
+      my $w_frame_left_b4 = $w_frame_left->Radiobutton(
+          -bitmap   => "\@$tk_library/demos/images/noletters",
+          -variable => \$letters,
+          -value    => 'empty',
+      );
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.14. How do I specify fonts? 
+ 
+ The quick answer is to specify the font configuration option of your widget as in: 
+ 
+     #!/usr/local/bin/perl -w
+     use Tk;
+     $main = MaiWindow->new();
+     $labl = $main -> Label('-text' => "Foo", '-font' => "fixed");
+     $labl -> pack;
+     MainLoop;
+ 
+ The long answer involves figuring out what fonts you have access to locally. The Unix
+ programs xlsfonts and xfontsel are useful in this regard. 
+ 
+ The perl/Tk version of xfontsel was distributed as the font_test script in the
+ Tk-b9.01 build directory. 
+ 
+ See also the later question (within this FAQ) on international fonts. 
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.15. How do I get the entry in an Entry? 
+ 
+ You want to call get on the return value of the widget itself. Here is how it may be
+ used in a simplified version of example 1.1 from the Tk::UserGuide where a Button
+ is set up to call a sub where the call to get lies: 
+ 
+     #!/usr/bin/perl -w
+     use strict;
+     use Tk;
+ 
+     my $main = MainWindow -> new();
+     my $entry = $main -> Entry();
+     $entry -> pack;
+     $main->Button(-text => 'Print', 
+                   -command => sub{do_print($entry)}
+                   )->pack;
+     MainLoop;
+ 
+     sub do_print {
+         my ($widget) = @_;
+         my $entered = $widget -> get();
+         print "The string \"$entered\" was entered.\n";
+     }
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.16. How do I hide a password Entry? 
+ 
+ Set the -show option to zero, as in this example: 
+ 
+     $entry = $form->Entry(-textvariable => \$user_entry, 
+                           -show => 0);
+ 
+ ______________________________________________________________________
+ 
+ 
+ 
+ 9.17. How do I obtain Menus that do not tear off? 
+ 
+ Nick Ing-Simmons outlined a couple of ways to achieve this result. The critical
+ feature being the -tearoff => 0 configuration option of the Menu. In Nick's
+ words: 
+ 
+     my $mb = $parent->Menubutton(...);    # The button
+     my $menu = $mb->Menu(-tearoff => 0);  # Create a non-tearoff menu
+     $mb->configure(-menu => $menu);       # Tell button to use it.
+     $mb->command(....);
+ 
+  Above is for clarity - you can loose $menu variable: 
+ 
+     my $mb = $parent->Menubutton(...);  
+     $mb->configure(-menu => $mb->Menu(-tearoff => 0));  
+     $mb->command(....);
+ 

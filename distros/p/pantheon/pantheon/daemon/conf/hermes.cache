@@ -1,0 +1,3 @@
+---
+command: $RealBin/hermes/cache -d
+user: root

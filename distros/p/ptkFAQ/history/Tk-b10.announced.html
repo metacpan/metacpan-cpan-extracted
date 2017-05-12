@@ -1,0 +1,97 @@
+<HTML><HEAD><BASE HREF="news:9603231716.AA03146@alconbury.tiuk.ti.com">
+<TITLE> Tk-b10</TITLE></HEAD><BODY>
+<H2>[PREV]  <A HREF="news:199603240132.UAA21379@Turkey.CC.Lehigh.EDU">[NEXT]</A>  <A HREF="news:9603231711.AA03137@alconbury.tiuk.ti.com">[PREV Thread]</A>  <A HREF="news:ANDREAS.96Mar24234521@marvin.berlin.de">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2><HR><ADDRESS> nick_at_home@tiuk.ti.com (Nick Ing-Simmons)
+</ADDRESS>
+<ADDRESS><H1> Tk-b10</H1>
+</ADDRESS>
+<ADDRESS> 23 Mar 96 17:16:27 GMT
+ ptk@guest.wpi.edu mailing list gateway
+</ADDRESS>
+
+<DL>
+
+<DT> Newsgroups:
+<DD> <A HREF="news:comp.lang.perl.tk">comp.lang.perl.tk</A>
+</DL>
+<HR>
+<PRE>Tk-b10 is now in CPAN.
+
+I released it the other day - from home - as work site was having 
+problems. 
+
+I have only just (if you get this) got mail working from home.
+
+I have been messing with Tk at home too, so -b10.* or -b11 or maybe
+even production release ;-) will be following.
+
+Changes in b10
+
+* Hand-converted Tk::HList.pm from Graham Barr.
+
+* Tk::Font from Graham Barr, added XListFonts to Tk::Xlib to support this.
+
+* Cleaned up demos from Steve - thanks as always.
+
+* Cleaned up error message propagation:
+   - now use $widget-&gt;BackTrace('message')  rather than "croak" to get perl call
+     history into "stack trace" for ErrorDialog etc.
+   - Resolved "duplicate" messages to be result of perl5.002b2's $@ handling,
+     and adjusted glue to comprehend this.
+
+* Resolved netbsd problem with certain (unused, undefined) Tix 'extern's. 
+   - will try and remember to run checking scripts in future...
+
+* Added `a' version of tkGrid.c (to be included in tk4.1b*) which 
+  allows folks to play with SpecTcl GUI builder (so I am told).
+
+* Merged tk4.0p3 changes.
+
+* Tested under perl5.002b3
+   - located nasty bug when perl's stack grows (and therfore changes address)
+     during a call to Tk. e.g. if Button callback invoked perl code which
+     puts a large array on the stack. This may explain the 'FileSelect' 
+     bug.
+   - Still some risk in this area - will investigate further before production
+     release. 
+
+* Adopted $VERSION checking via .xs and DynaLoader.
+* Added checks to toplevel Makefile.PL for installed perl5.002.
+* Changed gettimeofday() calls to #define in tkPort.h - as yet 
+  no 'configure' test for right prototype.
+
+* Edited (previously non-distributed) doc/man* directories so that doc/*.ht 
+  relates to perl/Tk rather than Tcl/Tk.
+  May have missed some changes - proof reading by users requested ;-)
+
+* Changed Tk::BackgroundError to Tk::Error, allows C API BackgroundError 
+  to be used and makes documentation read better.
+
+* Cleaned up and adopted Steves mkmenu from Menubar2 as $menu-&gt;AddItems
+  and incoprorated into Menu's create process. 
+  Can now say $parent-&gt;Menu(-menuitems =&gt; [...]);
+  Can also also use method $menu-&gt;AddItems([...]) post creation.
+
+- pre testing occured here 
+
+* Fixed various build problems.
+
+* Removed lingering debug. 
+
+* Changed ConfigSpecs to handle 'aliases' e.g. -fg for -foreground
+  in a manner more like core widgets.
+
+* Implemented Tk::Widget::after as a wrapper on core Tk::after.
+  Auto-cancels afters when widget is destroyed.
+
+* Hook for above $widget-&gt;OnDestroy(callback) is also available for general
+  use. Arranges for callback to be called just before widget is destroyed.
+  Note that unlike bind('<Destroy>',...) the widget methods are still 
+  available. For example this allows Text to save modified contents.
+
+
+-- 
+This article was gatewayed from the ptk@guest.wpi.edu mailing list.
+Problems? refay@carbon.cudenver.edu. Subscriptions: majordomo@guest.wpi.edu
+</PRE>
+<HR><H2>[PREV]  <A HREF="news:199603240132.UAA21379@Turkey.CC.Lehigh.EDU">[NEXT]</A>  <A HREF="news:9603231711.AA03137@alconbury.tiuk.ti.com">[PREV Thread]</A>  <A HREF="news:ANDREAS.96Mar24234521@marvin.berlin.de">[NEXT Thread]</A>  <A HREF="news:comp.lang.perl.tk">[Index]</A>  </H2>
+</BODY></HTML>

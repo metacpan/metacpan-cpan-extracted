@@ -1,0 +1,77 @@
+: comp.lang.perl.misc: Re: Q: Portable perl scripts
+***************************************************
+
+Larry W. Virden, x2487 (lvirden@cas.org)
+Thu, 3 Aug 95 08:54:34 EDT 
+
+ o Messages sorted by: [ date ][ thread ][ subject ][ author ] 
+ o Next message: Rick Poleshuck: "BIFF in TK" 
+ o Previous message: Tim Bunce: "Re: Newsgroup names" 
+
+Newsgroups: comp.lang.perl.misc
+Path:
+chemabs!malgudi.oar.net!news.sprintlink.net!cs.utexas.edu!usc!news.cerf.net!netlabs!lwall
+From: lwall@netlabs.com (Larry Wall)
+Subject: Re: Q: Portable perl scripts
+Message-ID: <1995Jul31.013759.22767@netlabs.com>
+Organization: NetLabs, Inc., Los Altos, California.
+References: <3uur5f$22r@agate.berkeley.edu>
+Date: Mon, 31 Jul 1995 01:37:59 GMT
+Lines: 45
+
+In article <3uur5f$22r@agate.berkeley.edu>,
+Chad Owen Yoshikawa <chad@whenever.CS.Berkeley.EDU> wrote:
+: 
+: I've read how to create 'portable' perl scripts, but the solutions
+: so far don't seem to work. For example, 
+:
+-------------------------------------------------------------------
+: #!/bin/sh -- Just another perl hacker
+: 
+: eval 'exec perl -S $0 "$@"'
+: if $running_some_shell;
+: 
+: print "hello world";
+:
+-------------------------------------------------------------------
+: 
+: Gives me 'Illegal variable name'. What appears to be happening is
+: that the current shell I'm running, tcsh, is being called to 
+: execute the script instead of /bin/sh. Since tcsh doesn't
+: understand $@, the script fails. So if I remove the first line,
+: /bin/sh is forced to execute the script and everything is fine. (It
+: also works if I change the $@ to $* which tcsh understands.)
+: 
+: But why is /bin/sh not executing the script? I'm fairly
+: certain that the "-- Just another perl hacker" is the culprit -- this
+: is what is causing the script to be executed by my current shell, 
+: although I don't understand why. The "--" should be the first arg to
+: /bin/sh and the rest should be ignored. Any explanation would be
+: appreciated,
+
+No, it's probably the # on the first line. On some systems that don't
+know about the #! hack, csh scripts are distinguished from sh scripts
+by whether the first line starts with #.
+
+Here's a more complete multilanguage hack for startup. The first line
+is for SCO systems that get the mean of && and || wrong. The second
+line is for sh, and the third line is for csh and variants.
+
+#!/bin/sh -a # perl, really
+
+"true" || eval 'exec /usr/bin/perl -S $0 $argv:q';
+eval '(exit $?0)' && eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
+& eval 'exec /usr/bin/perl -S $0 $argv:q'
+if 0;
+
+Larry
+
+-- 
+Larry W. Virden                 INET: lvirden@cas.org
+My new WWW home is coming...
+Unless explicitly stated to the contrary, nothing in this posting should 
+be construed as representing my employer's opinions.
+
+ o Next message: Rick Poleshuck: "BIFF in TK" 
+ o Previous message: Tim Bunce: "Re: Newsgroup names" 
+

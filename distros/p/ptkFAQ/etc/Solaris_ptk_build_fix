@@ -1,0 +1,116 @@
+From lns62::pvhp Thu Mar  7 23:12:06 1996
+Received: from cesr20.lns.cornell.edu (cesr20.lns.cornell.edu [128.84.170.20]) by lns598.lns.cornell.edu (8.6.11/8.6.11)
+	with ESMTP id XAA29981 for <pvhp>; Thu, 7 Mar 1996 23:12:03 -0500
+From: lns62::pvhp
+Received: from LNS62.DECnet MAIL11D_V3 (daemon@localhost) by cesr20.lns.cornell.edu (8.6.11/8.6.11) with SMTP id RAA24177 for <pvhp>; Thu, 7 Mar 1996 17:48:20 -0500
+Date: Thu, 7 Mar 1996 17:48:20 -0500
+Message-Id: <199603072248.RAA24177@cesr20.lns.cornell.edu>
+X-Authentication-Warning: cesr20.lns.cornell.edu: daemon owned process doing -bs
+To: cesr20::pvhp
+Subject: solaris ptk
+Status: R
+
+From:	IN%"Rajesh.Godbole@corp.sun.com"  7-MAR-1996 16:11:05.14
+To:	IN%"tbaca@wsmr-helstf1.army.mil", IN%"nik@tiuk.ti.com"
+CC:	IN%"ptk@guest.WPI.EDU"
+Subj:	RE: can't build Tk-b9.01 on Solaris 2.5
+
+Return-path: <owner-ptk@guest.WPI.EDU>
+Received: from guest.WPI.EDU by LNS62.LNS.CORNELL.EDU (PMDF V4.3-13 #13710)
+ id <01I22A9QG1DS8X1QRQ@LNS62.LNS.CORNELL.EDU>; Thu,
+ 07 Mar 1996 16:10:55 -0500 (EST)
+Received: (from majordom@localhost) by guest.WPI.EDU (8.7.3/8.7.3)
+ id OAA19857 for ptk-outgoing; Thu, 7 Mar 1996 14:45:22 -0500
+Received: from mercury.Sun.COM (mercury.Sun.COM [192.9.25.1])
+ by guest.WPI.EDU (8.7.3/8.7.3) with SMTP id OAA19852 for <ptk@guest.WPI.EDU>;
+ Thu, 7 Mar 1996 14:45:14 -0500
+Received: by mercury.Sun.COM (Sun.COM) id LAA23165; Thu,
+ 7 Mar 1996 11:45:56 -0800
+Received: from aries.Corp.Sun.COM by Corp.Sun.COM (5.x/SMI-5.3)
+ id AA19150; Thu, 7 Mar 1996 11:45:52 -0800
+Received: by aries.Corp.Sun.COM (SMI-8.6/SMI-SVR4) id LAA06366; Thu,
+ 7 Mar 1996 11:44:43 -0800
+Date: Thu, 07 Mar 1996 11:44:43 -0800
+From: Rajesh.Godbole@corp.sun.com (Rajesh Godbole)
+Subject: Re: can't build Tk-b9.01 on Solaris 2.5
+Sender: owner-ptk@guest.WPI.EDU
+To: tbaca@wsmr-helstf1.army.mil, nik@tiuk.ti.com
+Cc: ptk@guest.WPI.EDU
+Message-id: <199603071944.LAA06366@aries.Corp.Sun.COM>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-transfer-encoding: 7bit
+Content-MD5: teIMMKdX5tfzefgdE5Sjsw==
+Precedence: bulk
+
+
+#> Quick fix is to hack pTk/tkPort.h to remove offending declaration.
+#> (Which is there to keep gcc quiet on machines like older-solarises 
+#>  which ommited proto!)
+
+Or, define -D_SVID_GETTOD when building perl.  makemaker will 
+automatically recognize this flag for building ptk. You will
+also need to add the following define in Makefile.PL:
+
+$define .= " -DTIMEOFDAY_NO_TZ=\\\"1\\\"";
+
+-rajesh
+
+Paradise is exactly where you are right now, only much, much, better.
+			- Laurie Anderson
+
+
+------------- Begin Included Message -------------
+
+>From owner-ptk@guest.WPI.EDU  Thu Mar  7 10:53:46 1996
+Date: Thu, 7 Mar 96 18:35:49 GMT
+To: tbaca@wsmr-helstf1.army.mil
+Cc: ptk@guest.WPI.EDU
+From: Nick Ing-Simmons <nik@tiuk.ti.com>
+Subject: Re: can't build Tk-b9.01 on Solaris 2.5
+
+In <199603071805.LAA01627@wsmr-helstf1>
+On Thu, 7 Mar 1996 11:05:34 -0700
+Thomas L Baca <tbaca@wsmr-helstf1.army.mil> writes:
+>From looking through the archives, it seems that building this in
+>Solaris should be straight-forward.  Unfortunately, my build bombs
+>with:
+>
+>   .
+>   .
+>   .
+>cd pTk; make  libpTk.a
+>make[1]: Entering directory `/data2/home/tbaca/packages/work/Tk-b9.01/pTk'
+>gcc -c -I/usr/openwin/include -I. -I/usr/local/include -I/opt/gnu/include -O 
+-DVERSION=\"0.10\" -DXS_VERSION=\"0.10\" -fPIC -I/usr/local/lib/CORE 
+-DBASEEXT=\"pTk\" -DNTK_VERSION=\"b9.01\" -DUSE_PROTO -DHAVE_UNISTD_H 
+-DHAVE_SYS_SELECT_H -DHAVE_SYS_TIME_H -DHAVE_LIMITS_H "-DSELECT_MASK=fd_set" 
+-DANSI_SIGNED_CHAR -Wall -Wno-comment -Wno-unused -MMD 
+-D__USE_FIXED_PROTOTYPES__ Lang_f.c
+>In file included from Lang.h:34,
+>                 from Lang_f.c:1:
+>tkPort.h:224: conflicting types for `gettimeofday'
+>/usr/include/sys/time.h:263: previous declaration of `gettimeofday'
+>make[1]: *** [Lang_f.o] Error 1
+>make[1]: Leaving directory `/data2/home/tbaca/packages/work/Tk-b9.01/pTk'
+>make: *** [pTk/libpTk.a] Error 2
+>
+>
+>I'm using gcc 2.6.0 on Solaris 2.5.  What did I do wrong?
+
+Solaris2.5 added a prototype for gettimeofday() which conflicts with 
+one Tk uses. (Earlier Solarises avoided a prototype to allow BSDish
+code to compile.)
+
+This is fixed in Tk-b10, if I can ever get it out the door...
+
+Quick fix is to hack pTk/tkPort.h to remove offending declaration.
+(Which is there to keep gcc quiet on machines like older-solarises 
+ which ommited proto!)
+
+(I would also recommend gcc-2.7.2 - I had problems with 2.6.0 
+ on Solaris. gcc-2.6.3 fixed them I think but Tk is now 
+ developed on gcc-2.7.2...)
+
+------------- End Included Message -------------
+

@@ -1,0 +1,23 @@
+### perl: poros/code/nrid
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Vulcan::OptConf;
+
+my %seco;
+
+BEGIN { %seco = Vulcan::OptConf->load()->dump( 'seco' ) }
+
+use lib $seco{lib};
+use SECO::Engine::Access;
+
+return sub
+{
+    my %param = @_;
+    my $nrid = SECO::Engine::Access->new()->nrid( @{ $param{argv} } );
+
+    YAML::XS::DumpFile \*STDOUT, $nrid;
+    return 0;
+};

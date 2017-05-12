@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+
+use Hermes;
+use Hermes::DBI::Root;
+use Vulcan::OptConf;
+use Vulcan::Sudo;
+
+Vulcan::Sudo->sudo();
+
+$| ++;
+$/ = undef;
+
+$Vulcan::OptConf::THIS = 'hermes';
+
+=head1 SYNOPSIS
+
+Load YAML data into hermes databases.
+
+ $0 [input-file] [--quiet] [--filter '{cluster1: [table1,table2], ..}']
+
+=cut
+my %o = Vulcan::OptConf->load()->get( qw( quiet filter=s ) )->dump();
+my $range = Hermes->new();
+my $filter = $o{filter} ? YAML::XS::Load $o{filter} : {};
+
+while ( my ( $cluster, $table ) = each %$filter )
+{
+    my $ref = ref $table;
+    $table = $ref ? next : [ $table ] if $ref ne 'ARRAY';
+    $filter->{$cluster} = { map { $_ => 1 } @$table };
+}
+
+for my $input ( YAML::XS::Load( <> ) )
+{
+    my $error = "not HASH\n";
+
+    die $error if ref $input ne 'HASH';
+    map { die "$_: $error" if ref $input->{$_} ne 'HASH' } keys %$input;
+
+    while ( my ( $cluster, $input ) = each %$input )
+    {
+        next unless my $filter = %$filter ? $filter->{$cluster} : {};
+
+        my $db = Hermes::DBI::Root
+            ->new( File::Spec->join( $o{root}, $cluster ) );
+
+        while ( my ( $table, $input ) = each %$input )
+        {
+            next if %$filter && ! $filter->{$table};
+
+            warn "$cluster: $table\n" unless $o{quiet};
+            $db->create( $table );
+
+            while ( my ( $key, $val ) = each %$input )
+            {
+                map { $db->insert( $table, $_, $val ) }
+                    $range->load( $key )->list();
+            }
+        }
+    }
+}
+
+exit 0;

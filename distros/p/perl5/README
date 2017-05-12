@@ -1,0 +1,122 @@
+NAME
+    perl5 - Use a Perl 5 group of modules/features
+
+SYNOPSIS
+    Use a version of Perl and its feature set:
+
+        use perl5;      # Same as 'use perl5 v5.10.0;'
+        use perl5 v14.1;
+        use perl5 14.1;
+        use perl5-14.1;
+
+    Use a bundled feature set from a "perl5" plugin:
+
+        use perl5-i;
+        use perl5-2i;
+        use perl5-modern;
+        use perl5-yourShinyPlugin;
+
+    Or both:
+
+        use perl5 v14.1 -shiny;
+
+DESCRIPTION
+    The "perl5" module lets you "use" a well known set of modules in one
+    command.
+
+    It allows people to create plugins like "perl5::foo" and "perl5::bar"
+    that are sets of useful modules that have been tested together and are
+    known to create joy.
+
+    This module, "perl5", is generally the base class to such a plugin.
+
+USAGE
+    This:
+
+        use perl5-foo;
+
+    Is equivalent in Perl to:
+
+        use perl5 '-foo';
+
+    The "perl5" module takes the first argument in the "use" command, and
+    uses it to find a plugin, like "perl5::foo" in this case.
+
+    "perl5::foo" is typically just a subclass of perl5. It invokes a set of
+    modules for its caller.
+
+    If you use it with a version, like this:
+
+        use perl5 v14;
+
+    It is the same as saying:
+
+        use v5.14;
+        use strict;
+        use warnings;
+        use feature ':5.14';
+
+    If you use "perl5" with no arguments, like this:
+
+        use perl5;
+
+    It is the same as saying:
+
+        use perl5 v10;
+
+PLUGIN API
+    This module uses lexically-wrapped-goto-chaining-magic to correctly load
+    a set of modules (including optional version requirements and import
+    options) into the user's code. The API for specifying a perl5 plugin is
+    very simple.
+
+    To create a plugin called "perl5::foo" that gets called like this:
+
+        use perl5-foo;
+
+    Write some code like this:
+
+        package perl5::foo;
+        use base 'perl5';
+        our $VERSION = 0.12;
+
+        # These is the list of modules (with optional version and arguments)
+        sub imports {
+            return (
+                strict =>
+                warnings =>
+                features => [':5.10'],
+                SomeModule => 0.22,
+                OtherModule => 0.33, [option1 => 2],
+                Module => [],   # Don't invoke Module's import() method
+            );
+        }
+
+        1;
+
+INSPIRATION
+    This module was inspired by Michael Schwern's perl5i, and the talk he
+    gave about it at the 2010 OSDC in Melbourne. By "inspired" I mean that I
+    was perturbed by Schwern's non-TMTOWTDI attitude towards choosing a
+    standard set of Perl modules for all of us.
+
+    THIS IS PERL! THERE ARE NO STANDARDS!
+
+    ...and I told him so. I also promised that I would show him my feelings
+    in code. Schwern, *this* is how I feel! (See also: perl5::i)
+
+THANKS
+    Special thanks to schwern, mstrout, audreyt, rodrigo and jesse for ideas
+    and support.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2011-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,80 @@
+[PREV] [NEXT] [PREV Thread] [NEXT Thread] [Index] 
+==================================================
+
+
+bortzmeyer@pasteur.fr (Stephane Bortzmeyer) 
+
+May I create objects in any order?
+**********************************
+
+30 Nov 1995 17:48:21 GMT Institut Pasteur, Paris, France 
+
+Newsgroups: 
+   comp.lang.perl.tk 
+
+
+
+The problem: I have a program which works or not, depending on the 
+*creation* order of the objects.
+
+Here is a working version. It displays just the button:
+
+---------------------------------
+
+#!/usr/local/bin/perl -w
+
+require 5.001;
+use Tk;
+use strict;
+
+my $top_window = MainWindow->new;
+
+my $top_frame = $top_window->Frame (-background => 'red');
+
+my $button = $top_window->Button(-text => "Button Foobar");
+
+$top_frame->pack;
+
+$button->pack (-in => $top_frame);
+
+MainLoop;
+
+---------------------------------
+
+Here is the pathological version: I don't see the button, just the
+red background. The only difference with above is the order of 
+creation between the button and the frame. The packing order is 
+the same.
+
+---------------------------------
+
+#!/usr/local/bin/perl -w
+
+require 5.001;
+use Tk;
+use strict;
+
+my $top_window = MainWindow->new;
+
+my $button = $top_window->Button(-text => "Button Foobar");
+
+my $top_frame = $top_window->Frame (-background => 'red');
+
+$top_frame->pack;
+
+$button->pack (-in => $top_frame);
+
+MainLoop;
+
+----------------------------------
+
+Is it a bug or did I really understood nothing about the 
+packer? (IMHO, the two programs should behave the same.)
+
+Perl/TK 0.8 on an Alpha with OSF1 3.2. 
+
+
+
+[PREV] [NEXT] [PREV Thread] [NEXT Thread] [Index] 
+==================================================
+

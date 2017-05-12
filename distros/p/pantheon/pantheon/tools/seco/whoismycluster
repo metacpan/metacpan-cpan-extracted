@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use Sys::Hostname;
+
+use Hermes;
+use Vulcan::OptConf;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 [list of nodes]
+
+=cut
+my ( $option, %seco );
+BEGIN { $option = Vulcan::OptConf->load(); %seco = $option->dump( 'seco' ); }
+
+use lib $seco{lib};
+use SECO::Conf::Auto;
+
+my $range = Hermes->new( $option->dump( 'range') );
+my $db = $range->db;
+my ( %node, %cluster ) = SECO::Conf::Auto->new( $seco{conf} )->search
+(
+    @ARGV ? map { $range->load( $_ )->list } @ARGV : Sys::Hostname::hostname()
+);
+
+for my $node ( keys %node )
+{
+    if ( my @info = @{ $node{$node} } )
+    {
+        push @{ $cluster{seco}{ $info[0] . $info[2] . '@' . $info[1] } }, $node;
+        delete $node{$node};
+    }
+
+    if ( my @cluster = $db->select( 'name', node => [ 1, $node ] ) )
+    {
+        map { push @{ $cluster{hermes}{$_} }, $node } map { @$_ } @cluster;
+        delete $node{$node};
+    }
+}
+
+$cluster{unknown}{unknown} = [ keys %node ] if %node;
+
+for my $cluster ( values %cluster )
+{
+    map { $cluster->{$_} = $range->load( $cluster->{$_} )->dump } keys %$cluster
+}
+
+YAML::XS::DumpFile \*STDOUT, \%cluster;
+exit 0;
